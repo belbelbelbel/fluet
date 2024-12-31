@@ -26,9 +26,8 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-gray-900/80 backdrop-blur-md" : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-gray-900/80 backdrop-blur-md" : "bg-transparent"
+        }`}
     >
       <nav className="container mx-auto px-4 sm:px-8 py-4 sm:py-6">
         <div className="flex flex-wrap justify-between items-center max-w-6xl mx-auto">
@@ -51,9 +50,8 @@ export function Navbar() {
             )}
           </button>
           <div
-            className={`w-full sm:w-auto ${
-              isMenuOpen ? "block" : "hidden"
-            } sm:block mt-4 sm:mt-0`}
+            className={`w-full sm:w-auto ${isMenuOpen ? "block" : "hidden"
+              } sm:block mt-4 sm:mt-0`}
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-8">
               {["Features", "Pricing", "Docs"].map((item) => (
@@ -63,7 +61,7 @@ export function Navbar() {
                   className="text-gray-300 hover:text-white transition-colors py-2 sm:py-0 relative group"
                 >
                   {item}
-                  <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                  <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left">l</span>
                 </Link>
               ))}
               {userId && (
