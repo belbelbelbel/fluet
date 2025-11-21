@@ -1,5 +1,5 @@
 import { db } from "./dbConfig"
-import { eq, sql, desc } from "drizzle-orm"
+import { eq, sql, desc, and, gte, lte } from "drizzle-orm"
 import { GeneratedContent, Users, Subscription } from "./schema"
 import { sendWelcomeEmail } from "./mailtrap"
 
@@ -81,12 +81,15 @@ export const GetUserGeneratedContent = async (userId: number, limit: number = 10
     }
 };
 
-// Save generated content
+// Save generated content with customization
 export const SaveGeneratedContent = async (
     userId: number,
     prompt: string,
     content: string,
-    contentType: string
+    contentType: string,
+    tone?: string,
+    style?: string,
+    length?: string
 ) => {
     try {
         const [savedContent] = await db
@@ -96,6 +99,9 @@ export const SaveGeneratedContent = async (
                 prompt,
                 content,
                 contentType,
+                tone: tone || null,
+                style: style || null,
+                length: length || null,
             })
             .returning()
             .execute();
@@ -103,5 +109,52 @@ export const SaveGeneratedContent = async (
     } catch (error) {
         console.error(`[SaveGeneratedContent] Error encountered:`, error);
         throw new Error("Failed to save generated content");
+    }
+};
+
+// Get user's active subscription
+export const GetUserSubscription = async (userId: number) => {
+    try {
+        const [subscription] = await db
+            .select()
+            .from(Subscription)
+            .where(
+                and(
+                    eq(Subscription.userid, userId),
+                    eq(Subscription.canceldate, false)
+                )
+            )
+            .orderBy(desc(Subscription.startdate))
+            .limit(1)
+            .execute();
+        return subscription || null;
+    } catch (error) {
+        console.error(`[GetUserSubscription] Error encountered:`, error);
+        return null;
+    }
+};
+
+// Get user's usage count for current month
+export const GetUserUsageCount = async (userId: number) => {
+    try {
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const result = await db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(GeneratedContent)
+            .where(
+                and(
+                    eq(GeneratedContent.userId, userId),
+                    gte(GeneratedContent.createdAt, startOfMonth)
+                )
+            )
+            .execute();
+
+        return Number(result[0]?.count) || 0;
+    } catch (error) {
+        console.error(`[GetUserUsageCount] Error encountered:`, error);
+        return 0;
     }
 };

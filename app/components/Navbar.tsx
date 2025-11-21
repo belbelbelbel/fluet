@@ -61,17 +61,26 @@ export function Navbar() {
                   className="text-gray-300 hover:text-white transition-colors py-2 sm:py-0 relative group"
                 >
                   {item}
-                  <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left">l</span>
+                  <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                 </Link>
               ))}
               {userId && (
-                <Link
-                  href="/generate"
-                  className="text-gray-300 hover:text-white transition-colors py-2 sm:py-0 relative group"
-                >
-                  Dashboard
-                  <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                </Link>
+                <>
+                  <Link
+                    href="/generate"
+                    className="text-gray-300 hover:text-white transition-colors py-2 sm:py-0 relative group"
+                  >
+                    Generate
+                    <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                  </Link>
+                  <Link
+                    href="/history"
+                    className="text-gray-300 hover:text-white transition-colors py-2 sm:py-0 relative group"
+                  >
+                    History
+                    <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                  </Link>
+                </>
               )}
               <SignedOut>
                 <SignInButton mode="modal">
