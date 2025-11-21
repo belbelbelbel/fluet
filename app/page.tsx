@@ -42,7 +42,7 @@ console.log("consoleId",userclerkid)
         {/* Hero Section */}
         <div className="text-center py-12 sm:py-20 lg:py-32 relative">
           <BotIcon className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500 mx-auto mb-4 sm:mb-6 animate-pulse" />
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 sm:mb-6 px-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl  font-extrabold mb-4 sm:mb-6 px-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
             AI-Powered Social Media Content Generator
           </h1>
           <p className="text-base sm:text-lg lg:text-xl mb-6 sm:mb-10 text-gray-300 max-w-2xl mx-auto px-4">
