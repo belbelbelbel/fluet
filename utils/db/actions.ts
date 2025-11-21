@@ -2,6 +2,7 @@ import { db } from "./dbConfig"
 import { eq, sql, desc } from "drizzle-orm"
 import { GeneratedContent, Users, Subscription } from "./schema"
 import { sendWelcomeEmail } from "./mailtrap"
+
 export const CreateOrUpdateUser = async (stripecustomerId: string, email: string, name: string) => {
 
     try {
@@ -44,5 +45,63 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
     catch (error) {
         console.error(`[CreateOrUpdateUser] Error encountered:`, error);
         throw new Error("Failed to create or update user");
+    }
+};
+
+// Get user by Clerk ID
+export const GetUserByClerkId = async (clerkUserId: string) => {
+    try {
+        const [user] = await db
+            .select()
+            .from(Users)
+            .where(eq(Users.stripecustomerId, clerkUserId))
+            .limit(1)
+            .execute();
+        return user;
+    } catch (error) {
+        console.error(`[GetUserByClerkId] Error encountered:`, error);
+        throw new Error("Failed to get user");
+    }
+};
+
+// Get generated content for a user
+export const GetUserGeneratedContent = async (userId: number, limit: number = 10) => {
+    try {
+        const content = await db
+            .select()
+            .from(GeneratedContent)
+            .where(eq(GeneratedContent.userId, userId))
+            .orderBy(desc(GeneratedContent.createdAt))
+            .limit(limit)
+            .execute();
+        return content;
+    } catch (error) {
+        console.error(`[GetUserGeneratedContent] Error encountered:`, error);
+        throw new Error("Failed to get generated content");
+    }
+};
+
+// Save generated content
+export const SaveGeneratedContent = async (
+    userId: number,
+    prompt: string,
+    content: string,
+    contentType: string
+) => {
+    try {
+        const [savedContent] = await db
+            .insert(GeneratedContent)
+            .values({
+                userId,
+                prompt,
+                content,
+                contentType,
+            })
+            .returning()
+            .execute();
+        return savedContent;
+    } catch (error) {
+        console.error(`[SaveGeneratedContent] Error encountered:`, error);
+        throw new Error("Failed to save generated content");
     }
 };

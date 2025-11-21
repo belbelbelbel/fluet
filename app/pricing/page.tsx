@@ -45,6 +45,7 @@ const pricingPlans = [
 export default function PricingPage() {
   const { isSignedIn, user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubscribe = async (priceId: string) => {
     if (!isSignedIn) {
@@ -69,15 +70,23 @@ export default function PricingPage() {
       }
 
       const { sessionId } = await response.json();
-      const stripe = await loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-      );
+      
+      const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+      if (!stripePublishableKey || stripePublishableKey.includes('your_stripe_publishable_key')) {
+        throw new Error("Stripe publishable key is not configured. Please set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in your .env.local file.");
+      }
+      
+      const stripe = await loadStripe(stripePublishableKey);
       if (!stripe) {
         throw new Error("Failed to load Stripe");
       }
       await stripe.redirectToCheckout({ sessionId });
     } catch (error) {
       console.error("Error creating checkout session:", error);
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+      setError(errorMessage);
+      // Clear error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     } finally {
       setIsLoading(false);
     }
@@ -90,6 +99,16 @@ export default function PricingPage() {
         <h1 className="text-5xl font-bold mb-12 text-center text-white">
           Pricing Plans
         </h1>
+        {error && (
+          <div className="max-w-6xl mx-auto mb-8 p-4 bg-red-900/50 border border-red-500 rounded-lg text-red-200">
+            <p className="font-semibold">Error: {error}</p>
+            {error.includes("not configured") && (
+              <p className="text-sm mt-2">
+                Please check your .env.local file and ensure NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is set with a valid Stripe key (starts with pk_test_ or pk_live_).
+              </p>
+            )}
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {pricingPlans.map((plan, index) => (
             <div
