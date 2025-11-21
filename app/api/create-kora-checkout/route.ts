@@ -1,6 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+// Mark route as dynamic
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     // Authenticate the user

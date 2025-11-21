@@ -2,6 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, SaveGeneratedContent, GetUserSubscription, GetUserUsageCount } from "@/utils/db/actions";
 
+// Mark route as dynamic
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     // Authenticate the user
@@ -71,8 +74,7 @@ export async function POST(req: Request) {
           monthlyLimit = 0; // No subscription
       }
     }
-
-    // Check if user has reached limit
+    
     if (usageCount >= monthlyLimit) {
       return NextResponse.json(
         { 
@@ -153,7 +155,6 @@ async function generateAIContent(
     long: "detailed (300+ words)"
   }[length] || "medium length";
 
-  // Placeholder content templates (replace with actual AI integration)
   const baseContent: Record<string, string> = {
     twitter: `🧵 Thread: ${prompt}\n\n1/ Here's an engaging thread about this topic...\n\n2/ Let me break this down further...\n\n3/ The key takeaway is...\n\n#Thread #AI #Content`,
     instagram: `✨ ${prompt}\n\nThis is a captivating caption that engages your audience and tells a story. Use relevant hashtags and emojis to boost engagement! 📸\n\n#Instagram #Content #SocialMedia`,

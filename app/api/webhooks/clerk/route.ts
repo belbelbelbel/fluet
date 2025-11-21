@@ -3,6 +3,9 @@ import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { CreateOrUpdateUser } from '@/utils/db/actions';
 
+// Mark route as dynamic
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET;
 
@@ -38,8 +41,6 @@ export async function POST(req: Request) {
       const { id, email_addresses, first_name, last_name } = evt.data
       const email = email_addresses[0]?.email_address
       const name = `${first_name}  ${last_name}`
-      
-
       if (email) {
      
         try {

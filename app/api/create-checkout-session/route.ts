@@ -2,8 +2,11 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+// Mark route as dynamic
+export const dynamic = "force-dynamic";
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-11-20.acacia",
+  apiVersion: "2025-11-17.clover",
 });
 
 export async function POST(req: Request) {
@@ -45,7 +48,6 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
     // Get the base URL for success and cancel URLs
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
                     (req.headers.get("origin") || "http://localhost:3000");
@@ -68,7 +70,6 @@ export async function POST(req: Request) {
         userId: userId,
       },
     });
-
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {
     console.error("Error creating checkout session:", error);

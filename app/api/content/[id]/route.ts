@@ -5,6 +5,9 @@ import { GeneratedContent } from "@/utils/db/schema";
 import { eq } from "drizzle-orm";
 import { GetUserByClerkId } from "@/utils/db/actions";
 
+// Mark route as dynamic
+export const dynamic = "force-dynamic";
+
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } }
@@ -30,7 +33,6 @@ export async function DELETE(
 
     const contentId = parseInt(params.id);
 
-    // Verify content belongs to user
     const [content] = await db
       .select()
       .from(GeneratedContent)
@@ -52,7 +54,6 @@ export async function DELETE(
       );
     }
 
-    // Delete content
     await db
       .delete(GeneratedContent)
       .where(eq(GeneratedContent.id, contentId))

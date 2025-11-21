@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { CheckIcon, BotIcon, ZapIcon, SparklesIcon, TrendingUpIcon, GlobeIcon, CreditCardIcon } from "lucide-react";
 
 import { useUser } from "@clerk/nextjs";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Navbar } from "../components/Navbar";
 
@@ -55,7 +55,17 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showPaymentOptions, setShowPaymentOptions] = useState<string | null>(null);
 
-  const handlePlanSelect = (priceId: string | null) => {
+  const planMap = useMemo(() => {
+    const map = new Map<string, { name: string; price: string }>();
+    pricingPlans.forEach(plan => {
+      if (plan.priceId) {
+        map.set(plan.priceId, { name: plan.name, price: plan.price });
+      }
+    });
+    return map;
+  }, []);
+
+  const handlePlanSelect = useCallback((priceId: string | null) => {
     if (!priceId) {
       // Enterprise plan - contact sales
       return;
@@ -68,15 +78,17 @@ export default function PricingPage() {
     setSelectedPlan(priceId);
     setSelectedProvider(null); // Reset provider selection
     setError(null);
-  };
+  }, [isSignedIn]);
 
-  const handleSubscribe = async (priceId: string, provider: PaymentProvider) => {
+  const handleSubscribe = useCallback(async (priceId: string, provider: PaymentProvider) => {
     if (!isSignedIn || !provider) {
       return;
     }
 
     setIsLoading(true);
     setError(null);
+
+    const planInfo = planMap.get(priceId) || { name: "Unknown", price: "0" };
 
     try {
       const endpoint = provider === "stripe" 
@@ -91,8 +103,8 @@ export default function PricingPage() {
         body: JSON.stringify({
           priceId,
           userId: user?.id,
-          planName: pricingPlans.find(p => p.priceId === priceId)?.name || "Unknown",
-          amount: pricingPlans.find(p => p.priceId === priceId)?.price || "0",
+          planName: planInfo.name,
+          amount: planInfo.price,
         }),
       });
 
@@ -134,7 +146,13 @@ export default function PricingPage() {
       setShowPaymentOptions(null);
       setSelectedProvider(null);
     }
-  };
+  }, [isSignedIn, user?.id, planMap]);
+
+  const handleCancel = useCallback(() => {
+    setShowPaymentOptions(null);
+    setSelectedPlan(null);
+    setSelectedProvider(null);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b pt-20 from-black to-gray-900 text-gray-100">
@@ -236,11 +254,7 @@ export default function PricingPage() {
                     </div>
                     <div className="flex gap-2">
                       <Button
-                        onClick={() => {
-                          setShowPaymentOptions(null);
-                          setSelectedPlan(null);
-                          setSelectedProvider(null);
-                        }}
+                        onClick={handleCancel}
                         variant="outline"
                         className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
                       >

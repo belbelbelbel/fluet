@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
 import { Navbar } from "../components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ type Style = "concise" | "detailed" | "storytelling" | "list-based";
 type Length = "short" | "medium" | "long";
 
 export default function GeneratePage() {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
   const { userId } = useAuth();
   const [contentType, setContentType] = useState<ContentType>("twitter");
   const [prompt, setPrompt] = useState("");
@@ -40,18 +40,7 @@ export default function GeneratePage() {
   const [showPreview, setShowPreview] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!isSignedIn) {
-    return (
-      <div className="min-h-screen bg-black text-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Please sign in to continue</h1>
-          <p className="text-gray-400">You need to be signed in to generate content.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const handleGenerate = async () => {
+  const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) {
       setError("Please enter a topic or prompt");
       return;
@@ -90,22 +79,22 @@ export default function GeneratePage() {
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [prompt, contentType, tone, style, length, userId]);
 
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
     if (generatedContent) {
       await navigator.clipboard.writeText(generatedContent);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     }
-  };
+  }, [generatedContent]);
 
-  const handleRegenerate = () => {
+  const handleRegenerate = useCallback(() => {
     setGeneratedContent("");
     handleGenerate();
-  };
+  }, [handleGenerate]);
 
-  const getContentTypeIcon = (type: ContentType) => {
+  const getContentTypeIcon = useCallback((type: ContentType) => {
     switch (type) {
       case "twitter":
         return <TwitterIcon className="w-5 h-5" />;
@@ -116,9 +105,9 @@ export default function GeneratePage() {
       case "tiktok":
         return <MusicIcon className="w-5 h-5" />;
     }
-  };
+  }, []);
 
-  const getContentTypeLabel = (type: ContentType) => {
+  const getContentTypeLabel = useCallback((type: ContentType) => {
     switch (type) {
       case "twitter":
         return "Twitter Thread";
@@ -129,17 +118,17 @@ export default function GeneratePage() {
       case "tiktok":
         return "TikTok Content";
     }
-  };
+  }, []);
 
-  const renderPreview = () => {
+  const previewStyles = useMemo<Record<ContentType, string>>(() => ({
+    twitter: "bg-white text-black p-4 rounded-lg max-w-md mx-auto",
+    instagram: "bg-gradient-to-br from-purple-500 to-pink-500 text-white p-6 rounded-lg max-w-md mx-auto",
+    linkedin: "bg-blue-50 text-gray-900 p-6 rounded-lg max-w-2xl mx-auto",
+    tiktok: "bg-black text-white p-4 rounded-lg max-w-sm mx-auto",
+  }), []);
+
+  const renderPreview = useMemo(() => {
     if (!generatedContent) return null;
-
-    const previewStyles: Record<ContentType, string> = {
-      twitter: "bg-white text-black p-4 rounded-lg max-w-md mx-auto",
-      instagram: "bg-gradient-to-br from-purple-500 to-pink-500 text-white p-6 rounded-lg max-w-md mx-auto",
-      linkedin: "bg-blue-50 text-gray-900 p-6 rounded-lg max-w-2xl mx-auto",
-      tiktok: "bg-black text-white p-4 rounded-lg max-w-sm mx-auto",
-    };
 
     return (
       <div className={`${previewStyles[contentType]} shadow-xl`}>
@@ -149,7 +138,23 @@ export default function GeneratePage() {
         </div>
       </div>
     );
-  };
+  }, [generatedContent, contentType, previewStyles, getContentTypeLabel]);
+
+  const contentTypes = useMemo(() => (["twitter", "instagram", "linkedin", "tiktok"] as ContentType[]), []);
+  const tones = useMemo(() => (["professional", "casual", "funny", "inspiring", "educational"] as Tone[]), []);
+  const styles = useMemo(() => (["concise", "detailed", "storytelling", "list-based"] as Style[]), []);
+  const lengths = useMemo(() => (["short", "medium", "long"] as Length[]), []);
+
+  if (!isSignedIn) {
+    return (
+      <div className="min-h-screen bg-black text-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Please sign in to continue</h1>
+          <p className="text-gray-400">You need to be signed in to generate content.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-20 bg-gradient-to-b from-black to-gray-900 text-gray-100">
@@ -175,7 +180,7 @@ export default function GeneratePage() {
               Select Platform
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-              {(["twitter", "instagram", "linkedin", "tiktok"] as ContentType[]).map((type) => (
+              {contentTypes.map((type) => (
                 <button
                   key={type}
                   onClick={() => setContentType(type)}
@@ -234,7 +239,7 @@ export default function GeneratePage() {
                     Tone
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                    {(["professional", "casual", "funny", "inspiring", "educational"] as Tone[]).map((t) => (
+                    {tones.map((t) => (
                       <button
                         key={t}
                         onClick={() => setTone(t)}
@@ -256,7 +261,7 @@ export default function GeneratePage() {
                     Style
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {(["concise", "detailed", "storytelling", "list-based"] as Style[]).map((s) => (
+                    {styles.map((s) => (
                       <button
                         key={s}
                         onClick={() => setStyle(s)}
@@ -278,7 +283,7 @@ export default function GeneratePage() {
                     Length
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {(["short", "medium", "long"] as Length[]).map((l) => (
+                    {lengths.map((l) => (
                       <button
                         key={l}
                         onClick={() => setLength(l)}
@@ -378,7 +383,7 @@ export default function GeneratePage() {
               {/* Preview */}
               {showPreview && (
                 <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                  {renderPreview()}
+                  {renderPreview}
                 </div>
               )}
 

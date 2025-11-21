@@ -10,8 +10,6 @@ import {
   ZapIcon,
   TrendingUpIcon,
   CheckCircleIcon,
-  Wand2Icon,
-  FileTextIcon,
   EyeIcon,
 } from "lucide-react";
 import Link from "next/link";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
 import { Navbar } from "../components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -38,13 +38,7 @@ export default function HistoryPage() {
   const [filter, setFilter] = useState<ContentType | "all">("all");
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (isSignedIn && userId) {
-      fetchContent();
-    }
-  }, [isSignedIn, userId, filter]);
-
-  const fetchContent = async () => {
+  const fetchContent = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/content?filter=${filter}`);
@@ -57,15 +51,21 @@ export default function HistoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
-  const handleCopy = async (text: string, id: number) => {
+  useEffect(() => {
+    if (isSignedIn && userId) {
+      fetchContent();
+    }
+  }, [isSignedIn, userId, fetchContent]);
+
+  const handleCopy = useCallback(async (text: string, id: number) => {
     await navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
-  };
+  }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     if (!confirm("Are you sure you want to delete this content?")) return;
     
     try {
@@ -73,14 +73,14 @@ export default function HistoryPage() {
         method: "DELETE",
       });
       if (response.ok) {
-        setContent(content.filter((item) => item.id !== id));
+        setContent((prev) => prev.filter((item) => item.id !== id));
       }
     } catch (error) {
       console.error("Error deleting content:", error);
     }
-  };
+  }, []);
 
-  const getContentTypeIcon = (type: string) => {
+  const getContentTypeIcon = useCallback((type: string) => {
     switch (type) {
       case "twitter":
         return <TwitterIcon className="w-4 h-4 text-blue-400" />;
@@ -93,9 +93,9 @@ export default function HistoryPage() {
       default:
         return null;
     }
-  };
+  }, []);
 
-  const formatDate = (dateString: string) => {
+  const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -104,7 +104,9 @@ export default function HistoryPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
+  }, []);
+
+  const contentTypes = useMemo(() => (["twitter", "instagram", "linkedin", "tiktok"] as ContentType[]), []);
 
   if (!isSignedIn) {
     return (
@@ -147,7 +149,7 @@ export default function HistoryPage() {
               >
                 All
               </button>
-              {(["twitter", "instagram", "linkedin", "tiktok"] as ContentType[]).map((type) => (
+              {contentTypes.map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilter(type)}

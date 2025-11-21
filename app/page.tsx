@@ -5,17 +5,11 @@ import {
   InstagramIcon,
   LinkedinIcon,
   MusicIcon,
-  ArrowRightIcon,
   CheckCircleIcon,
   Wand2Icon,
-  TrendingUpIcon,
-  ZapIcon,
   BotIcon,
-  FileTextIcon,
   MessageSquareIcon,
 } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
-import { SignUpButton } from "@clerk/nextjs";
 import { Navbar } from "./components/Navbar";
 
 export default function Home() {

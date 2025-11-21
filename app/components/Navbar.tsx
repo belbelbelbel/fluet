@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   SignInButton,
   SignUpButton,
@@ -8,21 +9,36 @@ import {
   SignedIn,
   useAuth,
 } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Menu, X, Zap } from "lucide-react";
 
 export function Navbar() {
   const { userId } = useAuth();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  const handleScroll = useCallback(() => {
+    setIsScrolled(window.scrollY > 10);
   }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen((prev) => !prev);
+  }, []);
+
+  const navItems = useMemo(() => ["Features", "Pricing", "Docs"], []);
+
+  const isActive = useCallback((path: string) => {
+    if (path === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(path);
+  }, [pathname]);
 
   return (
     <header
@@ -41,7 +57,7 @@ export function Navbar() {
           </div>
           <button
             className="sm:hidden text-white focus:outline-none"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={toggleMenu}
           >
             {isMenuOpen ? (
               <X className="w-6 h-6" />
@@ -54,31 +70,59 @@ export function Navbar() {
               } sm:block mt-4 sm:mt-0`}
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-8">
-              {["Features", "Pricing", "Docs"].map((item) => (
-                <Link
-                  key={item}
-                  href={`/${item.toLowerCase()}`}
-                  className="text-gray-300 hover:text-white transition-colors py-2 sm:py-0 relative group"
-                >
-                  {item}
-                  <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                const href = `/${item.toLowerCase()}`;
+                const active = isActive(href);
+                return (
+                  <Link
+                    key={item}
+                    href={href}
+                    className={`${
+                      active ? "text-white" : "text-gray-300"
+                    } hover:text-white transition-colors py-2 sm:py-0 relative group`}
+                  >
+                    {item}
+                    <span
+                      className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
+                        active
+                          ? "scale-x-100"
+                          : "scale-x-0 group-hover:scale-x-100"
+                      }`}
+                    ></span>
+                  </Link>
+                );
+              })}
               {userId && (
                 <>
                   <Link
                     href="/generate"
-                    className="text-gray-300 hover:text-white transition-colors py-2 sm:py-0 relative group"
+                    className={`${
+                      isActive("/generate") ? "text-white" : "text-gray-300"
+                    } hover:text-white transition-colors py-2 sm:py-0 relative group`}
                   >
                     Generate
-                    <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                    <span
+                      className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
+                        isActive("/generate")
+                          ? "scale-x-100"
+                          : "scale-x-0 group-hover:scale-x-100"
+                      }`}
+                    ></span>
                   </Link>
                   <Link
                     href="/history"
-                    className="text-gray-300 hover:text-white transition-colors py-2 sm:py-0 relative group"
+                    className={`${
+                      isActive("/history") ? "text-white" : "text-gray-300"
+                    } hover:text-white transition-colors py-2 sm:py-0 relative group`}
                   >
                     History
-                    <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                    <span
+                      className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
+                        isActive("/history")
+                          ? "scale-x-100"
+                          : "scale-x-0 group-hover:scale-x-100"
+                      }`}
+                    ></span>
                   </Link>
                 </>
               )}

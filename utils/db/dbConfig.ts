@@ -16,22 +16,14 @@ function getDatabase() {
     databaseUrl === "postgresql://user:password@host:port/database?sslmode=require";
   
   if (isPlaceholder) {
-    // During build, we can't connect, so we'll handle this gracefully
-    // The actual error will occur at runtime when the database is accessed
-    if (process.env.NEXT_PHASE === "phase-production-build") {
-      // During build, create a dummy connection that won't be used
-      // This prevents the build from failing
-      if (!_sql) {
-        try {
-          _sql = neon("postgresql://localhost/dummy?sslmode=disable");
-        } catch {
-          // If even the dummy fails, we'll handle it at runtime
-        }
-      }
-      if (!_db && _sql) {
-        _db = drizzle(_sql, { schema });
-      }
-      return _db!;
+    // During build time, skip actual connection
+    // This will be caught at runtime when database is actually used
+    if (process.env.NEXT_PHASE === "phase-production-build" || process.env.NEXT_PHASE === "phase-development-build") {
+      // Return a mock that will fail gracefully when used
+      throw new Error(
+        "DATABASE_URL is not configured. Please set a valid DATABASE_URL in your .env.local file. " +
+        "Build is continuing but database operations will fail at runtime."
+      );
     }
     
     // At runtime, throw a helpful error
@@ -51,8 +43,19 @@ function getDatabase() {
   return _db;
 }
 
+// Use a getter function instead of Proxy for better TypeScript support
+export function getDb() {
+  return getDatabase();
+}
+
+// Export db as a lazy proxy
 export const db = new Proxy({} as ReturnType<typeof drizzle>, {
   get(_target, prop) {
-    return getDatabase()[prop as keyof ReturnType<typeof drizzle>];
+    const dbInstance = getDatabase();
+    const value = dbInstance[prop as keyof ReturnType<typeof drizzle>];
+    if (typeof value === "function") {
+      return value.bind(dbInstance);
+    }
+    return value;
   },
 });

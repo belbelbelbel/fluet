@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
-import { CreateOrUpdateUser, GetUserByClerkId } from "@/utils/db/actions";
+import { GetUserByClerkId } from "@/utils/db/actions";
 import { db } from "@/utils/db/dbConfig";
-import { Subscription, Users } from "@/utils/db/schema";
+import { Subscription } from "@/utils/db/schema";
 import { eq, and } from "drizzle-orm";
+
+// Mark route as dynamic
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
     // Get the webhook signature from headers
-    const signature = req.headers.get("x-kora-signature");
+    // const signature = req.headers.get("x-kora-signature");
     const webhookSecret = process.env.KORA_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
@@ -57,13 +60,25 @@ export async function POST(req: Request) {
   }
 }
 
-async function handleSuccessfulPayment(eventData: any) {
+interface KoraWebhookData {
+  metadata?: {
+    userId?: string;
+    planName?: string;
+    priceId?: string;
+  };
+  customer?: {
+    userId?: string;
+  };
+  reference?: string;
+  id?: string;
+}
+
+async function handleSuccessfulPayment(eventData: KoraWebhookData) {
   try {
     // Extract user information from Kora webhook data
     // Adjust field names based on Kora's actual webhook payload structure
     const userId = eventData.metadata?.userId || eventData.customer?.userId;
     const planName = eventData.metadata?.planName;
-    const priceId = eventData.metadata?.priceId;
     const reference = eventData.reference || eventData.id;
 
     if (!userId || !planName) {
@@ -110,7 +125,7 @@ async function handleSuccessfulPayment(eventData: any) {
         userid: user.id,
         plan: planName,
         startdate: new Date(),
-        enddate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        enddate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 
         canceldate: false,
       });
     }

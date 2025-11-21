@@ -2,6 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, GetUserGeneratedContent } from "@/utils/db/actions";
 
+// Mark route as dynamic
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   try {
     const { userId: clerkUserId } = await auth();
@@ -27,7 +30,7 @@ export async function GET(req: Request) {
 
     let content = await GetUserGeneratedContent(user.id, 100);
 
-    // Apply filter
+
     if (filter !== "all") {
       content = content.filter((item) => item.contentType === filter);
     }

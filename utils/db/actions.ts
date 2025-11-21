@@ -12,7 +12,6 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
             .where(eq(Users.stripecustomerId, stripecustomerId))
             .limit(1)
             .execute();
-        // console.log(`[CreateOrUpdateUser] Existing user check result:`, existingUser);-
         if (existingUser) {
             const [updatedUser] = await db
                 .update(Users)
@@ -24,7 +23,6 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
             return updatedUser;
         } else {
             console.log(`[CreateOrUpdateUser] User not found, creating new one...`);
-
             const [newUser] = await db
                 .insert(Users)
                 .values({
@@ -64,7 +62,7 @@ export const GetUserByClerkId = async (clerkUserId: string) => {
     }
 };
 
-// Get generated content for a user
+
 export const GetUserGeneratedContent = async (userId: number, limit: number = 10) => {
     try {
         const content = await db
@@ -81,7 +79,7 @@ export const GetUserGeneratedContent = async (userId: number, limit: number = 10
     }
 };
 
-// Save generated content with customization
+
 export const SaveGeneratedContent = async (
     userId: number,
     prompt: string,
@@ -112,7 +110,6 @@ export const SaveGeneratedContent = async (
     }
 };
 
-// Get user's active subscription
 export const GetUserSubscription = async (userId: number) => {
     try {
         const [subscription] = await db
@@ -134,7 +131,6 @@ export const GetUserSubscription = async (userId: number) => {
     }
 };
 
-// Get user's usage count for current month
 export const GetUserUsageCount = async (userId: number) => {
     try {
         const startOfMonth = new Date();
