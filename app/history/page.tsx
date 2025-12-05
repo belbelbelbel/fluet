@@ -124,15 +124,12 @@ export default function HistoryPage() {
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
               Content History
             </h1>
             <p className="text-sm sm:text-base text-gray-400">View and manage your generated content</p>
           </div>
-
-          {/* Filters */}
           <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center space-x-2">
               <FilterIcon className="w-5 h-5 text-gray-400" />
@@ -165,8 +162,6 @@ export default function HistoryPage() {
               ))}
             </div>
           </div>
-
-          {/* Content List */}
           {loading ? (
             <div className="text-center py-12 text-gray-400">Loading...</div>
           ) : content.length === 0 ? (
@@ -243,12 +238,10 @@ export default function HistoryPage() {
                       </Button>
                     </div>
                   </div>
-
                   <div className="mb-3">
                     <p className="text-sm text-gray-400 mb-1">Prompt:</p>
                     <p className="text-gray-300 text-sm">{item.prompt}</p>
                   </div>
-
                   <div className="p-4 bg-gray-900 rounded border border-gray-700">
                     <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed">
                       {item.content}

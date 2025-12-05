@@ -7,7 +7,7 @@ import {
   LinkedinIcon,
   MusicIcon,
   BotIcon,
-  ZapIcon,
+  Wand2Icon,
   TrendingUpIcon,
   CheckCircleIcon,
   EyeIcon,
@@ -100,7 +100,7 @@ export default function FeaturesPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="p-6 bg-gray-800 rounded-lg border border-gray-700">
-                <ZapIcon className="w-8 h-8 text-yellow-400 mb-4" />
+                <Wand2Icon className="w-8 h-8 text-yellow-400 mb-4" />
                 <h3 className="text-xl font-semibold mb-3 text-white">
                   AI-Powered Generation
                 </h3>

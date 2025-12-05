@@ -4,7 +4,6 @@ import { GeneratedContent, Users, Subscription } from "./schema"
 import { sendWelcomeEmail } from "./mailtrap"
 
 export const CreateOrUpdateUser = async (stripecustomerId: string, email: string, name: string) => {
-
     try {
         const [existingUser] = await db
             .select()
@@ -46,7 +45,6 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
     }
 };
 
-// Get user by Clerk ID
 export const GetUserByClerkId = async (clerkUserId: string) => {
     try {
         const [user] = await db
@@ -78,7 +76,6 @@ export const GetUserGeneratedContent = async (userId: number, limit: number = 10
         throw new Error("Failed to get generated content");
     }
 };
-
 
 export const SaveGeneratedContent = async (
     userId: number,
@@ -136,7 +133,6 @@ export const GetUserUsageCount = async (userId: number) => {
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
         startOfMonth.setHours(0, 0, 0, 0);
-
         const result = await db
             .select({ count: sql<number>`count(*)::int` })
             .from(GeneratedContent)
@@ -147,7 +143,6 @@ export const GetUserUsageCount = async (userId: number) => {
                 )
             )
             .execute();
-
         return Number(result[0]?.count) || 0;
     } catch (error) {
         console.error(`[GetUserUsageCount] Error encountered:`, error);

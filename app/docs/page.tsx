@@ -3,7 +3,7 @@
 import { Navbar } from "../components/Navbar";
 import {
   BookOpenIcon,
-  SparklesIcon,
+  RocketIcon,
   HelpCircleIcon,
   CodeIcon,
 } from "lucide-react";
@@ -115,7 +115,7 @@ export default function DocsPage() {
           {/* Quick Start */}
           <div className="mb-12 p-6 bg-blue-600/10 border border-blue-500/50 rounded-lg">
             <div className="flex items-start space-x-3">
-              <SparklesIcon className="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" />
+              <RocketIcon className="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" />
               <div>
                 <h2 className="text-xl font-semibold mb-2 text-white">
                   Quick Start

@@ -10,7 +10,7 @@ import {
   useAuth,
 } from "@clerk/nextjs";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X, PenTool } from "lucide-react";
 
 export function Navbar() {
   const { userId } = useAuth();
@@ -26,7 +26,7 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
-
+  
   const toggleMenu = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
   }, []);
@@ -49,7 +49,7 @@ export function Navbar() {
         <div className="flex flex-wrap justify-between items-center max-w-6xl mx-auto">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <Zap className="w-8 h-8 text-blue-500" />
+              <PenTool className="w-8 h-8 text-blue-500" />
               <span className="text-xl sm:text-2xl font-bold text-white">
                 Fluet AI
               </span>

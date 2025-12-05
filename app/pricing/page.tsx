@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, BotIcon, ZapIcon, SparklesIcon, TrendingUpIcon, GlobeIcon, CreditCardIcon } from "lucide-react";
+import { CheckIcon, BotIcon, StarIcon, CrownIcon, TrendingUpIcon, GlobeIcon, CreditCardIcon } from "lucide-react";
 
 import { useUser } from "@clerk/nextjs";
 import { useState, useCallback, useMemo } from "react";
@@ -25,7 +25,7 @@ const pricingPlans = [
     name: "Pro",
     price: "29",
     priceId: "price_1PyFN0Bibz3ZDixDqm9eYL8W",
-    icon: <ZapIcon className="w-8 h-8 text-yellow-400" />,
+    icon: <StarIcon className="w-8 h-8 text-yellow-400" />,
     features: [
       "500 AI-generated posts per month",
       "Twitter, Instagram, LinkedIn, and TikTok content",
@@ -37,7 +37,7 @@ const pricingPlans = [
     name: "Enterprise",
     price: "Custom",
     priceId: null,
-    icon: <SparklesIcon className="w-8 h-8 text-purple-400" />,
+    icon: <CrownIcon className="w-8 h-8 text-purple-400" />,
     features: [
       "Unlimited AI-generated posts",
       "All social media platforms",

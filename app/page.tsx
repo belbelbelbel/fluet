@@ -22,7 +22,6 @@ console.log("consoleId",userclerkid)
       <Navbar />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Decorative elements - hidden on mobile */}
         <div className="hidden md:block absolute top-20 left-10 animate-float">
           <BotIcon className="w-8 h-8 text-blue-400 opacity-50" />
         </div>

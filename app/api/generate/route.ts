@@ -2,12 +2,11 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, SaveGeneratedContent, GetUserSubscription, GetUserUsageCount } from "@/utils/db/actions";
 
-// Mark route as dynamic
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    // Authenticate the user
+
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
@@ -17,11 +16,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Parse request body
     const body = await req.json();
     const { prompt, contentType, tone, style, length, userId: clientUserId } = body;
 
-    // Verify the userId from the request matches the authenticated user
     if (clientUserId !== clerkUserId) {
       return NextResponse.json(
         { error: "User ID mismatch" },
@@ -43,7 +40,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Find user in database by Clerk ID
+
     const user = await GetUserByClerkId(clerkUserId);
 
     if (!user) {
@@ -53,11 +50,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check subscription and usage limits
     const subscription = await GetUserSubscription(user.id);
     const usageCount = await GetUserUsageCount(user.id);
-    
-    // Determine limit based on subscription plan
+
     let monthlyLimit = 0;
     if (subscription && !subscription.canceldate) {
       switch (subscription.plan.toLowerCase()) {
@@ -68,10 +63,10 @@ export async function POST(req: Request) {
           monthlyLimit = 500;
           break;
         case "enterprise":
-          monthlyLimit = Infinity; // Unlimited
+          monthlyLimit = Infinity;
           break;
         default:
-          monthlyLimit = 0; // No subscription
+          monthlyLimit = 0;
       }
     }
     
@@ -87,7 +82,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Generate content with customization
     const generatedContent = await generateAIContent(
       prompt, 
       contentType, 
@@ -96,7 +90,6 @@ export async function POST(req: Request) {
       length || "medium"
     );
 
-    // Save generated content to database with customization
     const savedContent = await SaveGeneratedContent(
       user.id,
       prompt.trim(),
@@ -122,7 +115,6 @@ export async function POST(req: Request) {
   }
 }
 
-// AI generation function with customization
 async function generateAIContent(
   prompt: string,
   contentType: string,
@@ -130,10 +122,7 @@ async function generateAIContent(
   style: string,
   length: string
 ): Promise<string> {
-  // Simulate API call delay
   await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  // Build prompt with customization
   const toneDescription = {
     professional: "professional and business-focused",
     casual: "casual and friendly",
@@ -148,7 +137,7 @@ async function generateAIContent(
     storytelling: "narrative and story-driven",
     "list-based": "organized as a clear list"
   }[style] || "concise";
-
+  
   const lengthDescription = {
     short: "brief (50-100 words)",
     medium: "medium length (100-300 words)",
@@ -163,7 +152,5 @@ async function generateAIContent(
   };
 
   const content = baseContent[contentType] || `Generated content about: ${prompt}`;
-  
-  // Add customization note (in real implementation, AI would use these parameters)
   return `${content}\n\n[Generated with ${toneDescription} tone, ${styleDescription} style, ${lengthDescription}]`;
 }
