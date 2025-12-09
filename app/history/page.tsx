@@ -21,6 +21,7 @@ import {
   XIcon,
   CalendarPlusIcon,
   RefreshCwIcon,
+  Loader2Icon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -39,7 +40,7 @@ interface GeneratedContent {
 }
 
 export default function HistoryPage() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const { userId } = useAuth();
   const router = useRouter();
   const [content, setContent] = useState<GeneratedContent[]>([]);
@@ -149,6 +150,21 @@ export default function HistoryPage() {
 
   const contentTypes = useMemo(() => (["twitter", "instagram", "linkedin", "tiktok"] as ContentType[]), []);
 
+  // Show loading spinner while checking auth
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative w-16 h-16 mx-auto mb-4">
+            <Loader2Icon className="w-16 h-16 text-blue-500 animate-spin" />
+            <FileTextIcon className="w-8 h-8 text-purple-500 absolute -top-2 -right-2 animate-pulse" />
+          </div>
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-black text-gray-100 flex items-center justify-center">
@@ -161,42 +177,42 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b pt-20 from-black to-gray-900 text-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-gray-100">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
-                Content History
-              </h1>
-              <p className="text-sm sm:text-base text-gray-400">View and manage your generated content</p>
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+        <div className="max-w-3xl mx-auto">
+          {/* Header - Consistent */}
+          <div className="mb-10">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-semibold text-white mb-1.5">
+                  History
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Your generated content
+                </p>
+              </div>
+              <Button
+                onClick={fetchContent}
+                size="sm"
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-800"
+                title="Refresh"
+              >
+                <RefreshCwIcon className="w-4 h-4" />
+              </Button>
             </div>
-            <Button
-              onClick={() => {
-                console.log("Refreshing content...");
-                fetchContent();
-              }}
-              variant="outline"
-              size="sm"
-              className="border-gray-600 text-black hover:bg-gray-700"
-            >
-              <RefreshCwIcon className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
           </div>
-          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-            <div className="flex items-center space-x-2">
-              <FilterIcon className="w-5 h-5 text-gray-400" />
-              <span className="text-sm text-gray-400 sm:hidden">Filter:</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
+
+          {/* Filters - Consistent */}
+          <div className="mb-8">
+            <div className="flex gap-1.5">
               <button
                 onClick={() => setFilter("all")}
-                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs transition-colors ${
                   filter === "all"
                     ? "bg-blue-600 text-white"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    : "bg-gray-900/50 text-gray-400 hover:bg-gray-800 hover:text-gray-300"
                 }`}
               >
                 All
@@ -205,10 +221,10 @@ export default function HistoryPage() {
                 <button
                   key={type}
                   onClick={() => setFilter(type)}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all flex items-center space-x-2 ${
+                  className={`px-3 py-1.5 rounded-md text-xs transition-colors flex items-center gap-1.5 ${
                     filter === type
                       ? "bg-blue-600 text-white"
-                      : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                      : "bg-gray-900/50 text-gray-400 hover:bg-gray-800 hover:text-gray-300"
                   }`}
                 >
                   {getContentTypeIcon(type)}
@@ -218,54 +234,41 @@ export default function HistoryPage() {
             </div>
           </div>
           {loading ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 animate-pulse">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-12 h-12 bg-gray-700 rounded-lg"></div>
+                <div key={i} className="p-4 bg-gray-900/50 rounded-lg border border-gray-800 animate-pulse">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-gray-800 rounded-lg"></div>
                     <div className="flex-1">
-                      <div className="h-4 bg-gray-700 rounded w-1/4 mb-2"></div>
-                      <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-800 rounded w-1/4 mb-2"></div>
+                      <div className="h-3 bg-gray-800 rounded w-1/2"></div>
                     </div>
                   </div>
-                  <div className="h-20 bg-gray-700 rounded-lg mb-3"></div>
-                  <div className="h-32 bg-gray-700 rounded-lg"></div>
+                  <div className="h-16 bg-gray-800 rounded mb-2"></div>
+                  <div className="h-24 bg-gray-800 rounded"></div>
                 </div>
               ))}
             </div>
-          ) : !isSignedIn ? (
-            <div className="text-center py-12">
-              <div className="w-24 h-24 mx-auto mb-6 bg-gray-800 rounded-full flex items-center justify-center">
-                <FileTextIcon className="w-12 h-12 text-gray-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Please sign in</h3>
-              <p className="text-gray-400">You need to be signed in to view your content history.</p>
-            </div>
           ) : content.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-full flex items-center justify-center border border-blue-500/30">
-                <FileTextIcon className="w-16 h-16 text-blue-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">No Content Yet</h3>
-              <p className="text-gray-400 mb-2 max-w-md mx-auto">
-                Your generated content will appear here for easy access and management
-              </p>
-              <p className="text-gray-500 text-sm mb-8 max-w-md mx-auto">
+            <div className="text-center py-12">
+              <FileTextIcon className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+              <h3 className="text-lg font-semibold text-white mb-1.5">No content yet</h3>
+              <p className="text-sm text-gray-500 mb-4">
                 Generate your first piece of content to get started
               </p>
               <Button
                 asChild
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                <a href="/generate">Generate Your First Content</a>
+                <a href="/generate">Generate Content</a>
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {content.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 sm:p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 hover:border-blue-500/50 transition-all shadow-lg"
+                  className="p-4 bg-gray-900/50 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors"
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4">
                     <div className="flex items-center space-x-3">
@@ -309,61 +312,47 @@ export default function HistoryPage() {
                     </div>
                     <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                       <Button
-                        onClick={() => setViewingContent(item)}
-                        variant="outline"
-                        size="sm"
-                        className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
-                      >
-                        <EyeIcon className="w-4 h-4 mr-1" />
-                        View
-                      </Button>
-                      <Button
                         onClick={() => handleCopy(item.content, item.id)}
-                        variant="outline"
                         size="sm"
-                        className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
+                        variant="ghost"
+                        className="text-gray-400 hover:text-white hover:bg-gray-800 h-8 w-8 p-0"
+                        title="Copy"
                       >
                         {copiedId === item.id ? (
-                          <>
-                            <CheckIcon className="w-4 h-4 mr-1" />
-                            Copied
-                          </>
+                          <CheckIcon className="w-4 h-4" />
                         ) : (
-                          <>
-                            <CopyIcon className="w-4 h-4 mr-1" />
-                            Copy
-                          </>
+                          <CopyIcon className="w-4 h-4" />
                         )}
                       </Button>
                       <Button
-                        onClick={() => handleSchedule(item)}
-                        variant="outline"
+                        onClick={() => setViewingContent(item)}
                         size="sm"
-                        className="border-purple-600 text-purple-400 hover:bg-purple-600/20"
+                        variant="ghost"
+                        className="text-gray-400 hover:text-white hover:bg-gray-800"
                       >
-                        <CalendarPlusIcon className="w-4 h-4 mr-1" />
-                        Schedule
+                        View
                       </Button>
                       <Button
                         onClick={() => handleDelete(item.id)}
-                        variant="outline"
                         size="sm"
-                        className="border-red-600 text-red-400 hover:bg-red-600/20"
+                        variant="ghost"
+                        className="text-gray-400 hover:text-red-400 hover:bg-gray-800"
+                        title="Delete"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
                   <div className="mb-3">
-                    <p className="text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide">Original Prompt</p>
-                    <p className="text-gray-300 text-sm bg-gray-900/50 px-3 py-2 rounded-lg border border-gray-700">{item.prompt}</p>
+                    <p className="text-xs text-gray-500 mb-1.5">Prompt</p>
+                    <p className="text-gray-300 text-sm bg-gray-900/30 px-3 py-2 rounded border border-gray-800">{item.prompt}</p>
                   </div>
-                  <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+                  <div className="p-3 bg-gray-900/30 rounded border border-gray-800">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Generated Content</p>
-                      <span className="text-xs text-gray-500">{item.content.length} characters</span>
+                      <p className="text-xs text-gray-500">Content</p>
+                      <span className="text-xs text-gray-600">{item.content.length} chars</span>
                     </div>
-                    <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed max-h-48 overflow-y-auto">
+                    <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed max-h-40 overflow-y-auto">
                       {item.content}
                     </pre>
                   </div>
@@ -381,48 +370,40 @@ export default function HistoryPage() {
           onClick={() => setViewingContent(null)}
         >
           <div 
-            className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border border-gray-700 max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+            className="bg-gray-900 rounded-lg border border-gray-800 max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
-            <div className="p-6 border-b border-gray-700 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-gray-700 rounded-lg">
-                  {getContentTypeIcon(viewingContent.contentType)}
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white capitalize">
-                    {viewingContent.contentType} Content
-                  </h3>
-                  <p className="text-sm text-gray-400">{formatDate(viewingContent.createdAt)}</p>
-                </div>
-              </div>
+            {/* Modal Header - Minimal */}
+            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white capitalize">
+                {viewingContent.contentType}
+              </h3>
               <button
                 onClick={() => setViewingContent(null)}
-                className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
+                className="text-gray-500 hover:text-gray-300 transition-colors p-1.5 hover:bg-gray-800 rounded"
               >
-                <XIcon className="w-5 h-5" />
+                <XIcon className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {/* Modal Content - Clean */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-3">
               <div>
-                <p className="text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Original Prompt</p>
-                <p className="text-gray-300 bg-gray-800/50 px-4 py-3 rounded-lg border border-gray-700">
+                <p className="text-xs text-gray-500 mb-1.5">Prompt</p>
+                <p className="text-gray-300 text-sm bg-gray-900/30 px-3 py-2 rounded border border-gray-800">
                   {viewingContent.prompt}
                 </p>
               </div>
               {viewingContent.tone && (
-                <div className="flex items-center space-x-2 text-sm">
-                  <span className="text-gray-400">Tone:</span>
-                  <span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded capitalize">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-gray-500">Tone:</span>
+                  <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded capitalize">
                     {viewingContent.tone}
                   </span>
                   {viewingContent.style && (
                     <>
-                      <span className="text-gray-400">Style:</span>
-                      <span className="px-2 py-1 bg-purple-500/10 text-purple-400 rounded capitalize">
+                      <span className="text-gray-500">Style:</span>
+                      <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 rounded capitalize">
                         {viewingContent.style}
                       </span>
                     </>
@@ -430,61 +411,52 @@ export default function HistoryPage() {
                 </div>
               )}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Generated Content</p>
-                  <span className="text-xs text-gray-500">{viewingContent.content.length} characters</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-xs text-gray-500">Content</p>
+                  <span className="text-xs text-gray-600">{viewingContent.content.length} chars</span>
                 </div>
-                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                  <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed">
+                <div className="bg-gray-900/30 rounded p-4 border border-gray-800">
+                  <pre className="whitespace-pre-wrap text-gray-100 text-sm leading-relaxed">
                     {viewingContent.content}
                   </pre>
                 </div>
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="p-6 border-t border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-xs text-gray-500">
-                Ready to schedule this content?
-              </div>
-              <div className="flex gap-3 w-full sm:w-auto">
-                <Button
-                  onClick={() => {
-                    handleCopy(viewingContent.content, viewingContent.id);
-                  }}
-                  variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-700 flex-1 sm:flex-none"
-                >
-                  {copiedId === viewingContent.id ? (
-                    <>
-                      <CheckIcon className="w-4 h-4 mr-2" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <CopyIcon className="w-4 h-4 mr-2" />
-                      Copy
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={() => {
-                    setViewingContent(null);
-                    handleSchedule(viewingContent);
-                  }}
-                  variant="outline"
-                  className="border-purple-600 text-purple-400 hover:bg-purple-600/20 flex-1 sm:flex-none"
-                >
-                  <CalendarPlusIcon className="w-4 h-4 mr-2" />
-                  Schedule
-                </Button>
-                <Button
-                  onClick={() => setViewingContent(null)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-none"
-                >
-                  Close
-                </Button>
-              </div>
+            {/* Modal Footer - Simplified */}
+            <div className="p-4 border-t border-gray-800 bg-gray-900/50 flex items-center justify-end gap-2">
+              <Button
+                onClick={() => {
+                  handleCopy(viewingContent.content, viewingContent.id);
+                }}
+                size="sm"
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-800"
+              >
+                {copiedId === viewingContent.id ? (
+                  <CheckIcon className="w-4 h-4" />
+                ) : (
+                  <CopyIcon className="w-4 h-4" />
+                )}
+              </Button>
+              <Button
+                onClick={() => {
+                  setViewingContent(null);
+                  handleSchedule(viewingContent);
+                }}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Schedule
+              </Button>
+              <Button
+                onClick={() => setViewingContent(null)}
+                size="sm"
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-800"
+              >
+                Close
+              </Button>
             </div>
           </div>
         </div>

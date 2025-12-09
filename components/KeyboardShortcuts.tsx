@@ -26,18 +26,18 @@ export function KeyboardShortcuts() {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        variant="outline"
         size="sm"
-        className="fixed bottom-4 right-4 border-gray-600 text-gray-300 hover:bg-gray-700 z-40"
+        className="fixed bottom-4 right-4 bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 shadow-lg z-40 px-3 py-2"
         title="Keyboard Shortcuts (Ctrl/Cmd + /)"
       >
-        <KeyboardIcon className="w-4 h-4" />
+        <KeyboardIcon className="w-5 h-5 mr-1.5" />
+        <span className="text-xs hidden sm:inline">Shortcuts</span>
       </Button>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
         <div className="p-6 border-b border-gray-700 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-white flex items-center">

@@ -9,6 +9,7 @@ import { showToast } from "@/lib/toast";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { exportAsText, exportAsPDF } from "@/lib/export";
 import { contentTemplates, type ContentTemplate } from "@/lib/templates";
+import { DropdownMenu, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   TwitterIcon,
   InstagramIcon,
@@ -29,6 +30,7 @@ import {
   SaveIcon,
   DownloadIcon,
   FileTextIcon as FileTextIconExport,
+  MoreVerticalIcon,
 } from "lucide-react";
 
 type ContentType = "twitter" | "instagram" | "linkedin" | "tiktok";
@@ -37,7 +39,7 @@ type Style = "concise" | "detailed" | "storytelling" | "list-based";
 type Length = "short" | "medium" | "long";
 
 export default function GeneratePage() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const { userId } = useAuth();
   const router = useRouter();
   const [contentType, setContentType] = useState<ContentType>("twitter");
@@ -273,6 +275,21 @@ export default function GeneratePage() {
   const styles = useMemo(() => (["concise", "detailed", "storytelling", "list-based"] as Style[]), []);
   const lengths = useMemo(() => (["short", "medium", "long"] as Length[]), []);
 
+  // Show loading spinner while checking auth
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative w-16 h-16 mx-auto mb-4">
+            <Loader2Icon className="w-16 h-16 text-blue-500 animate-spin" />
+            <Wand2Icon className="w-8 h-8 text-purple-500 absolute -top-2 -right-2 animate-pulse" />
+          </div>
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-black text-gray-100 flex items-center justify-center">
@@ -285,69 +302,58 @@ export default function GeneratePage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 bg-gradient-to-b from-black to-gray-900 text-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-gray-100">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8 sm:mb-12">
-            <div className="flex items-center justify-center mb-3 sm:mb-4">
-              <BotIcon className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 mr-2" />
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
-                Generate AI Content
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+        <div className="max-w-3xl mx-auto">
+          {/* Header - Consistent */}
+          <div className="text-center mb-12">
+            <h1 className="text-2xl font-semibold text-white mb-2">
+              Generate Content
               </h1>
-            </div>
-            <p className="text-gray-400 text-base sm:text-lg px-4">
-              Create engaging social media content with AI
+            <p className="text-sm text-gray-500">
+              Create engaging social media posts
             </p>
           </div>
 
-          {/* Content Type Selection */}
-          <div className="mb-6 sm:mb-8">
-            <label className="block text-sm font-medium text-gray-300 mb-3 px-1">
-              Select Platform
-            </label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {/* Content Type Selection - Clean */}
+          <div className="mb-8">
+            <div className="flex gap-2">
               {contentTypes.map((type) => (
                 <button
                   key={type}
                   onClick={() => setContentType(type)}
-                  className={`p-3 sm:p-4 rounded-lg border-2 transition-all ${contentType === type
-                    ? "border-blue-500 bg-blue-500/10"
-                    : "border-gray-700 hover:border-gray-600"
+                  className={`flex-1 flex items-center justify-center gap-2 p-2.5 rounded-lg border transition-colors ${contentType === type
+                    ? "border-blue-500 bg-blue-500/10 text-blue-400"
+                    : "border-gray-800 bg-gray-900/50 text-gray-400 hover:border-gray-700 hover:text-gray-300"
                     }`}
                 >
-                  <div className="flex items-center justify-center mb-2">
                     {getContentTypeIcon(type)}
-                  </div>
-                  <div className="text-xs sm:text-sm font-medium">{getContentTypeLabel(type)}</div>
+                  <span className="text-xs font-medium hidden sm:inline">{getContentTypeLabel(type)}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Templates & Prompt Input */}
-          <div className="mb-6">
+          {/* Templates & Prompt Input - Clean */}
+          <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <label
-                htmlFor="prompt"
-                className="block text-sm font-semibold text-gray-200"
-              >
-                What would you like to create?
-              </label>
-              <Button
+            <label
+              htmlFor="prompt"
+                className="block text-sm font-medium text-gray-300"
+            >
+              What would you like to create?
+            </label>
+              <button
                 onClick={() => setShowTemplates(!showTemplates)}
-                variant="outline"
-                size="sm"
-                className="border-blue-600 text-black hover:bg-blue-600/20 hover:text-white text-xs"
+                className="text-xs text-gray-500 hover:text-gray-400 transition-colors"
               >
-                 Templates
-              </Button>
+                {showTemplates ? "Hide" : "Templates"}
+              </button>
             </div>
 
             {showTemplates && (
-              <div className="mb-4 p-4 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700">
-                <h3 className="text-sm font-semibold text-white mb-3">Content Templates</h3>
+              <div className="mb-3 p-3 bg-gray-900/50 rounded-lg border border-gray-800">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {contentTemplates
                     .filter(t => t.contentType === contentType)
@@ -355,68 +361,56 @@ export default function GeneratePage() {
                       <button
                         key={template.id}
                         onClick={() => handleUseTemplate(template)}
-                        className="text-left p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg border border-gray-600 hover:border-blue-500 transition-all"
+                        className="text-left p-2.5 bg-gray-800/50 hover:bg-gray-800 rounded-md border border-gray-700 hover:border-blue-500/50 transition-colors"
                       >
-                        <div className="font-medium text-white text-sm mb-1">{template.name}</div>
-                        <div className="text-xs text-gray-400">{template.description}</div>
+                        <div className="font-medium text-white text-xs mb-0.5">{template.name}</div>
+                        <div className="text-xs text-gray-500">{template.description}</div>
                       </button>
                     ))}
                 </div>
-                {contentTemplates.filter(t => t.contentType === contentType).length === 0 && (
-                  <p className="text-sm text-gray-400 text-center py-2">No templates available for this platform</p>
-                )}
               </div>
             )}
             <textarea
               id="prompt"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Describe your content idea... 
-
-Examples:
-• A Twitter thread about the future of AI
-• An Instagram caption for a sunset photo
-• A LinkedIn post about productivity tips
-• A TikTok video script about morning routines"
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all"
-              rows={5}
+              placeholder="Describe your content idea..."
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all text-sm"
+              rows={4}
               disabled={isGenerating}
             />
-            <div className="mt-2 flex items-center justify-between">
+            <div className="mt-1.5 flex items-center justify-between">
               <p className="text-xs text-gray-500">
-                💡 Tip: Be specific about your topic and key points for better results
-              </p>
-              <span className="text-xs text-gray-600">{prompt.length} characters</span>
+                Be specific for better results
+            </p>
+              <span className="text-xs text-gray-600">{prompt.length}</span>
             </div>
           </div>
 
-          {/* Customization Options */}
-          <div className="mb-6">
+          {/* Customization Options - Simplified */}
+          <div className="mb-8">
             <button
               onClick={() => setShowCustomization(!showCustomization)}
-              className="flex items-center space-x-2 text-sm font-medium text-gray-300 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
+              className="flex items-center gap-2 text-xs font-medium text-gray-400 hover:text-gray-300 transition-colors"
             >
-              <SettingsIcon className="w-4 h-4" />
-              <span>{showCustomization ? "Hide" : "Show"} Advanced Options</span>
+              <SettingsIcon className="w-3.5 h-3.5" />
+              <span>{showCustomization ? "Hide" : "Show"} options</span>
             </button>
 
             {showCustomization && (
-              <div className="mt-4 p-5 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 space-y-5 shadow-lg">
+              <div className="mt-3 p-4 bg-gray-900/50 rounded-lg border border-gray-800 space-y-4">
                 {/* Tone */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-3">
-                    Content Tone
-                    <span className="text-xs font-normal text-gray-500 ml-2">How should it sound?</span>
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  <label className="block text-xs font-medium text-gray-400 mb-2">Tone</label>
+                  <div className="flex flex-wrap gap-1.5">
                     {tones.map((t) => (
                       <button
                         key={t}
                         onClick={() => setTone(t)}
-                        className={`px-4 py-2.5 rounded-lg text-xs font-medium capitalize transition-all ${tone === t
-                          ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg scale-105"
-                          : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-102"
-                          }`}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-colors ${tone === t
+                            ? "bg-blue-600 text-white"
+                          : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300"
+                        }`}
                       >
                         {t}
                       </button>
@@ -426,19 +420,16 @@ Examples:
 
                 {/* Style */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-3">
-                    Writing Style
-                    <span className="text-xs font-normal text-gray-500 ml-2">How should it be structured?</span>
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <label className="block text-xs font-medium text-gray-400 mb-2">Style</label>
+                  <div className="flex flex-wrap gap-1.5">
                     {styles.map((s) => (
                       <button
                         key={s}
                         onClick={() => setStyle(s)}
-                        className={`px-4 py-2.5 rounded-lg text-xs font-medium capitalize transition-all ${style === s
-                          ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg scale-105"
-                          : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-102"
-                          }`}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-colors ${style === s
+                            ? "bg-blue-600 text-white"
+                          : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300"
+                        }`}
                       >
                         {s}
                       </button>
@@ -448,19 +439,16 @@ Examples:
 
                 {/* Length */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-3">
-                    Content Length
-                    <span className="text-xs font-normal text-gray-500 ml-2">How detailed should it be?</span>
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <label className="block text-xs font-medium text-gray-400 mb-2">Length</label>
+                  <div className="flex gap-1.5">
                     {lengths.map((l) => (
                       <button
                         key={l}
                         onClick={() => setLength(l)}
-                        className={`px-4 py-2.5 rounded-lg text-xs font-medium capitalize transition-all ${length === l
-                          ? "bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg scale-105"
-                          : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-102"
-                          }`}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-colors ${length === l
+                            ? "bg-blue-600 text-white"
+                          : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300"
+                        }`}
                       >
                         {l}
                       </button>
@@ -471,29 +459,29 @@ Examples:
             )}
           </div>
 
-          {/* Error Message */}
+          {/* Error Message - Minimal */}
           {error && (
-            <div className="mb-6 p-4 bg-red-900/50 border border-red-500 rounded-lg text-red-200">
-              <p className="font-semibold">Error: {error}</p>
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
 
-          {/* Generate Button */}
-          <div className="mb-6 sm:mb-8">
+          {/* Generate Button - Clean */}
+          <div className="mb-10">
             <Button
               onClick={handleGenerate}
               disabled={isGenerating || !prompt.trim()}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 sm:py-3 text-base sm:text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGenerating ? (
                 <>
-                  <Loader2Icon className="w-5 h-5 mr-2 animate-spin" />
+                  <Loader2Icon className="w-4 h-4 animate-spin" />
                   Generating...
                 </>
               ) : (
                 <>
-                  <Wand2Icon className="w-5 h-5 mr-2" />
-                  Generate Content
+                  <Wand2Icon className="w-4 h-4" />
+                  Generate
                 </>
               )}
             </Button>
@@ -536,82 +524,69 @@ Examples:
                 className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Modal Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-700">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <CheckIcon className="w-6 h-6 text-green-500" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-white">
-                        {getContentTypeLabel(contentType)} Ready!
-                      </h2>
-                      <p className="text-sm text-gray-400">Your content has been generated</p>
-                    </div>
-                  </div>
+                {/* Modal Header - Minimal */}
+                <div className="flex items-center justify-between p-4 border-b border-gray-800">
+                  <h2 className="text-lg font-semibold text-white">
+                    {getContentTypeLabel(contentType)}
+                  </h2>
                   <button
                     onClick={() => setShowContentModal(false)}
-                    className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
+                    className="text-gray-500 hover:text-gray-300 transition-colors p-1.5 hover:bg-gray-800 rounded"
                   >
-                    <XIcon className="w-5 h-5" />
+                    <XIcon className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Modal Content */}
-                <div className="flex-1 overflow-y-auto p-6">
+                {/* Modal Content - Clean */}
+                <div className="flex-1 overflow-y-auto p-5">
                   {isEditing ? (
-                    <div className="space-y-4">
-                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-sm text-blue-400 flex items-center">
-                          <EditIcon className="w-4 h-4 mr-2" />
-                          Editing mode - Press Ctrl/Cmd + S to save, Esc to cancel
+                    <div className="space-y-3">
+                      <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3">
+                        <p className="text-xs text-blue-400">
+                          Press Ctrl/Cmd + S to save, Esc to cancel
                         </p>
                       </div>
                       <textarea
                         value={editedContent}
                         onChange={(e) => setEditedContent(e.target.value)}
-                        className="w-full min-h-[300px] px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm leading-relaxed"
+                        className="w-full min-h-[300px] px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm leading-relaxed"
                         placeholder="Edit your content here..."
                       />
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span>{editedContent.length} characters</span>
-                        <span>Press Ctrl/Cmd + S to save</span>
+                      <div className="text-xs text-gray-500 text-right">
+                        {editedContent.length} characters
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
-                      <div className="prose prose-invert max-w-none">
-                        <pre className="whitespace-pre-wrap text-gray-200 font-sans text-base leading-relaxed">
-                          {generatedContent}
-                        </pre>
-                      </div>
+                    <div className="bg-gray-900/30 rounded-lg p-5 border border-gray-800">
+                      <pre className="whitespace-pre-wrap text-gray-100 font-sans text-sm leading-relaxed">
+                        {generatedContent}
+                      </pre>
                     </div>
                   )}
                 </div>
 
-                {/* Modal Footer */}
-                <div className="p-6 border-t border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center space-x-2 text-sm text-gray-400">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span>Content generated successfully • {generatedContent.length} characters</span>
+                {/* Modal Footer - Simplified */}
+                <div className="p-4 border-t border-gray-800 bg-gray-900/50 relative">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                      <span>{generatedContent.length} chars</span>
                     </div>
-                    <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-center sm:justify-end">
+                    <div className="flex items-center gap-2 relative">
                       {isEditing ? (
                         <>
                           <Button
                             onClick={handleSaveEdit}
                             size="sm"
-                            className="bg-green-600 hover:bg-green-700 text-white"
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4"
                           >
-                            <SaveIcon className="w-4 h-4 mr-2" />
-                            Save Changes
+                            Save
                           </Button>
-                          <Button
+                  <Button
                             onClick={handleCancelEdit}
-                            variant="outline"
-                            size="sm"
-                            className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
+                    variant="outline"
+                    size="sm"
+                            className="border-gray-700 text-black hover:bg-gray-800 hover:text-white px-4"
                           >
                             Cancel
                           </Button>
@@ -619,97 +594,83 @@ Examples:
                       ) : (
                         <>
                           <Button
-                            onClick={handleEdit}
-                            variant="outline"
-                            size="sm"
-                            className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
-                          >
-                            <EditIcon className="w-4 h-4 mr-2" />
-                            Edit
-                          </Button>
-                          <Button
                             onClick={handleCopy}
-                            variant="outline"
                             size="sm"
-                            className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
+                            className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
                           >
                             {isCopied ? (
-                              <>
-                                <CheckIcon className="w-4 h-4 mr-2" />
-                                Copied!
-                              </>
+                              <CheckIcon className="w-4 h-4" />
                             ) : (
-                              <>
-                                <CopyIcon className="w-4 h-4 mr-2" />
-                                Copy
-                              </>
+                              <CopyIcon className="w-4 h-4" />
                             )}
                           </Button>
-                          <Button
-                            onClick={handleExportText}
-                            variant="outline"
-                            size="sm"
-                            className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
-                            title="Export as text file"
+                          <DropdownMenu
+                            trigger={
+                              <Button
+                                size="sm"
+                                className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-3"
+                                title="More options"
+                              >
+                                <MoreVerticalIcon className="w-5 h-5" />
+                              </Button>
+                            }
                           >
-                            <DownloadIcon className="w-4 h-4 mr-2" />
-                            Export TXT
-                          </Button>
+                            <DropdownMenuItem
+                              onClick={handleEdit}
+                              icon={<EditIcon className="w-4 h-4" />}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={handleExportText}
+                              icon={<DownloadIcon className="w-4 h-4" />}
+                            >
+                              Export as TXT
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={handleExportPDF}
+                              icon={<FileTextIconExport className="w-4 h-4" />}
+                            >
+                              Export as PDF
+                            </DropdownMenuItem>
+                            <div className="border-t border-gray-800 my-1"></div>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setShowContentModal(false);
+                                handleRegenerate();
+                              }}
+                              icon={<RefreshCwIcon className="w-4 h-4" />}
+                            >
+                              Regenerate
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setShowContentModal(false);
+                                router.push(`/schedule?content=${encodeURIComponent(generatedContent)}&platform=${contentType}`);
+                              }}
+                              icon={<CalendarPlusIcon className="w-4 h-4" />}
+                            >
+                              Schedule
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setShowContentModal(false);
+                                router.push("/history");
+                              }}
+                              icon={<FileTextIcon className="w-4 h-4" />}
+                            >
+                              View History
+                            </DropdownMenuItem>
+                          </DropdownMenu>
                           <Button
-                            onClick={handleExportPDF}
-                            variant="outline"
+                            onClick={() => setShowContentModal(false)}
                             size="sm"
-                            className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
-                            title="Export as PDF"
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4"
                           >
-                            <FileTextIconExport className="w-4 h-4 mr-2" />
-                            Export PDF
-                          </Button>
+                            Done
+                  </Button>
                         </>
                       )}
-                      <Button
-                        onClick={() => {
-                          setShowContentModal(false);
-                          handleRegenerate();
-                        }}
-                        variant="outline"
-                        size="sm"
-                        className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
-                        disabled={isGenerating}
-                      >
-                        <RefreshCwIcon className="w-4 h-4 mr-2" />
-                        Regenerate
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setShowContentModal(false);
-                          router.push(`/schedule?content=${encodeURIComponent(generatedContent)}&platform=${contentType}`);
-                        }}
-                        variant="outline"
-                        size="sm"
-                        className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white"
-                      >
-                        <CalendarPlusIcon className="w-4 h-4 mr-2" />
-                        Schedule
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setShowContentModal(false);
-                          router.push("/history");
-                        }}
-                        variant="outline"
-                        size="sm"
-                        className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
-                      >
-                        View History
-                      </Button>
-                      <Button
-                        onClick={() => setShowContentModal(false)}
-                        size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        Done
-                      </Button>
                     </div>
                   </div>
                 </div>
@@ -717,70 +678,78 @@ Examples:
             </div>
           )}
 
-          {/* Generated Content */}
+          {/* Generated Content - Simplified */}
           {generatedContent && (
-            <div className="space-y-4">
-              {/* Actions Bar */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs sm:text-sm text-gray-400">Generated {getContentTypeLabel(contentType)}</span>
-                </div>
-                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                  <Button
-                    onClick={() => setShowPreview(!showPreview)}
-                    variant="outline"
-                    size="sm"
-                    className="border-gray-600 text-black hover:bg-gray-700"
-                  >
-                    <EyeIcon className="w-4 h-4 mr-1" />
-                    {showPreview ? "Hide" : "Preview"}
-                  </Button>
+            <div className="space-y-3">
+              {/* Minimal Actions Bar */}
+              <div className="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg border border-gray-800">
+                <span className="text-sm text-gray-400">{getContentTypeLabel(contentType)}</span>
+                <div className="flex items-center gap-2">
                   <Button
                     onClick={handleCopy}
-                    variant="outline"
                     size="sm"
-                    className="border-gray-600 text-black hover:bg-gray-700"
+                    variant="ghost"
+                    className="text-gray-400 hover:text-white hover:bg-gray-800 h-8 w-8 p-0"
+                    title="Copy"
                   >
                     {isCopied ? (
-                      <>
-                        <CheckIcon className="w-4 h-4 mr-1" />
-                        Copied
-                      </>
+                      <CheckIcon className="w-4 h-4" />
                     ) : (
-                      <>
-                        <CopyIcon className="w-4 h-4 mr-1" />
-                        Copy
-                      </>
+                      <CopyIcon className="w-4 h-4" />
                     )}
                   </Button>
+                  <DropdownMenu
+                    trigger={
                   <Button
-                    onClick={handleRegenerate}
-                    variant="outline"
                     size="sm"
-                    className="border-gray-600 text-black hover:bg-gray-700"
-                    disabled={isGenerating}
+                        className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 h-8 w-8 p-0"
+                        title="More options"
+                      >
+                        <MoreVerticalIcon className="w-5 h-5" />
+                      </Button>
+                    }
                   >
-                    <RefreshCwIcon className="w-4 h-4 mr-1" />
+                    <DropdownMenuItem
+                      onClick={() => setShowPreview(!showPreview)}
+                      icon={<EyeIcon className="w-4 h-4" />}
+                    >
+                      {showPreview ? "Hide Preview" : "Show Preview"}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleRegenerate}
+                      icon={<RefreshCwIcon className="w-4 h-4" />}
+                    >
                     Regenerate
-                  </Button>
+                    </DropdownMenuItem>
+                    <div className="border-t border-gray-800 my-1"></div>
+                    <DropdownMenuItem
+                      onClick={handleExportText}
+                      icon={<DownloadIcon className="w-4 h-4" />}
+                    >
+                      Export TXT
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleExportPDF}
+                      icon={<FileTextIconExport className="w-4 h-4" />}
+                    >
+                      Export PDF
+                    </DropdownMenuItem>
+                  </DropdownMenu>
                 </div>
               </div>
 
-              {/* Preview */}
+              {/* Preview - Simplified */}
               {showPreview && (
-                <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <div className="p-4 bg-gray-900/30 rounded-lg border border-gray-800">
                   {renderPreview}
                 </div>
               )}
 
-              {/* Content Display */}
-              <div className="p-6 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="prose prose-invert max-w-none">
-                  <pre className="whitespace-pre-wrap text-gray-200 font-sans text-sm leading-relaxed">
+              {/* Content Display - Clean */}
+              <div className="p-5 bg-gray-900/30 rounded-lg border border-gray-800">
+                <pre className="whitespace-pre-wrap text-gray-100 font-sans text-sm leading-relaxed">
                     {generatedContent}
                   </pre>
-                </div>
               </div>
             </div>
           )}

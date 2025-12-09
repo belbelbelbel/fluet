@@ -20,6 +20,7 @@ import {
   CheckIcon,
   XIcon,
   ZapIcon,
+  Loader2Icon,
 } from "lucide-react";
 
 type ContentType = "twitter" | "instagram" | "linkedin" | "tiktok";
@@ -36,7 +37,7 @@ interface ScheduledPost {
 }
 
 export default function SchedulePage() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const { userId } = useAuth();
   const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -230,6 +231,21 @@ export default function SchedulePage() {
     [scheduledPosts]
   );
 
+  // Show loading spinner while checking auth
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative w-16 h-16 mx-auto mb-4">
+            <Loader2Icon className="w-16 h-16 text-blue-500 animate-spin" />
+            <CalendarIcon className="w-8 h-8 text-purple-500 absolute -top-2 -right-2 animate-pulse" />
+          </div>
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-black text-gray-100 flex items-center justify-center">
@@ -242,19 +258,19 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b pt-20 from-black to-gray-900 text-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-gray-100">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-8 sm:mb-12">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+        <div className="max-w-3xl mx-auto">
+          {/* Header - Consistent */}
+          <div className="mb-10">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 mb-2">
-                  Schedule & Automate
+                <h1 className="text-2xl font-semibold text-white mb-1.5">
+                  Schedule
                 </h1>
-                <p className="text-gray-400 text-base sm:text-lg">
-                  Automate your social media content posting
+                <p className="text-sm text-gray-500">
+                  Automate your posts
                 </p>
               </div>
               <Button
@@ -265,42 +281,27 @@ export default function SchedulePage() {
                   setScheduledTime("");
                   setShowScheduleModal(true);
                 }}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
               >
-                <PlusIcon className="w-5 h-5 mr-2" />
-                Schedule Post
+                <PlusIcon className="w-4 h-4 mr-1.5" />
+                New
               </Button>
             </div>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm mb-1">Upcoming</p>
-                  <p className="text-3xl font-bold text-white">{upcomingPosts.length}</p>
-                </div>
-                <ClockIcon className="w-10 h-10 text-blue-400" />
-              </div>
+          {/* Stats Cards - Minimal */}
+          <div className="grid grid-cols-3 gap-4 mb-10">
+            <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
+              <p className="text-xs text-gray-500 mb-1">Upcoming</p>
+              <p className="text-xl font-semibold text-white">{upcomingPosts.length}</p>
             </div>
-            <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/30 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm mb-1">Posted</p>
-                  <p className="text-3xl font-bold text-white">{pastPosts.filter((p) => p.posted).length}</p>
-                </div>
-                <CheckIcon className="w-10 h-10 text-green-400" />
-              </div>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
+              <p className="text-xs text-gray-500 mb-1">Posted</p>
+              <p className="text-xl font-semibold text-white">{pastPosts.filter((p) => p.posted).length}</p>
             </div>
-            <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/30 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm mb-1">Total</p>
-                  <p className="text-3xl font-bold text-white">{scheduledPosts.length}</p>
-                </div>
-                <ZapIcon className="w-10 h-10 text-purple-400" />
-              </div>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
+              <p className="text-xs text-gray-500 mb-1">Total</p>
+              <p className="text-xl font-semibold text-white">{scheduledPosts.length}</p>
             </div>
           </div>
 
@@ -313,62 +314,54 @@ export default function SchedulePage() {
             <>
               {/* Upcoming Posts */}
               {upcomingPosts.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                    <ClockIcon className="w-6 h-6 mr-2 text-blue-400" />
-                    Upcoming Posts
-                  </h2>
-                  <div className="space-y-4">
+                <div className="mb-10">
+                  <h2 className="text-lg font-semibold text-white mb-4">Upcoming</h2>
+                  <div className="space-y-5">
                     {upcomingPosts.map((post) => (
                       <div
                         key={post.id}
-                        className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-6 hover:border-blue-500/50 transition-all shadow-lg"
+                        className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors"
                       >
-                        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                        <div className="flex items-start justify-between gap-3 mb-2">
                           <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-3">
-                              <div className="p-2 bg-gray-700 rounded-lg">
-                                {getPlatformIcon(post.platform)}
-                              </div>
-                              <div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="font-semibold text-white capitalize">
-                                    {post.platform}
-                                  </span>
-                                  <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-500/30">
-                                    {getTimeUntil(post.scheduledFor)}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-gray-400 mt-1">
-                                  {formatDateTime(post.scheduledFor)}
-                                </p>
-                              </div>
+                            <div className="flex items-center gap-2 mb-1.5">
+                              {getPlatformIcon(post.platform)}
+                              <span className="text-sm font-medium text-white capitalize">
+                                {post.platform}
+                              </span>
+                              <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">
+                                {getTimeUntil(post.scheduledFor)}
+                              </span>
                             </div>
-                            <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700 mt-3">
-                              <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed line-clamp-3">
-                                {post.content}
-                              </pre>
-                            </div>
+                            <span className="text-xs text-gray-500">
+                              {formatDateTime(post.scheduledFor)}
+                            </span>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-1.5">
                             <Button
                               onClick={() => handleEdit(post)}
-                              variant="outline"
                               size="sm"
-                              className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
+                              variant="ghost"
+                              className="text-gray-400 hover:text-white hover:bg-gray-800 h-8 w-8 p-0"
+                              title="Edit"
                             >
-                              <EditIcon className="w-4 h-4 mr-1" />
-                              Edit
+                              <EditIcon className="w-4 h-4" />
                             </Button>
                             <Button
                               onClick={() => handleDelete(post.id)}
-                              variant="outline"
                               size="sm"
-                              className="border-red-600 text-red-400 hover:bg-red-600/20"
+                              variant="ghost"
+                              className="text-gray-400 hover:text-red-400 hover:bg-gray-800 h-8 w-8 p-0"
+                              title="Delete"
                             >
                               <TrashIcon className="w-4 h-4" />
                             </Button>
                           </div>
+                        </div>
+                        <div className="bg-gray-900/30 rounded p-3 border border-gray-800">
+                          <pre className="whitespace-pre-wrap text-gray-200 text-xs leading-relaxed line-clamp-2">
+                            {post.content}
+                          </pre>
                         </div>
                       </div>
                     ))}
@@ -379,41 +372,32 @@ export default function SchedulePage() {
               {/* Past Posts */}
               {pastPosts.length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                    <CheckIcon className="w-6 h-6 mr-2 text-green-400" />
-                    Past Posts
-                  </h2>
-                  <div className="space-y-4">
+                  <h2 className="text-lg font-semibold text-white mb-4">Past</h2>
+                  <div className="space-y-5">
                     {pastPosts.map((post) => (
                       <div
                         key={post.id}
-                        className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-xl p-6 opacity-75"
+                        className="bg-gray-900/30 border border-gray-800 rounded-lg p-3 opacity-70"
                       >
-                        <div className="flex items-center space-x-3 mb-3">
-                          <div className="p-2 bg-gray-700 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
                             {getPlatformIcon(post.platform)}
-                          </div>
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <span className="font-semibold text-white capitalize">
-                                {post.platform}
+                            <span className="text-sm font-medium text-gray-400 capitalize">
+                              {post.platform}
+                            </span>
+                            {post.posted && (
+                              <span className="px-1.5 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">
+                                Posted
                               </span>
-                              {post.posted && (
-                                <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-500/30">
-                                  Posted
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-400 mt-1">
-                              {formatDateTime(post.scheduledFor)}
-                            </p>
+                            )}
                           </div>
+                          <span className="text-xs text-gray-600">
+                            {formatDateTime(post.scheduledFor)}
+                          </span>
                         </div>
-                        <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
-                          <pre className="whitespace-pre-wrap text-gray-300 text-sm leading-relaxed line-clamp-2">
-                            {post.content}
-                          </pre>
-                        </div>
+                        <pre className="whitespace-pre-wrap text-gray-400 text-xs leading-relaxed line-clamp-2">
+                          {post.content}
+                        </pre>
                       </div>
                     ))}
                   </div>
@@ -421,33 +405,19 @@ export default function SchedulePage() {
               )}
 
               {scheduledPosts.length === 0 && (
-                <div className="text-center py-16">
-                  <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-full flex items-center justify-center border border-blue-500/30">
-                    <CalendarIcon className="w-16 h-16 text-blue-400" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">No Scheduled Posts Yet</h3>
-                  <p className="text-gray-400 mb-2 max-w-md mx-auto">
-                    Automate your social media by scheduling your content in advance
+                <div className="text-center py-12">
+                  <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+                  <h3 className="text-lg font-semibold text-white mb-1.5">No scheduled posts</h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Schedule your content to automate posting
                   </p>
-                  <p className="text-gray-500 text-sm mb-8 max-w-md mx-auto">
-                    Schedule posts to go live at the perfect time for maximum engagement
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button
-                      onClick={() => setShowScheduleModal(true)}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg"
-                    >
-                      <PlusIcon className="w-5 h-5 mr-2" />
-                      Schedule Your First Post
-                    </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="border-gray-600 text-gray-300 hover:bg-gray-700 px-6 py-3 rounded-full"
-                    >
-                      <a href="/generate">Generate Content First</a>
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={() => setShowScheduleModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <PlusIcon className="w-4 h-4 mr-1.5" />
+                    Schedule Post
+                  </Button>
                 </div>
               )}
             </>
@@ -465,164 +435,112 @@ export default function SchedulePage() {
           }}
         >
           <div
-            className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+            className="bg-gray-900 border border-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-gray-700 flex items-center justify-between bg-gradient-to-r from-gray-900 to-gray-800">
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  {editingPost ? "Edit Scheduled Post" : "Schedule New Post"}
-                </h2>
-                <p className="text-sm text-gray-400 mt-1">
-                  {editingPost ? "Update your scheduled post details" : "Set when your content should be posted"}
-                </p>
-              </div>
+            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">
+                {editingPost ? "Edit Post" : "Schedule Post"}
+              </h2>
               <button
                 onClick={() => {
                   setShowScheduleModal(false);
                   setEditingPost(null);
                 }}
-                className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
-                aria-label="Close"
+                className="text-gray-500 hover:text-gray-300 transition-colors p-1.5 hover:bg-gray-800 rounded"
               >
-                <XIcon className="w-5 h-5" />
+                <XIcon className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {/* Platform Selection */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {/* Platform Selection - Clean */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-3">
-                  Select Platform
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <label className="block text-xs font-medium text-gray-400 mb-2">Platform</label>
+                <div className="flex gap-2">
                   {contentTypes.map((type) => (
                     <button
                       key={type}
                       onClick={() => setSelectedPlatform(type)}
-                      className={`p-4 rounded-lg border-2 transition-all ${
+                      className={`flex-1 flex items-center justify-center gap-2 p-2.5 rounded-lg border transition-colors ${
                         selectedPlatform === type
-                          ? "border-blue-500 bg-blue-500/10"
-                          : "border-gray-700 hover:border-gray-600"
+                          ? "border-blue-500 bg-blue-500/10 text-blue-400"
+                          : "border-gray-800 bg-gray-900/50 text-gray-400 hover:border-gray-700 hover:text-gray-300"
                       }`}
                     >
-                      <div className="flex flex-col items-center">
-                        {getPlatformIcon(type)}
-                        <span className="text-xs mt-2 capitalize">{type}</span>
-                      </div>
+                      {getPlatformIcon(type)}
+                      <span className="text-xs capitalize hidden sm:inline">{type}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Content Input */}
+              {/* Content Input - Clean */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Post Content
-                </label>
+                <label className="block text-xs font-medium text-gray-400 mb-2">Content</label>
                 <textarea
                   value={selectedContent}
                   onChange={(e) => setSelectedContent(e.target.value)}
-                  placeholder="Paste or type your content here. You can also generate content first and then schedule it..."
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  rows={10}
+                  placeholder="Paste or type your content here..."
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm"
+                  rows={6}
                 />
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-xs text-gray-500">
-                    {selectedContent.length} characters
-                  </p>
-                  {!selectedContent && (
-                    <Link
-                      href="/generate"
-                      className="text-xs text-black hover:text-blue-300 flex items-center"
-                    >
-                      Generate content first →
-                    </Link>
-                  )}
+                <div className="mt-1.5 text-xs text-gray-600 text-right">
+                  {selectedContent.length} chars
                 </div>
               </div>
 
-              {/* Date and Time */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Date and Time - Clean */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    <CalendarIcon className="w-4 h-4 inline mr-2" />
-                    Schedule Date
-                  </label>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Date</label>
                   <input
                     type="date"
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     min={new Date().toISOString().split("T")[0]}
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Select when to post</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    <ClockIcon className="w-4 h-4 inline mr-2" />
-                    Schedule Time
-                  </label>
+                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Time</label>
                   <input
                     type="time"
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Select the exact time</p>
                 </div>
               </div>
-              
-              {/* Quick Time Suggestions */}
-              {scheduledDate && (
-                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                  <p className="text-xs font-medium text-blue-400 mb-2">💡 Quick Schedule Tips</p>
-                  <ul className="text-xs text-gray-400 space-y-1">
-                    <li>• Best times: 9 AM, 12 PM, 3 PM, 6 PM (your timezone)</li>
-                    <li>• Weekdays typically get more engagement</li>
-                    <li>• Schedule multiple posts for consistent presence</li>
-                  </ul>
-                </div>
-              )}
             </div>
 
-            <div className="p-6 border-t border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-xs text-gray-500">
-                {selectedContent.trim() && scheduledDate && scheduledTime ? (
-                  <span className="text-green-400">✓ Ready to schedule</span>
+            <div className="p-4 border-t border-gray-800 bg-gray-900/50 flex items-center justify-end gap-2">
+              <Button
+                onClick={() => {
+                  setShowScheduleModal(false);
+                  setEditingPost(null);
+                }}
+                size="sm"
+                variant="ghost"
+                className="text-black hover:text-white hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSchedule}
+                disabled={isSubmitting || !selectedContent.trim() || !scheduledDate || !scheduledTime}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin mr-1.5"></div>
+                    {editingPost ? "Updating..." : "Scheduling..."}
+                  </>
                 ) : (
-                  <span>Please fill in all fields to continue</span>
+                  editingPost ? "Update" : "Schedule"
                 )}
-              </div>
-              <div className="flex gap-3 w-full sm:w-auto">
-                <Button
-                  onClick={() => {
-                    setShowScheduleModal(false);
-                    setEditingPost(null);
-                  }}
-                  variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-700 flex-1 sm:flex-none"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSchedule}
-                  disabled={isSubmitting || !selectedContent.trim() || !scheduledDate || !scheduledTime}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none min-w-[140px]"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      {editingPost ? "Updating..." : "Scheduling..."}
-                    </>
-                  ) : (
-                    <>
-                      <CalendarIcon className="w-4 h-4 mr-2" />
-                      {editingPost ? "Update" : "Schedule"}
-                    </>
-                  )}
-                </Button>
-              </div>
+              </Button>
             </div>
           </div>
         </div>

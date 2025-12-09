@@ -18,7 +18,7 @@ const userclerkid = globalThis.localStorage?.getItem('userclerkid')
 console.log("consoleId",userclerkid)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-gray-100 overflow-hidden pt-20">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-gray-100 overflow-hidden pt-20">
       <Navbar />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -203,7 +203,7 @@ console.log("consoleId",userclerkid)
               </Button>
             </SignUpButton>
           )} */}
-          <p className="mt-4 text-gray-400">No credit card required</p>
+          {/* <p className="mt-4 text-gray-400">No credit card required</p> */}
         </div>
       </main>
     </div>
