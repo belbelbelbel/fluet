@@ -256,7 +256,7 @@ export default function PricingPage() {
                       <Button
                         onClick={handleCancel}
                         variant="outline"
-                        className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
+                        className="flex-1 border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
                       >
                         Cancel
                       </Button>

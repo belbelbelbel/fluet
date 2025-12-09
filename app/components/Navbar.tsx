@@ -31,7 +31,7 @@ export function Navbar() {
     setIsMenuOpen((prev) => !prev);
   }, []);
 
-  const navItems = useMemo(() => ["Features", "Pricing", "Docs"], []);
+  const navItems = useMemo(() => ["Pricing", "Docs"], []);
 
   const isActive = useCallback((path: string) => {
     if (path === "/") {
@@ -69,7 +69,8 @@ export function Navbar() {
             className={`w-full sm:w-auto ${isMenuOpen ? "block" : "hidden"
               } sm:block mt-4 sm:mt-0`}
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6">
+              {/* Public Navigation */}
               {navItems.map((item) => {
                 const href = `/${item.toLowerCase()}`;
                 const active = isActive(href);
@@ -78,8 +79,8 @@ export function Navbar() {
                     key={item}
                     href={href}
                     className={`${
-                      active ? "text-white" : "text-gray-300"
-                    } hover:text-white transition-colors py-2 sm:py-0 relative group`}
+                      active ? "text-white font-medium" : "text-gray-300"
+                    } hover:text-white transition-colors py-2 sm:py-0 relative group text-sm sm:text-base`}
                   >
                     {item}
                     <span
@@ -92,13 +93,20 @@ export function Navbar() {
                   </Link>
                 );
               })}
+              
+              {/* Divider for signed-in users */}
+              {userId && (
+                <div className="hidden sm:block w-px h-6 bg-gray-700 mx-2"></div>
+              )}
+              
+              {/* User Navigation */}
               {userId && (
                 <>
                   <Link
                     href="/generate"
                     className={`${
-                      isActive("/generate") ? "text-white" : "text-gray-300"
-                    } hover:text-white transition-colors py-2 sm:py-0 relative group`}
+                      isActive("/generate") ? "text-white font-medium" : "text-gray-300"
+                    } hover:text-white transition-colors py-2 sm:py-0 relative group text-sm sm:text-base`}
                   >
                     Generate
                     <span
@@ -112,13 +120,28 @@ export function Navbar() {
                   <Link
                     href="/history"
                     className={`${
-                      isActive("/history") ? "text-white" : "text-gray-300"
-                    } hover:text-white transition-colors py-2 sm:py-0 relative group`}
+                      isActive("/history") ? "text-white font-medium" : "text-gray-300"
+                    } hover:text-white transition-colors py-2 sm:py-0 relative group text-sm sm:text-base`}
                   >
                     History
                     <span
                       className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
                         isActive("/history")
+                          ? "scale-x-100"
+                          : "scale-x-0 group-hover:scale-x-100"
+                      }`}
+                    ></span>
+                  </Link>
+                  <Link
+                    href="/schedule"
+                    className={`${
+                      isActive("/schedule") ? "text-white font-medium" : "text-gray-300"
+                    } hover:text-white transition-colors py-2 sm:py-0 relative group text-sm sm:text-base`}
+                  >
+                    Schedule
+                    <span
+                      className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
+                        isActive("/schedule")
                           ? "scale-x-100"
                           : "scale-x-0 group-hover:scale-x-100"
                       }`}

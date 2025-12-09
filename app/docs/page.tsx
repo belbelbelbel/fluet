@@ -181,7 +181,7 @@ export default function DocsPage() {
               <Button
                 asChild
                 variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="border-gray-600 text-gray-900 dark:text-gray-300 hover:bg-gray-700 dark:hover:text-white"
               >
                 <Link href="/generate">Try It Now</Link>
               </Button>
