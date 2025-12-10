@@ -1,0 +1,382 @@
+"use client";
+
+import { useAuth } from "@clerk/nextjs";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import {
+  Users,
+  UserPlus,
+  Crown,
+  Shield,
+  User,
+  Mail,
+  MoreVertical,
+  Trash2,
+  Edit,
+  Check,
+  X,
+} from "lucide-react";
+import { showToast } from "@/lib/toast";
+import { DropdownMenu, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+
+interface TeamMember {
+  id: number;
+  name: string;
+  email: string;
+  role: "owner" | "admin" | "member";
+  avatar?: string;
+  joinedAt: string;
+  contentGenerated: number;
+}
+
+export default function TeamPage() {
+  const { userId } = useAuth();
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [removeConfirm, setRemoveConfirm] = useState<{ open: boolean; id: number | null }>({
+    open: false,
+    id: null,
+  });
+
+  useEffect(() => {
+    if (userId) {
+      fetchTeamMembers();
+    }
+  }, [userId]);
+
+  const fetchTeamMembers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/team?userId=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMembers(data.members || []);
+      }
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInvite = async () => {
+    if (!inviteEmail.trim()) {
+      showToast.error("Invalid email", "Please enter a valid email address");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/team/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: inviteEmail, userId }),
+      });
+
+      if (response.ok) {
+        showToast.success("Invitation sent", `Invitation sent to ${inviteEmail}`);
+        setInviteEmail("");
+        setShowInviteModal(false);
+        fetchTeamMembers();
+      } else {
+        showToast.error("Failed to send invitation", "Please try again");
+      }
+    } catch (error) {
+      showToast.error("Error", "Failed to send invitation");
+    }
+  };
+
+  const handleRemoveMemberClick = (memberId: number) => {
+    setRemoveConfirm({ open: true, id: memberId });
+  };
+
+  const handleRemoveMemberConfirm = async () => {
+    if (!removeConfirm.id) return;
+
+    const memberId = removeConfirm.id;
+    setRemoveConfirm({ open: false, id: null });
+
+    try {
+      const response = await fetch(`/api/team/${memberId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        showToast.success("Member removed", "Team member has been removed");
+        fetchTeamMembers();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || "Failed to remove member";
+        showToast.error("Failed to remove member", errorMessage);
+      }
+    } catch (error) {
+      showToast.error("Error", "Failed to remove team member");
+    }
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "owner":
+        return <Crown className="w-4 h-4 text-yellow-400" />;
+      case "admin":
+        return <Shield className="w-4 h-4 text-blue-400" />;
+      default:
+        return <User className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case "owner":
+        return <Badge variant="warning">Owner</Badge>;
+      case "admin":
+        return <Badge variant="default">Admin</Badge>;
+      default:
+        return <Badge variant="secondary">Member</Badge>;
+    }
+  };
+
+  const stats = [
+    {
+      title: "Team Members",
+      value: members.length,
+      icon: Users,
+      color: "text-blue-400",
+      bgColor: "bg-blue-500/10",
+    },
+    {
+      title: "Admins",
+      value: members.filter((m) => m.role === "admin" || m.role === "owner").length,
+      icon: Shield,
+      color: "text-purple-400",
+      bgColor: "bg-purple-500/10",
+    },
+    {
+      title: "Total Content",
+      value: members.reduce((sum, m) => sum + m.contentGenerated, 0),
+      icon: User,
+      color: "text-green-400",
+      bgColor: "bg-green-500/10",
+    },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">Team Management</h1>
+          <p className="text-gray-400">
+            Manage your team members and their permissions
+          </p>
+        </div>
+        <Button
+          onClick={() => setShowInviteModal(true)}
+          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+        >
+          <UserPlus className="w-4 h-4 mr-2" />
+          Invite Member
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Card
+              key={index}
+              className={`${stat.bgColor} border-gray-700 hover:border-gray-600 transition-all`}
+            >
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-300">
+                  {stat.title}
+                </CardTitle>
+                <div className={`${stat.color} ${stat.bgColor} p-2 rounded-lg`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">
+                  {loading ? (
+                    <div className="h-8 w-16 bg-gray-800 rounded animate-pulse" />
+                  ) : (
+                    stat.value
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Team Members List */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-white">Team Members</CardTitle>
+          <CardDescription>
+            Manage roles and permissions for your team
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-20 bg-gray-800 rounded-lg animate-pulse"
+                />
+              ))}
+            </div>
+          ) : members.length === 0 ? (
+            <div className="text-center py-12">
+              <Users className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+              <p className="text-gray-400 mb-2">No team members yet</p>
+              <p className="text-sm text-gray-500 mb-4">
+                Invite team members to collaborate on content creation
+              </p>
+              <Button
+                onClick={() => setShowInviteModal(true)}
+                variant="outline"
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Invite Your First Member
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {members.map((member) => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                      {member.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-white">{member.name}</p>
+                        {getRoleIcon(member.role)}
+                        {getRoleBadge(member.role)}
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Mail className="w-3 h-3 text-gray-500" />
+                        <p className="text-sm text-gray-400">{member.email}</p>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {member.contentGenerated} posts • Joined{" "}
+                        {new Date(member.joinedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  {member.role !== "owner" && (
+                    <DropdownMenu
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-400 hover:text-white"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      }
+                    >
+                      <DropdownMenuItem
+                        onClick={() => {}}
+                        icon={<Edit className="w-4 h-4" />}
+                      >
+                        Edit Role
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleRemoveMemberClick(member.id)}
+                        icon={<Trash2 className="w-4 h-4" />}
+                      >
+                        Remove Member
+                      </DropdownMenuItem>
+                    </DropdownMenu>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowInviteModal(false)}
+        >
+          <Card
+            className="w-full max-w-md bg-gray-900 border-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader>
+              <CardTitle className="text-white">Invite Team Member</CardTitle>
+              <CardDescription>
+                Send an invitation to collaborate on your content
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-300 mb-2 block">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="colleague@example.com"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleInvite}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <Check className="w-4 h-4 mr-2" />
+                  Send Invitation
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowInviteModal(false);
+                    setInviteEmail("");
+                  }}
+                  variant="outline"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Remove Member Confirmation Dialog */}
+      {removeConfirm.open && (
+        <div className="fixed inset-0 z-[100]">
+          <ConfirmDialog
+            open={removeConfirm.open}
+            onClose={() => setRemoveConfirm({ open: false, id: null })}
+            onConfirm={handleRemoveMemberConfirm}
+            title="Remove Team Member"
+            description="Are you sure you want to remove this team member? They will lose access to the team immediately."
+            confirmText="Remove"
+            cancelText="Cancel"
+            variant="destructive"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+

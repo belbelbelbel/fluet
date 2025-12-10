@@ -266,18 +266,28 @@ async function generateAIContent(
   }[length] || "medium length";
 
   const platformInstructions: Record<string, string> = {
-    twitter: `Create a Twitter thread about "${prompt}". Format it as a numbered thread (1/, 2/, 3/, etc.) with engaging, conversational tweets. Include relevant hashtags at the end. Make it ${toneDescription} in tone, ${styleDescription} in style, and ${lengthDescription} in length.`,
-    instagram: `Create an Instagram caption about "${prompt}". Make it engaging, visually descriptive, and include relevant emojis and hashtags. The tone should be ${toneDescription}, style should be ${styleDescription}, and length should be ${lengthDescription}.`,
-    linkedin: `Create a professional LinkedIn post about "${prompt}". Make it thought-provoking and valuable for a professional network. Include a clear structure with key points. The tone should be ${toneDescription}, style should be ${styleDescription}, and length should be ${lengthDescription}.`,
+    twitter: `Create a Twitter thread about "${prompt}". Format it as a numbered thread (1/, 2/, 3/, etc.) with engaging, conversational tweets. Include relevant hashtags at the end. Make it ${toneDescription} in tone, ${styleDescription} in style, and ${lengthDescription} in length.
+
+IMPORTANT: Use ONLY plain text. NO markdown formatting, NO asterisks (*), NO bold text, NO numbered lists with asterisks. Just clean, readable text that can be copied directly to Twitter.`,
+    instagram: `Create an Instagram caption about "${prompt}". Make it engaging, visually descriptive, and include relevant emojis and hashtags. The tone should be ${toneDescription}, style should be ${styleDescription}, and length should be ${lengthDescription}.
+
+IMPORTANT: Use ONLY plain text. NO markdown formatting, NO asterisks (*), NO bold text. Just clean, readable text that can be copied directly to Instagram.`,
+    linkedin: `Create a professional LinkedIn post about "${prompt}". Make it thought-provoking and valuable for a professional network. Include a clear structure with key points. The tone should be ${toneDescription}, style should be ${styleDescription}, and length should be ${lengthDescription}.
+
+IMPORTANT: Use ONLY plain text. NO markdown formatting, NO asterisks (*), NO bold text, NO numbered lists with asterisks. Just clean, readable text that can be copied directly to LinkedIn.`,
     tiktok: `Create TikTok content about "${prompt}". Include:
 1. A video script with Hook (0-3s), Body (3-15s), and Call to Action (15-30s)
 2. A catchy caption
 3. Relevant hashtags
 
-Make it ${toneDescription} in tone, ${styleDescription} in style, and keep it engaging and authentic.`
+Make it ${toneDescription} in tone, ${styleDescription} in style, and keep it engaging and authentic.
+
+IMPORTANT: Use ONLY plain text. NO markdown formatting, NO asterisks (*), NO bold text. Just clean, readable text that can be copied directly to TikTok.`
   };
 
-  const systemPrompt = `You are an expert social media content creator. Generate high-quality, engaging content optimized for the specified platform. Follow the user's instructions precisely for tone, style, and length.`;
+  const systemPrompt = `You are an expert social media content creator. Generate high-quality, engaging content optimized for the specified platform. Follow the user's instructions precisely for tone, style, and length.
+
+CRITICAL: Always output content in PLAIN TEXT format only. Never use markdown formatting, asterisks (*), bold markers (**), or any other formatting symbols. The content should be ready to copy and paste directly into the social media platform without any formatting cleanup needed.`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -296,11 +306,30 @@ Make it ${toneDescription} in tone, ${styleDescription} in style, and keep it en
       max_tokens: 1000,
     });
 
-    const generatedContent = completion.choices[0]?.message?.content;
+    let generatedContent = completion.choices[0]?.message?.content;
     
     if (!generatedContent) {
       throw new Error("No content generated from OpenAI");
     }
+
+    // Clean up any markdown formatting that might have slipped through
+    // Remove bold markers (**text** or __text__)
+    generatedContent = generatedContent.replace(/\*\*(.*?)\*\*/g, '$1');
+    generatedContent = generatedContent.replace(/__(.*?)__/g, '$1');
+    // Remove italic markers (*text* or _text_)
+    generatedContent = generatedContent.replace(/\*(.*?)\*/g, '$1');
+    generatedContent = generatedContent.replace(/_(.*?)_/g, '$1');
+    // Remove code blocks
+    generatedContent = generatedContent.replace(/```[\s\S]*?```/g, '');
+    generatedContent = generatedContent.replace(/`(.*?)`/g, '$1');
+    // Remove markdown headers
+    generatedContent = generatedContent.replace(/^#{1,6}\s+/gm, '');
+    // Remove markdown links but keep the text
+    generatedContent = generatedContent.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+    // Remove markdown lists with asterisks (but keep numbered lists like 1/, 2/)
+    generatedContent = generatedContent.replace(/^\s*[\*\-\+]\s+/gm, '');
+    // Clean up extra whitespace
+    generatedContent = generatedContent.replace(/\n{3,}/g, '\n\n').trim();
 
     return generatedContent;
   } catch (error) {

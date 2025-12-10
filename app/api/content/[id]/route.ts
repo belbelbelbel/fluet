@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { db } from "@/utils/db/dbConfig";
 import { GeneratedContent } from "@/utils/db/schema";
@@ -9,17 +9,33 @@ export const dynamic = "force-dynamic";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const { userId: clerkUserId } = await auth();
+    // Try multiple methods to get the user ID (same pattern as other routes)
+    const authResult = await auth();
+    let clerkUserId = authResult?.userId;
+    
+    // If auth() didn't work, try currentUser()
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id || null;
+      } catch (userError) {
+        console.warn("currentUser() failed:", userError);
+      }
+    }
 
     if (!clerkUserId) {
+      console.error("[Delete API] No userId found - auth failed");
+      console.error("[Delete API] Auth result:", authResult);
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized", details: "Please sign in to delete content. If you're already signed in, please try refreshing the page." },
         { status: 401 }
       );
     }
+
+    console.log("[Delete API] Authenticated user:", clerkUserId);
 
     const user = await GetUserByClerkId(clerkUserId);
 
@@ -30,7 +46,9 @@ export async function DELETE(
       );
     }
 
-    const contentId = parseInt(params.id);
+    // Handle both Promise and direct params (Next.js 14 vs 15)
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const contentId = parseInt(resolvedParams.id);
 
     const [content] = await db
       .select()

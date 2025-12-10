@@ -45,3 +45,4 @@ export const exportAsPDF = async (content: string, title: string = "Generated Co
   printWindow.print();
 };
 
+

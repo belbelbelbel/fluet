@@ -101,53 +101,21 @@ export function Navbar() {
               
               {/* User Navigation */}
               {userId && (
-                <>
-                  <Link
-                    href="/generate"
-                    className={`${
-                      isActive("/generate") ? "text-white font-medium" : "text-gray-300"
-                    } hover:text-white transition-colors py-2 sm:py-0 relative group text-sm sm:text-base`}
-                  >
-                    Generate
-                    <span
-                      className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
-                        isActive("/generate")
-                          ? "scale-x-100"
-                          : "scale-x-0 group-hover:scale-x-100"
-                      }`}
-                    ></span>
-                  </Link>
-                  <Link
-                    href="/history"
-                    className={`${
-                      isActive("/history") ? "text-white font-medium" : "text-gray-300"
-                    } hover:text-white transition-colors py-2 sm:py-0 relative group text-sm sm:text-base`}
-                  >
-                    History
-                    <span
-                      className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
-                        isActive("/history")
-                          ? "scale-x-100"
-                          : "scale-x-0 group-hover:scale-x-100"
-                      }`}
-                    ></span>
-                  </Link>
-                  <Link
-                    href="/schedule"
-                    className={`${
-                      isActive("/schedule") ? "text-white font-medium" : "text-gray-300"
-                    } hover:text-white transition-colors py-2 sm:py-0 relative group text-sm sm:text-base`}
-                  >
-                    Schedule
-                    <span
-                      className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
-                        isActive("/schedule")
-                          ? "scale-x-100"
-                          : "scale-x-0 group-hover:scale-x-100"
-                      }`}
-                    ></span>
-                  </Link>
-                </>
+                <Link
+                  href="/dashboard"
+                  className={`${
+                    isActive("/dashboard") ? "text-white font-medium" : "text-gray-300"
+                  } hover:text-white transition-colors py-2 sm:py-0 relative group text-sm sm:text-base`}
+                >
+                  Dashboard
+                  <span
+                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transition-transform origin-left ${
+                      isActive("/dashboard")
+                        ? "scale-x-100"
+                        : "scale-x-0 group-hover:scale-x-100"
+                    }`}
+                  ></span>
+                </Link>
               )}
               <SignedOut>
                 <SignInButton mode="modal">
