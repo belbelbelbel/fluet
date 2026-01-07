@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { GetUserByClerkId } from "@/utils/db/actions";
 import { db } from "@/utils/db/dbConfig";
-import { GeneratedContent, ContentAnalytics } from "@/utils/db/schema";
+import { ContentAnalytics } from "@/utils/db/schema";
 import { eq, and, gte, sql, sum, count } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
@@ -30,7 +30,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Calculate date range
-    const now = new Date();
     const daysAgo = range === "7d" ? 7 : range === "30d" ? 30 : 90;
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysAgo);

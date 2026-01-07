@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, SaveGeneratedContent, GetUserSubscription, GetUserUsageCount, CreateOrUpdateUser } from "@/utils/db/actions";
@@ -12,9 +12,19 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { prompt, contentType, tone, style, length, userId: clientUserId } = body;
 
-    // Get authentication from Clerk
+    // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    const clerkUserId = authResult?.userId || clientUserId;
+    let clerkUserId = authResult?.userId || clientUserId;
+    
+    // If auth() didn't work, try currentUser() as fallback
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id || null;
+      } catch (userError) {
+        console.warn("currentUser() failed:", userError);
+      }
+    }
 
     // Log authentication status for debugging
     if (!clerkUserId) {
@@ -54,15 +64,17 @@ export async function POST(req: Request) {
     let usageCount = 0;
     
     try {
+      console.log(`[Generate API] Attempting to get/create user for Clerk ID: ${clerkUserId}`);
+      
       // First, try to get existing user
       user = await GetUserByClerkId(clerkUserId);
       
       // If user doesn't exist, create them
       if (!user || !user.id) {
-        console.log(`Creating new user for Clerk ID: ${clerkUserId}`);
+        console.log(`[Generate API] User not found, creating new user for Clerk ID: ${clerkUserId}`);
         
         // Try to get user details from Clerk
-        let userEmail = `${clerkUserId}@fluet.local`;
+        let userEmail = `${clerkUserId}@flippr.local`;
         let userName = `User ${clerkUserId}`;
         
         try {
@@ -74,15 +86,24 @@ export async function POST(req: Request) {
           if (clerkUser.firstName || clerkUser.lastName) {
             userName = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || userName;
           }
+          console.log(`[Generate API] Fetched Clerk user details - Email: ${userEmail}, Name: ${userName}`);
         } catch (clerkError) {
-          console.warn("Could not fetch Clerk user details, using fallback:", clerkError);
+          console.warn("[Generate API] Could not fetch Clerk user details, using fallback:", clerkError);
         }
         
         // Create the user in our database
-        user = await CreateOrUpdateUser(clerkUserId, userEmail, userName);
-        console.log(`✅ User created/updated: ${user.id}`);
+        try {
+          user = await CreateOrUpdateUser(clerkUserId, userEmail, userName);
+          if (!user || !user.id) {
+            throw new Error("CreateOrUpdateUser returned null or user without id");
+          }
+          console.log(`[Generate API] ✅ User created/updated successfully: ${user.id}`);
+        } catch (createError) {
+          console.error("[Generate API] ❌ Error creating user:", createError);
+          throw new Error(`Failed to create user: ${createError instanceof Error ? createError.message : String(createError)}`);
+        }
       } else {
-        console.log(`✅ User found: ${user.id}`);
+        console.log(`[Generate API] ✅ User found: ${user.id}`);
       }
       
       // Get subscription and usage info
@@ -110,11 +131,13 @@ export async function POST(req: Request) {
         }
       }
     } catch (error) {
-      console.error("❌ Error getting/creating user:", error);
+      console.error("[Generate API] ❌ Error getting/creating user:", error);
+      console.error("[Generate API] Error details:", error instanceof Error ? error.stack : String(error));
       return NextResponse.json(
         { 
           error: "Failed to authenticate user",
-          details: error instanceof Error ? error.message : "Unknown error"
+          details: error instanceof Error ? error.message : "Failed to get user",
+          message: "Please ensure you are signed in and try again. If the problem persists, please refresh the page."
         },
         { status: 500 }
       );

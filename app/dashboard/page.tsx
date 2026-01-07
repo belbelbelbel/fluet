@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,6 @@ import {
   Clock,
 } from "lucide-react";
 import Link from "next/link";
-import { showToast } from "@/lib/toast";
 
 interface DashboardStats {
   totalContent: number;
@@ -41,13 +40,8 @@ export default function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (userId) {
-      fetchDashboardStats();
-    }
-  }, [userId]);
-
-  const fetchDashboardStats = async () => {
+  const fetchDashboardStats = useCallback(async () => {
+    if (!userId) return;
     try {
       setLoading(true);
       const response = await fetch(`/api/dashboard/stats?userId=${userId}`);
@@ -60,7 +54,13 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchDashboardStats();
+    }
+  }, [userId, fetchDashboardStats]);
 
   const statCards = [
     {
@@ -127,26 +127,24 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
             Welcome back! 👋
           </h1>
-          <p className="text-gray-400">
+          <p className="text-sm sm:text-base text-gray-400">
             Here's what's happening with your content today
           </p>
         </div>
-        <Link href="/dashboard/generate">
-          <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/20">
+        <Link href="/dashboard/generate" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/20">
             <Wand2 className="w-4 h-4 mr-2" />
             Generate Content
           </Button>
         </Link>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -177,10 +175,9 @@ export default function DashboardPage() {
         })}
       </div>
 
-      {/* Quick Actions */}
       <div>
-        <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
@@ -210,9 +207,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Activity & Top Platform */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Platform */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
@@ -247,7 +242,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Performance Insights */}
         <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">

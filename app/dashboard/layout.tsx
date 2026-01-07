@@ -14,6 +14,7 @@ export default function DashboardLayout({
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const [sidebarWidth, setSidebarWidth] = useState(256);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
@@ -21,14 +22,28 @@ export default function DashboardLayout({
     }
   }, [isLoaded, isSignedIn, router]);
 
+  // Handle responsive sidebar
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   // Listen for sidebar width changes
   useEffect(() => {
-    const handleSidebarChange = (e: CustomEvent) => {
-      setSidebarWidth(e.detail.width);
+    const handleSidebarChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ width: number }>;
+      if (customEvent.detail?.width !== undefined) {
+        setSidebarWidth(customEvent.detail.width);
+      }
     };
-    window.addEventListener("sidebar-width-change" as any, handleSidebarChange);
+    window.addEventListener("sidebar-width-change", handleSidebarChange);
     return () => {
-      window.removeEventListener("sidebar-width-change" as any, handleSidebarChange);
+      window.removeEventListener("sidebar-width-change", handleSidebarChange);
     };
   }, []);
 
@@ -52,9 +67,11 @@ export default function DashboardLayout({
       <DashboardSidebar onWidthChange={(width) => setSidebarWidth(width)} />
       <main 
         className="transition-all duration-300 min-h-screen"
-        style={{ marginLeft: `${sidebarWidth}px` }}
+        style={{ 
+          marginLeft: isMobile ? '0' : `${sidebarWidth}px`,
+        }}
       >
-        <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
           {children}
         </div>
       </main>

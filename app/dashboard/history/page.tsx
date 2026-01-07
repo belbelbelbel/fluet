@@ -17,7 +17,6 @@ import {
   TrashIcon,
   CalendarIcon,
   FileTextIcon,
-  EyeIcon,
   XIcon,
   CalendarPlusIcon,
   RefreshCwIcon,
@@ -167,10 +166,10 @@ export default function DashboardHistoryPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Content History</h1>
-          <p className="text-gray-400">Your generated content</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Content History</h1>
+          <p className="text-sm sm:text-base text-gray-400">Your generated content</p>
         </div>
         <Button
           onClick={fetchContent}
@@ -185,10 +184,10 @@ export default function DashboardHistoryPage() {
 
       {/* Filters */}
       <div>
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           <button
             onClick={() => setFilter("all")}
-            className={`px-3 py-1.5 rounded-md text-xs transition-colors ${
+            className={`px-2 sm:px-3 py-1.5 rounded-md text-xs transition-colors ${
               filter === "all"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-900/50 text-gray-400 hover:bg-gray-800 hover:text-gray-300"
@@ -200,14 +199,14 @@ export default function DashboardHistoryPage() {
             <button
               key={type}
               onClick={() => setFilter(type)}
-              className={`px-3 py-1.5 rounded-md text-xs transition-colors flex items-center gap-1.5 ${
+              className={`px-2 sm:px-3 py-1.5 rounded-md text-xs transition-colors flex items-center gap-1.5 ${
                 filter === type
                   ? "bg-blue-600 text-white"
                   : "bg-gray-900/50 text-gray-400 hover:bg-gray-800 hover:text-gray-300"
               }`}
             >
               {getContentTypeIcon(type)}
-              <span className="capitalize">{type}</span>
+              <span className="capitalize hidden sm:inline">{type}</span>
             </button>
           ))}
         </div>

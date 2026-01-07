@@ -240,10 +240,10 @@ export default function DashboardSchedulePage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Schedule Posts</h1>
-          <p className="text-gray-400">Automate your content posting</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Schedule Posts</h1>
+          <p className="text-sm sm:text-base text-gray-400">We post for you automatically</p>
         </div>
         <Button
           onClick={() => {
@@ -253,7 +253,7 @@ export default function DashboardSchedulePage() {
             setScheduledTime("");
             setShowScheduleModal(true);
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           New Post
@@ -261,7 +261,7 @@ export default function DashboardSchedulePage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
           <p className="text-xs text-gray-500 mb-1">Upcoming</p>
           <p className="text-2xl font-semibold text-white">{upcomingPosts.length}</p>
@@ -380,7 +380,7 @@ export default function DashboardSchedulePage() {
               <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-600" />
               <h3 className="text-lg font-semibold text-white mb-1.5">No scheduled posts</h3>
               <p className="text-sm text-gray-500 mb-4">
-                Schedule your content to automate posting
+                We post for you automatically
               </p>
               <Button
                 onClick={() => setShowScheduleModal(true)}
@@ -397,18 +397,18 @@ export default function DashboardSchedulePage() {
       {/* Schedule Modal */}
       {showScheduleModal && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6"
           onClick={() => {
             setShowScheduleModal(false);
             setEditingPost(null);
           }}
         >
           <div
-            className="bg-gray-900 border border-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-xl"
+            className="bg-gray-900 border border-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-xl mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white">
+            <div className="p-4 sm:p-6 border-b border-gray-800 flex items-center justify-between">
+              <h2 className="text-base sm:text-lg font-semibold text-white">
                 {editingPost ? "Edit Post" : "Schedule Post"}
               </h2>
               <button
@@ -422,15 +422,15 @@ export default function DashboardSchedulePage() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-2">Platform</label>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-2 sm:flex gap-2">
                   {contentTypes.map((type) => (
                     <button
                       key={type}
                       onClick={() => setSelectedPlatform(type)}
-                      className={`flex-1 flex items-center justify-center gap-2 p-2.5 rounded-lg border transition-colors ${
+                      className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-lg border transition-colors ${
                         selectedPlatform === type
                           ? "border-blue-500 bg-blue-500/10 text-blue-400"
                           : "border-gray-800 bg-gray-900/50 text-gray-400 hover:border-gray-700 hover:text-gray-300"
@@ -480,7 +480,7 @@ export default function DashboardSchedulePage() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-800 bg-gray-900/50 flex items-center justify-end gap-2">
+            <div className="p-4 sm:p-6 border-t border-gray-800 bg-gray-900/50 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2">
               <Button
                 onClick={() => {
                   setShowScheduleModal(false);
@@ -488,7 +488,7 @@ export default function DashboardSchedulePage() {
                 }}
                 size="sm"
                 variant="ghost"
-                className="text-black hover:text-white hover:bg-gray-800"
+                className="w-full sm:w-auto text-gray-300 hover:text-white hover:bg-gray-800"
               >
                 Cancel
               </Button>
@@ -496,7 +496,7 @@ export default function DashboardSchedulePage() {
                 onClick={handleSchedule}
                 disabled={isSubmitting || !selectedContent.trim() || !scheduledDate || !scheduledTime}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
               >
                 {isSubmitting ? (
                   <>

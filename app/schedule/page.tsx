@@ -270,7 +270,7 @@ export default function SchedulePage() {
                   Schedule
                 </h1>
                 <p className="text-sm text-gray-500">
-                  Automate your posts
+                  We post for you automatically
                 </p>
               </div>
               <Button
@@ -409,7 +409,7 @@ export default function SchedulePage() {
                   <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-600" />
                   <h3 className="text-lg font-semibold text-white mb-1.5">No scheduled posts</h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    Schedule your content to automate posting
+                    We post for you automatically
                   </p>
                   <Button
                     onClick={() => setShowScheduleModal(true)}

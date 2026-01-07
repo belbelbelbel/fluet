@@ -177,19 +177,19 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-          <p className="text-gray-400">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Settings</h1>
+          <p className="text-sm sm:text-base text-gray-400">
             Manage your preferences and AI model selection
           </p>
         </div>
         <Button
           onClick={saveSettings}
           disabled={saving}
-          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
         >
           {saving ? (
             <>
@@ -205,25 +205,27 @@ export default function SettingsPage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="ai" className="space-y-6">
-        <TabsList className="bg-gray-900/50 border-gray-800">
-          <TabsTrigger value="ai">
-            <Bot className="w-4 h-4 mr-2" />
-            AI Models
-          </TabsTrigger>
-          <TabsTrigger value="general">
-            <Settings className="w-4 h-4 mr-2" />
-            General
-          </TabsTrigger>
-          <TabsTrigger value="notifications">
-            <Bell className="w-4 h-4 mr-2" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="appearance">
-            <Palette className="w-4 h-4 mr-2" />
-            Appearance
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="ai" className="space-y-4 sm:space-y-6">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <TabsList className="bg-gray-900/50 border-gray-800 inline-flex min-w-full sm:min-w-0 px-4 sm:px-0">
+            <TabsTrigger value="ai" className="flex-1 sm:flex-none">
+              <Bot className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">AI Models</span>
+            </TabsTrigger>
+            <TabsTrigger value="general" className="flex-1 sm:flex-none">
+              <Settings className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">General</span>
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex-1 sm:flex-none">
+              <Bell className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Notifications</span>
+            </TabsTrigger>
+            <TabsTrigger value="appearance" className="flex-1 sm:flex-none">
+              <Palette className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Appearance</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* AI Models Tab */}
         <TabsContent value="ai" className="space-y-6">
@@ -238,7 +240,7 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {aiModels.map((model) => {
                   const isSelected = settings.defaultAIModel === model.id;
                   return (
@@ -247,30 +249,30 @@ export default function SettingsPage() {
                       onClick={() =>
                         setSettings({ ...settings, defaultAIModel: model.id })
                       }
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                      className={`p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         isSelected
                           ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20"
                           : "border-gray-700 bg-gray-800/50 hover:border-gray-600"
                       }`}
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-2 sm:gap-4 flex-1 min-w-0">
                           <div
-                            className={`w-12 h-12 rounded-lg bg-gray-700 flex items-center justify-center ${model.color}`}
+                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gray-700 flex items-center justify-center flex-shrink-0 ${model.color}`}
                           >
                             {model.icon}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold text-white">{model.name}</h3>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                              <h3 className="font-semibold text-white text-sm sm:text-base">{model.name}</h3>
                               <Badge variant="secondary" className="text-xs">
                                 {model.provider}
                               </Badge>
                             </div>
-                            <p className="text-sm text-gray-400 mb-3">
+                            <p className="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">
                               {model.description}
                             </p>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-2">
                               {getSpeedBadge(model.speed)}
                               {getQualityBadge(model.quality)}
                               <Badge variant="outline" className="text-xs">
@@ -283,14 +285,14 @@ export default function SettingsPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center flex-shrink-0">
                           {isSelected && (
-                            <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-white" />
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                              <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                             </div>
                           )}
                           {!isSelected && (
-                            <div className="w-6 h-6 rounded-full border-2 border-gray-600" />
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-gray-600" />
                           )}
                         </div>
                       </div>
@@ -310,41 +312,49 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-700">
-                      <th className="text-left py-3 px-4 text-gray-300">Model</th>
-                      <th className="text-center py-3 px-4 text-gray-300">Speed</th>
-                      <th className="text-center py-3 px-4 text-gray-300">Quality</th>
-                      <th className="text-center py-3 px-4 text-gray-300">Cost</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {aiModels.map((model) => (
-                      <tr
-                        key={model.id}
-                        className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors"
-                      >
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <div className={model.color}>{model.icon}</div>
-                            <span className="text-white font-medium">{model.name}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          {getSpeedBadge(model.speed)}
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          {getQualityBadge(model.quality)}
-                        </td>
-                        <td className="py-3 px-4 text-center text-gray-400">
-                          {model.cost === "low" ? "Low" : model.cost === "medium" ? "Medium" : "High"}
-                        </td>
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+                  <table className="w-full text-xs sm:text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-700">
+                        <th className="text-left py-3 px-2 sm:px-4 text-gray-300">Model</th>
+                        <th className="text-center py-3 px-2 sm:px-4 text-gray-300 hidden sm:table-cell">Speed</th>
+                        <th className="text-center py-3 px-2 sm:px-4 text-gray-300 hidden sm:table-cell">Quality</th>
+                        <th className="text-center py-3 px-2 sm:px-4 text-gray-300">Cost</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {aiModels.map((model) => (
+                        <tr
+                          key={model.id}
+                          className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors"
+                        >
+                          <td className="py-3 px-2 sm:px-4">
+                            <div className="flex items-center gap-2">
+                              <div className={model.color}>{model.icon}</div>
+                              <div>
+                                <span className="text-white font-medium block">{model.name}</span>
+                                <div className="sm:hidden flex gap-2 mt-1">
+                                  {getSpeedBadge(model.speed)}
+                                  {getQualityBadge(model.quality)}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-2 sm:px-4 text-center hidden sm:table-cell">
+                            {getSpeedBadge(model.speed)}
+                          </td>
+                          <td className="py-3 px-2 sm:px-4 text-center hidden sm:table-cell">
+                            {getQualityBadge(model.quality)}
+                          </td>
+                          <td className="py-3 px-2 sm:px-4 text-center text-gray-400">
+                            {model.cost === "low" ? "Low" : model.cost === "medium" ? "Medium" : "High"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -359,11 +369,11 @@ export default function SettingsPage() {
                 Configure your general application preferences
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                <div>
-                  <h3 className="font-medium text-white mb-1">Auto-save Content</h3>
-                  <p className="text-sm text-gray-400">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-white mb-1 text-sm sm:text-base">Auto-save Content</h3>
+                  <p className="text-xs sm:text-sm text-gray-400">
                     Automatically save generated content to history
                   </p>
                 </div>
@@ -371,13 +381,14 @@ export default function SettingsPage() {
                   onClick={() =>
                     setSettings({ ...settings, autoSave: !settings.autoSave })
                   }
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                  className={`relative w-11 h-6 sm:w-12 sm:h-6 rounded-full transition-colors flex-shrink-0 ${
                     settings.autoSave ? "bg-blue-600" : "bg-gray-700"
                   }`}
+                  aria-label="Toggle auto-save"
                 >
                   <div
-                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.autoSave ? "translate-x-6" : "translate-x-0"
+                    className={`absolute top-0.5 left-0.5 sm:top-1 sm:left-1 w-5 h-5 sm:w-4 sm:h-4 bg-white rounded-full transition-transform ${
+                      settings.autoSave ? "translate-x-5 sm:translate-x-6" : "translate-x-0"
                     }`}
                   />
                 </button>
@@ -395,11 +406,11 @@ export default function SettingsPage() {
                 Control how and when you receive notifications
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                <div>
-                  <h3 className="font-medium text-white mb-1">Email Notifications</h3>
-                  <p className="text-sm text-gray-400">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-white mb-1 text-sm sm:text-base">Email Notifications</h3>
+                  <p className="text-xs sm:text-sm text-gray-400">
                     Receive email updates about your content
                   </p>
                 </div>
@@ -407,13 +418,14 @@ export default function SettingsPage() {
                   onClick={() =>
                     setSettings({ ...settings, notifications: !settings.notifications })
                   }
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                  className={`relative w-11 h-6 sm:w-12 sm:h-6 rounded-full transition-colors flex-shrink-0 ${
                     settings.notifications ? "bg-blue-600" : "bg-gray-700"
                   }`}
+                  aria-label="Toggle notifications"
                 >
                   <div
-                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.notifications ? "translate-x-6" : "translate-x-0"
+                    className={`absolute top-0.5 left-0.5 sm:top-1 sm:left-1 w-5 h-5 sm:w-4 sm:h-4 bg-white rounded-full transition-transform ${
+                      settings.notifications ? "translate-x-5 sm:translate-x-6" : "translate-x-0"
                     }`}
                   />
                 </button>
@@ -431,23 +443,23 @@ export default function SettingsPage() {
                 Customize the look and feel of your dashboard
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-300 mb-3 block">
+                <label className="text-xs sm:text-sm font-medium text-gray-300 mb-2 sm:mb-3 block">
                   Theme
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   {(["dark", "light", "system"] as const).map((theme) => (
                     <button
                       key={theme}
                       onClick={() => setSettings({ ...settings, theme })}
-                      className={`p-4 rounded-lg border-2 text-center transition-all ${
+                      className={`p-3 sm:p-4 rounded-lg border-2 text-center transition-all ${
                         settings.theme === theme
                           ? "border-blue-500 bg-blue-500/10"
                           : "border-gray-700 bg-gray-800/50 hover:border-gray-600"
                       }`}
                     >
-                      <p className="font-medium text-white capitalize">{theme}</p>
+                      <p className="font-medium text-white capitalize text-xs sm:text-sm">{theme}</p>
                     </button>
                   ))}
                 </div>

@@ -5,7 +5,7 @@ import { db } from "@/utils/db/dbConfig";
 import { GeneratedContent, ScheduledPosts } from "@/utils/db/schema";
 import { eq, and, gte, sql, count } from "drizzle-orm";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const { userId } = await auth();
     

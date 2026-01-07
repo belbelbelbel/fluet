@@ -244,7 +244,7 @@ export default function DocsPage() {
               Documentation
             </h1>
             <p className="text-base text-gray-400 max-w-2xl mx-auto">
-              Everything you need to know about using Fluet AI to create amazing social media content
+              Everything you need to know about using Flippr AI to create amazing social media content
             </p>
           </div>
 
@@ -274,7 +274,7 @@ export default function DocsPage() {
                   Quick Start Guide
                 </h2>
                 <p className="text-gray-300 mb-4">
-                  New to Fluet AI? Follow these steps to create your first post:
+                  New to Flippr AI? Follow these steps to create your first post:
                 </p>
                 <ol className="space-y-3 text-gray-300">
                   <li className="flex gap-3">

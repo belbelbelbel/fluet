@@ -40,37 +40,41 @@ export function Navbar() {
     return pathname.startsWith(path);
   }, [pathname]);
 
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
   return (
-    <header
-      className={`fixed top-0 left-0  right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-gray-900/80 backdrop-blur-md" : "bg-transparent"
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? "bg-gray-900/80 backdrop-blur-md" : "bg-transparent"
         }`}
-    >
-      <nav className="container mx-auto px-4 sm:px-8 py-4 sm:py-6">
-        <div className="flex flex-wrap justify-between items-center max-w-6xl mx-auto">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <PenTool className="w-8 h-8 text-blue-500" />
-              <span className="text-xl sm:text-2xl font-bold text-white">
-                Fluet AI
-              </span>
-            </Link>
-          </div>
-          <button
-            className="sm:hidden text-white focus:outline-none"
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
-          <div
-            className={`w-full sm:w-auto ${isMenuOpen ? "block" : "hidden"
-              } sm:block mt-4 sm:mt-0`}
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6">
-              {/* Public Navigation */}
+      >
+        <nav className="container mx-auto px-4 sm:px-8 py-4 sm:py-6">
+          <div className="flex flex-wrap justify-between items-center max-w-6xl mx-auto">
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center space-x-2">
+                <PenTool className="w-8 h-8 text-blue-500" />
+                <span className="text-xl sm:text-2xl font-bold text-white">
+                  Flippr AI
+                </span>
+              </Link>
+            </div>
+            <button
+              className="sm:hidden text-white focus:outline-none z-50 relative"
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+            <div className="hidden sm:flex sm:items-center sm:space-x-6">
+              {/* Public Navigation - Desktop */}
               {navItems.map((item) => {
                 const href = `/${item.toLowerCase()}`;
                 const active = isActive(href);
@@ -93,13 +97,13 @@ export function Navbar() {
                   </Link>
                 );
               })}
-              
+
               {/* Divider for signed-in users */}
               {userId && (
-                <div className="hidden sm:block w-px h-6 bg-gray-700 mx-2"></div>
+                <div className="w-px h-6 bg-gray-700 mx-2"></div>
               )}
-              
-              {/* User Navigation */}
+
+              {/* User Navigation - Desktop */}
               {userId && (
                 <Link
                   href="/dashboard"
@@ -119,12 +123,12 @@ export function Navbar() {
               )}
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="text-gray-300 hover:text-white transition-colors mt-2 sm:mt-0">
+                  <button className="text-gray-300 hover:text-white transition-colors">
                     Sign In
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition-colors mt-2 sm:mt-0">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition-colors">
                     Sign Up
                   </button>
                 </SignUpButton>
@@ -140,8 +144,121 @@ export function Navbar() {
               </SignedIn>
             </div>
           </div>
+        </nav>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 sm:hidden"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Menu Drawer */}
+      <div
+        className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-gradient-to-b from-gray-900 via-gray-900 to-black border-l border-gray-800 z-50 transform transition-transform duration-300 ease-in-out sm:hidden ${
+          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Mobile Menu Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-800">
+            <div className="flex items-center space-x-2">
+              <PenTool className="w-6 h-6 text-blue-500" />
+              <span className="text-xl font-bold text-white">Flippr AI</span>
+            </div>
+            <button
+              onClick={() => setIsMenuOpen(false)}
+              className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Mobile Menu Content */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Public Navigation - Mobile */}
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                Navigation
+              </p>
+              {navItems.map((item) => {
+                const href = `/${item.toLowerCase()}`;
+                const active = isActive(href);
+                return (
+                  <Link
+                    key={item}
+                    href={href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`block px-4 py-3 rounded-lg transition-colors ${
+                      active
+                        ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
+                        : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                    }`}
+                  >
+                    {item}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* User Navigation - Mobile */}
+            {userId && (
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                  Account
+                </p>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`block px-4 py-3 rounded-lg transition-colors ${
+                    isActive("/dashboard")
+                      ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              </div>
+            )}
+
+            {/* Auth Buttons - Mobile */}
+            <div className="pt-4 border-t border-gray-800 space-y-3">
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                  >
+                    Sign In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors"
+                  >
+                    Sign Up
+                  </button>
+                </SignUpButton>
+              </SignedOut>
+              <SignedIn>
+                <div className="px-4 py-3">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-10 h-10",
+                      },
+                    }}
+                  />
+                </div>
+              </SignedIn>
+            </div>
+          </div>
         </div>
-      </nav>
-    </header>
+      </div>
+    </>
   );
 }

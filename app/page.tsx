@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,35 +37,36 @@ console.log("consoleId",userclerkid)
         {/* Hero Section */}
         <div className="text-center py-12 sm:py-20 lg:py-32 relative">
           <BotIcon className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500 mx-auto mb-4 sm:mb-6 animate-pulse" />
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl  font-extrabold mb-4 sm:mb-6 px-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
-            AI-Powered Social Media Content Generator
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold mb-4 sm:mb-6 px-2 leading-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+              Your AI social media manager — we create and post content for you automatically.
+            </span>
           </h1>
           <p className="text-base sm:text-lg lg:text-xl mb-6 sm:mb-10 text-gray-300 max-w-2xl mx-auto px-4">
-            Create engaging content for Twitter, Instagram, LinkedIn, and TikTok with
-            cutting-edge AI technology.
+            Flip between platforms. One tool for all your social content.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 px-4">
             <Button
               asChild
               className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-base sm:text-lg transition duration-300 ease-in-out transform hover:scale-105"
             >
-              <Link href="/generate">Start Creating</Link>
+              <Link href="/dashboard/generate">Start Flipping</Link>
             </Button>
             <Button
               asChild
               className="w-full sm:w-auto bg-transparent border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-base sm:text-lg transition duration-300 ease-in-out"
             >
-              <Link href="#features">Learn More</Link>
+              <Link href="#features">See How It Works</Link>
             </Button>
           </div>
         </div>
 
         {/* Features Section */}
         <div className="py-12 sm:py-20" id="features">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-16 text-center text-white px-4">
-            Supercharge Your Social Media Presence
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-16 text-center text-white px-4">
+              Flip Between Platforms. One Tool, Infinite Possibilities.
+            </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
             {[
               {
                 title: "Twitter Threads",
@@ -139,9 +142,9 @@ console.log("consoleId",userclerkid)
           </div>
           <div className="relative z-10">
             <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-12 text-center text-white px-4">
-              Why Choose Our AI Content Generator?
+              Why Flip to Flippr AI?
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 max-w-4xl mx-auto px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto px-4">
               {[
                 "Save time and effort on content creation",
                 "Consistently produce high-quality posts",
@@ -185,8 +188,11 @@ console.log("consoleId",userclerkid)
             </svg>
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8 text-white">
-            Ready to revolutionize your social media strategy?
+            Ready to flip your content game?
           </h2>
+          <p className="text-lg sm:text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+            Join creators who flip between platforms effortlessly. One tool, infinite possibilities.
+          </p>
           {/* {userId ? (
             <Button
               asChild

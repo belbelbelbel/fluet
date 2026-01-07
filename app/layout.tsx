@@ -17,8 +17,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Fluet AI — Generate Social Media Posts Instantly",
-  description: "Create AI-powered content for Twitter, Instagram, LinkedIn, and TikTok in seconds. Fluet AI helps you write better posts, faster.",
+  title: "Flippr AI — Flip Between Platforms, Create Content Instantly",
+  description: "Flip seamlessly between Twitter, Instagram, LinkedIn, and TikTok. Create engaging AI-powered content for all your social platforms in seconds.",
 };
 
 export default function RootLayout({

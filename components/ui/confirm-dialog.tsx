@@ -34,11 +34,11 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6"
       onClick={onClose}
     >
       <Card
-        className="w-full max-w-md bg-gray-900 border-gray-700 shadow-xl"
+        className="w-full max-w-md bg-gray-900 border-gray-700 shadow-xl mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <CardHeader>
@@ -69,23 +69,23 @@ export function ConfirmDialog({
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2">
             <Button
               onClick={onClose}
               variant="outline"
               size="sm"
-              className="border-gray-700 text-black hover:bg-gray-800 hover:text-white"
+              className="w-full sm:w-auto border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
             >
               {cancelText}
             </Button>
             <Button
               onClick={handleConfirm}
               size="sm"
-              className={
+              className={`w-full sm:w-auto ${
                 variant === "destructive"
                   ? "bg-red-600 hover:bg-red-700 text-white"
                   : "bg-blue-600 hover:bg-blue-700 text-white"
-              }
+              }`}
             >
               {confirmText}
             </Button>

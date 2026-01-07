@@ -148,7 +148,7 @@ export default function FeaturesPage() {
           {/* Benefits */}
           <div className="mb-8 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-12 text-center text-white px-4">
-              Why Choose Fluet AI?
+              Why Choose Flippr AI?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
               {benefits.map((benefit, index) => (

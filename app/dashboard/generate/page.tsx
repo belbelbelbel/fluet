@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
@@ -19,9 +18,8 @@ import {
   CheckIcon,
   Loader2Icon,
   RefreshCwIcon,
-  EyeIcon,
   SettingsIcon,
-  BotIcon,
+  EyeIcon,
   FileTextIcon,
   XIcon,
   CalendarPlusIcon,
@@ -267,13 +265,13 @@ export default function DashboardGeneratePage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Generate Content</h1>
-        <p className="text-gray-400">Create engaging social media posts with AI</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Generate Content</h1>
+        <p className="text-sm sm:text-base text-gray-400">Create engaging social media posts with AI</p>
       </div>
 
       {/* Content Type Selection */}
       <div>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 sm:flex gap-2">
           {contentTypes.map((type) => (
             <button
               key={type}
@@ -305,9 +303,9 @@ export default function DashboardGeneratePage() {
           </button>
         </div>
 
-        {showTemplates && (
-          <div className="mb-3 p-3 bg-gray-900/50 rounded-lg border border-gray-800">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {showTemplates && (
+              <div className="mb-3 p-3 bg-gray-900/50 rounded-lg border border-gray-800">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 overflow-y-auto max-h-48 sm:max-h-none">
               {contentTemplates
                 .filter(t => t.contentType === contentType)
                 .map((template) => (
@@ -468,15 +466,15 @@ export default function DashboardGeneratePage() {
       {/* Content Modal */}
       {showContentModal && generatedContent && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6"
           onClick={() => setShowContentModal(false)}
         >
           <div
-            className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+            className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b border-gray-800">
-              <h2 className="text-lg font-semibold text-white">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-800">
+              <h2 className="text-base sm:text-lg font-semibold text-white">
                 {getContentTypeLabel(contentType)}
               </h2>
               <button
@@ -487,10 +485,10 @@ export default function DashboardGeneratePage() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5">
               {isEditing ? (
                 <div className="space-y-3">
-                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3">
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-2 sm:p-3">
                     <p className="text-xs text-blue-400">
                       Press Ctrl/Cmd + S to save, Esc to cancel
                     </p>
@@ -498,7 +496,7 @@ export default function DashboardGeneratePage() {
                   <textarea
                     value={editedContent}
                     onChange={(e) => setEditedContent(e.target.value)}
-                    className="w-full min-h-[300px] px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm leading-relaxed"
+                    className="w-full min-h-[200px] sm:min-h-[300px] px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm leading-relaxed"
                     placeholder="Edit your content here..."
                   />
                   <div className="text-xs text-gray-500 text-right">
@@ -514,7 +512,7 @@ export default function DashboardGeneratePage() {
               )}
             </div>
 
-            <div className="p-4 border-t border-gray-800 bg-gray-900/50 relative">
+            <div className="p-4 sm:p-6 border-t border-gray-800 bg-gray-900/50 relative">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>

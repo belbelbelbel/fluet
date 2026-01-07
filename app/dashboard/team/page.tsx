@@ -168,16 +168,16 @@ export default function TeamPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Team Management</h1>
-          <p className="text-gray-400">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Team Management</h1>
+          <p className="text-sm sm:text-base text-gray-400">
             Manage your team members and their permissions
           </p>
         </div>
         <Button
           onClick={() => setShowInviteModal(true)}
-          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Invite Member
@@ -185,7 +185,7 @@ export default function TeamPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -361,7 +361,6 @@ export default function TeamPage() {
         </div>
       )}
 
-      {/* Remove Member Confirmation Dialog */}
       {removeConfirm.open && (
         <div className="fixed inset-0 z-[100]">
           <ConfirmDialog
