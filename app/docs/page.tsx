@@ -1,6 +1,7 @@
 "use client";
 
 import { Navbar } from "../components/Navbar";
+import { Footer } from "../components/Footer";
 import {
   BookOpenIcon,
   RocketIcon,
@@ -230,20 +231,20 @@ export default function DocsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-gray-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
         <div className="max-w-3xl mx-auto">
-          {/* Header - Consistent */}
+          {/* Header */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full mb-6">
-              <BookOpenIcon className="w-4 h-4 text-blue-400" />
-              <span className="text-sm text-blue-400 font-medium">Complete Guide</span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gray-100 border border-gray-200 rounded-full mb-6">
+              <BookOpenIcon className="w-4 h-4 text-gray-700" />
+              <span className="text-sm text-gray-700 font-medium">Complete Guide</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Documentation
             </h1>
-            <p className="text-base text-gray-400 max-w-2xl mx-auto">
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
               Everything you need to know about using Flippr AI to create amazing social media content
             </p>
           </div>
@@ -256,49 +257,49 @@ export default function DocsPage() {
                 <Link
                   key={link.title}
                   href={link.href}
-                  className="p-4 bg-gray-900/50 border border-gray-800 rounded-lg hover:border-gray-700 transition-colors text-center"
+                  className="p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors text-center"
                 >
-                  <Icon className="w-5 h-5 text-blue-400 mx-auto mb-2" />
-                  <div className="text-xs text-gray-300">{link.title}</div>
+                  <Icon className="w-5 h-5 text-gray-700 mx-auto mb-2" />
+                  <div className="text-xs text-gray-600">{link.title}</div>
                 </Link>
               );
             })}
           </div>
 
           {/* Quick Start */}
-          <div className="mb-16 p-8 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+          <div className="mb-16 p-8 bg-gray-50 border border-gray-200 rounded-xl">
             <div className="flex items-start gap-4">
-              <RocketIcon className="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" />
+              <RocketIcon className="w-6 h-6 text-gray-700 mt-1 flex-shrink-0" />
               <div>
-                <h2 className="text-xl font-semibold mb-3 text-white">
+                <h2 className="text-xl font-semibold mb-3 text-gray-900">
                   Quick Start Guide
                 </h2>
-                <p className="text-gray-300 mb-4">
+                <p className="text-gray-600 mb-4">
                   New to Flippr AI? Follow these steps to create your first post:
                 </p>
-                <ol className="space-y-3 text-gray-300">
+                <ol className="space-y-3 text-gray-700">
                   <li className="flex gap-3">
-                    <span className="font-semibold text-blue-400">1.</span>
+                    <span className="font-semibold text-gray-900">1.</span>
                     <span>Sign up for an account and choose a subscription plan</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-blue-400">2.</span>
+                    <span className="font-semibold text-gray-900">2.</span>
                     <span>Go to the Generate page and select your platform</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-blue-400">3.</span>
+                    <span className="font-semibold text-gray-900">3.</span>
                     <span>Enter your topic or use a template to get started</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-blue-400">4.</span>
+                    <span className="font-semibold text-gray-900">4.</span>
                     <span>Customize tone, style, and length (optional)</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-blue-400">5.</span>
+                    <span className="font-semibold text-gray-900">5.</span>
                     <span>Click Generate and review your content</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-blue-400">6.</span>
+                    <span className="font-semibold text-gray-900">6.</span>
                     <span>Edit if needed, then copy, export, or schedule your post</span>
                   </li>
                 </ol>
@@ -310,23 +311,23 @@ export default function DocsPage() {
           <div className="space-y-16">
             {sections.map((section, sectionIndex) => (
               <div key={sectionIndex}>
-                <h2 className="text-2xl font-bold mb-8 text-white flex items-center gap-3">
-                  <CodeIcon className="w-6 h-6 text-blue-400" />
+                <h2 className="text-2xl font-bold mb-8 text-gray-900 flex items-center gap-3">
+                  <CodeIcon className="w-6 h-6 text-gray-700" />
                   {section.title}
                 </h2>
                 <div className="space-y-5">
                   {section.items.map((item, itemIndex) => (
                     <div
                       key={itemIndex}
-                      className="p-5 bg-gray-900/50 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors"
+                      className="p-5 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
                     >
                       <div className="flex items-start gap-3 mb-3">
-                        <HelpCircleIcon className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                        <h3 className="text-lg font-semibold text-white">
+                        <HelpCircleIcon className="w-5 h-5 text-gray-700 mt-0.5 flex-shrink-0" />
+                        <h3 className="text-lg font-semibold text-gray-900">
                           {item.question}
                         </h3>
                       </div>
-                      <p className="text-gray-300 ml-8 leading-relaxed">{item.answer}</p>
+                      <p className="text-gray-600 ml-8 leading-relaxed">{item.answer}</p>
                     </div>
                   ))}
                 </div>
@@ -336,48 +337,48 @@ export default function DocsPage() {
 
           {/* Feature Highlights */}
           <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div className="p-5 bg-gray-900/30 rounded-lg border border-gray-800">
-              <EditIcon className="w-6 h-6 text-green-400 mb-3" />
-              <h3 className="font-semibold text-white mb-2">Edit & Refine</h3>
-              <p className="text-sm text-gray-400">
+            <div className="p-5 bg-white rounded-xl border border-gray-200">
+              <EditIcon className="w-6 h-6 text-gray-700 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">Edit & Refine</h3>
+              <p className="text-sm text-gray-600">
                 Edit any generated content to match your exact needs
               </p>
             </div>
-            <div className="p-5 bg-gray-900/30 rounded-lg border border-gray-800">
-              <DownloadIcon className="w-6 h-6 text-blue-400 mb-3" />
-              <h3 className="font-semibold text-white mb-2">Export Options</h3>
-              <p className="text-sm text-gray-400">
+            <div className="p-5 bg-white rounded-xl border border-gray-200">
+              <DownloadIcon className="w-6 h-6 text-gray-700 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">Export Options</h3>
+              <p className="text-sm text-gray-600">
                 Export content as text files or PDFs for easy sharing
               </p>
             </div>
-            <div className="p-5 bg-gray-900/30 rounded-lg border border-gray-800">
-              <KeyboardIcon className="w-6 h-6 text-purple-400 mb-3" />
-              <h3 className="font-semibold text-white mb-2">Keyboard Shortcuts</h3>
-              <p className="text-sm text-gray-400">
+            <div className="p-5 bg-white rounded-xl border border-gray-200">
+              <KeyboardIcon className="w-6 h-6 text-gray-700 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">Keyboard Shortcuts</h3>
+              <p className="text-sm text-gray-600">
                 Work faster with keyboard shortcuts (Ctrl/Cmd + /)
               </p>
             </div>
           </div>
 
           {/* Support CTA */}
-          <div className="mt-20 text-center p-10 bg-gray-900/50 rounded-xl border border-gray-800">
-            <h2 className="text-2xl font-bold mb-4 text-white">
+          <div className="mt-20 text-center p-10 bg-gray-50 rounded-xl border border-gray-200">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900">
               Still have questions?
             </h2>
-            <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
               Can't find what you're looking for? Check out our pricing plans or try generating your first post.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button
                 asChild
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
               >
                 <Link href="/pricing">View Pricing</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
               >
                 <Link href="/generate">Try It Now</Link>
               </Button>
@@ -385,6 +386,7 @@ export default function DocsPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
     // Parse request body
     const body = await req.json();
-    const { priceId, userId: clientUserId } = body;
+    const { priceId, userId: clientUserId, planName } = body;
 
     // Verify the userId from the request matches the authenticated user
     if (clientUserId !== userId) {
@@ -68,6 +68,8 @@ export async function POST(req: Request) {
       cancel_url: `${baseUrl}/pricing?canceled=true`,
       metadata: {
         userId: userId,
+        planName: planName || "basic", // Include plan name for webhook processing
+        priceId: priceId, // Include price ID for reference
       },
     });
     return NextResponse.json({ sessionId: session.id });

@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, CreateScheduledPost, GetUserScheduledPosts, DeleteScheduledPost, UpdateScheduledPost } from "@/utils/db/actions";
 
@@ -7,11 +7,23 @@ export const dynamic = "force-dynamic";
 // Get all scheduled posts
 export async function GET() {
   try {
-    const { userId: clerkUserId } = await auth();
+    const authResult = await auth();
+    let clerkUserId = authResult?.userId;
+    
+    // If auth() didn't work, try currentUser() as fallback
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id || null;
+      } catch (userError) {
+        console.warn("[Schedule API GET] currentUser() failed:", userError);
+      }
+    }
 
     if (!clerkUserId) {
+      console.warn("[Schedule API GET] No userId from auth() or currentUser()");
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Please sign in" },
         { status: 401 }
       );
     }
@@ -38,11 +50,23 @@ export async function GET() {
 // Create a new scheduled post
 export async function POST(req: Request) {
   try {
-    const { userId: clerkUserId } = await auth();
+    const authResult = await auth();
+    let clerkUserId = authResult?.userId;
+    
+    // If auth() didn't work, try currentUser() as fallback
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id || null;
+      } catch (userError) {
+        console.warn("[Schedule API POST] currentUser() failed:", userError);
+      }
+    }
 
     if (!clerkUserId) {
+      console.warn("[Schedule API POST] No userId from auth() or currentUser()");
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Please sign in" },
         { status: 401 }
       );
     }
@@ -94,11 +118,23 @@ export async function POST(req: Request) {
 // Update a scheduled post
 export async function PUT(req: Request) {
   try {
-    const { userId: clerkUserId } = await auth();
+    const authResult = await auth();
+    let clerkUserId = authResult?.userId;
+    
+    // If auth() didn't work, try currentUser() as fallback
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id || null;
+      } catch (userError) {
+        console.warn("[Schedule API PUT] currentUser() failed:", userError);
+      }
+    }
 
     if (!clerkUserId) {
+      console.warn("[Schedule API PUT] No userId from auth() or currentUser()");
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Please sign in" },
         { status: 401 }
       );
     }
@@ -149,11 +185,23 @@ export async function PUT(req: Request) {
 // Delete a scheduled post
 export async function DELETE(req: Request) {
   try {
-    const { userId: clerkUserId } = await auth();
+    const authResult = await auth();
+    let clerkUserId = authResult?.userId;
+    
+    // If auth() didn't work, try currentUser() as fallback
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id || null;
+      } catch (userError) {
+        console.warn("[Schedule API DELETE] currentUser() failed:", userError);
+      }
+    }
 
     if (!clerkUserId) {
+      console.warn("[Schedule API DELETE] No userId from auth() or currentUser()");
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Please sign in" },
         { status: 401 }
       );
     }

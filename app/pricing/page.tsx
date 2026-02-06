@@ -1,10 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, StarIcon, CrownIcon, ZapIcon, ShieldIcon, SparklesIcon, ArrowRightIcon } from "lucide-react";
+import { CheckIcon, StarIcon, CrownIcon, ZapIcon, ShieldIcon, SparklesIcon, ArrowRightIcon, MinusIcon, PlusIcon, LayersIcon } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useState, useCallback, useMemo } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Navbar } from "../components/Navbar";
+import { Footer } from "../components/Footer";
 import { showToast } from "@/lib/toast";
 
 type PaymentProvider = "stripe" | "kora";
@@ -12,60 +13,56 @@ type PaymentProvider = "stripe" | "kora";
 const pricingPlans = [
   {
     id: "basic",
-    name: "Starter",
+    name: "Basic plan",
     description: "Perfect for individuals getting started",
-    price: "9",
+    price: "10",
     priceId: "price_1PyFKGBibz3ZDixDAaJ3HO74",
     popular: false,
+    icon: ZapIcon,
     features: [
-      "100 AI-generated posts per month",
-      "Twitter & Instagram content",
-      "Basic content templates",
-      "Content history & export",
-      "Email support",
-    ],
-    limitations: [
-      "Limited to 2 platforms",
-      "Basic analytics only",
+      "Flexible Plans",
+      "Scalability",
+      "24/7 Email Support",
+      "20GB Recording",
+      "Basic Analytics",
+      "2 Social Platforms",
     ],
   },
   {
     id: "pro",
-    name: "Professional",
+    name: "Business plan",
     description: "For content creators and small teams",
     price: "29",
     priceId: "price_1PyFN0Bibz3ZDixDqm9eYL8W",
     popular: true,
-    badge: "Most Popular",
+    badge: "Best Value",
+    icon: LayersIcon,
     features: [
-      "500 AI-generated posts per month",
-      "All platforms: Twitter, Instagram, LinkedIn, TikTok",
-      "Advanced content templates",
-      "We post for you automatically",
-      "Advanced analytics dashboard",
-      "Priority email support",
-      "Bulk content generation",
-      "Custom tone & style presets",
+      "Access to all basic features",
+      "Basic reporting and analytics",
+      "Up to 10 individual users",
+      "20GB individual data storage",
+      "All social platforms",
+      "Priority support",
     ],
-    savings: "Save 35% vs Starter",
   },
   {
     id: "enterprise",
-    name: "Enterprise",
+    name: "Enterprise plan",
     description: "For agencies and large teams",
     price: "Custom",
     priceId: null,
     popular: false,
+    icon: LayersIcon,
     features: [
-      "Unlimited AI-generated posts",
-      "All social media platforms",
+      "Access to all basic features",
+      "Advanced reporting and analytics",
+      "Unlimited users",
+      "Unlimited data storage",
       "Custom AI model training",
-      "White-label options",
       "Dedicated account manager",
-      "Custom integrations (API access)",
-      "Advanced team collaboration",
-      "SLA guarantee (99.9% uptime)",
-      "Onboarding & training included",
+      "API access",
+      "White-label options",
     ],
   },
 ];
@@ -89,6 +86,7 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showPaymentOptions, setShowPaymentOptions] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [userCount, setUserCount] = useState(1);
 
   const planMap = useMemo(() => {
     const map = new Map<string, { name: string; price: string }>();
@@ -198,124 +196,165 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-gray-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
         <div className="max-w-6xl mx-auto">
-          {/* Header Section - Consistent */}
+          {/* Header Section - Reference Style */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full mb-6">
-              <SparklesIcon className="w-4 h-4 text-blue-400" />
-              <span className="text-sm text-blue-400 font-medium">Simple, Transparent Pricing</span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-purple-50 border border-purple-200 rounded-full mb-6">
+              <span className="text-sm text-purple-900 font-medium">Features</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Choose Your Plan
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+              Simple Pricing, Powerful Features
             </h1>
-            <p className="text-base text-gray-400 max-w-2xl mx-auto mb-8">
-              Start free, upgrade as you grow. All plans include our core features with no hidden fees.
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+              Simple, transparent pricing that grows with you. Try any plan free for 30 days.
             </p>
 
-            {/* Billing Toggle */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <span className={`text-sm ${billingCycle === "monthly" ? "text-white" : "text-gray-500"}`}>
-                Monthly
-              </span>
-              <button
-                onClick={() => setBillingCycle(billingCycle === "monthly" ? "yearly" : "monthly")}
-                className="relative w-14 h-7 bg-gray-800 rounded-full transition-colors"
-              >
-                <div
-                  className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${
-                    billingCycle === "yearly" ? "translate-x-7" : ""
+            {/* Billing Toggle - Reference Style */}
+            <div className="flex items-center justify-center mb-12">
+              <div className="inline-flex items-center bg-white border border-gray-200 rounded-full p-1">
+                <button
+                  onClick={() => setBillingCycle("monthly")}
+                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                    billingCycle === "monthly"
+                      ? "bg-blue-50 text-gray-900"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
-                />
-              </button>
-              <span className={`text-sm ${billingCycle === "yearly" ? "text-white" : "text-gray-500"}`}>
-                Yearly
-                <span className="ml-2 px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">
-                  Save 17%
-                </span>
-              </span>
+                >
+                  Monthly billing
+                </button>
+                <button
+                  onClick={() => setBillingCycle("yearly")}
+                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                    billingCycle === "yearly"
+                      ? "bg-blue-50 text-gray-900"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Annual billing
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="max-w-4xl mx-auto mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-              <p className="text-sm text-red-400">{error}</p>
+            <div className="max-w-4xl mx-auto mb-8 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
-          {/* Pricing Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+          {/* Pricing Cards - Reference Style */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20">
             {pricingPlans.map((plan) => {
               const displayPrice = billingCycle === "yearly" && plan.price !== "Custom" 
                 ? getYearlyPrice(plan.price) 
                 : plan.price;
-              const monthlyEquivalent = plan.price !== "Custom" && billingCycle === "yearly"
-                ? `$${plan.price}/mo`
-                : null;
+              const Icon = plan.icon;
+              const isPopular = plan.popular;
 
               return (
                 <div
                   key={plan.id}
-                  className={`relative rounded-xl border transition-all ${
-                    plan.popular
-                      ? "border-blue-500 bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl shadow-blue-500/20 scale-105 lg:scale-100"
-                      : "border-gray-800 bg-gray-900/50 hover:border-gray-700"
+                  className={`relative rounded-xl transition-all ${
+                    isPopular
+                      ? "bg-gradient-to-b from-purple-900 to-purple-800 text-white"
+                      : "bg-white border border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <div className="px-4 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-semibold rounded-full">
+                  {isPopular && (
+                    <div className="absolute -top-3 right-4">
+                      <div className="px-3 py-1 bg-gray-900 text-white text-xs font-semibold rounded-lg transform rotate-2">
                         {plan.badge}
                       </div>
                     </div>
                   )}
 
-                  <div className="p-6 sm:p-8">
-                    {/* Plan Header */}
-                    <div className="mb-6">
-                      <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-                      <p className="text-sm text-gray-400">{plan.description}</p>
+                  <div className="p-8">
+                    {/* Icon */}
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-6 ${
+                      isPopular ? "bg-white/20" : "bg-blue-50"
+                    }`}>
+                      <Icon className={`w-6 h-6 ${isPopular ? "text-white" : "text-blue-600"}`} />
                     </div>
+
+                    {/* Plan Name */}
+                    <h3 className={`text-xl font-bold mb-2 ${isPopular ? "text-white" : "text-gray-900"}`}>
+                      {plan.name}
+                    </h3>
 
                     {/* Price */}
                     <div className="mb-6">
-                      <div className="flex items-baseline gap-2">
+                      <div className="flex items-baseline gap-2 mb-1">
                         {plan.price !== "Custom" ? (
                           <>
-                            <span className="text-5xl font-bold text-white">${displayPrice}</span>
-                            <span className="text-gray-400">
-                              {billingCycle === "yearly" ? "/year" : "/month"}
+                            <span className={`text-5xl font-bold ${isPopular ? "text-white" : "text-gray-900"}`}>
+                              ${displayPrice}
+                            </span>
+                            <span className={`text-lg ${isPopular ? "text-white/80" : "text-gray-600"}`}>
+                              /month
                             </span>
                           </>
                         ) : (
-                          <span className="text-5xl font-bold text-white">Custom</span>
+                          <span className={`text-5xl font-bold ${isPopular ? "text-white" : "text-gray-900"}`}>
+                            Custom
+                          </span>
                         )}
                       </div>
-                      {monthlyEquivalent && (
-                        <p className="text-sm text-gray-500 mt-1">
-                          {monthlyEquivalent} billed annually
+                      {billingCycle === "yearly" && plan.price !== "Custom" && (
+                        <p className={`text-sm ${isPopular ? "text-white/70" : "text-gray-500"}`}>
+                          Billed annually.
                         </p>
-                      )}
-                      {plan.savings && (
-                        <p className="text-sm text-green-400 mt-2 font-medium">{plan.savings}</p>
                       )}
                     </div>
 
-                    {/* Features List */}
+                    {/* User Selector - Reference Style */}
+                    {plan.id !== "enterprise" && (
+                      <div className={`flex items-center justify-between mb-6 p-2 rounded-lg ${
+                        isPopular 
+                          ? "bg-white/10 border border-white/20" 
+                          : "bg-gray-50 border border-gray-200"
+                      }`}>
+                        <button
+                          onClick={() => setUserCount(Math.max(1, userCount - 1))}
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                            isPopular 
+                              ? "bg-white/20 hover:bg-white/30" 
+                              : "bg-white hover:bg-gray-100 border border-gray-200"
+                          }`}
+                        >
+                          <MinusIcon className={`w-4 h-4 ${isPopular ? "text-white" : "text-gray-700"}`} />
+                        </button>
+                        <span className={`text-sm font-medium ${isPopular ? "text-white" : "text-gray-900"}`}>
+                          {userCount} USER{userCount !== 1 ? "S" : ""}
+                        </span>
+                        <button
+                          onClick={() => setUserCount(userCount + 1)}
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                            isPopular 
+                              ? "bg-white/20 hover:bg-white/30" 
+                              : "bg-white hover:bg-gray-100 border border-gray-200"
+                          }`}
+                        >
+                          <PlusIcon className={`w-4 h-4 ${isPopular ? "text-white" : "text-gray-700"}`} />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Features List - Reference Style */}
                     <ul className="space-y-3 mb-8">
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-3">
-                          <CheckIcon className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-gray-300">{feature}</span>
-                        </li>
-                      ))}
-                      {plan.limitations?.map((limitation, idx) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <span className="w-5 h-5 flex-shrink-0" />
-                          <span className="text-sm text-gray-500">{limitation}</span>
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            isPopular ? "bg-white/20" : "bg-gray-100"
+                          }`}>
+                            <CheckIcon className={`w-3 h-3 ${isPopular ? "text-white" : "text-blue-600"}`} />
+                          </div>
+                          <span className={`text-sm ${isPopular ? "text-white/90" : "text-gray-600"}`}>
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -326,39 +365,55 @@ export default function PricingPage() {
                         <div className="grid grid-cols-2 gap-3">
                           <button
                             onClick={() => setSelectedProvider("stripe")}
-                            className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                            className={`p-3 rounded-lg border transition-colors text-sm ${
                               selectedProvider === "stripe"
-                                ? "border-blue-500 bg-blue-500/10 text-white"
-                                : "border-gray-700 text-gray-400 hover:border-gray-600"
+                                ? isPopular
+                                  ? "border-white bg-white/20 text-white"
+                                  : "border-gray-900 bg-gray-50 text-gray-900"
+                                : isPopular
+                                  ? "border-white/30 text-white/80 hover:border-white/50 bg-white/10"
+                                  : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
                             }`}
                           >
                             <div className="font-medium mb-1">Stripe</div>
-                            <div className="text-xs opacity-75">Cards</div>
+                            <div className={`text-xs ${isPopular ? "text-white/70" : "text-gray-500"}`}>Cards</div>
                           </button>
                           <button
                             onClick={() => setSelectedProvider("kora")}
-                            className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                            className={`p-3 rounded-lg border transition-colors text-sm ${
                               selectedProvider === "kora"
-                                ? "border-green-500 bg-green-500/10 text-white"
-                                : "border-gray-700 text-gray-400 hover:border-gray-600"
+                                ? isPopular
+                                  ? "border-white bg-white/20 text-white"
+                                  : "border-gray-900 bg-gray-50 text-gray-900"
+                                : isPopular
+                                  ? "border-white/30 text-white/80 hover:border-white/50 bg-white/10"
+                                  : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
                             }`}
                           >
                             <div className="font-medium mb-1">Kora</div>
-                            <div className="text-xs opacity-75">Local</div>
+                            <div className={`text-xs ${isPopular ? "text-white/70" : "text-gray-500"}`}>Local</div>
                           </button>
                         </div>
                         <div className="flex gap-2">
                           <Button
                             onClick={handleCancel}
                             variant="outline"
-                            className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800"
+                            className={`flex-1 rounded-xl ${
+                              isPopular
+                                ? "border-white/30 text-white hover:bg-white/20"
+                                : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                            }`}
                           >
                             Cancel
                           </Button>
                           <Button
                             onClick={() => plan.priceId && selectedProvider && handleSubscribe(plan.priceId, selectedProvider)}
                             disabled={isLoading || !selectedProvider}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                            className={`flex-1 rounded-xl ${
+                              isPopular
+                                ? "bg-white text-purple-900 hover:bg-white/90"
+                                : "bg-gray-900 hover:bg-gray-800 text-white"
+                            }`}
                           >
                             {isLoading ? "Processing..." : "Continue"}
                           </Button>
@@ -368,10 +423,10 @@ export default function PricingPage() {
                       <Button
                         onClick={() => handlePlanSelect(plan.priceId)}
                         disabled={isLoading}
-                        className={`w-full py-3 font-semibold ${
-                          plan.popular
-                            ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                            : "bg-gray-800 hover:bg-gray-700 text-white"
+                        className={`w-full py-3 font-semibold rounded-xl ${
+                          isPopular
+                            ? "bg-white text-purple-900 hover:bg-white/90"
+                            : "bg-gray-900 hover:bg-gray-800 text-white"
                         }`}
                       >
                         {plan.priceId ? "Get Started" : "Contact Sales"}
@@ -384,59 +439,28 @@ export default function PricingPage() {
             })}
           </div>
 
-          {/* Feature Comparison Table */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold text-white text-center mb-10">
-              Compare Plans
-            </h2>
-            <div className="bg-gray-900/50 rounded-xl border border-gray-800 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-800">
-                      <th className="text-left p-4 text-sm font-semibold text-gray-400">Features</th>
-                      <th className="text-center p-4 text-sm font-semibold text-white">Starter</th>
-                      <th className="text-center p-4 text-sm font-semibold text-white bg-blue-500/10">Professional</th>
-                      <th className="text-center p-4 text-sm font-semibold text-white">Enterprise</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {allFeatures.map((feature, idx) => (
-                      <tr key={idx} className="border-b border-gray-800/50 last:border-0">
-                        <td className="p-4 text-sm text-gray-300">{feature.name}</td>
-                        <td className="p-4 text-center text-sm text-gray-400">{feature.basic}</td>
-                        <td className="p-4 text-center text-sm text-white bg-blue-500/5">{feature.pro}</td>
-                        <td className="p-4 text-center text-sm text-gray-400">{feature.enterprise}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
           {/* Trust Indicators */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            <div className="text-center p-6 bg-gray-900/30 rounded-lg border border-gray-800">
-              <ShieldIcon className="w-8 h-8 text-green-400 mx-auto mb-3" />
-              <h3 className="font-semibold text-white mb-2">Secure Payments</h3>
-              <p className="text-sm text-gray-400">256-bit SSL encryption</p>
+            <div className="text-center p-6 bg-white rounded-xl border border-gray-200">
+              <ShieldIcon className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">Secure Payments</h3>
+              <p className="text-sm text-gray-600">256-bit SSL encryption</p>
             </div>
-            <div className="text-center p-6 bg-gray-900/30 rounded-lg border border-gray-800">
-              <ZapIcon className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
-              <h3 className="font-semibold text-white mb-2">Cancel Anytime</h3>
-              <p className="text-sm text-gray-400">No long-term contracts</p>
+            <div className="text-center p-6 bg-white rounded-xl border border-gray-200">
+              <ZapIcon className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">Cancel Anytime</h3>
+              <p className="text-sm text-gray-600">No long-term contracts</p>
             </div>
-            <div className="text-center p-6 bg-gray-900/30 rounded-lg border border-gray-800">
-              <StarIcon className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-              <h3 className="font-semibold text-white mb-2">14-Day Money Back</h3>
-              <p className="text-sm text-gray-400">Risk-free guarantee</p>
+            <div className="text-center p-6 bg-white rounded-xl border border-gray-200">
+              <StarIcon className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-2">14-Day Money Back</h3>
+              <p className="text-sm text-gray-600">Risk-free guarantee</p>
             </div>
           </div>
 
           {/* FAQ Section */}
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold text-white text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
               Frequently Asked Questions
             </h2>
             <div className="space-y-4">
@@ -458,15 +482,16 @@ export default function PricingPage() {
                   a: "Yes! All plans start with a 7-day free trial. No credit card required to start.",
                 },
               ].map((faq, idx) => (
-                <div key={idx} className="p-5 bg-gray-900/30 rounded-lg border border-gray-800">
-                  <h3 className="font-semibold text-white mb-2">{faq.q}</h3>
-                  <p className="text-sm text-gray-400">{faq.a}</p>
+                <div key={idx} className="p-5 bg-white rounded-xl border border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-2">{faq.q}</h3>
+                  <p className="text-sm text-gray-600">{faq.a}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

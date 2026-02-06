@@ -1,8 +1,9 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { GetUserByClerkId, SaveGeneratedContent, GetUserSubscription, GetUserUsageCount, CreateOrUpdateUser } from "@/utils/db/actions";
-import OpenAI from "openai";
+import { GetUserByClerkId, SaveGeneratedContent, CreateOrUpdateUser } from "@/utils/db/actions";
+import { checkUsageLimit } from "@/utils/subscription/limits";
+import { getAIGenerator } from "@/utils/ai/optimized-generator";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!contentType || !["twitter", "instagram", "linkedin", "tiktok"].includes(contentType)) {
+    if (!contentType || !["twitter", "instagram", "linkedin", "tiktok", "youtube"].includes(contentType)) {
       return NextResponse.json(
         { error: "Invalid content type" },
         { status: 400 }
@@ -63,11 +64,32 @@ export async function POST(req: Request) {
     let monthlyLimit = Infinity;
     let usageCount = 0;
     
+    // Initialize usageStatus with default values to prevent undefined errors
+    let usageStatus = {
+      canGenerate: true,
+      usageCount: 0,
+      limit: 10,
+      remaining: 10,
+      percentageUsed: 0,
+      daysUntilReset: 30,
+      isNearLimit: false,
+      isInGracePeriod: false,
+      gracePeriodDaysRemaining: 0,
+      planName: "Free",
+      upgradeRecommended: false,
+    };
+    
     try {
       console.log(`[Generate API] Attempting to get/create user for Clerk ID: ${clerkUserId}`);
       
       // First, try to get existing user
-      user = await GetUserByClerkId(clerkUserId);
+      try {
+        user = await GetUserByClerkId(clerkUserId);
+      } catch (getUserError) {
+        console.error("[Generate API] Error getting user:", getUserError);
+        // Continue to create user
+        user = null;
+      }
       
       // If user doesn't exist, create them
       if (!user || !user.id) {
@@ -106,29 +128,16 @@ export async function POST(req: Request) {
         console.log(`[Generate API] ✅ User found: ${user.id}`);
       }
       
-      // Get subscription and usage info
-      if (user && user.id) {
-        try {
-          const subscription = await GetUserSubscription(user.id);
-          usageCount = await GetUserUsageCount(user.id);
-          
-          if (subscription && !subscription.canceldate) {
-            switch (subscription.plan.toLowerCase()) {
-              case "basic":
-                monthlyLimit = 100;
-                break;
-              case "pro":
-                monthlyLimit = 500;
-                break;
-              case "enterprise":
-                monthlyLimit = Infinity;
-                break;
-            }
-          }
-        } catch (subError) {
-          console.warn("Could not fetch subscription info:", subError);
-          // Continue with default limits
-        }
+      // Check usage limits using professional limits manager
+      try {
+        usageStatus = await checkUsageLimit(clerkUserId);
+        usageCount = usageStatus.usageCount;
+        monthlyLimit = usageStatus.limit;
+      } catch (limitError) {
+        console.error("[Generate API] Error checking usage limits:", limitError);
+        // Keep default values already set above
+        usageCount = 0;
+        monthlyLimit = 10;
       }
     } catch (error) {
       console.error("[Generate API] ❌ Error getting/creating user:", error);
@@ -152,13 +161,58 @@ export async function POST(req: Request) {
       );
     }
 
-    const generatedContent = await generateAIContent(
-      prompt, 
-      contentType, 
-      tone || "professional",
-      style || "concise",
-      length || "medium"
-    );
+    // ============================================
+    // PROFESSIONAL SUBSCRIPTION ENFORCEMENT
+    // ============================================
+    if (!usageStatus.canGenerate) {
+      const isFreeTier = usageStatus.planName === "Free";
+      const message = usageStatus.isInGracePeriod
+        ? `You've exceeded your ${usageStatus.planName} plan limit (${usageCount}/${monthlyLimit}). You have ${usageStatus.gracePeriodDaysRemaining} days of grace period remaining. Upgrade now to avoid interruption.`
+        : isFreeTier
+        ? `You've used all ${monthlyLimit} free posts this month. Upgrade to a paid plan to continue generating content.`
+        : `You've used all ${monthlyLimit} posts for your ${usageStatus.planName} plan this month. Upgrade your plan or wait ${usageStatus.daysUntilReset} days for your quota to reset.`;
+      
+      console.warn(`[Generate API] ⚠️ Limit exceeded for user ${user.id}: ${usageCount}/${monthlyLimit} (${usageStatus.planName} plan)`);
+      
+      return NextResponse.json(
+        { 
+          error: "Monthly limit reached",
+          details: message,
+          usageCount,
+          limit: monthlyLimit,
+          remaining: usageStatus.remaining,
+          daysUntilReset: usageStatus.daysUntilReset,
+          upgradeRequired: true,
+          isFreeTier,
+          currentPlan: usageStatus.planName,
+          isInGracePeriod: usageStatus.isInGracePeriod,
+          gracePeriodDaysRemaining: usageStatus.gracePeriodDaysRemaining,
+        },
+        { status: 403 }
+      );
+    }
+    
+    // Log warning if near limit
+    if (usageStatus.isNearLimit) {
+      console.log(`[Generate API] ⚠️ User ${user.id} is near limit: ${usageCount}/${monthlyLimit} (${usageStatus.remaining} remaining, ${usageStatus.percentageUsed.toFixed(1)}% used)`);
+    }
+
+    // ============================================
+    // PROFESSIONAL AI CONTENT GENERATION
+    // ============================================
+    const aiGenerator = getAIGenerator();
+    const generationResult = await aiGenerator.generate(prompt, {
+      contentType,
+      tone: tone || "professional",
+      style: style || "concise",
+      length: length || "medium",
+      usePremium: usageStatus.planName === "Enterprise", // Use premium model for enterprise
+    });
+    
+    const generatedContent = generationResult.content;
+    
+    // Log generation metrics
+    console.log(`[Generate API] ✅ Content generated | Model: ${generationResult.model} | Tokens: ${generationResult.tokensUsed} | Cost: $${generationResult.cost.toFixed(4)}`);
 
     // Verify user exists in database before saving
     try {
@@ -222,11 +276,31 @@ export async function POST(req: Request) {
       );
     }
 
+    // Return success response with comprehensive usage info
+    const updatedUsageCount = usageCount + 1;
+    const updatedRemaining = monthlyLimit === Infinity ? Infinity : Math.max(0, monthlyLimit - updatedUsageCount);
+    
     return NextResponse.json({
       content: generatedContent,
       id: savedContentId,
-      usageCount: usageCount + 1,
-      limit: monthlyLimit,
+      usage: {
+        count: updatedUsageCount,
+        limit: monthlyLimit,
+        remaining: updatedRemaining,
+        percentageUsed: monthlyLimit === Infinity ? 0 : (updatedUsageCount / monthlyLimit) * 100,
+        daysUntilReset: usageStatus.daysUntilReset,
+        isNearLimit: monthlyLimit !== Infinity && updatedUsageCount >= monthlyLimit * 0.8,
+        upgradeRecommended: monthlyLimit !== Infinity && (updatedUsageCount / monthlyLimit) >= 0.9,
+      },
+      plan: {
+        name: usageStatus.planName,
+        isActive: usageStatus.planName !== "Free",
+      },
+      generation: {
+        model: generationResult.model,
+        tokensUsed: generationResult.tokensUsed,
+        cost: generationResult.cost,
+      },
     });
   } catch (error) {
     console.error("Error generating content:", error);
@@ -249,128 +323,3 @@ export async function POST(req: Request) {
   }
 }
 
-async function generateAIContent(
-  prompt: string,
-  contentType: string,
-  tone: string,
-  style: string,
-  length: string
-): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
-  }
-
-  const openai = new OpenAI({
-    apiKey: apiKey,
-  });
-
-  // Map tone, style, and length to descriptions
-  const toneDescription = {
-    professional: "professional and business-focused",
-    casual: "casual and friendly",
-    funny: "humorous and entertaining",
-    inspiring: "motivational and uplifting",
-    educational: "informative and educational"
-  }[tone] || "professional";
-
-  const styleDescription = {
-    concise: "concise and to the point",
-    detailed: "detailed and comprehensive",
-    storytelling: "narrative and story-driven",
-    "list-based": "organized as a clear list"
-  }[style] || "concise";
-  
-  const lengthDescription = {
-    short: "brief (50-100 words)",
-    medium: "medium length (100-300 words)",
-    long: "detailed (300+ words)"
-  }[length] || "medium length";
-
-  const platformInstructions: Record<string, string> = {
-    twitter: `Create a Twitter thread about "${prompt}". Format it as a numbered thread (1/, 2/, 3/, etc.) with engaging, conversational tweets. Include relevant hashtags at the end. Make it ${toneDescription} in tone, ${styleDescription} in style, and ${lengthDescription} in length.
-
-IMPORTANT: Use ONLY plain text. NO markdown formatting, NO asterisks (*), NO bold text, NO numbered lists with asterisks. Just clean, readable text that can be copied directly to Twitter.`,
-    instagram: `Create an Instagram caption about "${prompt}". Make it engaging, visually descriptive, and include relevant emojis and hashtags. The tone should be ${toneDescription}, style should be ${styleDescription}, and length should be ${lengthDescription}.
-
-IMPORTANT: Use ONLY plain text. NO markdown formatting, NO asterisks (*), NO bold text. Just clean, readable text that can be copied directly to Instagram.`,
-    linkedin: `Create a professional LinkedIn post about "${prompt}". Make it thought-provoking and valuable for a professional network. Include a clear structure with key points. The tone should be ${toneDescription}, style should be ${styleDescription}, and length should be ${lengthDescription}.
-
-IMPORTANT: Use ONLY plain text. NO markdown formatting, NO asterisks (*), NO bold text, NO numbered lists with asterisks. Just clean, readable text that can be copied directly to LinkedIn.`,
-    tiktok: `Create TikTok content about "${prompt}". Include:
-1. A video script with Hook (0-3s), Body (3-15s), and Call to Action (15-30s)
-2. A catchy caption
-3. Relevant hashtags
-
-Make it ${toneDescription} in tone, ${styleDescription} in style, and keep it engaging and authentic.
-
-IMPORTANT: Use ONLY plain text. NO markdown formatting, NO asterisks (*), NO bold text. Just clean, readable text that can be copied directly to TikTok.`
-  };
-
-  const systemPrompt = `You are an expert social media content creator. Generate high-quality, engaging content optimized for the specified platform. Follow the user's instructions precisely for tone, style, and length.
-
-CRITICAL: Always output content in PLAIN TEXT format only. Never use markdown formatting, asterisks (*), bold markers (**), or any other formatting symbols. The content should be ready to copy and paste directly into the social media platform without any formatting cleanup needed.`;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        {
-          role: "user",
-          content: platformInstructions[contentType] || `Create ${contentType} content about "${prompt}" with ${toneDescription} tone, ${styleDescription} style, and ${lengthDescription} length.`,
-        },
-      ],
-      temperature: 0.8,
-      max_tokens: 1000,
-    });
-
-    let generatedContent = completion.choices[0]?.message?.content;
-    
-    if (!generatedContent) {
-      throw new Error("No content generated from OpenAI");
-    }
-
-    // Clean up any markdown formatting that might have slipped through
-    // Remove bold markers (**text** or __text__)
-    generatedContent = generatedContent.replace(/\*\*(.*?)\*\*/g, '$1');
-    generatedContent = generatedContent.replace(/__(.*?)__/g, '$1');
-    // Remove italic markers (*text* or _text_)
-    generatedContent = generatedContent.replace(/\*(.*?)\*/g, '$1');
-    generatedContent = generatedContent.replace(/_(.*?)_/g, '$1');
-    // Remove code blocks
-    generatedContent = generatedContent.replace(/```[\s\S]*?```/g, '');
-    generatedContent = generatedContent.replace(/`(.*?)`/g, '$1');
-    // Remove markdown headers
-    generatedContent = generatedContent.replace(/^#{1,6}\s+/gm, '');
-    // Remove markdown links but keep the text
-    generatedContent = generatedContent.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
-    // Remove markdown lists with asterisks (but keep numbered lists like 1/, 2/)
-    generatedContent = generatedContent.replace(/^\s*[\*\-\+]\s+/gm, '');
-    // Clean up extra whitespace
-    generatedContent = generatedContent.replace(/\n{3,}/g, '\n\n').trim();
-
-    return generatedContent;
-  } catch (error) {
-    console.error("OpenAI API error:", error);
-    
-    // Provide more specific error messages
-    if (error instanceof Error) {
-      if (error.message.includes("API key")) {
-        throw new Error("OpenAI API key is invalid or missing. Please check your configuration.");
-      } else if (error.message.includes("rate limit")) {
-        throw new Error("OpenAI API rate limit exceeded. Please try again in a moment.");
-      } else if (error.message.includes("insufficient_quota")) {
-        throw new Error("OpenAI API quota exceeded. Please check your OpenAI account.");
-      } else {
-        throw new Error(`OpenAI API error: ${error.message}`);
-      }
-    }
-    
-    throw new Error("Failed to generate content with AI. Please try again.");
-  }
-}

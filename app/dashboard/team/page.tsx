@@ -52,7 +52,12 @@ export default function TeamPage() {
   const fetchTeamMembers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/team?userId=${userId}`);
+      const response = await fetch(`/api/team`, {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setMembers(data.members || []);
@@ -166,18 +171,18 @@ export default function TeamPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pt-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Team Management</h1>
-          <p className="text-sm sm:text-base text-gray-400">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Team Management</h1>
+          <p className="text-base text-gray-600">
             Manage your team members and their permissions
           </p>
         </div>
         <Button
           onClick={() => setShowInviteModal(true)}
-          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+          className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Invite Member
@@ -185,26 +190,26 @@ export default function TeamPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card
               key={index}
-              className={`${stat.bgColor} border-gray-700 hover:border-gray-600 transition-all`}
+              className="bg-white border-gray-200 hover:border-gray-300 transition-all rounded-xl"
             >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-300">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
                   {stat.title}
                 </CardTitle>
-                <div className={`${stat.color} ${stat.bgColor} p-2 rounded-lg`}>
-                  <Icon className="h-4 w-4" />
+                <div className="text-gray-700 bg-gray-100 p-2.5 rounded-xl">
+                  <Icon className="h-5 w-5" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-2xl font-bold text-gray-900">
                   {loading ? (
-                    <div className="h-8 w-16 bg-gray-800 rounded animate-pulse" />
+                    <div className="h-9 w-20 bg-gray-200 rounded animate-pulse" />
                   ) : (
                     stat.value
                   )}
@@ -216,10 +221,10 @@ export default function TeamPage() {
       </div>
 
       {/* Team Members List */}
-      <Card>
+      <Card className="bg-white border-gray-200 rounded-xl">
         <CardHeader>
-          <CardTitle className="text-white">Team Members</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-gray-900">Team Members</CardTitle>
+          <CardDescription className="text-gray-600">
             Manage roles and permissions for your team
           </CardDescription>
         </CardHeader>
@@ -229,20 +234,21 @@ export default function TeamPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-20 bg-gray-800 rounded-lg animate-pulse"
+                  className="h-20 bg-gray-200 rounded-xl animate-pulse"
                 />
               ))}
             </div>
           ) : members.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400 mb-2">No team members yet</p>
-              <p className="text-sm text-gray-500 mb-4">
+              <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-700 mb-2 font-semibold">No team members yet</p>
+              <p className="text-sm text-gray-600 mb-4">
                 Invite team members to collaborate on content creation
               </p>
               <Button
                 onClick={() => setShowInviteModal(true)}
                 variant="outline"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
                 Invite Your First Member
@@ -253,21 +259,21 @@ export default function TeamPage() {
               {members.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                    <div className="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center text-white font-semibold">
                       {member.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold text-white">{member.name}</p>
+                        <p className="font-semibold text-gray-900">{member.name}</p>
                         {getRoleIcon(member.role)}
                         {getRoleBadge(member.role)}
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <Mail className="w-3 h-3 text-gray-500" />
-                        <p className="text-sm text-gray-400">{member.email}</p>
+                        <p className="text-sm text-gray-600">{member.email}</p>
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
                         {member.contentGenerated} posts • Joined{" "}
@@ -281,7 +287,7 @@ export default function TeamPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-gray-400 hover:text-white"
+                          className="text-gray-600 hover:text-gray-900"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </Button>
@@ -311,22 +317,22 @@ export default function TeamPage() {
       {/* Invite Modal */}
       {showInviteModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
           onClick={() => setShowInviteModal(false)}
         >
           <Card
-            className="w-full max-w-md bg-gray-900 border-gray-700"
+            className="w-full max-w-md bg-white border-gray-200 rounded-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader>
-              <CardTitle className="text-white">Invite Team Member</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-gray-900">Invite Team Member</CardTitle>
+              <CardDescription className="text-gray-600">
                 Send an invitation to collaborate on your content
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-300 mb-2 block">
+                <label className="text-sm font-semibold text-gray-700 mb-2 block">
                   Email Address
                 </label>
                 <input
@@ -334,13 +340,13 @@ export default function TeamPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="colleague@example.com"
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                 />
               </div>
               <div className="flex gap-2">
                 <Button
                   onClick={handleInvite}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
                 >
                   <Check className="w-4 h-4 mr-2" />
                   Send Invitation
@@ -351,6 +357,7 @@ export default function TeamPage() {
                     setInviteEmail("");
                   }}
                   variant="outline"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
                 >
                   <X className="w-4 h-4 mr-2" />
                   Cancel

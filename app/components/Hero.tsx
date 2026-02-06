@@ -1,0 +1,64 @@
+"use client";
+
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRightIcon } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+
+export function Hero() {
+  const { isSignedIn } = useUser();
+
+  return (
+    <section className="relative bg-white overflow-hidden pt-48 pb-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl w-full">
+        {/* Centered Hero Content */}
+        <div className="flex flex-col items-center text-center space-y-8 mb-16 mt-0">
+          {/* Main Headline */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-gray-950 max-w-5xl">
+            An AI Powered Dashboard For Your Social Media
+          </h1>
+
+          {/* Subheading */}
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-700 leading-relaxed max-w-3xl font-normal">
+            Generate content without headache. Support powered with AI Technology for Twitter, Instagram, Linkedin, and TikTok.
+          </p>
+
+          {/* Email CTA - Centered */}
+          <div className="mt-8 w-full max-w-4xl">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                className="flex-1 px-5 py-4 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base bg-white"
+              />
+              <Button
+                asChild
+                size='default'
+                className="sm:w-auto bg-gray-950 hover:bg-gray-900 text-white px-8 py-4 text-base font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 whitespace-nowrap"
+              >
+                <Link href={isSignedIn ? "/dashboard/generate" : "/sign-up"}>
+                  Get Started
+                  <ArrowRightIcon className="w-5 h-5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Dashboard Preview Image - Centered Below */}
+        <div className="relative w-full flex items-center justify-center mt-12">
+          <div className="relative w-full max-w-6xl">
+            <img
+              src="/images/fluetdashboardimg.png"
+              alt="Flippr AI Dashboard Preview"
+              className="rounded-xl shadow-2xl w-full h-auto"
+              style={{
+                objectFit: 'cover',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

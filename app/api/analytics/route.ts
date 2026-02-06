@@ -5,12 +5,16 @@ import { db } from "@/utils/db/dbConfig";
 import { ContentAnalytics } from "@/utils/db/schema";
 import { eq, and, gte, sql, sum, count } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    const authResult = await auth();
+    const userId = authResult?.userId;
     
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      console.warn("[Analytics API] No userId from auth()");
+      return NextResponse.json({ error: "Unauthorized - Please sign in" }, { status: 401 });
     }
 
     const searchParams = req.nextUrl.searchParams;

@@ -1,6 +1,6 @@
 import { db } from "./dbConfig"
 import { eq, sql, desc, and, gte, lte } from "drizzle-orm"
-import { GeneratedContent, Users, Subscription, ScheduledPosts } from "./schema"
+import { GeneratedContent, Users, Subscription, ScheduledPosts, LinkedAccounts } from "./schema"
 import { sendWelcomeEmail } from "./mailtrap"
 
 export const CreateOrUpdateUser = async (stripecustomerId: string, email: string, name: string) => {
@@ -59,7 +59,6 @@ export const GetUserByClerkId = async (clerkUserId: string) => {
         throw new Error("Failed to get user");
     }
 };
-
 
 export const GetUserGeneratedContent = async (userId: number, limit: number = 10) => {
     try {
@@ -286,5 +285,120 @@ export const UpdateScheduledPost = async (
     } catch (error) {
         console.error(`[UpdateScheduledPost] Error encountered:`, error);
         throw new Error("Failed to update scheduled post");
+    }
+};
+
+// Linked Accounts Actions (for YouTube, Twitter, etc.)
+
+export const SaveOrUpdateLinkedAccount = async (data: {
+    userId: number;
+    platform: string;
+    accountId?: string;
+    accountUsername?: string;
+    accessToken: string;
+    refreshToken: string;
+    tokenExpiresAt: Date;
+    isActive?: boolean;
+}) => {
+    try {
+        // Check if account already exists
+        const [existing] = await db
+            .select()
+            .from(LinkedAccounts)
+            .where(
+                and(
+                    eq(LinkedAccounts.userId, data.userId),
+                    eq(LinkedAccounts.platform, data.platform)
+                )
+            )
+            .limit(1)
+            .execute();
+
+        if (existing) {
+            // Update existing account
+            const [updated] = await db
+                .update(LinkedAccounts)
+                .set({
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                    tokenExpiresAt: data.tokenExpiresAt,
+                    isActive: data.isActive ?? true,
+                    ...(data.accountId && { accountId: data.accountId }),
+                    ...(data.accountUsername && { accountUsername: data.accountUsername }),
+                })
+                .where(eq(LinkedAccounts.id, existing.id))
+                .returning()
+                .execute();
+            return updated;
+        } else {
+            // Create new account
+            const [created] = await db
+                .insert(LinkedAccounts)
+                .values({
+                    userId: data.userId,
+                    platform: data.platform,
+                    accountId: data.accountId || "",
+                    accountUsername: data.accountUsername || null,
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                    tokenExpiresAt: data.tokenExpiresAt,
+                    isActive: data.isActive ?? true,
+                })
+                .returning()
+                .execute();
+            return created;
+        }
+    } catch (error) {
+        console.error(`[SaveOrUpdateLinkedAccount] Error encountered:`, error);
+        throw new Error("Failed to save linked account");
+    }
+};
+
+export const GetLinkedAccount = async (userId: number, platform: string) => {
+    try {
+        const [account] = await db
+            .select()
+            .from(LinkedAccounts)
+            .where(
+                and(
+                    eq(LinkedAccounts.userId, userId),
+                    eq(LinkedAccounts.platform, platform),
+                    eq(LinkedAccounts.isActive, true)
+                )
+            )
+            .limit(1)
+            .execute();
+        return account || null;
+    } catch (error) {
+        console.error(`[GetLinkedAccount] Error encountered:`, error);
+        return null;
+    }
+};
+
+export const UpdateLinkedAccountToken = async (
+    userId: number,
+    platform: string,
+    accessToken: string,
+    tokenExpiresAt: Date
+) => {
+    try {
+        const [updated] = await db
+            .update(LinkedAccounts)
+            .set({
+                accessToken,
+                tokenExpiresAt,
+            })
+            .where(
+                and(
+                    eq(LinkedAccounts.userId, userId),
+                    eq(LinkedAccounts.platform, platform)
+                )
+            )
+            .returning()
+            .execute();
+        return updated;
+    } catch (error) {
+        console.error(`[UpdateLinkedAccountToken] Error encountered:`, error);
+        throw new Error("Failed to update token");
     }
 };

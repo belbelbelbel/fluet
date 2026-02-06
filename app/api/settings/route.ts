@@ -1,16 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    const authResult = await auth();
+    const userId = authResult?.userId;
     
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      console.warn("[Settings API] No userId from auth()");
+      return NextResponse.json({ error: "Unauthorized - Please sign in" }, { status: 401 });
     }
 
     const searchParams = req.nextUrl.searchParams;
     const requestedUserId = searchParams.get("userId");
+
+    // If no userId in query, use the authenticated userId
+    if (!requestedUserId) {
+      // Return settings for authenticated user
+      return NextResponse.json({
+        defaultAIModel: "gpt-4o-mini",
+        autoSave: true,
+        notifications: true,
+        theme: "light",
+      });
+    }
 
     if (requestedUserId !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
