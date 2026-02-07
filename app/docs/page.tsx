@@ -12,7 +12,7 @@ import {
   CalendarIcon,
   DownloadIcon,
   KeyboardIcon,
-  SparklesIcon,
+  ZapIcon,
   CopyIcon,
   EditIcon,
 } from "lucide-react";
@@ -227,7 +227,7 @@ export default function DocsPage() {
     { title: "Generate Content", href: "/generate", icon: Wand2Icon },
     { title: "View History", href: "/history", icon: FileTextIcon },
     { title: "Schedule Posts", href: "/schedule", icon: CalendarIcon },
-    { title: "View Pricing", href: "/pricing", icon: SparklesIcon },
+    { title: "View Pricing", href: "/pricing", icon: ZapIcon },
   ];
 
   return (

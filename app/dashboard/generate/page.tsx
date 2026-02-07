@@ -84,7 +84,7 @@ export default function DashboardGeneratePage() {
     }
     try {
       setLoadingRecent(true);
-      const response = await fetch(`/api/content?limit=5`, {
+      const response = await fetch(`/api/content?limit=5${userId ? `&userId=${userId}` : ''}`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -285,7 +285,7 @@ export default function DashboardGeneratePage() {
 
   const getPlatformIconBg = (platform: ContentType) => {
     switch (platform) {
-      case "twitter": return "bg-blue-500";
+      case "twitter": return "bg-black";
       case "instagram": return "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500";
       case "linkedin": return "bg-blue-600";
       case "tiktok": return "bg-black";
@@ -332,7 +332,7 @@ export default function DashboardGeneratePage() {
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-950 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               />
             </div>
           </div>
@@ -361,7 +361,7 @@ export default function DashboardGeneratePage() {
             {/* Platform Selection */}
             <Card className="bg-white border border-gray-200 rounded-xl">
               <CardContent className="p-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-3">Platform</label>
+                <label className="block text-sm font-semibold text-gray-950 mb-3">Platform</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {contentTypes.map((type) => (
             <button
@@ -385,10 +385,10 @@ export default function DashboardGeneratePage() {
             <Card className="bg-white border border-gray-200 rounded-xl">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <label className="block text-sm font-semibold text-gray-900">Templates</label>
+                  <label className="block text-sm font-semibold text-gray-950">Templates</label>
           <button
             onClick={() => setShowTemplates(!showTemplates)}
-                    className="text-xs text-gray-600 hover:text-gray-900"
+                    className="text-xs text-gray-600 hover:text-gray-950"
           >
                     {showTemplates ? "Hide" : "Show"} Templates
           </button>
@@ -403,7 +403,7 @@ export default function DashboardGeneratePage() {
                     onClick={() => handleUseTemplate(template)}
                           className="text-left p-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors"
                   >
-                          <div className="text-sm font-semibold text-gray-900 mb-1">{template.name}</div>
+                          <div className="text-sm font-semibold text-gray-950 mb-1">{template.name}</div>
                           <div className="text-xs text-gray-600">{template.description}</div>
                   </button>
                 ))}
@@ -415,14 +415,14 @@ export default function DashboardGeneratePage() {
             {/* Prompt Input */}
             <Card className="bg-white border border-gray-200 rounded-xl">
               <CardContent className="p-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
+                <label className="block text-sm font-semibold text-gray-950 mb-3">
                   What do you want to create?
                 </label>
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
                   placeholder="Describe what you want to post about... (e.g., 'A post about launching our new product')"
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 resize-none"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-950 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
           rows={4}
         />
                 <div className="mt-2 text-xs text-gray-500 text-right">
@@ -438,7 +438,7 @@ export default function DashboardGeneratePage() {
           onClick={() => setShowCustomization(!showCustomization)}
                   className="flex items-center justify-between w-full mb-4"
         >
-                  <label className="block text-sm font-semibold text-gray-900">Customization</label>
+                  <label className="block text-sm font-semibold text-gray-950">Customization</label>
                   <span className="text-xs text-gray-600">{showCustomization ? "Hide" : "Show"} Options</span>
         </button>
 
@@ -454,7 +454,7 @@ export default function DashboardGeneratePage() {
                     onClick={() => setTone(t)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       tone === t
-                                ? "bg-gray-900 text-white"
+                                ? "bg-purple-600 text-white"
                                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
@@ -474,7 +474,7 @@ export default function DashboardGeneratePage() {
                     onClick={() => setStyle(s)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       style === s
-                                ? "bg-gray-900 text-white"
+                                ? "bg-purple-600 text-white"
                                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
@@ -494,7 +494,7 @@ export default function DashboardGeneratePage() {
                     onClick={() => setLength(l)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       length === l
-                                ? "bg-gray-900 text-white"
+                                ? "bg-purple-600 text-white"
                                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
@@ -512,7 +512,7 @@ export default function DashboardGeneratePage() {
         <Button
           onClick={handleGenerate}
           disabled={isGenerating || !prompt.trim()}
-              className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-xl py-6 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-6 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <>
@@ -544,7 +544,7 @@ export default function DashboardGeneratePage() {
             <Card className="bg-white border border-gray-200 rounded-xl shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-bold text-gray-900">Recent Content</h2>
+                  <h2 className="text-lg font-bold text-gray-950">Recent Content</h2>
                   <button
                     onClick={() => fetchRecentContent()}
                     disabled={loadingRecent}
@@ -560,40 +560,51 @@ export default function DashboardGeneratePage() {
                     <p className="text-xs text-gray-500">Loading...</p>
                   </div>
                 ) : recentContent.length > 0 ? (
-                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                  <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
                     {recentContent.map((item) => (
                       <div
                         key={item.id}
-                        className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                        className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-all cursor-pointer group"
                         onClick={() => {
                           setPrompt(item.content);
                           setContentType(item.platform);
                         }}
                       >
-                        {/* Platform Icon and Name */}
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`${getPlatformIconBg(item.platform)} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                        <div className="flex items-start gap-3">
+                          {/* Platform Icon - Colored Square (like reference) */}
+                          <div className={`${getPlatformIconBg(item.platform)} w-10 h-10 rounded flex items-center justify-center flex-shrink-0`}>
                             {getPlatformIcon(item.platform, true)}
                           </div>
-                          <div className="flex items-center gap-2 flex-1">
-                            <span className="text-sm font-bold text-gray-900">{getPlatformLabel(item.platform)}</span>
-                            <div className="text-blue-500">
-                              {getPlatformIcon(item.platform)}
+                          
+                          {/* Content and Info */}
+                          <div className="flex-1 min-w-0">
+                            {/* Platform Name and Status */}
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-gray-950">
+                                  {getPlatformLabel(item.platform)}
+                                </span>
+                                {/* Small platform icon next to platform name (like reference) */}
+                                <div className="w-4 h-4 text-blue-500">
+                                  {getPlatformIcon(item.platform)}
+                                </div>
+                              </div>
+                              {/* Status Badge - Green Pill (like reference) */}
+                              <Badge className="bg-green-50 text-green-700 border border-green-200 text-xs px-2.5 py-1 font-medium rounded-full">
+                                {item.status}
+                              </Badge>
                             </div>
+                            
+                            {/* Content Text */}
+                            <p className="text-sm text-gray-950 mb-1.5 leading-relaxed line-clamp-2">
+                              {item.content}
+                            </p>
+                            
+                            {/* Secondary Status Text (like reference: "In. Twitter Generated") */}
+                            <p className="text-xs text-gray-500">
+                              In. {getPlatformLabel(item.platform)} {item.status === "Published" ? "Published" : item.status === "Scheduled" ? "Scheduled" : "Generated"}
+                            </p>
                           </div>
-                          <Badge className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${getStatusColor(item.status)}`}>
-                            {item.status}
-                          </Badge>
-                        </div>
-                        
-                        {/* Content Text */}
-                        <p className="text-sm text-gray-900 mb-3 leading-relaxed line-clamp-2">{item.content}</p>
-                        
-                        {/* Status and Date */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">
-                            In. {getPlatformLabel(item.platform)} {item.status === "Published" ? "Published" : item.status === "Scheduled" ? "Scheduled" : "Generated"}
-                          </span>
                         </div>
                       </div>
                     ))}
@@ -617,7 +628,7 @@ export default function DashboardGeneratePage() {
           <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900">Generated Content</h3>
+              <h3 className="text-lg font-bold text-gray-950">Generated Content</h3>
               <button
                 onClick={() => setShowContentModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"

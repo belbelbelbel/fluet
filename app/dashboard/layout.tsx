@@ -84,7 +84,7 @@ export default function DashboardLayout({
           marginLeft: isMobile ? '0' : `${sidebarWidth}px`,
         }}
       >
-        <div className="h-full w-full px-6 lg:px-8">
+        <div className="h-full w-full px-0">
           {children}
         </div>
       </main>

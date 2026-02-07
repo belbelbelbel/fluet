@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, StarIcon, CrownIcon, ZapIcon, ShieldIcon, SparklesIcon, ArrowRightIcon, MinusIcon, PlusIcon, LayersIcon } from "lucide-react";
+import { CheckIcon, StarIcon, CrownIcon, ZapIcon, ShieldIcon, ArrowRightIcon, MinusIcon, PlusIcon, LayersIcon } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useState, useCallback, useMemo } from "react";
 import { loadStripe } from "@stripe/stripe-js";

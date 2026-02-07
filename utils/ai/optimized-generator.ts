@@ -18,19 +18,19 @@ const MODEL_CONFIG = {
 
 // Token-optimized prompt templates (reduced by 40% vs standard prompts)
 const PLATFORM_PROMPTS: Record<string, (prompt: string, tone: string, style: string, length: string) => string> = {
-  twitter: (p, t, s, l) => `Twitter thread: "${p}". Format: numbered (1/, 2/, 3/). Tone: ${t}. Style: ${s}. Length: ${l}. Include hashtags. Plain text only, no markdown.`,
+  twitter: (p, t, s, l) => `Twitter thread: "${p}". Format: numbered (1/, 2/, 3/). Tone: ${t}. Style: ${s}. Length: ${l}. Include hashtags. NO EMOJIS. Plain text only, no markdown.`,
   
-  instagram: (p, t, s, l) => `Instagram caption: "${p}". Engaging, visual. Tone: ${t}. Style: ${s}. Length: ${l}. Include emojis & hashtags. Plain text only.`,
+  instagram: (p, t, s, l) => `Instagram caption: "${p}". Engaging, visual. Tone: ${t}. Style: ${s}. Length: ${l}. Include hashtags. NO EMOJIS. Plain text only.`,
   
-  linkedin: (p, t, s, l) => `LinkedIn post: "${p}". Professional, valuable. Tone: ${t}. Style: ${s}. Length: ${l}. Clear structure. Plain text only.`,
+  linkedin: (p, t, s, l) => `LinkedIn post: "${p}". Professional, valuable. Tone: ${t}. Style: ${s}. Length: ${l}. Clear structure. NO EMOJIS. Plain text only.`,
   
-  tiktok: (p, t, s, l) => `TikTok content: "${p}". Script: Hook (0-3s), Body (3-15s), CTA (15-30s). Caption + hashtags. Tone: ${t}. Plain text only.`,
+  tiktok: (p, t, s, l) => `TikTok content: "${p}". Script: Hook (0-3s), Body (3-15s), CTA (15-30s). Caption + hashtags. Tone: ${t}. NO EMOJIS. Plain text only.`,
   
-  youtube: (p, t, s, l) => `YouTube video description: "${p}". SEO-optimized, engaging. Tone: ${t}. Style: ${s}. Length: ${l}. Include keywords, timestamps if applicable, call-to-action. Plain text only.`,
+  youtube: (p, t, s, l) => `YouTube video description: "${p}". SEO-optimized, engaging. Tone: ${t}. Style: ${s}. Length: ${l}. Include keywords, timestamps if applicable, call-to-action. NO EMOJIS. Plain text only.`,
 };
 
 // System prompt optimized for minimal tokens (reduced from 200 to 80 tokens)
-const SYSTEM_PROMPT = `Expert social media creator. Generate platform-optimized content. Output PLAIN TEXT only - no markdown, asterisks, or formatting. Ready to copy-paste.`;
+const SYSTEM_PROMPT = `Expert social media creator. Generate platform-optimized content. Output PLAIN TEXT only - no markdown, asterisks, formatting, or emojis. Ready to copy-paste.`;
 
 interface GenerationOptions {
   contentType: string;
@@ -241,7 +241,7 @@ export class OptimizedAIGenerator {
   }
 
   private cleanContent(content: string): string {
-    // Remove markdown formatting (optimized regex)
+    // Remove markdown formatting and emojis (optimized regex)
     return content
       .replace(/\*\*(.*?)\*\*/g, '$1')      // Bold
       .replace(/__(.*?)__/g, '$1')          // Bold alt
@@ -253,6 +253,14 @@ export class OptimizedAIGenerator {
       .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Links
       .replace(/^\s*[\*\-\+]\s+/gm, '')     // List markers
       .replace(/\n{3,}/g, '\n\n')           // Multiple newlines
+      // Remove emojis (common emoji ranges)
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Miscellaneous Symbols and Pictographs
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')  // Miscellaneous Symbols
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')  // Dingbats
+      .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
+      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport and Map Symbols
+      .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
+      .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Supplemental Symbols and Pictographs
       .trim();
   }
 

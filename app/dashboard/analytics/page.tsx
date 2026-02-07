@@ -137,7 +137,7 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-8 border-b-2 border-gray-200">
         <div className="flex-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Analytics Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-3">Analytics Dashboard</h1>
           <p className="text-lg text-gray-600">
             Track your content performance across all platforms
           </p>
@@ -147,7 +147,7 @@ export default function AnalyticsPage() {
             onClick={() => setTimeRange("7d")}
             className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               timeRange === "7d"
-                ? "bg-gray-900 text-white shadow-md"
+                ? "bg-purple-600 text-white shadow-md"
                 : "bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
             }`}
           >
@@ -157,7 +157,7 @@ export default function AnalyticsPage() {
             onClick={() => setTimeRange("30d")}
             className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               timeRange === "30d"
-                ? "bg-gray-900 text-white shadow-md"
+                ? "bg-purple-600 text-white shadow-md"
                 : "bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
             }`}
           >
@@ -167,7 +167,7 @@ export default function AnalyticsPage() {
             onClick={() => setTimeRange("90d")}
             className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               timeRange === "90d"
-                ? "bg-gray-900 text-white shadow-md"
+                ? "bg-purple-600 text-white shadow-md"
                 : "bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
             }`}
           >
@@ -178,7 +178,7 @@ export default function AnalyticsPage() {
 
       {/* Key Metrics */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Key Metrics</h2>
+        <h2 className="text-xl font-bold text-gray-950 mb-6">Key Metrics</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
@@ -196,7 +196,7 @@ export default function AnalyticsPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 mb-3">
+                  <div className="text-2xl font-bold text-gray-950 mb-3">
                     {loading ? (
                       <div className="h-10 w-28 bg-gray-200 rounded animate-pulse" />
                     ) : (
@@ -227,10 +227,10 @@ export default function AnalyticsPage() {
 
       {/* Engagement Rate Card */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Engagement Overview</h2>
+        <h2 className="text-xl font-bold text-gray-950 mb-6">Engagement Overview</h2>
         <Card className="bg-white border-2 border-gray-200 rounded-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-gray-900">
+            <CardTitle className="flex items-center gap-3 text-gray-950">
               <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
                 <BarChart3 className="w-6 h-6 text-gray-700" />
               </div>
@@ -244,7 +244,7 @@ export default function AnalyticsPage() {
             <div className="space-y-6">
               <div className="flex items-end gap-6">
                 <div className="flex-1">
-                  <div className="text-3xl font-bold text-gray-900 mb-3">
+                  <div className="text-3xl font-bold text-gray-950 mb-3">
                     {loading ? (
                       <div className="h-16 w-32 bg-gray-200 rounded animate-pulse" />
                     ) : (
@@ -256,7 +256,7 @@ export default function AnalyticsPage() {
                 <div className="flex-1">
                   <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gray-900 transition-all duration-1000"
+                      className="h-full bg-purple-600 transition-all duration-1000"
                       style={{ width: `${Math.min(data.engagementRate, 100)}%` }}
                     />
                   </div>
@@ -278,10 +278,10 @@ export default function AnalyticsPage() {
 
       {/* Platform Performance */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Platform Performance</h2>
+        <h2 className="text-xl font-bold text-gray-950 mb-6">Platform Performance</h2>
         <Card className="bg-white border-2 border-gray-200 rounded-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-gray-900 text-xl">Performance by Platform</CardTitle>
+            <CardTitle className="text-gray-950 text-xl">Performance by Platform</CardTitle>
             <CardDescription className="text-gray-600">
               See how your content performs across different platforms
             </CardDescription>
@@ -299,7 +299,7 @@ export default function AnalyticsPage() {
                         {getPlatformIcon(platform.platform)}
                       </div>
                       <div>
-                        <p className="font-bold text-lg text-gray-900 capitalize mb-1">
+                        <p className="font-bold text-lg text-gray-950 capitalize mb-1">
                           {platform.platform}
                         </p>
                         <p className="text-sm text-gray-600">
@@ -308,7 +308,7 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-gray-900 mb-1">
+                      <p className="text-2xl font-bold text-gray-950 mb-1">
                         {platform.engagement}%
                       </p>
                       <p className="text-xs text-gray-600 font-medium">Engagement</p>

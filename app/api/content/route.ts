@@ -7,91 +7,86 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    // Get user ID from Clerk auth - this should work with the middleware
-    let authResult;
-    try {
-      authResult = await auth();
-    } catch (authError) {
-      console.error("[Content API] auth() threw an error:", authError);
-      authResult = null;
-    }
-    
-    const clerkUserId = authResult?.userId;
-    
-    console.log("[Content API] Auth check:", {
-      hasAuthResult: !!authResult,
-      userId: clerkUserId,
-      sessionId: authResult?.sessionId,
-      orgId: authResult?.orgId,
-    });
-    
-    // If no userId, try currentUser as fallback
-    let finalUserId = clerkUserId;
-    if (!finalUserId) {
-      try {
-        const user = await currentUser();
-        finalUserId = user?.id || null;
-        console.log("[Content API] currentUser() fallback:", { 
-          userId: finalUserId,
-          hasUser: !!user,
-          email: user?.emailAddresses?.[0]?.emailAddress,
-        });
-      } catch (userError) {
-        console.warn("[Content API] currentUser() failed:", userError);
-        if (userError instanceof Error) {
-          console.warn("[Content API] currentUser() error message:", userError.message);
-        }
-      }
-    }
-
-    if (!finalUserId) {
-      console.error("[Content API] ❌ Authentication failed - no userId");
-      console.error("[Content API] Auth result:", JSON.stringify(authResult, null, 2));
-      console.error("[Content API] Request URL:", req.url);
-      console.error("[Content API] Request method:", req.method);
-      
-      // Check if this is a browser request or API request
-      const userAgent = req.headers.get('user-agent') || '';
-      console.error("[Content API] User agent:", userAgent);
-      
-      return NextResponse.json(
-        { error: "Unauthorized - Please sign in" },
-        { status: 401 }
-      );
-    }
-    
-    console.log("[Content API] ✅ Authenticated user:", finalUserId);
-
+    // Parse query params first to get client userId (same pattern as generate API)
     const { searchParams } = new URL(req.url);
+    const clientUserId = searchParams.get("userId");
     const filter = searchParams.get("filter") || "all";
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam, 10) : 100;
 
+    // Use the EXACT same auth pattern as generate API (which works)
+    const authResult = await auth();
+    let clerkUserId = authResult?.userId || clientUserId || null;
+    
+    // If auth() didn't work, try currentUser() as fallback (same as generate)
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id || null;
+        console.log("[Content API] currentUser() fallback result:", { userId: clerkUserId });
+      } catch (userError) {
+        console.warn("[Content API] currentUser() failed:", userError);
+      }
+    }
+
+    // Log authentication status for debugging
+    if (!clerkUserId) {
+      console.warn("[Content API] ⚠️ No userId found - auth failed, trying fallbacks");
+      console.warn("[Content API] Auth result:", { hasAuthResult: !!authResult, userId: authResult?.userId });
+      console.warn("[Content API] Client userId from query:", clientUserId);
+    }
+
+    if (!clerkUserId) {
+      console.warn("[Content API] ⚠️ No userId - returning empty array");
+      return NextResponse.json([]);
+    }
+    
+    console.log("[Content API] ✅ Authenticated Clerk user ID:", clerkUserId);
+
     let user;
     try {
-      user = await GetUserByClerkId(finalUserId);
+      console.log(`[Content API] Looking up user with Clerk ID: ${clerkUserId}`);
+      user = await GetUserByClerkId(clerkUserId);
+      if (!user) {
+        console.log(`[Content API] ⚠️ User not found in database for Clerk ID: ${clerkUserId}`);
+        console.log(`[Content API] This might mean:`);
+        console.log(`  1. User was created with a different Clerk ID`);
+        console.log(`  2. User needs to generate content first to be created`);
+        console.log(`  3. Database lookup is failing`);
+        return NextResponse.json([]);
+      }
+      console.log(`[Content API] ✅ Found user: DB ID ${user.id}, Email: ${user.email}, Clerk ID: ${user.stripecustomerId}`);
     } catch (userError) {
-      console.error(`[Content API] Error getting user for Clerk ID ${finalUserId}:`, userError);
+      console.error(`[Content API] ❌ Error getting user:`, userError);
+      if (userError instanceof Error) {
+        console.error(`[Content API] Error message: ${userError.message}`);
+        console.error(`[Content API] Error stack: ${userError.stack}`);
+      }
       return NextResponse.json([]);
     }
-
-    if (!user) {
-      // Return empty array instead of error if user doesn't exist yet
-      // This is normal for new users who haven't generated content yet
-      console.log(`[Content API] User not found in database for Clerk ID: ${finalUserId}.`);
-      console.log(`[Content API] This is normal - user will be created when they generate their first content.`);
-      console.log(`[Content API] Returning empty array instead of error.`);
-      return NextResponse.json([]);
-    }
-
-    console.log(`[Content API] Found user in database: ID ${user.id} for Clerk ID ${finalUserId}`);
 
     let content;
     try {
+      console.log(`[Content API] Querying content for user ID: ${user.id} (limit: ${limit})`);
+      console.log(`[Content API] User details - ID: ${user.id}, Email: ${user.email}, Clerk ID: ${user.stripecustomerId}`);
+      
       content = await GetUserGeneratedContent(user.id, limit);
-      console.log(`[Content API] Database query returned ${content?.length || 0} items`);
+      console.log(`[Content API] ✅ Database query successful - returned ${content?.length || 0} items`);
+      
+      if (content && content.length > 0) {
+        console.log(`[Content API] ✅ Found ${content.length} content items!`);
+        console.log(`[Content API] Sample content IDs:`, content.slice(0, 3).map(c => c.id));
+        console.log(`[Content API] Content types:`, content.slice(0, 3).map(c => c.contentType));
+      } else {
+        console.log(`[Content API] ⚠️ No content found for user ID ${user.id}`);
+        console.log(`[Content API] This could mean:`);
+        console.log(`  1. User hasn't generated any content yet`);
+        console.log(`  2. Content was generated but saved with a different user ID`);
+        console.log(`  3. Content exists but query is failing`);
+        console.log(`[Content API] ⚠️ If you see content in the database, check if the userId matches: ${user.id}`);
+      }
     } catch (dbError) {
-      console.error("[Content API] Database error fetching content:", dbError);
+      console.error("[Content API] ❌ Database error fetching content:", dbError);
       if (dbError instanceof Error) {
         console.error("[Content API] Error message:", dbError.message);
         console.error("[Content API] Error stack:", dbError.stack);
@@ -100,7 +95,7 @@ export async function GET(req: Request) {
       return NextResponse.json([]);
     }
     
-    console.log(`[Content API] Found ${content.length} items for user ${user.id} (limit: ${limit})`);
+    console.log(`[Content API] ✅ Returning ${content.length} items for user ${user.id}`);
 
     if (filter !== "all") {
       content = content.filter((item) => item.contentType === filter);

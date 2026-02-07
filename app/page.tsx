@@ -12,7 +12,6 @@ import {
   BotIcon,
   MessageSquareIcon,
   ArrowRightIcon,
-  SparklesIcon,
   ZapIcon,
   TrendingUpIcon,
   ClockIcon,

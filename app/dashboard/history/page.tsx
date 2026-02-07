@@ -61,9 +61,10 @@ export default function DashboardHistoryPage() {
     
     try {
       setLoading(true);
-      const url = `/api/content?filter=${filter}`;
+      const url = `/api/content?filter=${filter}${userId ? `&userId=${userId}` : ''}`;
       
       console.log("[History Page] Fetching content from:", url);
+      console.log("[History Page] User ID being sent:", userId);
       
       const response = await fetch(url, {
         credentials: "include",
@@ -114,13 +115,16 @@ export default function DashboardHistoryPage() {
     // Only fetch if user is loaded, signed in, and has a userId
     if (isLoaded) {
       if (isSignedIn && userId) {
-        console.log("[History Page] User is signed in, fetching content");
+        console.log("[History Page] User is signed in, fetching content for userId:", userId);
         fetchContent();
       } else {
-        console.log("[History Page] User is not signed in or no userId, skipping fetch");
+        console.log("[History Page] User is not signed in or no userId");
+        console.log("[History Page] isLoaded:", isLoaded, "isSignedIn:", isSignedIn, "userId:", userId);
         setContent([]);
         setLoading(false);
       }
+    } else {
+      console.log("[History Page] Clerk is still loading...");
     }
   }, [isLoaded, isSignedIn, userId, fetchContent]);
 
@@ -202,7 +206,7 @@ export default function DashboardHistoryPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Content History</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-2">Content History</h1>
           <p className="text-base text-gray-600">Your generated content</p>
         </div>
         <Button
@@ -223,7 +227,7 @@ export default function DashboardHistoryPage() {
             onClick={() => setFilter("all")}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
               filter === "all"
-                ? "bg-gray-900 text-white"
+                ? "bg-purple-600 text-white"
                 : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
             }`}
           >
@@ -235,7 +239,7 @@ export default function DashboardHistoryPage() {
               onClick={() => setFilter(type)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
                 filter === type
-                  ? "bg-gray-900 text-white"
+                  ? "bg-purple-600 text-white"
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
@@ -265,18 +269,22 @@ export default function DashboardHistoryPage() {
           ))}
         </div>
       ) : content.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12 bg-white border border-gray-200 rounded-xl">
           <FileTextIcon className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-1.5">No content yet</h3>
+          <h3 className="text-lg font-semibold text-gray-950 mb-1.5">No content history yet</h3>
           <p className="text-sm text-gray-600 mb-4">
-            Generate your first piece of content to get started
+            {userId 
+              ? "Generate your first piece of content to see it here"
+              : "Please sign in to view your content history"}
           </p>
-          <Button
-            onClick={() => router.push("/dashboard/generate")}
-            className="bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
-          >
-            Generate Content
-          </Button>
+          {userId && (
+            <Button
+              onClick={() => router.push("/dashboard/generate")}
+              className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+            >
+              Generate Content
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-6">
@@ -293,7 +301,7 @@ export default function DashboardHistoryPage() {
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold capitalize text-sm sm:text-base text-gray-900">
+                        <span className="font-semibold capitalize text-sm sm:text-base text-gray-950">
                           {item.contentType}
                         </span>
                         {item.posted === true && (
@@ -368,7 +376,7 @@ export default function DashboardHistoryPage() {
                   <p className="text-xs text-gray-600 font-medium">Content</p>
                   <span className="text-xs text-gray-500">{item.content.length} chars</span>
                 </div>
-                <pre className="whitespace-pre-wrap text-gray-900 text-sm leading-relaxed max-h-40 overflow-y-auto">
+                <pre className="whitespace-pre-wrap text-gray-950 text-sm leading-relaxed max-h-40 overflow-y-auto">
                   {item.content}
                 </pre>
               </div>
@@ -389,12 +397,12 @@ export default function DashboardHistoryPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 capitalize">
+              <h3 className="text-lg font-semibold text-gray-950 capitalize">
                 {viewingContent.contentType}
               </h3>
               <button
                 onClick={() => setViewingContent(null)}
-                className="text-gray-600 hover:text-gray-900 transition-colors p-1.5 hover:bg-gray-100 rounded-xl"
+                className="text-gray-600 hover:text-gray-950 transition-colors p-1.5 hover:bg-gray-100 rounded-xl"
               >
                 <XIcon className="w-4 h-4" />
               </button>
@@ -429,7 +437,7 @@ export default function DashboardHistoryPage() {
                   <span className="text-xs text-gray-600">{viewingContent.content.length} chars</span>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <pre className="whitespace-pre-wrap text-gray-900 text-sm leading-relaxed">
+                  <pre className="whitespace-pre-wrap text-gray-950 text-sm leading-relaxed">
                     {viewingContent.content}
                   </pre>
                 </div>

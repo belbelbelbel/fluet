@@ -175,14 +175,14 @@ export default function TeamPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Team Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-2">Team Management</h1>
           <p className="text-base text-gray-600">
             Manage your team members and their permissions
           </p>
         </div>
         <Button
           onClick={() => setShowInviteModal(true)}
-          className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
+          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Invite Member
@@ -207,7 +207,7 @@ export default function TeamPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl font-bold text-gray-950">
                   {loading ? (
                     <div className="h-9 w-20 bg-gray-200 rounded animate-pulse" />
                   ) : (
@@ -223,7 +223,7 @@ export default function TeamPage() {
       {/* Team Members List */}
       <Card className="bg-white border-gray-200 rounded-xl">
         <CardHeader>
-          <CardTitle className="text-gray-900">Team Members</CardTitle>
+          <CardTitle className="text-gray-950">Team Members</CardTitle>
           <CardDescription className="text-gray-600">
             Manage roles and permissions for your team
           </CardDescription>
@@ -262,12 +262,12 @@ export default function TeamPage() {
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center text-white font-semibold">
+                    <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold">
                       {member.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold text-gray-900">{member.name}</p>
+                        <p className="font-semibold text-gray-950">{member.name}</p>
                         {getRoleIcon(member.role)}
                         {getRoleBadge(member.role)}
                       </div>
@@ -287,7 +287,7 @@ export default function TeamPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-gray-600 hover:text-gray-900"
+                          className="text-gray-600 hover:text-gray-950"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </Button>
@@ -325,7 +325,7 @@ export default function TeamPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader>
-              <CardTitle className="text-gray-900">Invite Team Member</CardTitle>
+              <CardTitle className="text-gray-950">Invite Team Member</CardTitle>
               <CardDescription className="text-gray-600">
                 Send an invitation to collaborate on your content
               </CardDescription>
@@ -340,13 +340,13 @@ export default function TeamPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="colleague@example.com"
-                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
+                  className="w-full px-4 py-2 bg-white border border-gray-300 rounded-xl text-gray-950 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 />
               </div>
               <div className="flex gap-2">
                 <Button
                   onClick={handleInvite}
-                  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
                 >
                   <Check className="w-4 h-4 mr-2" />
                   Send Invitation

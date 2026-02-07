@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { showToast } from "@/lib/toast";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { CalendarView } from "@/components/CalendarView";
 import {
   TwitterIcon,
   InstagramIcon,
@@ -152,7 +153,9 @@ export default function DashboardSchedulePage() {
   const fetchScheduledPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/schedule", {
+      const url = `/api/schedule${userId ? `?userId=${userId}` : ''}`;
+      console.log("[Schedule Page] Fetching scheduled posts from:", url);
+      const response = await fetch(url, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -215,11 +218,13 @@ export default function DashboardSchedulePage() {
             content: selectedContent,
             platform: selectedPlatform,
             scheduledFor: scheduledDateTime.toISOString(),
+            userId: userId, // Include userId in request body
           }
         : {
             content: selectedContent,
             platform: selectedPlatform,
             scheduledFor: scheduledDateTime.toISOString(),
+            userId: userId, // Include userId in request body
           };
 
       const response = await fetch("/api/schedule", {
@@ -250,7 +255,7 @@ export default function DashboardSchedulePage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedContent, selectedPlatform, scheduledDate, scheduledTime, editingPost, fetchScheduledPosts, formatDateTime]);
+  }, [selectedContent, selectedPlatform, scheduledDate, scheduledTime, editingPost, fetchScheduledPosts, formatDateTime, userId]);
 
   const handleDeleteClick = useCallback((id: number) => {
     setDeleteConfirm({ open: true, id });
@@ -263,7 +268,9 @@ export default function DashboardSchedulePage() {
     setDeleteConfirm({ open: false, id: null });
 
     try {
-      const response = await fetch(`/api/schedule?id=${id}`, {
+      const url = `/api/schedule?id=${id}${userId ? `&userId=${userId}` : ''}`;
+      console.log("[Schedule Page] Deleting scheduled post:", url);
+      const response = await fetch(url, {
         method: "DELETE",
         credentials: "include",
       });
@@ -280,7 +287,7 @@ export default function DashboardSchedulePage() {
       console.error("Error deleting scheduled post:", error);
       showToast.error("Failed to delete", "An error occurred. Please try again.");
     }
-  }, [deleteConfirm.id, fetchScheduledPosts]);
+  }, [deleteConfirm.id, fetchScheduledPosts, userId]);
 
   const handleEdit = useCallback((post: ScheduledPost) => {
     setEditingPost(post);
@@ -317,117 +324,26 @@ export default function DashboardSchedulePage() {
     [scheduledPosts]
   );
 
-  // Calendar view helpers
-  const getWeekDates = useCallback(() => {
-    const today = new Date();
-    const day = today.getDay();
-    const diff = today.getDate() - day;
-    const weekStart = new Date(today.setDate(diff));
-    const dates = [];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(weekStart);
-      date.setDate(weekStart.getDate() + i);
-      dates.push({
-        day: date.toLocaleDateString("en-US", { weekday: "short" }),
-        date: date.getDate(),
-        month: date.getMonth() + 1,
-        fullDate: date,
-      });
-    }
-    return dates;
-  }, []);
-
-  const weekDates = getWeekDates();
-
-  // Format time slot labels like the reference (M.on, 9.0B, 12.30, 14.8B)
-  const formatTimeSlot = (hours: number) => {
-    if (hours === 0 || hours < 6) return "M.on";
-    if (hours === 9) return "9.0B";
-    if (hours === 12) return "12.30";
-    if (hours === 14 || hours === 15) return "14.8B";
-    if (hours < 12) return `${hours}.0${hours % 10}`;
-    return `${hours - 12}.${hours % 10}B`;
-  };
-
-  // Group posts by time slots for calendar view
-  const timeSlots = useMemo(() => {
-    // More granular time slots based on actual scheduled posts
-    const allTimes = upcomingPosts
-      .map((post) => {
-        const date = new Date(post.scheduledFor);
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        return hours * 60 + minutes;
-      })
-      .sort((a, b) => a - b);
-
-    // Create time slots every 3 hours, plus specific times from posts
-    const slots = new Set<string>();
-    for (let h = 0; h < 24; h += 3) {
-      slots.add(`${h.toString().padStart(2, "0")}:00`);
-    }
-    
-    // Add specific post times (rounded to nearest hour for display)
-    allTimes.forEach((minutes) => {
-      const hours = Math.floor(minutes / 60);
-      slots.add(`${hours.toString().padStart(2, "0")}:00`);
-    });
-
-    return Array.from(slots).sort();
-  }, [upcomingPosts]);
-
-  const getPostPosition = useCallback((post: ScheduledPost) => {
-    const postDate = new Date(post.scheduledFor);
-    const dayIndex = weekDates.findIndex(
-      (d) =>
-        d.fullDate.getDate() === postDate.getDate() &&
-        d.fullDate.getMonth() === postDate.getMonth() &&
-        d.fullDate.getFullYear() === postDate.getFullYear()
-    );
-
-    if (dayIndex === -1) return null;
-
-    const hours = postDate.getHours();
-    const minutes = postDate.getMinutes();
-    const timeInMinutes = hours * 60 + minutes;
-
-    // Find closest time slot
-    let slotIndex = 0;
-    for (let i = 0; i < timeSlots.length; i++) {
-      const [slotHours] = timeSlots[i].split(":").map(Number);
-      if (timeInMinutes >= slotHours * 60) {
-        slotIndex = i;
-      } else {
-        break;
-      }
-    }
-
-    return {
-      dayIndex,
-      slotIndex,
-      time: `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`,
-    };
-  }, [weekDates, timeSlots]);
 
   const getPlatformColor = (platform: string) => {
     switch (platform.toLowerCase()) {
       case "twitter":
-        return "bg-blue-50 border-blue-200 text-blue-900";
+        return "bg-gray-50 border-gray-200 text-gray-950";
       case "instagram":
         return "bg-pink-50 border-pink-200 text-pink-900";
       case "linkedin":
         return "bg-blue-50 border-blue-200 text-blue-900";
       case "tiktok":
-        return "bg-gray-50 border-gray-200 text-gray-900";
+        return "bg-gray-50 border-gray-200 text-gray-950";
       default:
-        return "bg-gray-50 border-gray-200 text-gray-900";
+        return "bg-gray-50 border-gray-200 text-gray-950";
     }
   };
 
   const getPlatformIconBg = (platform: string) => {
     switch (platform.toLowerCase()) {
       case "twitter":
-        return "bg-blue-500";
+        return "bg-black";
       case "instagram":
         return "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500";
       case "linkedin":
@@ -444,7 +360,7 @@ export default function DashboardSchedulePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Schedule Posts</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-2">Schedule Posts</h1>
           <p className="text-base text-gray-600">We post for you automatically</p>
         </div>
         <Button
@@ -455,7 +371,7 @@ export default function DashboardSchedulePage() {
             setScheduledTime("");
             setShowScheduleModal(true);
           }}
-          className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
+          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           New Post
@@ -535,98 +451,19 @@ export default function DashboardSchedulePage() {
             </Button>
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            {/* Horizontal Scrollable Container */}
-            <div className="overflow-x-auto scrollbar-thin">
-              <div className="min-w-[1200px] p-6">
-                {/* Days Header - Sticky */}
-                <div className="grid grid-cols-8 gap-2 mb-4 border-b-2 border-gray-200 pb-4 sticky top-0 bg-white z-30">
-                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide sticky left-0 bg-white z-30 border-r border-gray-100 pr-4 min-w-[70px]"></div>
-                  {weekDates.map((date, idx) => (
-                    <div key={idx} className="text-center">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{date.day}</div>
-                      <div className={`text-base font-bold ${idx === 0 ? 'text-gray-900' : 'text-gray-700'}`}>
-                        {idx === 0 ? `${date.month}/${date.date}` : date.date}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Time Slots and Posts - Professional Grid */}
-                <div className="space-y-2">
-                  {timeSlots.map((slot, slotIdx) => {
-                    const [hours] = slot.split(":").map(Number);
-                    const postsInSlot = upcomingPosts.filter((post) => {
-                      const postDate = new Date(post.scheduledFor);
-                      const postHours = postDate.getHours();
-                      // Match posts to time slot (within 3 hour window)
-                      return postHours >= hours && postHours < hours + 3;
-                    });
-
-                    if (postsInSlot.length === 0 && slotIdx > 0 && slotIdx < timeSlots.length - 1) {
-                      return null;
-                    }
-
-                    return (
-                      <div key={slotIdx} className="grid grid-cols-8 gap-2 items-start">
-                        {/* Time Label - Sticky for horizontal scroll */}
-                        <div className="text-xs font-semibold text-gray-600 pt-3 text-right pr-4 sticky left-0 bg-white z-20 min-w-[70px] border-r border-gray-100">
-                          {formatTimeSlot(hours)}
-                        </div>
-
-                        {/* Day Columns */}
-                        {weekDates.map((date, dayIdx) => {
-                          const postsForDay = postsInSlot.filter((post) => {
-                            const postDate = new Date(post.scheduledFor);
-                            return (
-                              postDate.getDate() === date.fullDate.getDate() &&
-                              postDate.getMonth() === date.fullDate.getMonth() &&
-                              postDate.getFullYear() === date.fullDate.getFullYear()
-                            );
-                          });
-
-                          return (
-                            <div
-                              key={dayIdx}
-                              className="min-h-[100px] border border-gray-200 rounded-lg p-3 bg-gray-50 relative hover:bg-gray-100 transition-colors min-w-[140px]"
-                            >
-                              {postsForDay.map((post) => {
-                                const postDate = new Date(post.scheduledFor);
-                                const postHours = postDate.getHours();
-                                const postMinutes = postDate.getMinutes();
-                                const timeStr = `${postHours.toString().padStart(2, "0")}:${postMinutes.toString().padStart(2, "0")}`;
-                                const platformName = post.platform === "twitter" ? "Twitter" : post.platform === "instagram" ? "Instagram" : post.platform === "linkedin" ? "LinkedIn" : "TikTok";
-
-                                return (
-                                  <div
-                                    key={post.id}
-                                    className="bg-white rounded-lg p-3 mb-2 border border-gray-200 cursor-pointer hover:border-gray-300 hover:shadow-md transition-all group"
-                                    onClick={() => handleEdit(post)}
-                                  >
-                                    <div className="flex items-center gap-2.5 mb-2">
-                                      <div className={`${getPlatformIconBg(post.platform)} w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 shadow-sm`}>
-                                        {getPlatformIcon(post.platform)}
-                                      </div>
-                                      <span className="text-xs font-semibold text-gray-900 flex-1 truncate">
-                                        {platformName}
-                                      </span>
-                                    </div>
-                                    <div className="text-[11px] font-medium text-gray-500 pl-10">
-                                      {timeStr}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
+          <CalendarView
+            events={upcomingPosts.map((post) => ({
+              id: post.id,
+              date: new Date(post.scheduledFor),
+              title: `${post.platform.charAt(0).toUpperCase() + post.platform.slice(1)} Post`,
+              platform: post.platform,
+              content: post.content,
+            }))}
+            onEventClick={(event) => {
+              const post = upcomingPosts.find((p) => p.id === event.id);
+              if (post) handleEdit(post);
+            }}
+          />
         )
       ) : (
         <>

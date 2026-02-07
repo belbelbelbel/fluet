@@ -10,7 +10,6 @@ import {
   Settings,
   Bot,
   Zap,
-  Sparkles,
   Brain,
   Check,
   Globe,
@@ -103,7 +102,7 @@ const aiModels: AIModelInfo[] = [
     speed: "fast",
     quality: "high",
     cost: "low",
-    icon: <Sparkles className="w-5 h-5" />,
+    icon: <Zap className="w-5 h-5" />,
     color: "text-green-400",
   },
   {
@@ -290,7 +289,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-2">Settings</h1>
           <p className="text-base text-gray-600">
             Manage your preferences and AI model selection
           </p>
@@ -298,7 +297,7 @@ export default function SettingsPage() {
         <Button
           onClick={saveSettings}
           disabled={saving}
-          className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white rounded-xl px-6"
+          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white rounded-xl px-6"
         >
           {saving ? (
             <>
@@ -317,7 +316,7 @@ export default function SettingsPage() {
       <Tabs defaultValue="ai" className="space-y-6">
         <div className="overflow-x-auto -mx-4 sm:mx-0">
           <TabsList className="bg-gray-100 border border-gray-200 inline-flex min-w-full sm:min-w-0 px-4 sm:px-0 rounded-xl">
-            <TabsTrigger value="ai" className="flex-1 sm:flex-none data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-600">
+            <TabsTrigger value="ai" className="flex-1 sm:flex-none data-[state=active]:bg-white data-[state=active]:text-gray-950 text-gray-600">
               <Bot className="w-4 h-4 mr-1 sm:mr-2" />
               <span className="text-xs sm:text-sm">AI Models</span>
             </TabsTrigger>
@@ -340,7 +339,7 @@ export default function SettingsPage() {
         <TabsContent value="ai" className="space-y-6">
           <Card className="bg-white border-gray-200 rounded-xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
+              <CardTitle className="flex items-center gap-2 text-gray-950">
                 <Bot className="w-5 h-5 text-gray-700" />
                 Default AI Model
               </CardTitle>
@@ -352,7 +351,7 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 {/* Custom Dropdown Selector */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-3">
+                  <label className="block text-sm font-semibold text-gray-950 mb-3">
                     Select AI Model
                   </label>
                   <div className="relative" ref={modelDropdownRef}>
@@ -372,7 +371,7 @@ export default function SettingsPage() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-gray-900 text-base">{selectedModel.name}</span>
+                                  <span className="font-semibold text-gray-950 text-base">{selectedModel.name}</span>
                                   <Badge className="bg-gray-100 text-gray-700 border-gray-200 text-xs">
                                     {selectedModel.provider}
                                   </Badge>
@@ -406,7 +405,7 @@ export default function SettingsPage() {
                                   setIsModelDropdownOpen(false);
                                 }}
                                 className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left ${
-                                  isSelected ? "bg-gray-950 text-white" : ""
+                                  isSelected ? "bg-purple-600 text-white" : ""
                                 }`}
                               >
                                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
@@ -465,7 +464,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <h3 className="font-semibold text-gray-900 text-lg">{selectedModel.name}</h3>
+                            <h3 className="font-semibold text-gray-950 text-lg">{selectedModel.name}</h3>
                             <Badge className="bg-white text-gray-700 border-gray-200 text-xs">
                               {selectedModel.provider}
                             </Badge>
@@ -496,7 +495,7 @@ export default function SettingsPage() {
           {/* Model Comparison */}
           <Card className="bg-white border-gray-200 rounded-xl">
             <CardHeader>
-              <CardTitle className="text-gray-900">Model Comparison</CardTitle>
+              <CardTitle className="text-gray-950">Model Comparison</CardTitle>
               <CardDescription className="text-gray-600">
                 Quick reference for model capabilities
               </CardDescription>
@@ -523,7 +522,7 @@ export default function SettingsPage() {
                             <div className="flex items-center gap-2">
                               <div className="text-gray-700">{model.icon}</div>
                               <div>
-                                <span className="text-gray-900 font-medium block">{model.name}</span>
+                                <span className="text-gray-950 font-medium block">{model.name}</span>
                                 <div className="sm:hidden flex gap-2 mt-1">
                                   {getSpeedBadge(model.speed)}
                                   {getQualityBadge(model.quality)}
@@ -554,7 +553,7 @@ export default function SettingsPage() {
         <TabsContent value="general" className="space-y-6">
           <Card className="bg-white border-gray-200 rounded-xl">
             <CardHeader>
-              <CardTitle className="text-gray-900">Niche Selection</CardTitle>
+              <CardTitle className="text-gray-950">Niche Selection</CardTitle>
               <CardDescription className="text-gray-600">
                 Choose your niche to get personalized content ideas
               </CardDescription>

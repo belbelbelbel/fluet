@@ -62,6 +62,7 @@ export const GetUserByClerkId = async (clerkUserId: string) => {
 
 export const GetUserGeneratedContent = async (userId: number, limit: number = 10) => {
     try {
+        console.log(`[GetUserGeneratedContent] Querying for user ID: ${userId}, limit: ${limit}`);
         const content = await db
             .select()
             .from(GeneratedContent)
@@ -69,9 +70,21 @@ export const GetUserGeneratedContent = async (userId: number, limit: number = 10
             .orderBy(desc(GeneratedContent.createdAt))
             .limit(limit)
             .execute();
+        console.log(`[GetUserGeneratedContent] Found ${content.length} items for user ${userId}`);
+        if (content.length > 0) {
+            console.log(`[GetUserGeneratedContent] First content item:`, {
+                id: content[0].id,
+                contentType: content[0].contentType,
+                createdAt: content[0].createdAt,
+                userId: content[0].userId
+            });
+        }
         return content;
     } catch (error) {
         console.error(`[GetUserGeneratedContent] Error encountered:`, error);
+        if (error instanceof Error) {
+            console.error(`[GetUserGeneratedContent] Error message: ${error.message}`);
+        }
         throw new Error("Failed to get generated content");
     }
 };

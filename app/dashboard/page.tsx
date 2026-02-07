@@ -154,27 +154,27 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Top Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between">
-        <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-950 truncate">
               Welcome, {userName}
-          </h1>
-            <p className="text-sm text-gray-600 mt-1">{currentDate}</p>
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">{currentDate}</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <div className="relative">
-              <Bell className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
+              <Bell className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-950" />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </div>
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-none">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search anything..."
-                className="pl-10 pr-10 py-2 w-64 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Search..."
+                className="pl-9 pr-8 py-2 w-full sm:w-48 lg:w-64 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 hidden sm:inline">
                 /
               </span>
             </div>
@@ -183,76 +183,76 @@ export default function DashboardPage() {
       </div>
 
       {/* Main Content */}
-      <div className="px-6 lg:px-8 py-6 space-y-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Card className="bg-white border border-gray-200 rounded-xl">
-            <CardContent className="p-6">
-              <div className="text-sm font-medium text-gray-600 mb-2">
+            <CardContent className="p-4 sm:p-6">
+              <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1.5 sm:mb-2">
                 Total posts
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-950 mb-1.5 sm:mb-2">
                 {loading ? (
-                  <div className="h-9 w-20 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-8 sm:h-9 w-16 sm:w-20 bg-gray-200 rounded animate-pulse" />
                 ) : (
                   stats.totalContent
                 )}
               </div>
-              <div className="flex items-center gap-1 text-sm font-medium text-green-600">
-                <TrendingUp className="w-4 h-4" />
-                <span>▲+55% engagement since last month</span>
+              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-green-600">
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="truncate">▲+55% since last month</span>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-white border border-gray-200 rounded-xl">
-            <CardContent className="p-6">
-              <div className="text-sm font-medium text-gray-600 mb-2">
+            <CardContent className="p-4 sm:p-6">
+              <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1.5 sm:mb-2">
                 Post likes
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-950 mb-1.5 sm:mb-2">
                 2.4M
               </div>
-              <div className="flex items-center gap-1 text-sm font-medium text-red-600">
-                <TrendingDown className="w-4 h-4" />
-                <span>▼-25% engagement since last month</span>
+              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-red-600">
+                <TrendingDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="truncate">▼-25% since last month</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white border border-gray-200 rounded-xl">
-            <CardContent className="p-6">
-              <div className="text-sm font-medium text-gray-600 mb-2">
+          <Card className="bg-white border border-gray-200 rounded-xl sm:col-span-2 lg:col-span-1">
+            <CardContent className="p-4 sm:p-6">
+              <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1.5 sm:mb-2">
                 Total comments
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-950 mb-1.5 sm:mb-2">
                 3.5M
               </div>
-              <div className="flex items-center gap-1 text-sm font-medium text-green-600">
-                <TrendingUp className="w-4 h-4" />
-                <span>▲+15% engagement since last month</span>
+              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-green-600">
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="truncate">▲+15% since last month</span>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - 2 spans */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* My Social Overview */}
             <Card className="bg-white border border-gray-200 rounded-xl">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold text-gray-900">
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
+                  <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
                     My social overview
-                </CardTitle>
+                  </CardTitle>
                   <div className="flex items-center gap-2">
-                    <select className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select className="flex-1 sm:flex-none text-xs sm:text-sm border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
                       <option>Jul 2024 - Dec 2024</option>
                       <option>Jan 2024 - Jun 2024</option>
                     </select>
-                    <select className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select className="flex-1 sm:flex-none text-xs sm:text-sm border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
                       <option>Engagement</option>
                       <option>Reach</option>
                       <option>Impressions</option>
@@ -260,10 +260,10 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <div className="space-y-4 sm:space-y-6">
                   {/* Line Chart */}
-                  <div className="h-64 relative">
+                  <div className="h-48 sm:h-64 relative overflow-x-auto">
                     <svg
                       width="100%"
                       height="100%"
@@ -376,27 +376,27 @@ export default function DashboardPage() {
                     </svg>
 
                     {/* Legend */}
-                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-6 mt-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-3 sm:gap-6 mt-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-blue-500"></div>
                         <span className="text-xs text-gray-600">Facebook</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-gray-900"></div>
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-purple-600"></div>
                         <span className="text-xs text-gray-600">Instagram</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-teal-500"></div>
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-teal-500"></div>
                         <span className="text-xs text-gray-600">LinkedIn</span>
                       </div>
                     </div>
                   </div>
 
                   {/* World Map Placeholder */}
-                  <div className="h-48 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center">
-                    <div className="text-center">
-                      <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 font-medium">
+                  <div className="h-40 sm:h-48 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center">
+                    <div className="text-center px-4">
+                      <MapPin className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium">
                         Top geographies
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
@@ -410,98 +410,98 @@ export default function DashboardPage() {
 
             {/* Engagement Rate Metrics */}
             <Card className="bg-white border border-gray-200 rounded-xl">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold text-gray-900">
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
+                <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
                   Engagement rate metrics
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-      <div>
-                      <p className="font-semibold text-gray-900">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm sm:text-base font-semibold text-gray-950">
                         Engagement rate (per impression)
                       </p>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <p className="text-lg font-bold text-gray-900">5.0%</p>
-                      <span className="text-sm font-medium text-red-600">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <p className="text-base sm:text-lg font-bold text-gray-950">5.0%</p>
+                      <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
                         ▼12.7%
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div>
-                      <p className="font-semibold text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm sm:text-base font-semibold text-gray-950">
                         Facebook engagement rate
                       </p>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <p className="text-lg font-bold text-gray-900">5.0%</p>
-                      <span className="text-sm font-medium text-red-600">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <p className="text-base sm:text-lg font-bold text-gray-950">5.0%</p>
+                      <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
                         ▼12.7%
                       </span>
-        </div>
-      </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div>
-                      <p className="font-semibold text-gray-900">
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm sm:text-base font-semibold text-gray-950">
                         Instagram engagement rate
                       </p>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <p className="text-lg font-bold text-gray-900">12.3%</p>
-                      <span className="text-sm font-medium text-green-600">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <p className="text-base sm:text-lg font-bold text-gray-950">12.3%</p>
+                      <span className="text-xs sm:text-sm font-medium text-green-600 whitespace-nowrap">
                         ▲3.5%
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div>
-                      <p className="font-semibold text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm sm:text-base font-semibold text-gray-950">
                         Linkedin engagement rate
                       </p>
-                  </div>
-                    <div className="flex items-center gap-4">
-                      <p className="text-lg font-bold text-gray-900">4.5%</p>
-                      <span className="text-sm font-medium text-red-600">
+                    </div>
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <p className="text-base sm:text-lg font-bold text-gray-950">4.5%</p>
+                      <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
                         ▼9.7%
                       </span>
-              </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Column */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Top Geographies */}
             <Card className="bg-white border border-gray-200 rounded-xl">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold text-gray-900">
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
+                <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
                   Top geographies
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <div className="space-y-3 sm:space-y-4">
                   {topGeographies.map((geo, idx) => (
-                    <div key={idx} className="space-y-2">
+                    <div key={idx} className="space-y-1.5 sm:space-y-2">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-xs sm:text-sm font-medium text-gray-950 truncate flex-1 min-w-0 pr-2">
                           {geo.country}
                         </p>
-                        <p className="text-sm font-bold text-gray-900">
+                        <p className="text-xs sm:text-sm font-bold text-gray-950 whitespace-nowrap">
                           {geo.rate}%
                         </p>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2">
                         <div
-                          className="bg-teal-500 h-2 rounded-full"
+                          className="bg-teal-500 h-1.5 sm:h-2 rounded-full"
                           style={{ width: `${geo.rate}%` }}
                         ></div>
-                  </div>
-                </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </CardContent>
@@ -509,27 +509,27 @@ export default function DashboardPage() {
 
             {/* My Post Planner */}
             <Card className="bg-white border border-gray-200 rounded-xl">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold text-gray-900">
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
+                <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
                   My post planner
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex gap-2 overflow-x-auto pb-2">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 sm:-mx-6 px-4 sm:px-6">
                   {weekDates.map((date, idx) => (
                     <div
                       key={idx}
-                      className={`flex-shrink-0 px-4 py-2 rounded-lg text-center min-w-[70px] ${
+                      className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg text-center min-w-[60px] sm:min-w-[70px] ${
                         date.isToday
-                          ? "bg-gray-900 text-white"
+                          ? "bg-purple-600 text-white"
                           : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                       }`}
                     >
                       <div className="text-xs font-medium">{date.day}</div>
                       <div className="text-sm font-semibold mt-1">
                         {date.date}
-              </div>
-                  </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </CardContent>
@@ -537,47 +537,47 @@ export default function DashboardPage() {
 
             {/* Comments and Mentions */}
             <Card className="bg-white border border-gray-200 rounded-xl">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold text-gray-900">
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
+                <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
                   Comments and mentions
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <div className="space-y-3 sm:space-y-4">
                   {commentsData.map((comment, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-semibold text-blue-700">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xs sm:text-sm font-semibold text-blue-700">
                           {comment.avatar}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-semibold text-gray-900">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+                          <p className="text-xs sm:text-sm font-semibold text-gray-950">
                             {comment.name}
                           </p>
                           <p className="text-xs text-gray-500">
                             {comment.handle}
                           </p>
                         </div>
-                        <p className="text-xs text-gray-600 mb-1">
+                        <p className="text-xs text-gray-600 mb-0.5 sm:mb-1">
                           {comment.location}
                         </p>
                         <p className="text-xs text-gray-500">
                           {comment.time}
                         </p>
                       </div>
-                      <MoreVertical className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" />
+                      <MoreVertical className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600 flex-shrink-0" />
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-              </div>
-            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
