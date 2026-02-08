@@ -154,7 +154,6 @@ export default function DashboardSchedulePage() {
     try {
       setLoading(true);
       const url = `/api/schedule${userId ? `?userId=${userId}` : ''}`;
-      console.log("[Schedule Page] Fetching scheduled posts from:", url);
       const response = await fetch(url, {
         credentials: "include",
         headers: {
@@ -269,7 +268,6 @@ export default function DashboardSchedulePage() {
 
     try {
       const url = `/api/schedule?id=${id}${userId ? `&userId=${userId}` : ''}`;
-      console.log("[Schedule Page] Deleting scheduled post:", url);
       const response = await fetch(url, {
         method: "DELETE",
         credentials: "include",
@@ -356,7 +354,7 @@ export default function DashboardSchedulePage() {
   };
 
   return (
-    <div className="space-y-8 pt-8">
+    <div className="space-y-8 pt-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>

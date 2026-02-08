@@ -285,7 +285,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6 lg:space-y-8 pt-8">
+    <div className="space-y-6 lg:space-y-8 pt-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200">
         <div>

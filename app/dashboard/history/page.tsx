@@ -53,7 +53,6 @@ export default function DashboardHistoryPage() {
 
   const fetchContent = useCallback(async () => {
     if (!userId) {
-      console.log("[History Page] No userId, skipping fetch");
       setContent([]);
       setLoading(false);
       return;
@@ -63,17 +62,12 @@ export default function DashboardHistoryPage() {
       setLoading(true);
       const url = `/api/content?filter=${filter}${userId ? `&userId=${userId}` : ''}`;
       
-      console.log("[History Page] Fetching content from:", url);
-      console.log("[History Page] User ID being sent:", userId);
-      
       const response = await fetch(url, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      
-      console.log("[History Page] Response status:", response.status);
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -93,15 +87,8 @@ export default function DashboardHistoryPage() {
       }
       
       const data = await response.json();
-      console.log("[History Page] Received data:", data);
       const contentArray = Array.isArray(data) ? data : [];
-      console.log("[History Page] Content array length:", contentArray.length);
       setContent(contentArray);
-      if (contentArray.length > 0) {
-        showToast.success(`Loaded ${contentArray.length} content items`, "Your content history is ready");
-      } else {
-        console.log("[History Page] No content found. User may need to generate content first.");
-      }
     } catch (error) {
       console.error("[History Page] Error fetching content:", error);
       setContent([]);
@@ -115,16 +102,11 @@ export default function DashboardHistoryPage() {
     // Only fetch if user is loaded, signed in, and has a userId
     if (isLoaded) {
       if (isSignedIn && userId) {
-        console.log("[History Page] User is signed in, fetching content for userId:", userId);
         fetchContent();
       } else {
-        console.log("[History Page] User is not signed in or no userId");
-        console.log("[History Page] isLoaded:", isLoaded, "isSignedIn:", isSignedIn, "userId:", userId);
         setContent([]);
         setLoading(false);
       }
-    } else {
-      console.log("[History Page] Clerk is still loading...");
     }
   }, [isLoaded, isSignedIn, userId, fetchContent]);
 
@@ -202,7 +184,7 @@ export default function DashboardHistoryPage() {
   const contentTypes = useMemo(() => (["twitter", "instagram", "linkedin", "tiktok"] as ContentType[]), []);
 
   return (
-    <div className="space-y-8 pt-8">
+    <div className="space-y-8 pt-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>

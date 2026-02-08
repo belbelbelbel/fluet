@@ -152,7 +152,7 @@ export default function DashboardPage() {
   const weekDates = getWeekDates();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white max-w-8xl mx-auto">
       {/* Top Header */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">

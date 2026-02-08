@@ -20,34 +20,21 @@ export async function GET(req: Request) {
       try {
         const user = await currentUser();
         clerkUserId = user?.id || null;
-        console.log("[Schedule API GET] currentUser() fallback result:", { userId: clerkUserId });
       } catch (userError) {
-        console.warn("[Schedule API GET] currentUser() failed:", userError);
+        // Silent fallback
       }
     }
 
-    // Log authentication status for debugging
     if (!clerkUserId) {
-      console.warn("[Schedule API GET] ⚠️ No userId found - auth failed, trying fallbacks");
-      console.warn("[Schedule API GET] Client userId from query:", clientUserId);
-    }
-
-    if (!clerkUserId) {
-      console.warn("[Schedule API GET] No userId - returning empty array");
       return NextResponse.json([]);
     }
-
-    console.log("[Schedule API GET] ✅ Authenticated Clerk user ID:", clerkUserId);
 
     const user = await GetUserByClerkId(clerkUserId);
     if (!user) {
-      console.log("[Schedule API GET] User not found in database - returning empty array");
       return NextResponse.json([]);
     }
 
-    console.log("[Schedule API GET] ✅ Found user: DB ID", user.id);
     const scheduledPosts = await GetUserScheduledPosts(user.id);
-    console.log("[Schedule API GET] ✅ Returning", scheduledPosts.length, "scheduled posts");
     return NextResponse.json(scheduledPosts);
   } catch (error) {
     console.error("Error fetching scheduled posts:", error);
@@ -74,28 +61,17 @@ export async function POST(req: Request) {
       try {
         const user = await currentUser();
         clerkUserId = user?.id || null;
-        console.log("[Schedule API POST] currentUser() fallback result:", { userId: clerkUserId });
       } catch (userError) {
-        console.warn("[Schedule API POST] currentUser() failed:", userError);
+        // Silent fallback
       }
     }
 
-    // Log authentication status for debugging
     if (!clerkUserId) {
-      console.warn("[Schedule API POST] ⚠️ No userId found - auth failed, trying fallbacks");
-      console.warn("[Schedule API POST] Auth result:", { hasAuthResult: !!authResult, userId: authResult?.userId });
-      console.warn("[Schedule API POST] Client userId from body:", clientUserId);
-    }
-
-    if (!clerkUserId) {
-      console.error("[Schedule API POST] ❌ No userId - cannot schedule post");
       return NextResponse.json(
         { error: "Unauthorized - Please sign in" },
         { status: 401 }
       );
     }
-
-    console.log("[Schedule API POST] ✅ Authenticated Clerk user ID:", clerkUserId);
 
     if (!platform || !content || !scheduledFor) {
       return NextResponse.json(
@@ -114,14 +90,11 @@ export async function POST(req: Request) {
 
     const user = await GetUserByClerkId(clerkUserId);
     if (!user) {
-      console.error("[Schedule API POST] ❌ User not found in database for Clerk ID:", clerkUserId);
       return NextResponse.json(
         { error: "User not found. Please generate content first to create your account." },
         { status: 404 }
       );
     }
-
-    console.log("[Schedule API POST] ✅ Found user: DB ID", user.id);
     const scheduledPost = await CreateScheduledPost(
       user.id,
       contentId || null,
@@ -156,26 +129,17 @@ export async function PUT(req: Request) {
       try {
         const user = await currentUser();
         clerkUserId = user?.id || null;
-        console.log("[Schedule API PUT] currentUser() fallback result:", { userId: clerkUserId });
       } catch (userError) {
-        console.warn("[Schedule API PUT] currentUser() failed:", userError);
+        // Silent fallback
       }
     }
 
-    // Log authentication status for debugging
     if (!clerkUserId) {
-      console.warn("[Schedule API PUT] ⚠️ No userId found - auth failed, trying fallbacks");
-    }
-
-    if (!clerkUserId) {
-      console.error("[Schedule API PUT] ❌ No userId - cannot update post");
       return NextResponse.json(
         { error: "Unauthorized - Please sign in" },
         { status: 401 }
       );
     }
-
-    console.log("[Schedule API PUT] ✅ Authenticated Clerk user ID:", clerkUserId);
 
     if (!id) {
       return NextResponse.json(
@@ -186,14 +150,11 @@ export async function PUT(req: Request) {
 
     const user = await GetUserByClerkId(clerkUserId);
     if (!user) {
-      console.error("[Schedule API PUT] ❌ User not found in database");
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
       );
     }
-
-    console.log("[Schedule API PUT] ✅ Found user: DB ID", user.id);
     const updates: Partial<{ content: string; scheduledFor: Date; platform: string }> = {};
     if (content) updates.content = content;
     if (scheduledFor) {
@@ -236,26 +197,17 @@ export async function DELETE(req: Request) {
       try {
         const user = await currentUser();
         clerkUserId = user?.id || null;
-        console.log("[Schedule API DELETE] currentUser() fallback result:", { userId: clerkUserId });
       } catch (userError) {
-        console.warn("[Schedule API DELETE] currentUser() failed:", userError);
+        // Silent fallback
       }
     }
 
-    // Log authentication status for debugging
     if (!clerkUserId) {
-      console.warn("[Schedule API DELETE] ⚠️ No userId found - auth failed, trying fallbacks");
-    }
-
-    if (!clerkUserId) {
-      console.error("[Schedule API DELETE] ❌ No userId - cannot delete post");
       return NextResponse.json(
         { error: "Unauthorized - Please sign in" },
         { status: 401 }
       );
     }
-
-    console.log("[Schedule API DELETE] ✅ Authenticated Clerk user ID:", clerkUserId);
 
     if (!id) {
       return NextResponse.json(
@@ -266,14 +218,11 @@ export async function DELETE(req: Request) {
 
     const user = await GetUserByClerkId(clerkUserId);
     if (!user) {
-      console.error("[Schedule API DELETE] ❌ User not found in database");
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
       );
     }
-
-    console.log("[Schedule API DELETE] ✅ Found user: DB ID", user.id);
     await DeleteScheduledPost(parseInt(id), user.id);
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -93,24 +93,16 @@ export default function DashboardGeneratePage() {
       
       if (response.ok) {
         const data = await response.json();
-        console.log("[Generate Page] Fetched recent content:", data);
-        
         if (data && Array.isArray(data) && data.length > 0) {
           const formatted = data.slice(0, 5).map((item: any) => ({
             id: item.id?.toString() || Math.random().toString(),
             platform: (item.contentType || item.platform) as ContentType,
             content: (item.content || "").substring(0, 100) + ((item.content || "").length > 100 ? "..." : ""),
-            status: (item.posted ? "Published" : "Generated") as const,
+            status: (item.posted ? "Published" : "Generated") as RecentContent["status"],
             date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : new Date().toLocaleDateString(),
           }));
-          console.log("[Generate Page] Formatted recent content:", formatted);
           setRecentContent(formatted);
         } else {
-          console.log("[Generate Page] No content found, setting empty array");
-          console.log("[Generate Page] This might mean:");
-          console.log("  1. User doesn't exist in database yet (will be created on first content generation)");
-          console.log("  2. No content has been generated yet");
-          console.log("  3. Content exists but API returned empty array");
           setRecentContent([]);
         }
       } else {
@@ -320,9 +312,8 @@ export default function DashboardGeneratePage() {
   const lengths = useMemo(() => (["short", "medium", "long"] as Length[]), []);
 
   return (
-    <div className="h-full flex flex-col bg-white">
-      {/* Top Header - Fixed */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 -mx-6 lg:-mx-8 px-6 lg:px-8 py-4 mt-6">
+    <div className="h-full flex flex-col bg-white max-w-6xl mx-auto">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 py-4 mt-6">
         <div className="flex items-center justify-between">
           <div className="flex-1 max-w-md">
             <div className="relative">

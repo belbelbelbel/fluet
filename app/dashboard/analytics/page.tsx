@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className="space-y-8 pb-8 pt-8">
+    <div className="space-y-8 pb-8 pt-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-8 border-b-2 border-gray-200">
         <div className="flex-1">
