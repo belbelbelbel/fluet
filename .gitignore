@@ -39,10 +39,20 @@ next-env.d.ts
 /public/generated-videos/
 /public/generated-videos/*
 
-# large media files (consider using CDN instead)
-# Uncomment if you want to ignore assets and use external storage/CDN
-# /public/assets/audio/
-# /public/assets/visuals/
+# large media files (exceed GitHub's 100MB limit - use CDN instead)
+# These specific files are too large for GitHub:
+/public/assets/audio/background/ambient/ocean_waves.wav
+/public/assets/audio/background/ambient/ocean_waves2.wav
+/public/assets/audio/background/rain/rain_extraheavy:light_1.flac
+/public/assets/audio/background/sleep/white_noise
+/public/assets/audio/background/sleep/white_noise.wav
+/public/assets/audio/background/sleep/whitenoise2.wav
+
+# Note: Other smaller audio files in /public/assets/ are still tracked
+# If you need these large files, consider using:
+# - Git LFS (git-lfs.github.com)
+# - Cloud storage (S3, Cloudinary, etc.)
+# - CDN service
 
 # font archives
 *.zip
