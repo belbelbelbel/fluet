@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, AlertCircle, Zap, Crown } from "lucide-react";
+import { TrendingUp, AlertCircle, Bolt, Crown } from "lucide-react";
 import Link from "next/link";
 
 interface UsageStats {
@@ -52,7 +52,7 @@ export function UsageDashboard() {
       <Card className="border-2 border-gray-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-gray-900">
-            <Zap className="w-5 h-5 text-blue-600" />
+            <Bolt className="w-5 h-5 text-blue-600" />
             Usage This Month
           </CardTitle>
         </CardHeader>
@@ -120,7 +120,7 @@ export function UsageDashboard() {
         <CardTitle className="flex items-center justify-between text-gray-900">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-              <Zap className="w-5 h-5 text-gray-700" />
+              <Bolt className="w-5 h-5 text-gray-700" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">Usage This Month</h3>

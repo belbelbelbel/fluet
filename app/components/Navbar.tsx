@@ -35,6 +35,7 @@ export function Navbar() {
     { name: "Home", href: "/", isAnchor: false },
     { name: "Features", href: "#features", isAnchor: true },
     { name: "Pricing", href: "#pricing", isAnchor: true },
+    { name: "FAQ", href: "#faq", isAnchor: true },
   ], []);
 
   const isActive = useCallback((path: string) => {
@@ -52,8 +53,10 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-gray-200 ${
-          isScrolled ? "bg-white shadow-sm" : "bg-white"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b backdrop-blur-sm ${
+          isScrolled 
+            ? "bg-white/80 border-gray-200 shadow-sm" 
+            : "bg-white/95 border-gray-200/50"
         }`}
       >
         <nav className="container mx-auto px-4 sm:px-8 py-4">

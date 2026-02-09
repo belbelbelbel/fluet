@@ -60,10 +60,21 @@ export default function TeamPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        setMembers(data.members || []);
+        // Always ensure we have at least the current user as owner
+        if (data.members && data.members.length > 0) {
+          setMembers(data.members);
+        } else {
+          // If no members returned, the current user should still be shown
+          // This will be handled by the API, but as a fallback:
+          setMembers([]);
+        }
+      } else {
+        console.error("Failed to fetch team members:", response.status);
+        // Don't clear members on error, keep what we have
       }
     } catch (error) {
       console.error("Error fetching team members:", error);
+      // Don't clear members on error, keep what we have
     } finally {
       setLoading(false);
     }
@@ -83,15 +94,18 @@ export default function TeamPage() {
       });
 
       if (response.ok) {
+        const data = await response.json();
         showToast.success("Invitation sent", `Invitation sent to ${inviteEmail}`);
         setInviteEmail("");
         setShowInviteModal(false);
         fetchTeamMembers();
       } else {
-        showToast.error("Failed to send invitation", "Please try again");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || "Failed to send invitation. Please try again.";
+        showToast.error("Invitation failed", errorMessage);
       }
     } catch (error) {
-      showToast.error("Error", "Failed to send invitation");
+      showToast.error("Error", "Failed to send invitation. Please try again.");
     }
   };
 
@@ -182,7 +196,7 @@ export default function TeamPage() {
         </div>
         <Button
           onClick={() => setShowInviteModal(true)}
-          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 hover:shadow-md text-white rounded-xl transition-all"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Invite Member
@@ -248,7 +262,7 @@ export default function TeamPage() {
               <Button
                 onClick={() => setShowInviteModal(true)}
                 variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-900 rounded-xl transition-all"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
                 Invite Your First Member
@@ -287,7 +301,7 @@ export default function TeamPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-gray-600 hover:text-gray-950"
+                          className="text-gray-500 hover:text-gray-950 hover:bg-gray-100 border border-transparent hover:border-gray-300 rounded-lg transition-all"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </Button>
@@ -346,7 +360,7 @@ export default function TeamPage() {
               <div className="flex gap-2">
                 <Button
                   onClick={handleInvite}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 hover:shadow-md text-white rounded-xl transition-all"
                 >
                   <Check className="w-4 h-4 mr-2" />
                   Send Invitation
@@ -357,7 +371,7 @@ export default function TeamPage() {
                     setInviteEmail("");
                   }}
                   variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-900 rounded-xl transition-all"
                 >
                   <X className="w-4 h-4 mr-2" />
                   Cancel

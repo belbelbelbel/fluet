@@ -185,7 +185,7 @@ export default function AnalyticsPage() {
             return (
               <Card
                 key={index}
-                className="bg-white border-2 border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all rounded-xl"
+                className="bg-white border-2 border-gray-200 rounded-xl"
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                   <CardTitle className="text-sm font-bold text-gray-700 uppercase tracking-wide">

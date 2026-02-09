@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
+    // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    const userId = authResult?.userId;
+    let userId = authResult?.userId;
+    
+    // If auth() didn't work, try currentUser() as fallback
+    if (!userId) {
+      try {
+        const user = await currentUser();
+        userId = user?.id || null;
+      } catch (userError) {
+        console.warn("[Settings API] currentUser() failed:", userError);
+      }
+    }
     
     if (!userId) {
       console.warn("[Settings API] No userId from auth()");
@@ -50,10 +61,22 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    // Get authentication from Clerk - try multiple methods (same pattern as other routes)
+    const authResult = await auth();
+    let userId = authResult?.userId;
+    
+    // If auth() didn't work, try currentUser() as fallback
+    if (!userId) {
+      try {
+        const user = await currentUser();
+        userId = user?.id || null;
+      } catch (userError) {
+        console.warn("[Settings API] currentUser() failed:", userError);
+      }
+    }
     
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized - Please sign in" }, { status: 401 });
     }
 
     const { userId: requestedUserId, settings } = await req.json();

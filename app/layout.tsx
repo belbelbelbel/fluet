@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
+import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs"
 import { dark } from '@clerk/themes'
-import { Toaster } from "sonner";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeToaster } from "@/components/ThemeToaster";
 import "./globals.css";
 
-const nunito = Nunito({
-  subsets: ["latin"],
-  weight: "variable",
+const nunito = localFont({
+  src: [
+    {
+      path: "./fonts/Nunito/Nunito-VariableFont_wght.ttf",
+      weight: "100 900",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Nunito/Nunito-Italic-VariableFont_wght.ttf",
+      weight: "100 900",
+      style: "italic",
+    },
+  ],
   variable: "--font-nunito",
   display: "swap",
 });
@@ -31,17 +42,12 @@ export default function RootLayout({
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
     >
-      <html lang="en">
-        <body
-          className={`${nunito.variable} font-sans antialiased`}
-        >
-          {children}
-          <Toaster 
-            position="top-right"
-            richColors
-            closeButton
-            theme="dark"
-          />
+      <html lang="en" suppressHydrationWarning className={nunito.variable}>
+        <body className={`${nunito.className} antialiased`}>
+          <ThemeProvider>
+            {children}
+            <ThemeToaster />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

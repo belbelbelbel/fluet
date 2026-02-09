@@ -13,7 +13,6 @@ import {
   LinkedinIcon,
   MusicIcon,
   PlayIcon,
-  Wand2Icon,
   SearchIcon,
   BellIcon,
   SettingsIcon,
@@ -64,14 +63,7 @@ export default function DashboardGeneratePage() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const [showContentModal, setShowContentModal] = useState(false);
 
-  const loadingMessages = useMemo(() => [
-    "✨ Crafting your perfect content...",
-    "🚀 Unleashing AI creativity...",
-    "💡 Generating engaging ideas...",
-    "🎨 Polishing your content...",
-    "⚡ Almost there! Final touches...",
-    "🌟 Creating something amazing...",
-  ], []);
+  // Removed loading messages - just use "Generating..." text
 
   // Recent content - fetch from API
   const [recentContent, setRecentContent] = useState<RecentContent[]>([]);
@@ -164,11 +156,7 @@ export default function DashboardGeneratePage() {
     setError(null);
     setGeneratedContent("");
     setEditedContent("");
-
-    // Show loading messages
-    const messageInterval = setInterval(() => {
-      setLoadingMessage(loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
-    }, 2000);
+    setLoadingMessage("Generating...");
 
     try {
       const response = await fetch("/api/generate", {
@@ -184,8 +172,6 @@ export default function DashboardGeneratePage() {
           userId,
         }),
       });
-
-      clearInterval(messageInterval);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -205,7 +191,6 @@ export default function DashboardGeneratePage() {
         fetchRecentContent();
       }, 500);
     } catch (error) {
-      clearInterval(messageInterval);
       console.error("Error generating content:", error);
       setError("Failed to generate content. Please try again.");
       showToast.error("Error", "Failed to generate content. Please try again.");
@@ -213,7 +198,7 @@ export default function DashboardGeneratePage() {
       setIsGenerating(false);
       setLoadingMessage("");
     }
-  }, [prompt, contentType, tone, style, length, userId, loadingMessages, fetchRecentContent]);
+  }, [prompt, contentType, tone, style, length, userId, fetchRecentContent]);
 
   const handleCopy = useCallback(async () => {
     if (generatedContent) {
@@ -507,14 +492,11 @@ export default function DashboardGeneratePage() {
         >
           {isGenerating ? (
             <>
-                  <Loader2Icon className="w-5 h-5 mr-2 animate-spin" />
-                  {loadingMessage || "Generating..."}
+              <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
+              Generating...
             </>
           ) : (
-            <>
-                  <Wand2Icon className="w-5 h-5 mr-2" />
-                  Generate Content
-            </>
+            "Generate Content"
           )}
         </Button>
 
@@ -557,8 +539,10 @@ export default function DashboardGeneratePage() {
                         key={item.id}
                         className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-all cursor-pointer group"
                         onClick={() => {
-                          setPrompt(item.content);
+                          setGeneratedContent(item.content);
+                          setEditedContent(item.content);
                           setContentType(item.platform);
+                          setShowContentModal(true);
                         }}
                       >
                         <div className="flex items-start gap-3">

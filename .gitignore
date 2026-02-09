@@ -34,3 +34,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated videos (user-created, temporary)
+/public/generated-videos/
+/public/generated-videos/*
+
+# large media files (consider using CDN instead)
+# Uncomment if you want to ignore assets and use external storage/CDN
+# /public/assets/audio/
+# /public/assets/visuals/
+
+# font archives
+*.zip
+app/fonts/*.zip
+
+# temporary files
+*.tmp
+*.temp
+*.log

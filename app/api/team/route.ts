@@ -1,26 +1,37 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { GetUserByClerkId } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    // Get authentication from Clerk - try multiple methods
     const authResult = await auth();
-    const userId = authResult?.userId;
+    let clerkUserId = authResult?.userId;
     
-    if (!userId) {
+    // If auth() didn't work, try currentUser() as fallback
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id || null;
+      } catch (userError) {
+        console.warn("[Team API] currentUser() failed:", userError);
+      }
+    }
+    
+    if (!clerkUserId) {
       console.warn("[Team API] No userId from auth()");
       return NextResponse.json({ error: "Unauthorized - Please sign in" }, { status: 401 });
     }
 
-    const user = await GetUserByClerkId(userId);
+    const user = await GetUserByClerkId(clerkUserId);
     if (!user || !user.id) {
       return NextResponse.json({ members: [] });
     }
 
-    // For now, return the current user as the only team member
-    // This will be expanded when team schema is added
+    // Always include the current user as the owner/admin
+    // This will be expanded when team schema is added to include other members
     const members = [
       {
         id: user.id,
@@ -32,9 +43,13 @@ export async function GET() {
       },
     ];
 
+    // TODO: When TeamMembers table is implemented, fetch additional members:
+    // const teamMembers = await GetTeamMembers(user.id);
+    // members.push(...teamMembers);
+
     return NextResponse.json({ members });
   } catch (error) {
-    console.error("Error fetching team members:", error);
+    console.error("[Team API] Error fetching team members:", error);
     return NextResponse.json(
       { error: "Failed to fetch team members" },
       { status: 500 }

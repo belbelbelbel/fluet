@@ -2,6 +2,7 @@
 
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   BookOpenIcon,
   RocketIcon,
@@ -12,14 +13,23 @@ import {
   CalendarIcon,
   DownloadIcon,
   KeyboardIcon,
-  ZapIcon,
+  Bolt,
   CopyIcon,
   EditIcon,
+  Bot,
+  Palette,
+  Users,
+  Lightbulb,
+  Youtube,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Accordion } from "@/components/ui/accordion";
 
 export default function DocsPage() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const sections = [
     {
       title: "Getting Started",
@@ -32,7 +42,7 @@ export default function DocsPage() {
         {
           question: "What platforms are supported?",
           answer:
-            "We support Twitter (threads), Instagram (captions), LinkedIn (posts), and TikTok (captions, hashtags, video scripts). Each platform has optimized content generation tailored to its format and audience.",
+            "We support Twitter (threads), Instagram (captions), LinkedIn (posts), TikTok (captions, hashtags, video scripts), and YouTube (video generation and upload). Each platform has optimized content generation tailored to its format and audience.",
         },
         {
           question: "Do I need to sign in?",
@@ -74,6 +84,16 @@ export default function DocsPage() {
     {
       title: "Content Management",
       items: [
+        {
+          question: "What is Content Ideas?",
+          answer:
+            "Content Ideas is a feature that provides daily, personalized content suggestions based on your selected niche. Go to the Content Ideas page to see fresh ideas tailored for your business. You can generate captions from these ideas or save them to your Post Stack for later scheduling.",
+        },
+        {
+          question: "What is Post Stack?",
+          answer:
+            "Post Stack is where you save content ideas that you want to schedule later. When you find a great content idea, click 'Save to Stack' to add it to your Post Stack. You can then schedule these saved ideas when you're ready to post them.",
+        },
         {
           question: "Where can I see my generated content?",
           answer:
@@ -122,12 +142,37 @@ export default function DocsPage() {
       ],
     },
     {
+      title: "Settings & Customization",
+      items: [
+        {
+          question: "How do I change my AI model?",
+          answer:
+            "Go to Settings → AI Models tab. Select your preferred AI model from the dropdown. Options include GPT-4o Mini (fast, low cost), GPT-4 (high quality), Claude 3 Haiku (fast), Claude 3 Sonnet (balanced), and Gemini Pro (multilingual). Your selection will be used for all future content generation.",
+        },
+        {
+          question: "How do I change my niche?",
+          answer:
+            "Go to Settings → General tab. Select your niche from the available options (Home Food Vendor, Street Food Seller, Baker/Cake Vendor, Fashion Seller, Beauty/Hair Vendor, Business/Coach, Online Vendor). Your niche selection affects the Content Ideas you receive.",
+        },
+        {
+          question: "How do I change the theme?",
+          answer:
+            "Go to Settings → Appearance tab. Choose between Light, Dark, or System (follows your device preference). The theme applies immediately across the entire application, including the landing page.",
+        },
+        {
+          question: "How do I connect my YouTube account?",
+          answer:
+            "Go to Settings → General tab → YouTube Integration. Click 'Connect YouTube' to authorize access. Once connected, you can generate and upload videos directly to YouTube from the dashboard.",
+        },
+      ],
+    },
+    {
       title: "Subscription & Limits",
       items: [
         {
           question: "What are the subscription plans?",
           answer:
-            "Starter: $9/month (100 posts/month), Professional: $29/month (500 posts/month), Enterprise: Custom pricing (unlimited posts). All plans include core features like content editing, export, scheduling, and history. Limits reset monthly on your billing date.",
+            "Starter: $9/month (100 posts/month), Professional: $29/month (500 posts/month), Enterprise: Custom pricing (unlimited posts). All plans include core features like content editing, export, scheduling, history, Content Ideas, and YouTube automation. Limits reset monthly on your billing date.",
         },
         {
           question: "What happens when I reach my limit?",
@@ -172,7 +217,12 @@ export default function DocsPage() {
         {
           question: "How does the AI generation work?",
           answer:
-            "Our AI uses OpenAI's GPT-4o-mini model, trained on social media content patterns. It generates platform-optimized content based on your prompts, tone, style, and length preferences. The AI understands each platform's unique format and audience expectations.",
+            "Our AI uses multiple models including GPT-4o Mini, GPT-4, Claude 3 Haiku, Claude 3 Sonnet, and Gemini Pro. You can select your preferred model in Settings. The AI generates platform-optimized content based on your prompts, tone, style, and length preferences. It understands each platform's unique format and audience expectations. Generated content does NOT include emojis unless specifically requested.",
+        },
+        {
+          question: "How does YouTube video generation work?",
+          answer:
+            "YouTube automation allows you to generate videos with background music and visuals. Go to Settings to connect your YouTube account. Once connected, you can schedule YouTube posts that will automatically generate videos using AI-selected audio and video assets, then upload them to your channel at the scheduled time.",
         },
         {
           question: "Is my data secure?",
@@ -182,7 +232,7 @@ export default function DocsPage() {
         {
           question: "Can I integrate with my social media accounts?",
           answer:
-            "Direct posting and OAuth integration are coming soon. For now, you can copy your generated content and paste it directly into your social media platforms. This gives you full control to review and edit before posting.",
+            "Yes! YouTube integration is available. Connect your YouTube account in Settings to enable automated video generation and upload. For other platforms (Twitter, Instagram, LinkedIn, TikTok), you can copy your generated content and paste it directly. Direct posting for other platforms is coming soon.",
         },
         {
           question: "What happens if generation fails?",
@@ -224,27 +274,41 @@ export default function DocsPage() {
   ];
 
   const quickLinks = [
-    { title: "Generate Content", href: "/generate", icon: Wand2Icon },
-    { title: "View History", href: "/history", icon: FileTextIcon },
-    { title: "Schedule Posts", href: "/schedule", icon: CalendarIcon },
-    { title: "View Pricing", href: "/pricing", icon: ZapIcon },
+    { title: "Generate Content", href: "/dashboard/generate", icon: Wand2Icon },
+    { title: "Content Ideas", href: "/dashboard/content-ideas", icon: Lightbulb },
+    { title: "Schedule Posts", href: "/dashboard/schedule", icon: CalendarIcon },
+    { title: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDark ? "bg-gray-950 text-gray-100" : "bg-white text-gray-900"
+    }`}>
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gray-100 border border-gray-200 rounded-full mb-6">
-              <BookOpenIcon className="w-4 h-4 text-gray-700" />
-              <span className="text-sm text-gray-700 font-medium">Complete Guide</span>
+            <div className={`inline-flex items-center gap-2 px-4 py-1.5 border rounded-full mb-6 ${
+              isDark 
+                ? "bg-purple-500/10 border-purple-500/20" 
+                : "bg-gray-100 border-gray-200"
+            }`}>
+              <BookOpenIcon className={`w-4 h-4 ${
+                isDark ? "text-purple-300" : "text-gray-700"
+              }`} />
+              <span className={`text-sm font-medium ${
+                isDark ? "text-purple-300" : "text-gray-700"
+              }`}>Complete Guide</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h1 className={`text-3xl sm:text-4xl font-bold mb-4 ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}>
               Documentation
             </h1>
-            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+            <p className={`text-base max-w-2xl mx-auto ${
+              isDark ? "text-gray-300" : "text-gray-600"
+            }`}>
               Everything you need to know about using Flippr AI to create amazing social media content
             </p>
           </div>
@@ -257,49 +321,81 @@ export default function DocsPage() {
                 <Link
                   key={link.title}
                   href={link.href}
-                  className="p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors text-center"
+                  className={`p-4 border rounded-xl hover:border-gray-300 transition-colors text-center ${
+                    isDark 
+                      ? "bg-gray-800 border-gray-700 hover:border-gray-600" 
+                      : "bg-white border-gray-200"
+                  }`}
                 >
-                  <Icon className="w-5 h-5 text-gray-700 mx-auto mb-2" />
-                  <div className="text-xs text-gray-600">{link.title}</div>
+                  <Icon className={`w-5 h-5 mx-auto mb-2 ${
+                    isDark ? "text-purple-400" : "text-gray-700"
+                  }`} />
+                  <div className={`text-xs ${
+                    isDark ? "text-gray-300" : "text-gray-600"
+                  }`}>{link.title}</div>
                 </Link>
               );
             })}
           </div>
 
           {/* Quick Start */}
-          <div className="mb-16 p-8 bg-gray-50 border border-gray-200 rounded-xl">
+          <div className={`mb-16 p-8 border rounded-xl ${
+            isDark 
+              ? "bg-gray-800/50 border-gray-700" 
+              : "bg-gray-50 border-gray-200"
+          }`}>
             <div className="flex items-start gap-4">
-              <RocketIcon className="w-6 h-6 text-gray-700 mt-1 flex-shrink-0" />
+              <RocketIcon className={`w-6 h-6 mt-1 flex-shrink-0 ${
+                isDark ? "text-purple-400" : "text-gray-700"
+              }`} />
               <div>
-                <h2 className="text-xl font-semibold mb-3 text-gray-900">
+                <h2 className={`text-xl font-semibold mb-3 ${
+                  isDark ? "text-white" : "text-gray-900"
+                }`}>
                   Quick Start Guide
                 </h2>
-                <p className="text-gray-600 mb-4">
+                <p className={`mb-4 ${
+                  isDark ? "text-gray-300" : "text-gray-600"
+                }`}>
                   New to Flippr AI? Follow these steps to create your first post:
                 </p>
-                <ol className="space-y-3 text-gray-700">
+                <ol className={`space-y-3 ${
+                  isDark ? "text-gray-300" : "text-gray-700"
+                }`}>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-gray-900">1.</span>
+                    <span className={`font-semibold ${
+                      isDark ? "text-white" : "text-gray-900"
+                    }`}>1.</span>
                     <span>Sign up for an account and choose a subscription plan</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-gray-900">2.</span>
+                    <span className={`font-semibold ${
+                      isDark ? "text-white" : "text-gray-900"
+                    }`}>2.</span>
                     <span>Go to the Generate page and select your platform</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-gray-900">3.</span>
-                    <span>Enter your topic or use a template to get started</span>
+                    <span className={`font-semibold ${
+                      isDark ? "text-white" : "text-gray-900"
+                    }`}>3.</span>
+                    <span>Enter your topic or use Content Ideas to get started</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-gray-900">4.</span>
+                    <span className={`font-semibold ${
+                      isDark ? "text-white" : "text-gray-900"
+                    }`}>4.</span>
                     <span>Customize tone, style, and length (optional)</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-gray-900">5.</span>
+                    <span className={`font-semibold ${
+                      isDark ? "text-white" : "text-gray-900"
+                    }`}>5.</span>
                     <span>Click Generate and review your content</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="font-semibold text-gray-900">6.</span>
+                    <span className={`font-semibold ${
+                      isDark ? "text-white" : "text-gray-900"
+                    }`}>6.</span>
                     <span>Edit if needed, then copy, export, or schedule your post</span>
                   </li>
                 </ol>
@@ -308,79 +404,169 @@ export default function DocsPage() {
           </div>
 
           {/* FAQ Sections */}
-          <div className="space-y-16">
+          <div className="space-y-12">
             {sections.map((section, sectionIndex) => (
               <div key={sectionIndex}>
-                <h2 className="text-2xl font-bold mb-8 text-gray-900 flex items-center gap-3">
-                  <CodeIcon className="w-6 h-6 text-gray-700" />
+                <h2 className={`text-2xl font-semibold mb-6 flex items-center gap-3 ${
+                  isDark ? "text-white" : "text-gray-900"
+                }`}>
+                  <CodeIcon className={`w-6 h-6 ${
+                    isDark ? "text-purple-400" : "text-gray-700"
+                  }`} />
                   {section.title}
                 </h2>
-                <div className="space-y-5">
-                  {section.items.map((item, itemIndex) => (
-                    <div
-                      key={itemIndex}
-                      className="p-5 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
-                    >
-                      <div className="flex items-start gap-3 mb-3">
-                        <HelpCircleIcon className="w-5 h-5 text-gray-700 mt-0.5 flex-shrink-0" />
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {item.question}
-                        </h3>
-                      </div>
-                      <p className="text-gray-600 ml-8 leading-relaxed">{item.answer}</p>
-                    </div>
-                  ))}
-                </div>
+                <Accordion 
+                  items={section.items} 
+                  isDark={isDark}
+                  defaultOpenIndex={sectionIndex === 0 ? 0 : undefined}
+                />
               </div>
             ))}
           </div>
 
           {/* Feature Highlights */}
           <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div className="p-5 bg-white rounded-xl border border-gray-200">
-              <EditIcon className="w-6 h-6 text-gray-700 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Edit & Refine</h3>
-              <p className="text-sm text-gray-600">
-                Edit any generated content to match your exact needs
+            <div className={`p-5 rounded-xl border ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
+              <Lightbulb className={`w-6 h-6 mb-3 ${
+                isDark ? "text-purple-400" : "text-gray-700"
+              }`} />
+              <h3 className={`font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Content Ideas</h3>
+              <p className={`text-sm ${
+                isDark ? "text-gray-300" : "text-gray-600"
+              }`}>
+                Get daily personalized content ideas based on your niche
               </p>
             </div>
-            <div className="p-5 bg-white rounded-xl border border-gray-200">
-              <DownloadIcon className="w-6 h-6 text-gray-700 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Export Options</h3>
-              <p className="text-sm text-gray-600">
-                Export content as text files or PDFs for easy sharing
+            <div className={`p-5 rounded-xl border ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
+              <Youtube className={`w-6 h-6 mb-3 ${
+                isDark ? "text-purple-400" : "text-gray-700"
+              }`} />
+              <h3 className={`font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>YouTube Automation</h3>
+              <p className={`text-sm ${
+                isDark ? "text-gray-300" : "text-gray-600"
+              }`}>
+                Automatically generate and upload videos to YouTube
               </p>
             </div>
-            <div className="p-5 bg-white rounded-xl border border-gray-200">
-              <KeyboardIcon className="w-6 h-6 text-gray-700 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Keyboard Shortcuts</h3>
-              <p className="text-sm text-gray-600">
+            <div className={`p-5 rounded-xl border ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
+              <Palette className={`w-6 h-6 mb-3 ${
+                isDark ? "text-purple-400" : "text-gray-700"
+              }`} />
+              <h3 className={`font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Theme Customization</h3>
+              <p className={`text-sm ${
+                isDark ? "text-gray-300" : "text-gray-600"
+              }`}>
+                Choose between light, dark, or system theme
+              </p>
+            </div>
+            <div className={`p-5 rounded-xl border ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
+              <Bot className={`w-6 h-6 mb-3 ${
+                isDark ? "text-purple-400" : "text-gray-700"
+              }`} />
+              <h3 className={`font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>AI Model Selection</h3>
+              <p className={`text-sm ${
+                isDark ? "text-gray-300" : "text-gray-600"
+              }`}>
+                Choose from multiple AI models (GPT-4, Claude, Gemini)
+              </p>
+            </div>
+            <div className={`p-5 rounded-xl border ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
+              <Users className={`w-6 h-6 mb-3 ${
+                isDark ? "text-purple-400" : "text-gray-700"
+              }`} />
+              <h3 className={`font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Team Collaboration</h3>
+              <p className={`text-sm ${
+                isDark ? "text-gray-300" : "text-gray-600"
+              }`}>
+                Invite team members and collaborate on content
+              </p>
+            </div>
+            <div className={`p-5 rounded-xl border ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
+              <KeyboardIcon className={`w-6 h-6 mb-3 ${
+                isDark ? "text-purple-400" : "text-gray-700"
+              }`} />
+              <h3 className={`font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Keyboard Shortcuts</h3>
+              <p className={`text-sm ${
+                isDark ? "text-gray-300" : "text-gray-600"
+              }`}>
                 Work faster with keyboard shortcuts (Ctrl/Cmd + /)
               </p>
             </div>
           </div>
 
           {/* Support CTA */}
-          <div className="mt-20 text-center p-10 bg-gray-50 rounded-xl border border-gray-200">
-            <h2 className="text-2xl font-bold mb-4 text-gray-900">
+          <div className={`mt-20 text-center p-10 rounded-xl border ${
+            isDark 
+              ? "bg-gray-800/50 border-gray-700" 
+              : "bg-gray-50 border-gray-200"
+          }`}>
+            <h2 className={`text-2xl font-bold mb-4 ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}>
               Still have questions?
             </h2>
-            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+            <p className={`mb-6 max-w-2xl mx-auto ${
+              isDark ? "text-gray-300" : "text-gray-600"
+            }`}>
               Can't find what you're looking for? Check out our pricing plans or try generating your first post.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button
                 asChild
-                className="bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
+                className={`rounded-xl ${
+                  isDark 
+                    ? "bg-purple-600 hover:bg-purple-700 text-white" 
+                    : "bg-gray-900 hover:bg-gray-800 text-white"
+                }`}
               >
                 <Link href="/pricing">View Pricing</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+                className={`rounded-xl ${
+                  isDark 
+                    ? "border-gray-600 text-gray-300 hover:bg-gray-700" 
+                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
               >
-                <Link href="/generate">Try It Now</Link>
+                <Link href="/dashboard/generate">Try It Now</Link>
               </Button>
             </div>
           </div>

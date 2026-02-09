@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, StarIcon, ZapIcon, ShieldIcon, ArrowRightIcon, MinusIcon, PlusIcon, LayersIcon } from "lucide-react";
+import { CheckIcon, StarIcon, Bolt, ShieldIcon, ArrowRightIcon, MinusIcon, PlusIcon, LayersIcon } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useState, useCallback, useMemo } from "react";
 import { loadStripe } from "@stripe/stripe-js";
@@ -16,7 +16,7 @@ const pricingPlans = [
     price: "10",
     priceId: "price_1PyFKGBibz3ZDixDAaJ3HO74",
     popular: false,
-    icon: ZapIcon,
+    icon: Bolt,
     features: [
       "Flexible Plans",
       "Scalability",
@@ -433,7 +433,7 @@ export function PricingSection() {
               <p className="text-sm text-gray-600">256-bit SSL encryption</p>
             </div>
             <div className="text-center p-6 bg-white rounded-xl border border-gray-200">
-              <ZapIcon className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+              <Bolt className="w-8 h-8 text-gray-700 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Cancel Anytime</h3>
               <p className="text-sm text-gray-600">No long-term contracts</p>
             </div>

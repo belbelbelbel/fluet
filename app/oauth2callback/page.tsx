@@ -47,7 +47,8 @@ export default function OAuthCallbackPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code }),
+        credentials: "include",
+        body: JSON.stringify({ code, userId }),
       });
 
       const data = await response.json();

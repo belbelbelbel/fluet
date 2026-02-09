@@ -19,7 +19,7 @@ import {
   PlusIcon,
   CheckIcon,
   XIcon,
-  ZapIcon,
+  Bolt,
   Loader2Icon,
 } from "lucide-react";
 

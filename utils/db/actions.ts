@@ -60,6 +60,21 @@ export const GetUserByClerkId = async (clerkUserId: string) => {
     }
 };
 
+export const GetUserByEmail = async (email: string) => {
+    try {
+        const [user] = await db
+            .select()
+            .from(Users)
+            .where(eq(Users.email, email))
+            .limit(1)
+            .execute();
+        return user;
+    } catch (error) {
+        console.error(`[GetUserByEmail] Error encountered:`, error);
+        throw new Error("Failed to get user by email");
+    }
+};
+
 export const GetUserGeneratedContent = async (userId: number, limit: number = 10) => {
     try {
         console.log(`[GetUserGeneratedContent] Querying for user ID: ${userId}, limit: ${limit}`);
@@ -350,7 +365,7 @@ export const SaveOrUpdateLinkedAccount = async (data: {
                 .values({
                     userId: data.userId,
                     platform: data.platform,
-                    accountId: data.accountId || "",
+                    accountId: data.accountId || null,
                     accountUsername: data.accountUsername || null,
                     accessToken: data.accessToken,
                     refreshToken: data.refreshToken,
@@ -361,9 +376,33 @@ export const SaveOrUpdateLinkedAccount = async (data: {
                 .execute();
             return created;
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error(`[SaveOrUpdateLinkedAccount] Error encountered:`, error);
-        throw new Error("Failed to save linked account");
+        
+        // Provide more detailed error information
+        if (error instanceof Error) {
+            console.error(`[SaveOrUpdateLinkedAccount] Error message: ${error.message}`);
+            console.error(`[SaveOrUpdateLinkedAccount] Error stack: ${error.stack}`);
+            
+            // Check for specific database errors
+            if (error.message.includes('relation "linked_accounts" does not exist') || 
+                error.message.includes('does not exist')) {
+                throw new Error("linked_accounts table does not exist. Please run: npx drizzle-kit push");
+            }
+            if (error.message.includes('foreign key')) {
+                throw new Error(`User with ID ${data.userId} does not exist in database`);
+            }
+            if (error.message.includes('violates') || error.message.includes('constraint')) {
+                throw new Error(`Database constraint violation: ${error.message}`);
+            }
+            if (error.message.includes('connection') || error.message.includes('timeout')) {
+                throw new Error(`Database connection error: ${error.message}`);
+            }
+            
+            throw new Error(`Failed to save linked account: ${error.message}`);
+        }
+        
+        throw new Error(`Failed to save linked account: ${String(error)}`);
     }
 };
 
@@ -413,5 +452,32 @@ export const UpdateLinkedAccountToken = async (
     } catch (error) {
         console.error(`[UpdateLinkedAccountToken] Error encountered:`, error);
         throw new Error("Failed to update token");
+    }
+};
+
+export const DisconnectLinkedAccount = async (
+    userId: number,
+    platform: string
+) => {
+    try {
+        // Just deactivate the account instead of deleting tokens
+        // This allows reconnection without losing the account reference
+        const [updated] = await db
+            .update(LinkedAccounts)
+            .set({
+                isActive: false,
+            })
+            .where(
+                and(
+                    eq(LinkedAccounts.userId, userId),
+                    eq(LinkedAccounts.platform, platform)
+                )
+            )
+            .returning()
+            .execute();
+        return updated;
+    } catch (error) {
+        console.error(`[DisconnectLinkedAccount] Error encountered:`, error);
+        throw new Error("Failed to disconnect account");
     }
 };

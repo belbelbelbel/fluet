@@ -12,7 +12,7 @@ export function Hero() {
     <section className="relative bg-white overflow-hidden pt-48 pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl w-full">
         {/* Centered Hero Content */}
-        <div className="flex flex-col items-center text-center space-y-8 mb-16 mt-0">
+        <div className="flex flex-col items-center text-center space-y-8 mb-16 mt-6">
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-gray-950 max-w-5xl">
             An AI Powered Dashboard For Your Social Media
