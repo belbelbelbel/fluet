@@ -8,12 +8,12 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { createProfessionalVideo, createSleepVideo, createRainVideo, createAmbientVideo } from "@/utils/youtube/video-generator";
 import { uploadVideoToYouTube, getCategoryId } from "@/utils/youtube/upload-service";
 import { getYouTubeTokens } from "@/utils/youtube/token-manager";
-import { updateProgress, completeProgress, errorProgress } from "@/utils/youtube/progress-tracker";
+import { initProgress, updateProgress, completeProgress, errorProgress } from "@/utils/youtube/progress-tracker";
 import path from "path";
 import { promises as fs } from "fs";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 600; // 10 minutes max (for video generation + upload)
+export const maxDuration = 300; // 5 minutes max (Vercel Hobby plan limit)
 
 interface GenerateAndUploadRequest {
   contentType: "rain_sounds" | "sleep_sounds" | "ambient_sounds" | "white_noise";
@@ -34,6 +34,17 @@ interface GenerateAndUploadRequest {
 export async function POST(req: Request) {
   let generatedVideoPath: string | null = null;
   let jobId: string | null = null;
+  const startTime = Date.now();
+  const MAX_EXECUTION_TIME = 280 * 1000; // 280 seconds (4m 40s) - leave 20s buffer for upload
+
+  // Helper function to check if we're running out of time
+  const checkTimeout = () => {
+    const elapsed = Date.now() - startTime;
+    if (elapsed > MAX_EXECUTION_TIME) {
+      throw new Error("Function execution time limit approaching. Please try a shorter video or split the process.");
+    }
+    return elapsed;
+  };
 
   try {
     let body: GenerateAndUploadRequest;
@@ -97,9 +108,16 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!durationMinutes || durationMinutes < 1 || durationMinutes > 480) {
+    // Limit video duration for free tier (5-minute function limit)
+    // Longer videos take longer to generate, so we limit to 30 minutes for now
+    // This ensures generation + upload completes within 5 minutes
+    const MAX_DURATION_FOR_FREE_TIER = 30;
+    if (!durationMinutes || durationMinutes < 1 || durationMinutes > MAX_DURATION_FOR_FREE_TIER) {
       return NextResponse.json(
-        { error: "Duration must be between 1 and 480 minutes (8 hours)" },
+        { 
+          error: `Duration must be between 1 and ${MAX_DURATION_FOR_FREE_TIER} minutes for free tier`,
+          details: "Due to Vercel's 5-minute function limit, videos longer than 30 minutes may timeout. Please use shorter durations."
+        },
         { status: 400 }
       );
     }
@@ -128,9 +146,15 @@ export async function POST(req: Request) {
 
     console.log(`[Generate & Upload] 🎬 Starting video generation and upload`);
     console.log(`[Generate & Upload] Content: ${contentType} | Duration: ${durationMinutes}min | Quality: ${quality}`);
+    console.log(`[Generate & Upload] ⏱️  Time limit: 5 minutes (Vercel Hobby plan)`);
 
     // Generate job ID for progress tracking
     jobId = `video-${clerkUserId}-${Date.now()}`;
+    
+    // Initialize progress tracking
+    const totalDurationSeconds = durationMinutes * 60;
+    initProgress(jobId, totalDurationSeconds);
+    updateProgress(jobId, 0, "generating", `Starting video generation (${durationMinutes} min)...`);
 
     // Step 1: Generate video
     const outputDir = path.join(process.cwd(), "public", "generated-videos");
@@ -188,7 +212,8 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log(`[Generate & Upload] ✅ Video generated: ${path.basename(outputPath)}`);
+    const generationTime = checkTimeout();
+    console.log(`[Generate & Upload] ✅ Video generated: ${path.basename(outputPath)} (took ${Math.round(generationTime / 1000)}s)`);
 
     // Step 2: Prepare metadata
     const categoryId = getCategoryId(category);
@@ -313,6 +338,13 @@ export async function POST(req: Request) {
       } else {
         console.log(`[Generate & Upload] ✅ FINAL VALIDATION PASSED: ${finalMinutesAway} minutes away (safe)`);
       }
+    }
+    
+    // Final timeout check before upload
+    const timeBeforeUpload = checkTimeout();
+    const remainingSeconds = Math.round((MAX_EXECUTION_TIME - timeBeforeUpload) / 1000);
+    if (remainingSeconds < 20) {
+      console.warn(`[Generate & Upload] ⚠️  Only ${remainingSeconds}s remaining - upload may timeout`);
     }
     
     let uploadResult;
