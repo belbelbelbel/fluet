@@ -157,8 +157,8 @@ export default function PostStackPage() {
                       <div className="flex-1 min-w-0">
                         {/* Topic */}
                         <div className="flex items-start sm:items-center gap-2 sm:gap-3 mb-3">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0">
-                            <FormatIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0">
+                            <FormatIcon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                           </div>
                           <h3 className="text-base sm:text-lg font-bold text-gray-950 tracking-tight flex-1">
                             {item.topic}

@@ -15,12 +15,20 @@ export function Hero() {
         <div className="flex flex-col items-center text-center space-y-8 mb-16 mt-6">
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-gray-950 max-w-5xl">
-            An AI Powered Dashboard For Your Social Media
+            Built for{" "}
+            <span className="relative inline-block">
+              <span className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent font-extrabold text-5xl sm:text-6xl md:text-7xl lg:text-7xl drop-shadow-sm">
+                Nigerian
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-purple-700/20 to-purple-800/20 blur-xl -z-10"></span>
+            </span>{" "}
+            Social Media Managers
           </h1>
 
           {/* Subheading */}
           <p className="text-lg sm:text-xl md:text-2xl text-gray-700 leading-relaxed max-w-3xl font-normal">
-            Generate content without headache. Support powered with AI Technology for Twitter, Instagram, Linkedin, and TikTok.
+            Manage, generate and schedule content for all your client accounts in one place. 
+            Perfect for agencies managing multiple pages.
           </p>
 
           {/* Email CTA - Centered */}

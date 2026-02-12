@@ -14,36 +14,38 @@ const pricingPlans = [
   {
     id: "basic",
     name: "Basic plan",
-    description: "Perfect for individuals getting started",
-    price: "10",
+    description: "Perfect for freelance social media managers",
+    price: "10000",
+    priceDisplay: "₦10,000",
     priceId: "price_1PyFKGBibz3ZDixDAaJ3HO74",
     popular: false,
     icon: Bolt,
     features: [
-      "Flexible Plans",
-      "Scalability",
+      "AI Content Generation",
+      "Multi-Platform Scheduling",
       "24/7 Email Support",
-      "20GB Recording",
       "Basic Analytics",
       "2 Social Platforms",
+      "Google Calendar Reminders",
     ],
   },
   {
     id: "pro",
     name: "Business plan",
-    description: "For content creators and small teams",
-    price: "29",
+    description: "For small agencies managing 3-10 clients",
+    price: "25000",
+    priceDisplay: "₦25,000",
     priceId: "price_1PyFN0Bibz3ZDixDqm9eYL8W",
     popular: true,
     badge: "Best Value",
     icon: LayersIcon,
     features: [
       "Access to all basic features",
-      "Basic reporting and analytics",
-      "Up to 10 individual users",
-      "20GB individual data storage",
+      "Advanced reporting and analytics",
+      "Up to 10 team members",
       "All social platforms",
       "Priority support",
+      "Team collaboration",
     ],
   },
   {
@@ -51,6 +53,7 @@ const pricingPlans = [
     name: "Enterprise plan",
     description: "For agencies and large teams",
     price: "Custom",
+    priceDisplay: "Custom",
     priceId: null,
     popular: false,
     icon: LayersIcon,
@@ -193,7 +196,8 @@ export default function PricingPage() {
   const getYearlyPrice = (monthlyPrice: string) => {
     if (monthlyPrice === "Custom") return "Custom";
     const price = parseInt(monthlyPrice);
-    return Math.round(price * 10).toString();
+    // 10 months for yearly (save 2 months)
+    return (price * 10).toString();
   };
 
   return (
@@ -292,7 +296,7 @@ export default function PricingPage() {
                         {plan.price !== "Custom" ? (
                           <>
                             <span className={`text-5xl font-bold ${isPopular ? "text-white" : "text-gray-900"}`}>
-                              ${displayPrice}
+                              {plan.priceDisplay || `₦${parseInt(displayPrice).toLocaleString('en-NG')}`}
                             </span>
                             <span className={`text-lg ${isPopular ? "text-white/80" : "text-gray-600"}`}>
                               /month

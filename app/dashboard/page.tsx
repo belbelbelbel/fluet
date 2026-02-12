@@ -34,33 +34,33 @@ const engagementData = [
 ];
 
 const topGeographies = [
-  { country: "United States of America", rate: 65.1 },
-  { country: "China", rate: 50.5 },
-  { country: "Bangladesh", rate: 39.2 },
-  { country: "Australia", rate: 9.2 },
+  { country: "Lagos, Nigeria", rate: 65.1 },
+  { country: "Abuja, Nigeria", rate: 50.5 },
+  { country: "Port Harcourt, Nigeria", rate: 39.2 },
+  { country: "Ibadan, Nigeria", rate: 9.2 },
 ];
 
 const commentsData = [
   {
-    name: "Monu x",
-    handle: "@monu_icons",
-    location: "Sylhet, Bangladesh",
-    time: "31 Jan 12.30 AM",
-    avatar: "M",
-  },
-  {
-    name: "Sarah Johnson",
-    handle: "@sarahj",
+    name: "Amina Okafor",
+    handle: "@amina_social",
     location: "Lagos, Nigeria",
-    time: "30 Jan 3.45 PM",
-    avatar: "S",
+    time: "31 Jan 12.30 AM",
+    avatar: "A",
   },
   {
-    name: "Mike Chen",
-    handle: "@mikechen",
-    location: "New York, USA",
+    name: "Chukwu Emeka",
+    handle: "@chukwu_digital",
+    location: "Abuja, Nigeria",
+    time: "30 Jan 3.45 PM",
+    avatar: "C",
+  },
+  {
+    name: "Fatima Bello",
+    handle: "@fatima_media",
+    location: "Port Harcourt, Nigeria",
     time: "30 Jan 11.20 AM",
-    avatar: "M",
+    avatar: "F",
   },
 ];
 

@@ -209,7 +209,7 @@ export default function ContentIdeasPage() {
                   <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-gray-200">
                     <Button
                       onClick={() => handleGenerateCaption(idea)}
-                      className="flex-1 sm:flex-none bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                      className="flex-1 sm:flex-none bg-black hover:bg-black/90 text-white rounded-xl"
                     >
                       Generate Caption
                     </Button>

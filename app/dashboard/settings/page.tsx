@@ -18,6 +18,8 @@ import {
   Cpu,
   Code,
   Twitter,
+  Instagram,
+  Calendar,
 } from "lucide-react";
 import { showToast } from "@/lib/toast";
 import { Niche } from "@/lib/content-ideas";
@@ -156,6 +158,8 @@ interface UserSettings {
   niche?: Niche;
   youtubeConnected?: boolean;
   twitterConnected?: boolean;
+  instagramConnected?: boolean;
+  googleCalendarConnected?: boolean;
 }
 
 export default function SettingsPage() {
@@ -169,6 +173,8 @@ export default function SettingsPage() {
     niche: (localStorage.getItem("userNiche") as Niche) || undefined,
     youtubeConnected: false, // Will be checked from database/API
     twitterConnected: false, // Will be checked from database/API
+    instagramConnected: false, // Will be checked from database/API
+    googleCalendarConnected: false, // Will be checked from database/API
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -196,6 +202,30 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error("Error checking Twitter connection:", error);
+    }
+  };
+
+  const checkInstagramConnection = async () => {
+    try {
+      const response = await fetch(`/api/instagram/status${userId ? `?userId=${userId}` : ''}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(prev => ({ ...prev, instagramConnected: data.connected }));
+      }
+    } catch (error) {
+      console.error("Error checking Instagram connection:", error);
+    }
+  };
+
+  const checkGoogleCalendarConnection = async () => {
+    try {
+      const response = await fetch(`/api/google-calendar/status${userId ? `?userId=${userId}` : ''}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(prev => ({ ...prev, googleCalendarConnected: data.connected }));
+      }
+    } catch (error) {
+      console.error("Error checking Google Calendar connection:", error);
     }
   };
 
@@ -236,15 +266,23 @@ export default function SettingsPage() {
       fetchSettings();
       checkYouTubeConnection();
       checkTwitterConnection();
+      checkInstagramConnection();
+      checkGoogleCalendarConnection();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
-  // Check YouTube connection when component mounts or URL changes
+  // Check connections when component mounts or URL changes
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("youtube") === "connected") {
       checkYouTubeConnection();
+      // Clean up URL
+      window.history.replaceState({}, "", "/dashboard/settings");
+    }
+    if (urlParams.get("success") === "google_calendar_connected") {
+      checkGoogleCalendarConnection();
+      showToast.success("Google Calendar connected", "You'll now receive calendar reminders for manual posts");
       // Clean up URL
       window.history.replaceState({}, "", "/dashboard/settings");
     }
@@ -376,11 +414,11 @@ export default function SettingsPage() {
                   {isModelDropdownOpen && (
                     <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
                       <div className="py-1">
-                        {aiModels.map((model) => {
-                          const isSelected = settings.defaultAIModel === model.id;
-                          return (
+                {aiModels.map((model) => {
+                  const isSelected = settings.defaultAIModel === model.id;
+                  return (
                             <button
-                              key={model.id}
+                      key={model.id}
                               type="button"
                               onClick={() => {
                                 setSettings({ ...settings, defaultAIModel: model.id });
@@ -391,25 +429,25 @@ export default function SettingsPage() {
                               }`}
                             >
                               <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-gray-600">
-                                {model.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
+                            {model.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
                                   <span className={`font-medium ${isSelected ? "text-gray-950" : "text-gray-700"}`}>
                                     {model.name}
                                   </span>
                                   <span className="text-xs text-gray-400">•</span>
                                   <span className="text-xs text-gray-500">{model.provider}</span>
-                                  {isSelected && (
+                          {isSelected && (
                                     <Check className="w-4 h-4 text-gray-950 ml-auto flex-shrink-0" />
-                                  )}
-                                </div>
-                              </div>
-                            </button>
-                          );
-                        })}
+                          )}
+                        </div>
                       </div>
-                    </div>
+                            </button>
+                  );
+                })}
+              </div>
+                                </div>
                   )}
                 </div>
               </div>
@@ -693,6 +731,205 @@ export default function SettingsPage() {
                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-sm text-green-800 break-words">
                     ✅ Your Twitter account is connected. You can now schedule and post tweets automatically.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Instagram Integration */}
+          <div className="bg-white border border-gray-200 rounded-lg">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-950 mb-1">Instagram Integration</h2>
+              <p className="text-sm text-gray-600">
+                Connect your Instagram account to enable automated photo and video posting
+              </p>
+            </div>
+            <div className="p-4 sm:p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                    <Instagram className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-950 mb-1">Instagram Account</h3>
+                    <p className="text-sm text-gray-600 break-words">
+                      {settings.instagramConnected 
+                        ? "Connected - Ready for automated posting"
+                        : "Not connected - Requires Facebook Page (we'll guide you)"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  {settings.instagramConnected && (
+                    <Button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch("/api/instagram/disconnect", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            credentials: "include",
+                            body: JSON.stringify({ userId }),
+                          });
+
+                          if (response.ok) {
+                            setSettings(prev => ({ ...prev, instagramConnected: false }));
+                            // Refresh connection status to ensure UI is updated
+                            await checkInstagramConnection();
+                            showToast.success("Instagram disconnected", "Your Instagram account has been disconnected");
+                          } else {
+                            const data = await response.json();
+                            throw new Error(data.error || "Failed to disconnect");
+                          }
+                        } catch (error: unknown) {
+                          console.error("Disconnect error:", error);
+                          showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect Instagram");
+                        }
+                      }}
+                      className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
+                    >
+                      <LinkIcon className="w-4 h-4 mr-2" />
+                      Disconnect
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => {
+                      // Redirect to OAuth flow
+                      window.location.href = "/api/instagram/auth";
+                    }}
+                    className={`w-full sm:w-auto flex-shrink-0 ${
+                      settings.instagramConnected
+                        ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                    }`}
+                  >
+                    {settings.instagramConnected ? (
+                      <>
+                        <LinkIcon className="w-4 h-4 mr-2" />
+                        Reconnect
+                      </>
+                    ) : (
+                      <>
+                        <Instagram className="w-4 h-4 mr-2" />
+                        Connect Instagram
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+              {!settings.instagramConnected && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800 break-words">
+                    ℹ️ Instagram requires a Facebook Page connection. Don't worry - you don't need to use Facebook personally! 
+                    We'll guide you through creating a Page (takes 2 minutes).
+                  </p>
+                </div>
+              )}
+              {settings.instagramConnected && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800 break-words">
+                    ✅ Your Instagram account is connected. You can now schedule and post photos/videos automatically.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Google Calendar Integration */}
+          <div className="bg-white border border-gray-200 rounded-lg">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-950 mb-1">Google Calendar Integration</h2>
+              <p className="text-sm text-gray-600">
+                Connect your Google Calendar to receive email and push reminders for posts that need manual posting
+              </p>
+            </div>
+            <div className="p-4 sm:p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-950 mb-1">Google Calendar</h3>
+                    <p className="text-sm text-gray-600 break-words">
+                      {settings.googleCalendarConnected 
+                        ? "Connected - You'll receive calendar reminders for LinkedIn and TikTok posts"
+                        : "Not connected - Connect to get email reminders for manual posts"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  {settings.googleCalendarConnected && (
+                    <Button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch("/api/google-calendar/disconnect", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            credentials: "include",
+                            body: JSON.stringify({ userId }),
+                          });
+
+                          if (response.ok) {
+                            setSettings(prev => ({ ...prev, googleCalendarConnected: false }));
+                            await checkGoogleCalendarConnection();
+                            showToast.success("Google Calendar disconnected", "Your Google Calendar has been disconnected");
+                          } else {
+                            const data = await response.json();
+                            throw new Error(data.error || "Failed to disconnect");
+                          }
+                        } catch (error: unknown) {
+                          console.error("Disconnect error:", error);
+                          showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect Google Calendar");
+                        }
+                      }}
+                      className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
+                    >
+                      <LinkIcon className="w-4 h-4 mr-2" />
+                      Disconnect
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => {
+                      // Redirect to OAuth flow
+                      window.location.href = "/api/google-calendar/auth";
+                    }}
+                    className={`w-full sm:w-auto flex-shrink-0 ${
+                      settings.googleCalendarConnected
+                        ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                        : "bg-blue-600 hover:bg-blue-700 text-white"
+                    }`}
+                  >
+                    {settings.googleCalendarConnected ? (
+                      <>
+                        <LinkIcon className="w-4 h-4 mr-2" />
+                        Reconnect
+                      </>
+                    ) : (
+                      <>
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Connect Google Calendar
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+              {!settings.googleCalendarConnected && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800 break-words">
+                    ℹ️ When you schedule posts for LinkedIn or TikTok (which require manual posting), 
+                    we'll create Google Calendar events so you receive email and push reminders at the right time.
+                  </p>
+                </div>
+              )}
+              {settings.googleCalendarConnected && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800 break-words">
+                    ✅ Your Google Calendar is connected. You'll receive email and push reminders for LinkedIn and TikTok posts.
                   </p>
                 </div>
               )}

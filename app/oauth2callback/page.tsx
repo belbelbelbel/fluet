@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, CheckCircle2, XCircle, Twitter, PlayIcon } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Twitter, PlayIcon, Instagram } from "lucide-react";
 
 function OAuthCallbackContent() {
   const router = useRouter();
@@ -13,7 +13,7 @@ function OAuthCallbackContent() {
   const { userId } = useAuth();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
-  const [platform, setPlatform] = useState<"youtube" | "twitter">("youtube");
+  const [platform, setPlatform] = useState<"youtube" | "twitter" | "instagram">("youtube");
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -23,6 +23,8 @@ function OAuthCallbackContent() {
     // Detect platform from state or default to YouTube
     if (state?.includes("twitter")) {
       setPlatform("twitter");
+    } else if (state?.includes("instagram")) {
+      setPlatform("instagram");
     }
 
     if (error) {
@@ -38,8 +40,9 @@ function OAuthCallbackContent() {
     }
 
     if (!userId) {
+      const platformName = platform === "twitter" ? "Twitter" : platform === "instagram" ? "Instagram" : "YouTube";
       setStatus("error");
-      setMessage(`Please sign in to connect ${platform === "twitter" ? "Twitter" : "YouTube"}`);
+      setMessage(`Please sign in to connect ${platformName}`);
       return;
     }
 
@@ -49,8 +52,16 @@ function OAuthCallbackContent() {
 
   const handleTokenExchange = async (code: string) => {
     try {
-      const endpoint = platform === "twitter" ? "/api/twitter/callback" : "/api/youtube/callback";
-      const platformName = platform === "twitter" ? "Twitter" : "YouTube";
+      let endpoint = "/api/youtube/callback";
+      let platformName = "YouTube";
+      
+      if (platform === "twitter") {
+        endpoint = "/api/twitter/callback";
+        platformName = "Twitter";
+      } else if (platform === "instagram") {
+        endpoint = "/api/instagram/callback";
+        platformName = "Instagram";
+      }
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -77,7 +88,7 @@ function OAuthCallbackContent() {
     } catch (error: unknown) {
       console.error("Token exchange error:", error);
       setStatus("error");
-      const platformName = platform === "twitter" ? "Twitter" : "YouTube";
+      const platformName = platform === "twitter" ? "Twitter" : platform === "instagram" ? "Instagram" : "YouTube";
       setMessage(error instanceof Error ? error.message : `Failed to connect ${platformName}`);
     }
   };
@@ -90,10 +101,10 @@ function OAuthCallbackContent() {
             <>
               <Loader2 className="w-12 h-12 text-gray-950 animate-spin mx-auto mb-4" />
               <h2 className="text-xl font-bold text-gray-950 mb-2">
-                Connecting {platform === "twitter" ? "Twitter" : "YouTube"}...
+                Connecting {platform === "twitter" ? "Twitter" : platform === "instagram" ? "Instagram" : "YouTube"}...
               </h2>
               <p className="text-gray-600">
-                Please wait while we connect your {platform === "twitter" ? "Twitter" : "YouTube"} account
+                Please wait while we connect your {platform === "twitter" ? "Twitter" : platform === "instagram" ? "Instagram" : "YouTube"} account
               </p>
             </>
           )}
@@ -102,7 +113,7 @@ function OAuthCallbackContent() {
             <>
               <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-gray-950 mb-2">
-                {platform === "twitter" ? "Twitter" : "YouTube"} Connected!
+                {platform === "twitter" ? "Twitter" : platform === "instagram" ? "Instagram" : "YouTube"} Connected!
               </h2>
               <p className="text-gray-600 mb-4">{message}</p>
               <p className="text-sm text-gray-500">

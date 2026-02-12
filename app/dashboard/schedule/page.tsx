@@ -9,6 +9,7 @@ import { showToast } from "@/lib/toast";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CalendarView } from "@/components/CalendarView";
+import { PostReminderModal } from "@/components/PostReminderModal";
 import {
   TwitterIcon,
   InstagramIcon,
@@ -22,6 +23,8 @@ import {
   Loader2Icon,
   BriefcaseIcon,
   PlayIcon,
+  CheckCircleIcon,
+  ClockIcon,
 } from "lucide-react";
 
 type ContentType = "twitter" | "instagram" | "linkedin" | "tiktok" | "youtube";
@@ -117,6 +120,10 @@ export default function DashboardSchedulePage() {
     id: null,
   });
   const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
+  const [reminderPost, setReminderPost] = useState<ScheduledPost | null>(null);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [twitterConnected, setTwitterConnected] = useState(false);
+  const [instagramConnected, setInstagramConnected] = useState(false);
 
   const contentTypes: ContentType[] = ["twitter", "instagram", "linkedin", "tiktok", "youtube"];
   
@@ -145,6 +152,8 @@ export default function DashboardSchedulePage() {
       const params = new URLSearchParams(window.location.search);
       const content = params.get("content");
       const platform = params.get("platform");
+      const reminderId = params.get("reminder");
+      
       if (content) {
         setSelectedContent(decodeURIComponent(content));
         if (platform && contentTypes.includes(platform as ContentType)) {
@@ -153,8 +162,19 @@ export default function DashboardSchedulePage() {
         setShowScheduleModal(true);
         window.history.replaceState({}, "", "/dashboard/schedule");
       }
+      
+      // Handle reminder modal
+      if (reminderId) {
+        const postId = parseInt(reminderId);
+        const post = scheduledPosts.find(p => p.id === postId);
+        if (post) {
+          setReminderPost(post);
+          setShowReminderModal(true);
+        }
+        window.history.replaceState({}, "", "/dashboard/schedule");
+      }
     }
-  }, []);
+  }, [scheduledPosts]);
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
@@ -172,23 +192,77 @@ export default function DashboardSchedulePage() {
         return null;
     }
   };
+
+  // Get platform posting status (auto-post vs reminder)
+  const getPlatformPostingStatus = (platform: string): { type: "auto" | "reminder"; message: string } => {
+    const platformLower = platform.toLowerCase();
+    
+    switch (platformLower) {
+      case "youtube":
+        return {
+          type: youtubeConnected ? "auto" : "reminder",
+          message: youtubeConnected ? "Auto-posts" : "Connect account to auto-post",
+        };
+      case "twitter":
+        return {
+          type: twitterConnected ? "auto" : "reminder",
+          message: twitterConnected ? "Auto-posts" : "Connect account to auto-post",
+        };
+      case "instagram":
+        return {
+          type: instagramConnected ? "auto" : "reminder",
+          message: instagramConnected ? "Auto-posts" : "Connect account to auto-post",
+        };
+      case "linkedin":
+        return {
+          type: "reminder",
+          message: "Manual posting (requires Company Page)",
+        };
+      case "tiktok":
+        return {
+          type: "reminder",
+          message: "Manual posting (no API available)",
+        };
+      default:
+        return {
+          type: "reminder",
+          message: "Manual posting",
+        };
+    }
+  };
   
-  // Check YouTube connection status
+  // Check platform connection status
   useEffect(() => {
-    const checkYouTube = async () => {
+    const checkConnections = async () => {
+      if (!userId) return;
+      
       try {
-        const response = await fetch(`/api/youtube/status${userId ? `?userId=${userId}` : ''}`);
-        if (response.ok) {
-          const data = await response.json();
-          setYoutubeConnected(data.connected || false);
+        // Check YouTube
+        const youtubeResponse = await fetch(`/api/youtube/status${userId ? `?userId=${userId}` : ''}`);
+        if (youtubeResponse.ok) {
+          const youtubeData = await youtubeResponse.json();
+          setYoutubeConnected(youtubeData.connected || false);
+        }
+        
+        // Check Twitter
+        const twitterResponse = await fetch(`/api/twitter/status${userId ? `?userId=${userId}` : ''}`);
+        if (twitterResponse.ok) {
+          const twitterData = await twitterResponse.json();
+          setTwitterConnected(twitterData.connected || false);
+        }
+        
+        // Check Instagram
+        const instagramResponse = await fetch(`/api/instagram/status${userId ? `?userId=${userId}` : ''}`);
+        if (instagramResponse.ok) {
+          const instagramData = await instagramResponse.json();
+          setInstagramConnected(instagramData.connected || false);
         }
       } catch (error) {
-        console.error("Error checking YouTube connection:", error);
+        console.error("Error checking platform connections:", error);
       }
     };
-    if (userId) {
-      checkYouTube();
-    }
+    
+    checkConnections();
   }, [userId]);
 
   const fetchScheduledPosts = useCallback(async () => {
@@ -680,12 +754,39 @@ export default function DashboardSchedulePage() {
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between gap-3 mb-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1.5">
-                          {getPlatformIcon(post.platform)}
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            {getPlatformIcon(post.platform)}
                             <span className="text-sm font-semibold text-gray-900 capitalize">
-                            {post.platform}
-                          </span>
-                            <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-lg border border-gray-200">
+                              {post.platform}
+                            </span>
+                          </div>
+                          {(() => {
+                            const status = getPlatformPostingStatus(post.platform);
+                            return (
+                              <span
+                                className={`px-2 py-0.5 text-xs rounded-lg border ${
+                                  status.type === "auto"
+                                    ? "bg-green-50 text-green-700 border-green-200"
+                                    : "bg-orange-50 text-orange-700 border-orange-200"
+                                }`}
+                                title={status.message}
+                              >
+                                {status.type === "auto" ? (
+                                  <span className="flex items-center gap-1">
+                                    <CheckCircleIcon className="w-3 h-3" />
+                                    Auto-posts
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1">
+                                    <ClockIcon className="w-3 h-3" />
+                                    Reminder
+                                  </span>
+                                )}
+                              </span>
+                            );
+                          })()}
+                          <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-lg border border-gray-200">
                             {getTimeUntil(post.scheduledFor)}
                           </span>
                         </div>
@@ -1113,6 +1214,21 @@ export default function DashboardSchedulePage() {
           </div>
         </div>
       )}
+
+      {/* Post Reminder Modal */}
+      <PostReminderModal
+        isOpen={showReminderModal}
+        onClose={() => {
+          setShowReminderModal(false);
+          setReminderPost(null);
+        }}
+        post={reminderPost ? {
+          id: reminderPost.id,
+          platform: reminderPost.platform,
+          content: reminderPost.content,
+          scheduledFor: reminderPost.scheduledFor,
+        } : null}
+      />
 
       {/* Delete Confirmation Dialog */}
       {deleteConfirm.open && (

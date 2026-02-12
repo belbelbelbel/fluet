@@ -64,7 +64,7 @@ export function Navbar() {
             {/* Logo - Left - Matching Dashboard */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-lg bg-gray-950 flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm">
                   <PenTool className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-lg font-bold text-gray-950">

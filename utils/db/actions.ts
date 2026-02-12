@@ -1,6 +1,6 @@
 import { db } from "./dbConfig"
 import { eq, sql, desc, and, gte, lte } from "drizzle-orm"
-import { GeneratedContent, Users, Subscription, ScheduledPosts, LinkedAccounts } from "./schema"
+import { GeneratedContent, Users, Subscription, ScheduledPosts, LinkedAccounts, Notifications } from "./schema"
 import { sendWelcomeEmail } from "./mailtrap"
 
 export const CreateOrUpdateUser = async (stripecustomerId: string, email: string, name: string) => {
@@ -527,5 +527,118 @@ export const MarkScheduledPostAsPosted = async (postId: number) => {
     } catch (error) {
         console.error(`[MarkScheduledPostAsPosted] Error encountered:`, error);
         throw new Error("Failed to mark post as posted");
+    }
+};
+
+// Notification Actions
+
+/**
+ * Create a notification for a user
+ */
+export const CreateNotification = async (
+    userId: number,
+    type: string,
+    title: string,
+    message: string,
+    link?: string
+) => {
+    try {
+        const [notification] = await db
+            .insert(Notifications)
+            .values({
+                userId,
+                type,
+                title,
+                message,
+                link: link || null,
+                read: false,
+            })
+            .returning()
+            .execute();
+        return notification;
+    } catch (error) {
+        console.error(`[CreateNotification] Error encountered:`, error);
+        throw new Error("Failed to create notification");
+    }
+};
+
+/**
+ * Get all notifications for a user
+ */
+export const GetUserNotifications = async (userId: number, unreadOnly: boolean = false) => {
+    try {
+        const conditions = [eq(Notifications.userId, userId)];
+        if (unreadOnly) {
+            conditions.push(eq(Notifications.read, false));
+        }
+        
+        const notifications = await db
+            .select()
+            .from(Notifications)
+            .where(and(...conditions))
+            .orderBy(desc(Notifications.createdAt))
+            .execute();
+        return notifications;
+    } catch (error) {
+        console.error(`[GetUserNotifications] Error encountered:`, error);
+        throw new Error("Failed to get notifications");
+    }
+};
+
+/**
+ * Mark a notification as read
+ */
+export const MarkNotificationAsRead = async (notificationId: number) => {
+    try {
+        const [updated] = await db
+            .update(Notifications)
+            .set({
+                read: true,
+                readAt: new Date(),
+            })
+            .where(eq(Notifications.id, notificationId))
+            .returning()
+            .execute();
+        return updated;
+    } catch (error) {
+        console.error(`[MarkNotificationAsRead] Error encountered:`, error);
+        throw new Error("Failed to mark notification as read");
+    }
+};
+
+/**
+ * Get pending posts that need manual posting reminders
+ * (posts that are due but can't be auto-posted)
+ */
+export const GetPostsNeedingReminders = async () => {
+    try {
+        const now = new Date();
+        const posts = await db
+            .select()
+            .from(ScheduledPosts)
+            .where(
+                and(
+                    lte(ScheduledPosts.scheduledFor, now),
+                    eq(ScheduledPosts.posted, false)
+                )
+            )
+            .orderBy(ScheduledPosts.scheduledFor)
+            .execute();
+        
+        // Filter posts that need reminders (platforms that can't auto-post)
+        const postsNeedingReminders = posts.filter(post => {
+            const platform = post.platform.toLowerCase();
+            // Platforms that need manual posting:
+            // - linkedin (requires Company Page)
+            // - tiktok (no reliable API)
+            // - twitter (if no account connected)
+            // - instagram (if no account connected or no image)
+            return ["linkedin", "tiktok"].includes(platform);
+        });
+        
+        return postsNeedingReminders;
+    } catch (error) {
+        console.error(`[GetPostsNeedingReminders] Error encountered:`, error);
+        throw new Error("Failed to get posts needing reminders");
     }
 };
