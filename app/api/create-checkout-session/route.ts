@@ -5,9 +5,15 @@ import Stripe from "stripe";
 // Mark route as dynamic
 export const dynamic = "force-dynamic";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-11-17.clover",
-});
+// Lazy initialization of Stripe to avoid build-time errors
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY is not configured");
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-11-17.clover",
+  });
+}
 
 export async function POST(req: Request) {
   try {
@@ -29,6 +35,8 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
+
+    const stripe = getStripe();
 
     // Parse request body
     const body = await req.json();

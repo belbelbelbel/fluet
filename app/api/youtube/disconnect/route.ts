@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
@@ -54,10 +54,10 @@ export async function POST(request: Request) {
       success: true,
       message: "YouTube disconnected successfully",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("YouTube disconnect error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to disconnect YouTube" },
+      { error: error instanceof Error ? error.message : "Failed to disconnect YouTube" },
       { status: 500 }
     );
   }

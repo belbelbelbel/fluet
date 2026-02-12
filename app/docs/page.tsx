@@ -6,16 +6,10 @@ import { useTheme } from "@/contexts/ThemeContext";
 import {
   BookOpenIcon,
   RocketIcon,
-  HelpCircleIcon,
   CodeIcon,
   Wand2Icon,
-  FileTextIcon,
   CalendarIcon,
-  DownloadIcon,
   KeyboardIcon,
-  Bolt,
-  CopyIcon,
-  EditIcon,
   Bot,
   Palette,
   Users,
@@ -544,7 +538,7 @@ export default function DocsPage() {
             <p className={`mb-6 max-w-2xl mx-auto ${
               isDark ? "text-gray-300" : "text-gray-600"
             }`}>
-              Can't find what you're looking for? Check out our pricing plans or try generating your first post.
+              Can&apos;t find what you&apos;re looking for? Check out our pricing plans or try generating your first post.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button

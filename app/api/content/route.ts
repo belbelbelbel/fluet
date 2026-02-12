@@ -16,14 +16,14 @@ export async function GET(req: Request) {
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
     
     // If auth() didn't work, try currentUser() as fallback (same as generate)
     if (!clerkUserId) {
       try {
         const user = await currentUser();
         clerkUserId = user?.id || null;
-      } catch (userError) {
+      } catch {
         // Silent fallback
       }
     }

@@ -19,8 +19,8 @@ export async function GET(req: Request) {
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
-      } catch (userError) {
+        clerkUserId = user?.id ?? null;
+      } catch {
         // Silent fallback
       }
     }
@@ -60,8 +60,8 @@ export async function POST(req: Request) {
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
-      } catch (userError) {
+        clerkUserId = user?.id ?? null;
+      } catch {
         // Silent fallback
       }
     }
@@ -128,8 +128,8 @@ export async function PUT(req: Request) {
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
-      } catch (userError) {
+        clerkUserId = user?.id ?? null;
+      } catch {
         // Silent fallback
       }
     }
@@ -190,16 +190,21 @@ export async function DELETE(req: Request) {
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId ?? null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
-      } catch (userError) {
+        clerkUserId = user?.id ?? null;
+      } catch {
         // Silent fallback
       }
+    }
+    
+    // Use clientUserId as final fallback if provided
+    if (!clerkUserId && clientUserId) {
+      clerkUserId = clientUserId;
     }
 
     if (!clerkUserId) {

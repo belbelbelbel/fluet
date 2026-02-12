@@ -14,12 +14,9 @@ import {
   CopyIcon,
   CheckIcon,
   TrashIcon,
-  FilterIcon,
   CalendarIcon,
   FileTextIcon,
-  EyeIcon,
   XIcon,
-  CalendarPlusIcon,
   RefreshCwIcon,
   Loader2Icon,
 } from "lucide-react";
@@ -102,9 +99,16 @@ export default function HistoryPage() {
   const handleDelete = useCallback(async (id: number) => {
     if (!confirm("Are you sure you want to delete this content?")) return;
     
+    if (!userId) {
+      showToast.error("Authentication required", "Please sign in to delete content");
+      return;
+    }
+    
     try {
-      const response = await fetch(`/api/content/${id}`, {
+      const url = `/api/content/${id}?userId=${userId}`;
+      const response = await fetch(url, {
         method: "DELETE",
+        credentials: "include",
       });
       if (response.ok) {
         setContent((prev) => prev.filter((item) => item.id !== id));
@@ -116,7 +120,7 @@ export default function HistoryPage() {
       console.error("Error deleting content:", error);
       showToast.error("Failed to delete", "An error occurred while deleting the content");
     }
-  }, []);
+  }, [userId]);
 
   const handleSchedule = useCallback((item: GeneratedContent) => {
     router.push(`/schedule?content=${encodeURIComponent(item.content)}&platform=${item.contentType}`);

@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Lightbulb,
   Calendar,
+  type LucideIcon,
 } from "lucide-react";
 import { getDailyContentIdeas, ContentIdea, Niche, HookStyle, Format } from "@/lib/content-ideas";
 import { showToast } from "@/lib/toast";
@@ -26,7 +27,7 @@ const hookStyleLabels: Record<HookStyle, string> = {
   tip: "Tip",
 };
 
-const formatLabels: Record<Format, { label: string; icon: any }> = {
+const formatLabels: Record<Format, { label: string; icon: LucideIcon }> = {
   text_only: { label: "Text Only", icon: FileText },
   text_image: { label: "Text + Image", icon: ImageIcon },
   carousel: { label: "Carousel", icon: BookOpen },
@@ -38,7 +39,6 @@ export default function ContentIdeasPage() {
   const [niche, setNiche] = useState<Niche | null>(null);
   const [contentIdeas, setContentIdeas] = useState<ContentIdea[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedIdea, setSelectedIdea] = useState<ContentIdea | null>(null);
 
   useEffect(() => {
     // Get niche from localStorage - non-blocking
@@ -83,7 +83,7 @@ export default function ContentIdeasPage() {
 
     // Use requestIdleCallback if available, otherwise setTimeout
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(loadIdeas, { timeout: 100 });
+      (window as Window & { requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number }).requestIdleCallback?.(loadIdeas, { timeout: 100 });
     } else {
       setTimeout(loadIdeas, 0);
     }
@@ -97,7 +97,6 @@ export default function ContentIdeasPage() {
   };
 
   const handleGenerateCaption = (idea: ContentIdea) => {
-    setSelectedIdea(idea);
     router.push(`/dashboard/generate-caption?id=${idea.id}`);
   };
 
@@ -185,7 +184,7 @@ export default function ContentIdeasPage() {
                       <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5 sm:mb-2">Hook Example</p>
                       <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5 sm:p-3">
                         <p className="text-xs sm:text-sm text-gray-950 leading-relaxed">
-                          "{idea.hookExample}"
+                          &ldquo;{idea.hookExample}&rdquo;
                         </p>
                       </div>
                     </div>
@@ -235,7 +234,7 @@ export default function ContentIdeasPage() {
                 No content ideas yet
               </h3>
               <p className="text-base text-gray-600 mb-4">
-                We're working on adding more ideas for your niche
+                We&apos;re working on adding more ideas for your niche
               </p>
               <Button
                 onClick={handleRefresh}

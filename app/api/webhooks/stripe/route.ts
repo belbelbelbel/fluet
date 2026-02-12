@@ -3,14 +3,20 @@ import { headers } from "next/headers";
 import Stripe from "stripe";
 import { GetUserByClerkId } from "@/utils/db/actions";
 import { db } from "@/utils/db/dbConfig";
-import { Subscription } from "@/utils/db/schema";
+import { Subscription as DbSubscription } from "@/utils/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-11-17.clover",
-});
+// Lazy initialization of Stripe to avoid build-time errors
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY is not configured");
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-11-17.clover",
+  });
+}
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -27,6 +33,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
+    const stripe = getStripe();
     event = stripe.webhooks.constructEvent(
       body,
       signature,
@@ -109,11 +116,26 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     
     // If session has a subscription, fetch it to get the plan details
     if (session.subscription) {
-      subscriptionId = session.subscription as string;
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      subscriptionId =
+        typeof session.subscription === "string"
+          ? session.subscription
+          : session.subscription.id;
+
+      // NOTE: The Stripe SDK types for this API version don't expose
+      // `current_period_start` / `current_period_end` strongly typed,
+      // but the fields are present at runtime. Cast through unknown first
+      // to avoid type conflicts with database Subscription type.
+      const stripe = getStripe();
+      const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+      const subscription = stripeSubscription as unknown as Stripe.Subscription & {
+        current_period_start: number;
+        current_period_end: number;
+      };
       
       // Extract plan name from subscription
-      const priceId = subscription.items.data[0]?.price.id;
+      const priceId = subscription.items?.data?.[0]?.price?.id as
+        | string
+        | undefined;
       
       // Map price IDs to plan names (comprehensive mapping)
       const priceIdToPlan: Record<string, string> = {
@@ -126,9 +148,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         planName = priceIdToPlan[priceId];
       }
       
-      // Use actual subscription dates
-      startDate = new Date(subscription.current_period_start * 1000);
-      endDate = new Date(subscription.current_period_end * 1000);
+      // Use actual subscription dates (Unix timestamps from Stripe)
+      if (subscription.current_period_start && subscription.current_period_end) {
+        startDate = new Date(subscription.current_period_start * 1000);
+        endDate = new Date(subscription.current_period_end * 1000);
+      }
     } else {
       // For one-time payments, set 30-day period
       endDate.setMonth(endDate.getMonth() + 1);
@@ -145,11 +169,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     // Check if subscription already exists (idempotency check)
     const [existingSubscription] = await db
       .select()
-      .from(Subscription)
+      .from(DbSubscription)
       .where(
         and(
-          eq(Subscription.userid, user.id),
-          eq(Subscription.canceldate, false)
+          eq(DbSubscription.userid, user.id),
+          eq(DbSubscription.canceldate, false)
         )
       )
       .limit(1)
@@ -160,7 +184,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     if (existingSubscription) {
       // Update existing subscription (idempotent operation)
       await db
-        .update(Subscription)
+        .update(DbSubscription)
         .set({
           stripesubscripionId: finalSubscriptionId,
           plan: planName,
@@ -168,13 +192,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           enddate: endDate,
           canceldate: false,
         })
-        .where(eq(Subscription.userid, user.id))
+        .where(eq(DbSubscription.userid, user.id))
         .execute();
       
       console.log(`✅ Updated subscription for user ${user.id}: ${planName} (${startDate.toISOString()} - ${endDate.toISOString()})`);
     } else {
       // Create new subscription
-      await db.insert(Subscription).values({
+      await db.insert(DbSubscription).values({
         stripesubscripionId: finalSubscriptionId,
         userid: user.id,
         plan: planName,
@@ -195,9 +219,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 }
 
-async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+async function handleSubscriptionUpdated(subscriptionParam: Stripe.Subscription) {
   try {
+    // Cast subscription to include the period properties that exist at runtime
+    const subscription = subscriptionParam as unknown as Stripe.Subscription & {
+      current_period_start: number;
+      current_period_end: number;
+    };
+    
     // Get customer ID and find user
+    const stripe = getStripe();
     const customerId = subscription.customer as string;
     const customer = await stripe.customers.retrieve(customerId);
     
@@ -232,14 +263,14 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
     // Update subscription in database
     await db
-      .update(Subscription)
+      .update(DbSubscription)
       .set({
         plan: planName,
         startdate: new Date(subscription.current_period_start * 1000),
         enddate: new Date(subscription.current_period_end * 1000),
         canceldate: subscription.status !== "active" && subscription.status !== "trialing",
       })
-      .where(eq(Subscription.userid, user.id))
+      .where(eq(DbSubscription.userid, user.id))
       .execute();
 
     console.log(`✅ Updated subscription for user ${user.id}: ${planName} (status: ${subscription.status})`);
@@ -251,6 +282,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   try {
+    const stripe = getStripe();
     const customerId = subscription.customer as string;
     const customer = await stripe.customers.retrieve(customerId);
     
@@ -273,11 +305,11 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
     // Mark subscription as cancelled
     await db
-      .update(Subscription)
+      .update(DbSubscription)
       .set({
         canceldate: true,
       })
-      .where(eq(Subscription.userid, user.id))
+      .where(eq(DbSubscription.userid, user.id))
       .execute();
 
     console.log(`✅ Cancelled subscription for user ${user.id}`);

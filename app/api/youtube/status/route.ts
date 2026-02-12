@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
@@ -49,7 +49,7 @@ export async function GET(request: Request) {
 
     // Get YouTube linked account (check both active and inactive to see if account exists)
     // First try to get active account
-    let youtubeAccount = await GetLinkedAccount(user.id, "youtube");
+    const youtubeAccount = await GetLinkedAccount(user.id, "youtube");
     
     // If not found, check if there's an inactive account (for reconnection)
     if (!youtubeAccount) {
@@ -97,10 +97,10 @@ export async function GET(request: Request) {
       expired: tokens === null && youtubeAccount.isActive, // Expired but refreshable
       accountUsername: youtubeAccount.accountUsername,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("YouTube status error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to check YouTube status" },
+      { error: error instanceof Error ? error.message : "Failed to check YouTube status" },
       { status: 500 }
     );
   }

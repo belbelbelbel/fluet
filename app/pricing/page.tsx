@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, StarIcon, CrownIcon, Bolt, ShieldIcon, ArrowRightIcon, MinusIcon, PlusIcon, LayersIcon } from "lucide-react";
+import { CheckIcon, StarIcon, Bolt, ShieldIcon, ArrowRightIcon, MinusIcon, PlusIcon, LayersIcon } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useState, useCallback, useMemo } from "react";
 import { loadStripe } from "@stripe/stripe-js";
@@ -67,23 +67,24 @@ const pricingPlans = [
   },
 ];
 
-const allFeatures = [
-  { name: "AI-generated posts per month", basic: "100", pro: "500", enterprise: "Unlimited" },
-  { name: "Social media platforms", basic: "2", pro: "4", enterprise: "All" },
-  { name: "Content templates", basic: "Basic", pro: "Advanced", enterprise: "Custom" },
-  { name: "We post for you automatically", basic: "❌", pro: "✅", enterprise: "✅" },
-  { name: "Analytics dashboard", basic: "Basic", pro: "Advanced", enterprise: "Enterprise" },
-  { name: "Bulk generation", basic: "❌", pro: "✅", enterprise: "✅" },
-  { name: "API access", basic: "❌", pro: "❌", enterprise: "✅" },
-  { name: "Support", basic: "Email", pro: "Priority", enterprise: "Dedicated" },
-];
+// Unused - commented out
+// const allFeatures = [
+//   { name: "AI-generated posts per month", basic: "100", pro: "500", enterprise: "Unlimited" },
+//   { name: "Social media platforms", basic: "2", pro: "4", enterprise: "All" },
+//   { name: "Content templates", basic: "Basic", pro: "Advanced", enterprise: "Custom" },
+//   { name: "We post for you automatically", basic: "❌", pro: "✅", enterprise: "✅" },
+//   { name: "Analytics dashboard", basic: "Basic", pro: "Advanced", enterprise: "Enterprise" },
+//   { name: "Bulk generation", basic: "❌", pro: "✅", enterprise: "✅" },
+//   { name: "API access", basic: "❌", pro: "❌", enterprise: "✅" },
+//   { name: "Support", basic: "Email", pro: "Priority", enterprise: "Dedicated" },
+// ];
 
 export default function PricingPage() {
   const { isSignedIn, user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedProvider, setSelectedProvider] = useState<PaymentProvider | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  // const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showPaymentOptions, setShowPaymentOptions] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [userCount, setUserCount] = useState(1);
@@ -111,7 +112,7 @@ export default function PricingPage() {
       return;
     }
     setShowPaymentOptions(priceId);
-    setSelectedPlan(priceId);
+    // setSelectedPlan(priceId); // Unused - commented out
     setSelectedProvider(null);
     setError(null);
   }, [isSignedIn]);
@@ -177,7 +178,7 @@ export default function PricingPage() {
       setTimeout(() => setError(null), 5000);
     } finally {
       setIsLoading(false);
-      setSelectedPlan(null);
+      // setSelectedPlan(null); // Unused - commented out
       setShowPaymentOptions(null);
       setSelectedProvider(null);
     }
@@ -185,7 +186,7 @@ export default function PricingPage() {
 
   const handleCancel = useCallback(() => {
     setShowPaymentOptions(null);
-    setSelectedPlan(null);
+    // setSelectedPlan(null); // Unused - commented out
     setSelectedProvider(null);
   }, []);
 

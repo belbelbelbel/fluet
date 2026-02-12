@@ -60,7 +60,7 @@ export default function DashboardGeneratePage() {
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("");
+  // const [loadingMessage, setLoadingMessage] = useState("");
   const [showContentModal, setShowContentModal] = useState(false);
 
   // Removed loading messages - just use "Generating..." text
@@ -86,12 +86,25 @@ export default function DashboardGeneratePage() {
       if (response.ok) {
         const data = await response.json();
         if (data && Array.isArray(data) && data.length > 0) {
-          const formatted = data.slice(0, 5).map((item: any) => ({
+          const formatted = data.slice(0, 5).map((item: { id?: string | number; [key: string]: unknown }) => ({
             id: item.id?.toString() || Math.random().toString(),
             platform: (item.contentType || item.platform) as ContentType,
-            content: (item.content || "").substring(0, 100) + ((item.content || "").length > 100 ? "..." : ""),
+            content: (() => {
+              const contentStr = typeof item.content === 'string' ? item.content : String(item.content || "");
+              return contentStr.substring(0, 100) + (contentStr.length > 100 ? "..." : "");
+            })(),
             status: (item.posted ? "Published" : "Generated") as RecentContent["status"],
-            date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : new Date().toLocaleDateString(),
+            date: (() => {
+              if (!item.createdAt) return new Date().toLocaleDateString();
+              const dateValue = typeof item.createdAt === 'string' || typeof item.createdAt === 'number' || item.createdAt instanceof Date 
+                ? item.createdAt 
+                : String(item.createdAt);
+              try {
+                return new Date(dateValue).toLocaleDateString();
+              } catch {
+                return new Date().toLocaleDateString();
+              }
+            })(),
           }));
           setRecentContent(formatted);
         } else {
@@ -156,7 +169,7 @@ export default function DashboardGeneratePage() {
     setError(null);
     setGeneratedContent("");
     setEditedContent("");
-    setLoadingMessage("Generating...");
+    // setLoadingMessage("Generating..."); // Unused - commented out
 
     try {
       const response = await fetch("/api/generate", {
@@ -196,7 +209,7 @@ export default function DashboardGeneratePage() {
       showToast.error("Error", "Failed to generate content. Please try again.");
     } finally {
       setIsGenerating(false);
-      setLoadingMessage("");
+      // setLoadingMessage(""); // Unused - commented out
     }
   }, [prompt, contentType, tone, style, length, userId, fetchRecentContent]);
 
@@ -252,13 +265,14 @@ export default function DashboardGeneratePage() {
     }
   };
 
-  const getStatusColor = (status: RecentContent["status"]) => {
-    switch (status) {
-      case "Generated": return "bg-green-50 text-green-700 border-green-200";
-      case "Published": return "bg-green-50 text-green-700 border-green-200";
-      case "Scheduled": return "bg-green-50 text-green-700 border-green-200";
-    }
-  };
+  // Unused function - commented out
+  // const getStatusColor = (status: RecentContent["status"]) => {
+  //   switch (status) {
+  //     case "Generated": return "bg-green-50 text-green-700 border-green-200";
+  //     case "Published": return "bg-green-50 text-green-700 border-green-200";
+  //     case "Scheduled": return "bg-green-50 text-green-700 border-green-200";
+  //   }
+  // };
 
   const getPlatformIconBg = (platform: ContentType) => {
     switch (platform) {

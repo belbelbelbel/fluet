@@ -120,6 +120,7 @@ export async function POST(req: Request) {
 interface KoraWebhookData {
   metadata?: {
     userId?: string;
+    clerkUserId?: string;
     planName?: string;
     priceId?: string;
   };

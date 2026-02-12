@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
-export default function OAuthCallbackPage() {
+function OAuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userId } = useAuth();
@@ -64,10 +64,10 @@ export default function OAuthCallbackPage() {
       setTimeout(() => {
         router.push("/dashboard/settings");
       }, 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Token exchange error:", error);
       setStatus("error");
-      setMessage(error.message || "Failed to connect YouTube");
+      setMessage(error instanceof Error ? error.message : "Failed to connect YouTube");
     }
   };
 
@@ -118,5 +118,24 @@ export default function OAuthCallbackPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function OAuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <Card className="max-w-md w-full border border-gray-200 rounded-2xl">
+          <CardContent className="p-8 text-center">
+            <Loader2 className="w-12 h-12 text-gray-950 animate-spin mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-950 mb-2">
+              Loading...
+            </h2>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <OAuthCallbackContent />
+    </Suspense>
   );
 }

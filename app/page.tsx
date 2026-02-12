@@ -11,17 +11,13 @@ import {
   CheckCircleIcon,
   Wand2Icon,
   BotIcon,
-  MessageSquareIcon,
   ArrowRightIcon,
-  Bolt,
   TrendingUpIcon,
   ClockIcon,
-  UsersIcon,
-  StarIcon,
   ShieldCheckIcon,
   Calendar,
   BarChart3,
-  Check,
+  Bolt,
 } from "lucide-react";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -450,7 +446,7 @@ export default function Home() {
               <p className={`text-xl max-w-3xl mx-auto ${
                 isDark ? "text-gray-400" : "text-gray-600"
               }`}>
-                We don't guess what works. We analyze millions of posts, measure engagement patterns, and deliver actionable intelligence that actually drives growth.
+                We don&apos;t guess what works. We analyze millions of posts, measure engagement patterns, and deliver actionable intelligence that actually drives growth.
               </p>
             </div>
 
@@ -548,7 +544,7 @@ export default function Home() {
                   <p className={`text-base leading-relaxed ${
                     isDark ? "text-gray-400" : "text-gray-600"
                   }`}>
-                    We track format performance across niches to show you what's underperforming. Stop wasting energy on formats that don't work.
+                    We track format performance across niches to show you what&apos;s underperforming. Stop wasting energy on formats that don&apos;t work.
                   </p>
                 </div>
               </div>
@@ -593,7 +589,7 @@ export default function Home() {
                         {
                           step: "03",
                           title: "Actionable Output",
-                          description: "We deliver 'Post this today' recommendations, 'Avoid this format' warnings, and 'Try this hook style' suggestions—not charts, but actions.",
+                          description: "We deliver &apos;Post this today&apos; recommendations, &apos;Avoid this format&apos; warnings, and &apos;Try this hook style&apos; suggestions—not charts, but actions.",
                         },
                       ].map((item, index) => (
                         <div key={index} className="flex gap-4">
@@ -630,7 +626,7 @@ export default function Home() {
                       <p className={`text-base leading-relaxed ${
                         isDark ? "text-gray-400" : "text-gray-600"
                       }`}>
-                        We don't use global data. Our insights are specifically tuned for Nigerian creators, understanding local context, language, and behavior patterns.
+                        We don&apos;t use global data. Our insights are specifically tuned for Nigerian creators, understanding local context, language, and behavior patterns.
                       </p>
                     </div>
 
@@ -660,7 +656,7 @@ export default function Home() {
                       <p className={`text-base leading-relaxed ${
                         isDark ? "text-gray-400" : "text-gray-600"
                       }`}>
-                        We identify what's about to trend, not what already trended. Get ahead of the curve with predictive insights.
+                        We identify what&apos;s about to trend, not what already trended. Get ahead of the curve with predictive insights.
                       </p>
                     </div>
                   </div>

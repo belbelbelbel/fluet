@@ -254,13 +254,12 @@ export class OptimizedAIGenerator {
       .replace(/^\s*[\*\-\+]\s+/gm, '')     // List markers
       .replace(/\n{3,}/g, '\n\n')           // Multiple newlines
       // Remove emojis (common emoji ranges)
-      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Miscellaneous Symbols and Pictographs
-      .replace(/[\u{2600}-\u{26FF}]/gu, '')  // Miscellaneous Symbols
-      .replace(/[\u{2700}-\u{27BF}]/gu, '')  // Dingbats
-      .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
-      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport and Map Symbols
-      .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
-      .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Supplemental Symbols and Pictographs
+      .replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, '') // Emojis (surrogate pairs)
+      .replace(/[\u2600-\u26FF]/g, '')  // Miscellaneous Symbols
+      .replace(/[\u2700-\u27BF]/g, '')  // Dingbats
+      .replace(/\uD83D[\uDE80-\uDEFF]/g, '') // Transport and Map Symbols
+      .replace(/\uD83C[\uDDE0-\uDDFF]/g, '') // Flags
+      .replace(/\uD83E[\uDD00-\uDDFF]/g, '') // Supplemental Symbols and Pictographs
       .trim();
   }
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+// import { Card, CardContent } from "@/components/ui/card";
 import {
   Copy,
   Save,
@@ -180,7 +180,7 @@ export default function GenerateCaptionPage() {
                   <div className="border-l-4 border-purple-600 pl-4 py-2">
                     <p className="text-sm text-gray-500 mb-1">Hook</p>
                     <p className="text-base text-gray-950 italic leading-relaxed">
-                      "{idea.hookExample}"
+                      &ldquo;{idea.hookExample}&rdquo;
                     </p>
                   </div>
                 </div>

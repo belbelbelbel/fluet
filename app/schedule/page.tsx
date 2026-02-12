@@ -6,20 +6,17 @@ import { Navbar } from "../components/Navbar";
 import { Button } from "@/components/ui/button";
 import { showToast } from "@/lib/toast";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
-import Link from "next/link";
+// import Link from "next/link";
 import {
   TwitterIcon,
   InstagramIcon,
   LinkedinIcon,
   MusicIcon,
   CalendarIcon,
-  ClockIcon,
   TrashIcon,
   EditIcon,
   PlusIcon,
-  CheckIcon,
   XIcon,
-  Bolt,
   Loader2Icon,
 } from "lucide-react";
 

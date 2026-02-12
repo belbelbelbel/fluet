@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+// import { Card, CardContent } from "@/components/ui/card";
 import { 
   UtensilsCrossed, 
   ShoppingBag, 
@@ -110,7 +110,7 @@ export default function OnboardingPage() {
         localStorage.setItem("userNiche", selectedNiche);
         router.push("/dashboard/content-ideas");
       }
-    } catch (error) {
+    } catch {
       // Fallback to localStorage
       localStorage.setItem("userNiche", selectedNiche);
       router.push("/dashboard/content-ideas");

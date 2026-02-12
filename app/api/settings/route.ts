@@ -7,13 +7,13 @@ export async function GET(req: NextRequest) {
   try {
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let userId = authResult?.userId;
+    let userId: string | null | undefined = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!userId) {
       try {
         const user = await currentUser();
-        userId = user?.id || null;
+        userId = user?.id ?? null;
       } catch (userError) {
         console.warn("[Settings API] currentUser() failed:", userError);
       }
@@ -63,13 +63,13 @@ export async function POST(req: NextRequest) {
   try {
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let userId = authResult?.userId;
+    let userId: string | null | undefined = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!userId) {
       try {
         const user = await currentUser();
-        userId = user?.id || null;
+        userId = user?.id ?? null;
       } catch (userError) {
         console.warn("[Settings API] currentUser() failed:", userError);
       }

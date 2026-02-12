@@ -8,24 +8,22 @@ import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
   Trash2,
-  Edit,
   Plus,
   FileText,
   Image as ImageIcon,
   BookOpen,
   Film,
-  CheckCircle2,
   Clock,
 } from "lucide-react";
 import { showToast } from "@/lib/toast";
-import { Format } from "@/lib/content-ideas";
 
-const formatLabels: Record<Format, { label: string; icon: any }> = {
-  text_only: { label: "Text Only", icon: FileText },
-  text_image: { label: "Text + Image", icon: ImageIcon },
-  carousel: { label: "Carousel", icon: BookOpen },
-  video: { label: "Video", icon: Film },
-};
+// Unused - commented out
+// const formatLabels: Record<Format, { label: string; icon: LucideIcon }> = {
+//   text_only: { label: "Text Only", icon: FileText },
+//   text_image: { label: "Text + Image", icon: ImageIcon },
+//   carousel: { label: "Carousel", icon: BookOpen },
+//   video: { label: "Video", icon: Film },
+// };
 
 interface StackItem {
   ideaId: string;
@@ -182,7 +180,7 @@ export default function PostStackPage() {
                             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 sm:mb-2">Hook</p>
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5 sm:p-3">
                               <p className="text-xs sm:text-sm text-gray-950 italic leading-relaxed">
-                                "{item.hookExample}"
+                                &ldquo;{item.hookExample}&rdquo;
                               </p>
                             </div>
                           </div>

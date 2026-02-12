@@ -6,14 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   TrendingUp,
   TrendingDown,
-  FileText,
-  Heart,
-  MessageSquare,
   Bell,
   Search,
   MapPin,
-  Calendar,
-  User,
   MoreVertical,
 } from "lucide-react";
 // Chart component will be created inline
@@ -128,7 +123,7 @@ export default function DashboardPage() {
   });
 
   const userName = user?.firstName || user?.fullName || "User";
-  const userEmail = user?.primaryEmailAddress?.emailAddress || "";
+  // const userEmail = user?.primaryEmailAddress?.emailAddress || "";
 
   // Get current week dates
   const getWeekDates = () => {
@@ -159,7 +154,7 @@ export default function DashboardPage() {
           <div className="flex-1 min-w-0">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-950 truncate">
               Welcome, {userName}
-            </h1>
+          </h1>
             <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">{currentDate}</p>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
@@ -246,7 +241,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
                   <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
                     My social overview
-                  </CardTitle>
+                </CardTitle>
                   <div className="flex items-center gap-2">
                     <select className="flex-1 sm:flex-none text-xs sm:text-sm border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
                       <option>Jul 2024 - Dec 2024</option>
@@ -422,7 +417,7 @@ export default function DashboardPage() {
                       <p className="text-sm sm:text-base font-semibold text-gray-950">
                         Engagement rate (per impression)
                       </p>
-                    </div>
+      </div>
                     <div className="flex items-center gap-3 sm:gap-4">
                       <p className="text-base sm:text-lg font-bold text-gray-950">5.0%</p>
                       <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
@@ -441,8 +436,8 @@ export default function DashboardPage() {
                       <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
                         ▼12.7%
                       </span>
-                    </div>
-                  </div>
+        </div>
+      </div>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm sm:text-base font-semibold text-gray-950">
@@ -494,26 +489,26 @@ export default function DashboardPage() {
                         <p className="text-xs sm:text-sm font-bold text-gray-950 whitespace-nowrap">
                           {geo.rate}%
                         </p>
-                      </div>
+              </div>
                       <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2">
                         <div
                           className="bg-teal-500 h-1.5 sm:h-2 rounded-full"
                           style={{ width: `${geo.rate}%` }}
                         ></div>
-                      </div>
+              </div>
                     </div>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
+            </div>
+          </CardContent>
+        </Card>
 
             {/* My Post Planner */}
             <Card className="bg-white border border-gray-200 rounded-xl">
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
                 <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
                   My post planner
-                </CardTitle>
-              </CardHeader>
+            </CardTitle>
+          </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
                 <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 sm:-mx-6 px-4 sm:px-6">
                   {weekDates.map((date, idx) => (
@@ -528,8 +523,8 @@ export default function DashboardPage() {
                       <div className="text-xs font-medium">{date.day}</div>
                       <div className="text-sm font-semibold mt-1">
                         {date.date}
-                      </div>
-                    </div>
+                  </div>
+                </div>
                   ))}
                 </div>
               </CardContent>
@@ -562,22 +557,22 @@ export default function DashboardPage() {
                           <p className="text-xs text-gray-500">
                             {comment.handle}
                           </p>
-                        </div>
+              </div>
                         <p className="text-xs text-gray-600 mb-0.5 sm:mb-1">
                           {comment.location}
                         </p>
                         <p className="text-xs text-gray-500">
                           {comment.time}
                         </p>
-                      </div>
+                  </div>
                       <MoreVertical className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600 flex-shrink-0" />
-                    </div>
+                </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
+              </div>
+            </div>
       </div>
     </div>
   );

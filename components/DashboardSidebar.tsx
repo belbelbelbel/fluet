@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+// import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuth, useUser, useClerk } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -18,10 +18,6 @@ import {
   Settings,
   Users,
   LogOut,
-  Sparkles,
-  BookOpen,
-  Plug,
-  MapPin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 // Navigation organized into sections

@@ -21,7 +21,6 @@ import {
   XIcon,
   Loader2Icon,
   BriefcaseIcon,
-  ChevronDownIcon,
   PlayIcon,
 } from "lucide-react";
 
@@ -275,10 +274,19 @@ export default function DashboardSchedulePage() {
 
       setIsSubmitting(true);
       try {
+        // Create date from user's local time selection
+        // Note: new Date() with string interprets in local timezone, then toISOString() converts to UTC
+        // This is correct - YouTube API expects UTC times
         const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime}`);
         const now = new Date();
-        // Add buffer for video generation time and clock skew (25 minutes minimum)
-        const minScheduledTime = new Date(now.getTime() + 25 * 60 * 1000); // 25 minutes from now
+        
+        // YouTube requires 15 minutes minimum, but we need 40 minutes to account for:
+        // - Video generation time (15-20 minutes for a 30-min video)
+        // - Timezone differences (Nigeria UTC+1 vs YouTube UTC)
+        // - Clock skew between servers
+        // - Network and processing delays
+        const MINIMUM_MINUTES = 40;
+        const minScheduledTime = new Date(now.getTime() + MINIMUM_MINUTES * 60 * 1000);
         
         if (scheduledDateTime < now) {
           showToast.error("Invalid time", "Scheduled time must be in the future");
@@ -286,13 +294,13 @@ export default function DashboardSchedulePage() {
           return;
         }
         
-        // YouTube requires scheduled videos to be at least 15 minutes in the future
-        // We use 25 minutes to account for video generation time, clock skew, and processing delays
+        // Check if scheduled time meets the minimum requirement
         if (scheduledDateTime < minScheduledTime) {
           const minTimeStr = minScheduledTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const minutesUntilMin = Math.round((minScheduledTime.getTime() - now.getTime()) / 60000);
           showToast.error(
             "Invalid scheduled time", 
-            `YouTube requires scheduled videos to be at least 15 minutes in the future. Video generation takes time, so please schedule for ${minTimeStr} or later (25+ minutes recommended).`
+            `YouTube requires scheduled videos to be at least 15 minutes in the future. However, video generation takes 15-20 minutes, and we need to account for timezone differences. Please schedule for at least ${minutesUntilMin} minutes from now (${minTimeStr} or later).`
           );
           setIsSubmitting(false);
           return;
@@ -340,9 +348,9 @@ export default function DashboardSchedulePage() {
           const error = await response.json();
           showToast.error("Failed to schedule video", error.error || error.details || "Please try again");
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error scheduling YouTube video:", error);
-        showToast.error("Failed to schedule", error.message || "An error occurred. Please try again.");
+        showToast.error("Failed to schedule", error instanceof Error ? error.message : "An error occurred. Please try again.");
       } finally {
         setIsSubmitting(false);
       }
@@ -438,7 +446,12 @@ export default function DashboardSchedulePage() {
     setDeleteConfirm({ open: false, id: null });
 
     try {
-      const url = `/api/schedule?id=${id}${userId ? `&userId=${userId}` : ''}`;
+      if (!userId) {
+        showToast.error("Authentication required", "Please sign in to delete posts");
+        return;
+      }
+      
+      const url = `/api/schedule?id=${id}&userId=${userId}`;
       const response = await fetch(url, {
         method: "DELETE",
         credentials: "include",
@@ -499,39 +512,40 @@ export default function DashboardSchedulePage() {
   );
 
 
-  const getPlatformColor = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case "twitter":
-        return "bg-gray-50 border-gray-200 text-gray-950";
-      case "instagram":
-        return "bg-pink-50 border-pink-200 text-pink-900";
-      case "linkedin":
-        return "bg-blue-50 border-blue-200 text-blue-900";
-      case "tiktok":
-        return "bg-gray-50 border-gray-200 text-gray-950";
-      case "youtube":
-        return "bg-red-50 border-red-200 text-red-900";
-      default:
-        return "bg-gray-50 border-gray-200 text-gray-950";
-    }
-  };
+  // Unused functions - commented out
+  // const getPlatformColor = (platform: string) => {
+  //   switch (platform.toLowerCase()) {
+  //     case "twitter":
+  //       return "bg-gray-50 border-gray-200 text-gray-950";
+  //     case "instagram":
+  //       return "bg-pink-50 border-pink-200 text-pink-900";
+  //     case "linkedin":
+  //       return "bg-blue-50 border-blue-200 text-blue-900";
+  //     case "tiktok":
+  //       return "bg-gray-50 border-gray-200 text-gray-950";
+  //     case "youtube":
+  //       return "bg-red-50 border-red-200 text-red-900";
+  //     default:
+  //       return "bg-gray-50 border-gray-200 text-gray-950";
+  //   }
+  // };
 
-  const getPlatformIconBg = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case "twitter":
-        return "bg-black";
-      case "instagram":
-        return "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500";
-      case "linkedin":
-        return "bg-blue-600";
-      case "tiktok":
-        return "bg-black";
-      case "youtube":
-        return "bg-red-600";
-      default:
-        return "bg-gray-500";
-    }
-  };
+  // const getPlatformIconBg = (platform: string) => {
+  //   switch (platform.toLowerCase()) {
+  //     case "twitter":
+  //       return "bg-black";
+  //     case "instagram":
+  //       return "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500";
+  //     case "linkedin":
+  //       return "bg-blue-600";
+  //     case "tiktok":
+  //       return "bg-black";
+  //     case "youtube":
+  //       return "bg-red-600";
+  //     default:
+  //       return "bg-gray-500";
+  //   }
+  // };
 
   return (
     <div className="space-y-8 pt-8 max-w-5xl mx-auto">
@@ -707,10 +721,10 @@ export default function DashboardSchedulePage() {
                           </p>
                         ) : (
                           <pre className="whitespace-pre-wrap text-gray-900 text-sm leading-relaxed line-clamp-2">
-                            {post.content}
-                          </pre>
+                        {post.content}
+                      </pre>
                         )}
-                      </div>
+                    </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -751,8 +765,8 @@ export default function DashboardSchedulePage() {
                         </p>
                       ) : (
                         <pre className="whitespace-pre-wrap text-gray-700 text-xs leading-relaxed line-clamp-2">
-                          {post.content}
-                        </pre>
+                      {post.content}
+                    </pre>
                       )}
                     </CardContent>
                   </Card>
@@ -882,7 +896,7 @@ export default function DashboardSchedulePage() {
                       <label className="block text-xs font-semibold text-gray-700 mb-2">Content Type</label>
                       <select
                         value={youtubeContentType}
-                        onChange={(e) => setYoutubeContentType(e.target.value as any)}
+                        onChange={(e) => setYoutubeContentType(e.target.value as "rain_sounds" | "sleep_sounds" | "ambient_sounds" | "white_noise")}
                         className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                       >
                         <option value="rain_sounds">Rain Sounds</option>
@@ -910,7 +924,7 @@ export default function DashboardSchedulePage() {
                       <label className="block text-xs font-semibold text-gray-700 mb-2">Quality</label>
                       <select
                         value={youtubeQuality}
-                        onChange={(e) => setYoutubeQuality(e.target.value as any)}
+                        onChange={(e) => setYoutubeQuality(e.target.value as "high" | "medium" | "low")}
                         className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                       >
                         <option value="high">High</option>
@@ -923,7 +937,7 @@ export default function DashboardSchedulePage() {
                       <label className="block text-xs font-semibold text-gray-700 mb-2">Privacy</label>
                       <select
                         value={youtubePrivacy}
-                        onChange={(e) => setYoutubePrivacy(e.target.value as any)}
+                        onChange={(e) => setYoutubePrivacy(e.target.value as "public" | "unlisted" | "private")}
                         className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                       >
                         <option value="public">Public</option>
@@ -936,19 +950,19 @@ export default function DashboardSchedulePage() {
               ) : (
                 /* Regular Text Content Form */
                 <>
-                  <div>
+              <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-2">Content</label>
-                    <textarea
-                      value={selectedContent}
-                      onChange={(e) => setSelectedContent(e.target.value)}
-                      placeholder="Paste or type your content here..."
+                <textarea
+                  value={selectedContent}
+                  onChange={(e) => setSelectedContent(e.target.value)}
+                  placeholder="Paste or type your content here..."
                       className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 resize-none text-sm"
-                      rows={6}
-                    />
+                  rows={6}
+                />
                     <div className="mt-1.5 text-xs text-gray-500 text-right">
-                      {selectedContent.length} chars
-                    </div>
-                  </div>
+                  {selectedContent.length} chars
+                </div>
+              </div>
                 </>
               )}
 
@@ -967,7 +981,7 @@ export default function DashboardSchedulePage() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                     Time
                     {selectedPlatform === "youtube" && scheduledDate === getTodayDate() && (
-                      <span className="text-gray-500 font-normal ml-1">(min 25 min from now)</span>
+                      <span className="text-gray-500 font-normal ml-1">(min 40 min from now)</span>
                     )}
                   </label>
                   <input
@@ -975,12 +989,16 @@ export default function DashboardSchedulePage() {
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
                     min={scheduledDate === getTodayDate() ? (() => {
-                      // For YouTube, require 15 minutes minimum. For other platforms, 1 minute is fine
+                      // For YouTube, require 40 minutes minimum to account for:
+                      // - Video generation time (15-20 minutes)
+                      // - Timezone differences (Nigeria UTC+1 vs YouTube UTC)
+                      // - Clock skew and processing delays
+                      // For other platforms, 1 minute is fine
                       if (selectedPlatform === "youtube") {
                         const now = new Date();
-                        now.setMinutes(now.getMinutes() + 15);
-                        const hours = String(now.getHours()).padStart(2, '0');
-                        const minutes = String(now.getMinutes()).padStart(2, '0');
+                        const minTime = new Date(now.getTime() + 40 * 60 * 1000); // 40 minutes from now
+                        const hours = String(minTime.getHours()).padStart(2, '0');
+                        const minutes = String(minTime.getMinutes()).padStart(2, '0');
                         return `${hours}:${minutes}`;
                       }
                       return getMinTimeForToday();
@@ -989,7 +1007,7 @@ export default function DashboardSchedulePage() {
                   />
                   {selectedPlatform === "youtube" && scheduledDate === getTodayDate() && (
                     <p className="text-xs text-gray-500 mt-1">
-                      YouTube requires scheduled videos to be at least 15 minutes in the future. We recommend 25+ minutes to account for video generation time.
+                      YouTube requires scheduled videos to be at least 15 minutes in the future. We require 40+ minutes to account for video generation time (15-20 min), timezone differences, and processing delays.
                     </p>
                   )}
                 </div>

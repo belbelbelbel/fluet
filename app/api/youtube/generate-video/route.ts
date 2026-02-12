@@ -41,12 +41,12 @@ export async function POST(req: Request) {
 
     // Authentication
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId;
+    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
 
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
+        clerkUserId = user?.id ?? null;
       } catch (error) {
         console.warn("currentUser() failed:", error);
       }

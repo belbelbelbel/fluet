@@ -100,11 +100,11 @@ export function errorProgress(jobId: string, message: string): void {
  */
 export function cleanupOldProgress(): void {
   const oneHourAgo = Date.now() - 60 * 60 * 1000;
-  for (const [jobId, progress] of progressStore.entries()) {
+  progressStore.forEach((progress, jobId) => {
     if (progress.updatedAt < oneHourAgo) {
       progressStore.delete(jobId);
     }
-  }
+  });
 }
 
 // Cleanup every 30 minutes

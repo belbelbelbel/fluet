@@ -70,7 +70,7 @@ export function PricingSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedProvider, setSelectedProvider] = useState<PaymentProvider | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  // const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showPaymentOptions, setShowPaymentOptions] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [userCount, setUserCount] = useState(1);
@@ -98,7 +98,7 @@ export function PricingSection() {
       return;
     }
     setShowPaymentOptions(priceId);
-    setSelectedPlan(priceId);
+    // setSelectedPlan(priceId); // Unused - commented out
     setSelectedProvider(null);
     setError(null);
   }, [isSignedIn]);
@@ -164,7 +164,7 @@ export function PricingSection() {
       setTimeout(() => setError(null), 5000);
     } finally {
       setIsLoading(false);
-      setSelectedPlan(null);
+      // setSelectedPlan(null); // Unused - commented out
       setShowPaymentOptions(null);
       setSelectedProvider(null);
     }
@@ -172,7 +172,7 @@ export function PricingSection() {
 
   const handleCancel = useCallback(() => {
     setShowPaymentOptions(null);
-    setSelectedPlan(null);
+    // setSelectedPlan(null); // Unused - commented out
     setSelectedProvider(null);
   }, []);
 

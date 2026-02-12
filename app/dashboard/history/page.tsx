@@ -123,12 +123,18 @@ export default function DashboardHistoryPage() {
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteConfirm.id) return;
+    
+    if (!userId) {
+      showToast.error("Authentication required", "Please sign in to delete content");
+      setDeleteConfirm({ open: false, id: null });
+      return;
+    }
 
     const id = deleteConfirm.id;
     setDeleteConfirm({ open: false, id: null });
 
     try {
-      const response = await fetch(`/api/content/${id}`, {
+      const response = await fetch(`/api/content/${id}?userId=${userId}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
@@ -149,7 +155,7 @@ export default function DashboardHistoryPage() {
       console.error("Error deleting content:", error);
       showToast.error("Failed to delete", "An error occurred while deleting the content");
     }
-  }, [deleteConfirm.id]);
+  }, [deleteConfirm.id, userId]);
 
   const handleSchedule = useCallback((item: GeneratedContent) => {
     router.push(`/dashboard/schedule?content=${encodeURIComponent(item.content)}&platform=${item.contentType}`);

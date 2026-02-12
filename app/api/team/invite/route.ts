@@ -12,13 +12,13 @@ export async function POST(req: NextRequest) {
 
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId;
+    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
+        clerkUserId = user?.id ?? null;
       } catch (userError) {
         console.warn("currentUser() failed:", userError);
       }

@@ -8,12 +8,12 @@ export async function GET() {
   try {
     // Get authentication
     const authResult = await auth();
-    let clerkUserId = authResult?.userId;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
+        clerkUserId = user?.id ?? null;
       } catch (error) {
         console.warn("currentUser() failed:", error);
       }

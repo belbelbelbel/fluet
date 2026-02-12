@@ -12,18 +12,27 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
+    // Parse query params to get client userId as fallback
+    const { searchParams } = new URL(req.url);
+    const clientUserId = searchParams.get("userId");
+    
     // Try multiple methods to get the user ID (same pattern as other routes)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId;
+    let clerkUserId: string | null | undefined = authResult?.userId ?? null;
     
     // If auth() didn't work, try currentUser()
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
+        clerkUserId = user?.id ?? null;
       } catch (userError) {
         console.warn("currentUser() failed:", userError);
       }
+    }
+    
+    // Use clientUserId as final fallback if provided
+    if (!clerkUserId && clientUserId) {
+      clerkUserId = clientUserId;
     }
 
     if (!clerkUserId) {

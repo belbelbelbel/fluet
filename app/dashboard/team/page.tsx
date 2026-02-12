@@ -94,7 +94,7 @@ export default function TeamPage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         showToast.success("Invitation sent", `Invitation sent to ${inviteEmail}`);
         setInviteEmail("");
         setShowInviteModal(false);
@@ -104,7 +104,7 @@ export default function TeamPage() {
         const errorMessage = errorData.error || "Failed to send invitation. Please try again.";
         showToast.error("Invitation failed", errorMessage);
       }
-    } catch (error) {
+    } catch {
       showToast.error("Error", "Failed to send invitation. Please try again.");
     }
   };
@@ -133,7 +133,7 @@ export default function TeamPage() {
         const errorMessage = errorData.error || "Failed to remove member";
         showToast.error("Failed to remove member", errorMessage);
       }
-    } catch (error) {
+    } catch {
       showToast.error("Error", "Failed to remove team member");
     }
   };

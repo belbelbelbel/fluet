@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
@@ -107,16 +107,16 @@ export async function POST(request: Request) {
       channelId: accountId,
       channelName: accountUsername,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("YouTube callback error:", error);
     console.error("Error details:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined,
     });
     
     // Provide more helpful error messages
-    let errorMessage = error?.message || "Failed to connect YouTube";
+    let errorMessage = error instanceof Error ? error.message : "Failed to connect YouTube";
     
     if (errorMessage.includes("linked_accounts table does not exist")) {
       errorMessage = "Database table missing. Please contact support or try again later.";
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { 
         error: errorMessage,
-        details: process.env.NODE_ENV === "development" ? error?.stack : undefined
+        details: process.env.NODE_ENV === "development" && error instanceof Error ? error.stack : undefined
       },
       { status: 500 }
     );

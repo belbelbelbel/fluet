@@ -3,19 +3,13 @@
 import { useAuth } from "@clerk/nextjs";
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Settings,
   Bot,
   Brain,
   Check,
-  Globe,
-  Bell,
-  Shield,
-  Palette,
   Save,
   Loader2,
   ChevronDown,
@@ -551,9 +545,9 @@ export default function SettingsPage() {
                             const data = await response.json();
                             throw new Error(data.error || "Failed to disconnect");
                           }
-                        } catch (error: any) {
+                        } catch (error: unknown) {
                           console.error("Disconnect error:", error);
-                          showToast.error("Disconnect failed", error.message || "Failed to disconnect YouTube");
+                          showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect YouTube");
                         }
                       }}
                       className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"

@@ -64,12 +64,12 @@ export async function POST(req: Request) {
 
     // Authentication
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId;
+    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
 
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
+        clerkUserId = user?.id ?? null;
       } catch (error) {
         console.warn("currentUser() failed:", error);
       }
@@ -211,10 +211,15 @@ export async function POST(req: Request) {
     
     // Validate scheduled publish time (YouTube requires at least 15 minutes in the future)
     // IMPORTANT: Recalculate right before upload since video generation can take a long time
-    // Use 30-minute buffer to account for clock skew, processing delays, and network latency
+    // Use 40-minute buffer to account for:
+    // - Video generation time (~18-20 minutes for 30-min video)
+    // - Clock skew between servers (can be 1-2 minutes)
+    // - Timezone interpretation differences (Nigeria UTC+1, YouTube UTC)
+    // - Network latency and processing delays
     let validScheduledPublishTime: string | undefined = scheduledPublishTime;
     
     if (scheduledPublishTime) {
+      // Parse the scheduled time - ensure it's treated as UTC
       const scheduledDate = new Date(scheduledPublishTime);
       const now = new Date();
       
@@ -223,36 +228,29 @@ export async function POST(req: Request) {
         console.error(`[Generate & Upload] ❌ Invalid scheduled date: ${scheduledPublishTime}`);
         validScheduledPublishTime = undefined; // Don't send invalid date
       } else {
-        // Use 30 minutes buffer to account for clock skew and processing delays
-        const minScheduledTime = new Date(now.getTime() + 30 * 60 * 1000); // 30 minutes from NOW
+        // Use 40 minutes buffer to account for all delays and timezone issues
+        // This ensures YouTube's 15-minute minimum is always met even with:
+        // - Long video generation times
+        // - Timezone differences (Nigeria UTC+1 vs YouTube UTC)
+        // - Clock skew between servers
+        const SAFETY_BUFFER_MINUTES = 40;
+        const minScheduledTime = new Date(now.getTime() + SAFETY_BUFFER_MINUTES * 60 * 1000);
         
         const minutesUntilScheduled = Math.round((scheduledDate.getTime() - now.getTime()) / 60000);
         
-        console.log(`[Generate & Upload] 🔍 Validation check:`);
-        console.log(`[Generate & Upload]   - Original scheduled time: ${scheduledPublishTime}`);
-        console.log(`[Generate & Upload]   - Current server time: ${now.toISOString()}`);
+        console.log(`[Generate & Upload] 🔍 Validation check (UTC times):`);
+        console.log(`[Generate & Upload]   - Original scheduled time (UTC): ${scheduledPublishTime}`);
+        console.log(`[Generate & Upload]   - Current server time (UTC): ${now.toISOString()}`);
         console.log(`[Generate & Upload]   - Minutes until scheduled: ${minutesUntilScheduled}`);
-        console.log(`[Generate & Upload]   - Minimum required: 30 minutes`);
+        console.log(`[Generate & Upload]   - Minimum required: ${SAFETY_BUFFER_MINUTES} minutes (accounts for generation + timezone + clock skew)`);
         
-        // Always ensure it's at least 30 minutes away
-        if (minutesUntilScheduled < 30) {
+        // Always ensure it's at least SAFETY_BUFFER_MINUTES away
+        if (minutesUntilScheduled < SAFETY_BUFFER_MINUTES) {
           validScheduledPublishTime = minScheduledTime.toISOString();
           const newMinutesAway = Math.round((minScheduledTime.getTime() - now.getTime()) / 60000);
           console.log(`[Generate & Upload] ⚠️  ADJUSTED: ${scheduledPublishTime} (${minutesUntilScheduled} min) → ${validScheduledPublishTime} (${newMinutesAway} min)`);
         } else {
           console.log(`[Generate & Upload] ✅ VALID: ${scheduledPublishTime} (${minutesUntilScheduled} minutes away)`);
-        }
-        
-        // Final check - recalculate one more time right before logging
-        const finalCheck = new Date();
-        const finalMinutesAway = Math.round((new Date(validScheduledPublishTime).getTime() - finalCheck.getTime()) / 60000);
-        console.log(`[Generate & Upload] 📤 FINAL: Sending publishAt="${validScheduledPublishTime}" to YouTube (${finalMinutesAway} minutes from now)`);
-        
-        if (finalMinutesAway < 15) {
-          console.error(`[Generate & Upload] ❌ CRITICAL: Time is only ${finalMinutesAway} minutes away! Adjusting again...`);
-          const emergencyAdjust = new Date(finalCheck.getTime() + 30 * 60 * 1000);
-          validScheduledPublishTime = emergencyAdjust.toISOString();
-          console.log(`[Generate & Upload] 🚨 EMERGENCY ADJUST: ${validScheduledPublishTime}`);
         }
       }
     } else {
@@ -285,20 +283,35 @@ export async function POST(req: Request) {
     }
     
     // Final validation right before upload - double check the time is still valid
+    // This is critical because video generation can take 15-20 minutes, and we need to
+    // ensure the scheduled time is still valid from YouTube's perspective
     if (validScheduledPublishTime) {
       const finalNow = new Date();
       const finalScheduled = new Date(validScheduledPublishTime);
       const finalMinutesAway = Math.round((finalScheduled.getTime() - finalNow.getTime()) / 60000);
       
-      console.log(`[Generate & Upload] 🔍 PRE-UPLOAD CHECK:`);
-      console.log(`[Generate & Upload]   - Time to send: ${validScheduledPublishTime}`);
-      console.log(`[Generate & Upload]   - Current time: ${finalNow.toISOString()}`);
-      console.log(`[Generate & Upload]   - Minutes away: ${finalMinutesAway}`);
+      // YouTube's absolute minimum is 15 minutes, but we use 40 minutes to be safe
+      const ABSOLUTE_MINIMUM = 15; // YouTube's hard requirement
+      const SAFE_MINIMUM = 40; // Our safety buffer
       
-      if (finalMinutesAway < 30) {
-        const emergencyTime = new Date(finalNow.getTime() + 30 * 60 * 1000);
+      console.log(`[Generate & Upload] 🔍 PRE-UPLOAD CHECK (after video generation):`);
+      console.log(`[Generate & Upload]   - Time to send to YouTube (UTC): ${validScheduledPublishTime}`);
+      console.log(`[Generate & Upload]   - Current server time (UTC): ${finalNow.toISOString()}`);
+      console.log(`[Generate & Upload]   - Minutes away: ${finalMinutesAway}`);
+      console.log(`[Generate & Upload]   - YouTube minimum: ${ABSOLUTE_MINIMUM} min, Our safe minimum: ${SAFE_MINIMUM} min`);
+      
+      if (finalMinutesAway < SAFE_MINIMUM) {
+        const emergencyTime = new Date(finalNow.getTime() + SAFE_MINIMUM * 60 * 1000);
         validScheduledPublishTime = emergencyTime.toISOString();
-        console.log(`[Generate & Upload] 🚨 EMERGENCY: Time was only ${finalMinutesAway} min away! Adjusted to ${validScheduledPublishTime}`);
+        const newMinutesAway = Math.round((emergencyTime.getTime() - finalNow.getTime()) / 60000);
+        console.log(`[Generate & Upload] 🚨 EMERGENCY ADJUST: Time was only ${finalMinutesAway} min away! Adjusted to ${validScheduledPublishTime} (${newMinutesAway} min away)`);
+      } else if (finalMinutesAway < ABSOLUTE_MINIMUM) {
+        // This should never happen, but if it does, we MUST adjust
+        const emergencyTime = new Date(finalNow.getTime() + ABSOLUTE_MINIMUM * 60 * 1000);
+        validScheduledPublishTime = emergencyTime.toISOString();
+        console.log(`[Generate & Upload] 🚨 CRITICAL: Time was below YouTube's 15-min minimum! Adjusted to ${validScheduledPublishTime}`);
+      } else {
+        console.log(`[Generate & Upload] ✅ FINAL VALIDATION PASSED: ${finalMinutesAway} minutes away (safe)`);
       }
     }
     

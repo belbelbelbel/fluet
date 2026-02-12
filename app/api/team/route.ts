@@ -4,17 +4,17 @@ import { GetUserByClerkId } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     // Get authentication from Clerk - try multiple methods
     const authResult = await auth();
-    let clerkUserId = authResult?.userId;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
       try {
         const user = await currentUser();
-        clerkUserId = user?.id || null;
+        clerkUserId = user?.id ?? null;
       } catch (userError) {
         console.warn("[Team API] currentUser() failed:", userError);
       }
