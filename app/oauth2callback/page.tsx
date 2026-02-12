@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Twitter, PlayIcon } from "lucide-react";
 
 function OAuthCallbackContent() {
   const router = useRouter();
@@ -13,10 +13,17 @@ function OAuthCallbackContent() {
   const { userId } = useAuth();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
+  const [platform, setPlatform] = useState<"youtube" | "twitter">("youtube");
 
   useEffect(() => {
     const code = searchParams.get("code");
     const error = searchParams.get("error");
+    const state = searchParams.get("state");
+
+    // Detect platform from state or default to YouTube
+    if (state?.includes("twitter")) {
+      setPlatform("twitter");
+    }
 
     if (error) {
       setStatus("error");
@@ -32,17 +39,20 @@ function OAuthCallbackContent() {
 
     if (!userId) {
       setStatus("error");
-      setMessage("Please sign in to connect YouTube");
+      setMessage(`Please sign in to connect ${platform === "twitter" ? "Twitter" : "YouTube"}`);
       return;
     }
 
     // Exchange code for tokens
     handleTokenExchange(code);
-  }, [searchParams, userId]);
+  }, [searchParams, userId, platform]);
 
   const handleTokenExchange = async (code: string) => {
     try {
-      const response = await fetch("/api/youtube/callback", {
+      const endpoint = platform === "twitter" ? "/api/twitter/callback" : "/api/youtube/callback";
+      const platformName = platform === "twitter" ? "Twitter" : "YouTube";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,11 +64,11 @@ function OAuthCallbackContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to exchange token");
+        throw new Error(data.error || `Failed to exchange token`);
       }
 
       setStatus("success");
-      setMessage("YouTube connected successfully!");
+      setMessage(`${platformName} connected successfully!`);
       
       // Redirect to settings or dashboard after 2 seconds
       setTimeout(() => {
@@ -67,7 +77,8 @@ function OAuthCallbackContent() {
     } catch (error: unknown) {
       console.error("Token exchange error:", error);
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : "Failed to connect YouTube");
+      const platformName = platform === "twitter" ? "Twitter" : "YouTube";
+      setMessage(error instanceof Error ? error.message : `Failed to connect ${platformName}`);
     }
   };
 
@@ -79,10 +90,10 @@ function OAuthCallbackContent() {
             <>
               <Loader2 className="w-12 h-12 text-gray-950 animate-spin mx-auto mb-4" />
               <h2 className="text-xl font-bold text-gray-950 mb-2">
-                Connecting YouTube...
+                Connecting {platform === "twitter" ? "Twitter" : "YouTube"}...
               </h2>
               <p className="text-gray-600">
-                Please wait while we connect your YouTube account
+                Please wait while we connect your {platform === "twitter" ? "Twitter" : "YouTube"} account
               </p>
             </>
           )}
@@ -91,7 +102,7 @@ function OAuthCallbackContent() {
             <>
               <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-gray-950 mb-2">
-                YouTube Connected!
+                {platform === "twitter" ? "Twitter" : "YouTube"} Connected!
               </h2>
               <p className="text-gray-600 mb-4">{message}</p>
               <p className="text-sm text-gray-500">

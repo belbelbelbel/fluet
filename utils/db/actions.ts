@@ -481,3 +481,51 @@ export const DisconnectLinkedAccount = async (
         throw new Error("Failed to disconnect account");
     }
 };
+
+// Scheduled Posts Actions
+
+/**
+ * Get all scheduled posts that are due to be posted
+ * (scheduledFor <= now AND posted = false)
+ */
+export const GetPendingScheduledPosts = async () => {
+    try {
+        const now = new Date();
+        const posts = await db
+            .select()
+            .from(ScheduledPosts)
+            .where(
+                and(
+                    lte(ScheduledPosts.scheduledFor, now),
+                    eq(ScheduledPosts.posted, false)
+                )
+            )
+            .orderBy(ScheduledPosts.scheduledFor)
+            .execute();
+        return posts;
+    } catch (error) {
+        console.error(`[GetPendingScheduledPosts] Error encountered:`, error);
+        throw new Error("Failed to get pending scheduled posts");
+    }
+};
+
+/**
+ * Mark a scheduled post as posted
+ */
+export const MarkScheduledPostAsPosted = async (postId: number) => {
+    try {
+        const [updated] = await db
+            .update(ScheduledPosts)
+            .set({
+                posted: true,
+                postedAt: new Date(),
+            })
+            .where(eq(ScheduledPosts.id, postId))
+            .returning()
+            .execute();
+        return updated;
+    } catch (error) {
+        console.error(`[MarkScheduledPostAsPosted] Error encountered:`, error);
+        throw new Error("Failed to mark post as posted");
+    }
+};

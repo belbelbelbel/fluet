@@ -17,6 +17,7 @@ import {
   LinkIcon,
   Cpu,
   Code,
+  Twitter,
 } from "lucide-react";
 import { showToast } from "@/lib/toast";
 import { Niche } from "@/lib/content-ideas";
@@ -154,6 +155,7 @@ interface UserSettings {
   theme: "dark" | "light" | "system";
   niche?: Niche;
   youtubeConnected?: boolean;
+  twitterConnected?: boolean;
 }
 
 export default function SettingsPage() {
@@ -166,6 +168,7 @@ export default function SettingsPage() {
     theme: currentTheme,
     niche: (localStorage.getItem("userNiche") as Niche) || undefined,
     youtubeConnected: false, // Will be checked from database/API
+    twitterConnected: false, // Will be checked from database/API
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -181,6 +184,18 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error("Error checking YouTube connection:", error);
+    }
+  };
+
+  const checkTwitterConnection = async () => {
+    try {
+      const response = await fetch(`/api/twitter/status${userId ? `?userId=${userId}` : ''}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(prev => ({ ...prev, twitterConnected: data.connected }));
+      }
+    } catch (error) {
+      console.error("Error checking Twitter connection:", error);
     }
   };
 
@@ -220,6 +235,7 @@ export default function SettingsPage() {
     if (userId) {
       fetchSettings();
       checkYouTubeConnection();
+      checkTwitterConnection();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
@@ -585,6 +601,98 @@ export default function SettingsPage() {
                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-sm text-green-800 break-words">
                     ✅ Your YouTube account is connected. You can now schedule and upload videos automatically.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Twitter Integration */}
+          <div className="bg-white border border-gray-200 rounded-lg">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-950 mb-1">Twitter Integration</h2>
+              <p className="text-sm text-gray-600">
+                Connect your Twitter account to enable automated tweet scheduling and posting
+              </p>
+            </div>
+            <div className="p-4 sm:p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center flex-shrink-0">
+                    <Twitter className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-950 mb-1">Twitter Account</h3>
+                    <p className="text-sm text-gray-600 break-words">
+                      {settings.twitterConnected 
+                        ? "Connected - Ready for automated posting"
+                        : "Not connected - Click to connect your Twitter account"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  {settings.twitterConnected && (
+                    <Button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch("/api/twitter/disconnect", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            credentials: "include",
+                            body: JSON.stringify({ userId }),
+                          });
+
+                          if (response.ok) {
+                            setSettings(prev => ({ ...prev, twitterConnected: false }));
+                            // Refresh connection status to ensure UI is updated
+                            await checkTwitterConnection();
+                            showToast.success("Twitter disconnected", "Your Twitter account has been disconnected");
+                          } else {
+                            const data = await response.json();
+                            throw new Error(data.error || "Failed to disconnect");
+                          }
+                        } catch (error: unknown) {
+                          console.error("Disconnect error:", error);
+                          showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect Twitter");
+                        }
+                      }}
+                      className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
+                    >
+                      <LinkIcon className="w-4 h-4 mr-2" />
+                      Disconnect
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => {
+                      // Redirect to OAuth flow
+                      window.location.href = "/api/twitter/auth";
+                    }}
+                    className={`w-full sm:w-auto flex-shrink-0 ${
+                      settings.twitterConnected
+                        ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                        : "bg-sky-500 hover:bg-sky-600 text-white"
+                    }`}
+                  >
+                    {settings.twitterConnected ? (
+                      <>
+                        <LinkIcon className="w-4 h-4 mr-2" />
+                        Reconnect
+                      </>
+                    ) : (
+                      <>
+                        <Twitter className="w-4 h-4 mr-2" />
+                        Connect Twitter
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+              {settings.twitterConnected && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800 break-words">
+                    ✅ Your Twitter account is connected. You can now schedule and post tweets automatically.
                   </p>
                 </div>
               )}

@@ -26,6 +26,32 @@ const nunito = localFont({
 export const metadata: Metadata = {
   title: "Flippr AI — Flip Between Platforms, Create Content Instantly",
   description: "Flip seamlessly between Twitter, Instagram, LinkedIn, and TikTok. Create engaging AI-powered content for all your social platforms in seconds.",
+  openGraph: {
+    title: "Flippr AI — Flip Between Platforms, Create Content Instantly",
+    description: "Flip seamlessly between Twitter, Instagram, LinkedIn, and TikTok. Create engaging AI-powered content for all your social platforms in seconds.",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://fluet.vercel.app",
+    siteName: "Flippr AI",
+    images: [
+      {
+        url: "/images/logo.png", // Your logo for social sharing
+        width: 1200,
+        height: 630,
+        alt: "Flippr AI Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Flippr AI — Flip Between Platforms, Create Content Instantly",
+    description: "Flip seamlessly between Twitter, Instagram, LinkedIn, and TikTok. Create engaging AI-powered content for all your social platforms in seconds.",
+    images: ["/images/logo.png"], // Your logo for Twitter cards
+  },
+  icons: {
+    icon: "/images/logo.png", // Favicon
+    apple: "/images/logo.png", // Apple touch icon
+  },
 };
 
 export default function RootLayout({

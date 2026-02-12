@@ -10,6 +10,7 @@ import {
   Search,
   MapPin,
   MoreVertical,
+  Loader2,
 } from "lucide-react";
 // Chart component will be created inline
 
@@ -64,8 +65,8 @@ const commentsData = [
 ];
 
 export default function DashboardPage() {
-  const { userId } = useAuth();
-  const { user } = useUser();
+  const { userId, isLoaded: authLoaded } = useAuth();
+  const { user, isLoaded: userLoaded } = useUser();
   const [stats, setStats] = useState<DashboardStats>({
     totalContent: 224,
     scheduledPosts: 12,
@@ -74,7 +75,7 @@ export default function DashboardPage() {
     engagementRate: 8,
     topPlatform: "Instagram",
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchDashboardStats = useCallback(async () => {
     if (!userId) {
@@ -108,12 +109,18 @@ export default function DashboardPage() {
   }, [userId]);
 
   useEffect(() => {
+    // Wait for auth to load first
+    if (!authLoaded || !userLoaded) {
+      setLoading(true);
+      return;
+    }
+
     if (userId) {
       fetchDashboardStats();
     } else {
       setLoading(false);
     }
-  }, [userId, fetchDashboardStats]);
+  }, [userId, authLoaded, userLoaded, fetchDashboardStats]);
 
   const currentDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -145,6 +152,23 @@ export default function DashboardPage() {
   };
 
   const weekDates = getWeekDates();
+
+  // Show loading state
+  if (loading || !authLoaded || !userLoaded) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <Loader2 className="w-12 h-12 text-gray-950 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-950 mb-2">
+            Loading Dashboard...
+          </h2>
+          <p className="text-gray-600">
+            Please wait while we load your dashboard data
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white max-w-8xl mx-auto">
