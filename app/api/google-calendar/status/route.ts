@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { GetUserByClerkId, GetLinkedAccount, SaveOrUpdateLinkedAccount } from "@/utils/db/actions";
 import { verifyGoogleCalendarToken } from "@/utils/google-calendar/events";
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
  * GET /api/google-calendar/status
  * Check if user has Google Calendar connected
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const authResult = await auth();
     const clerkUserId: string | null | undefined = authResult?.userId ?? null;
@@ -53,10 +53,10 @@ export async function GET(req: NextRequest) {
         await SaveOrUpdateLinkedAccount({
           userId: user.id,
           platform: "google_calendar",
-          accountId: null,
-          accountUsername: null,
+          accountId: undefined, // Google Calendar doesn't need account ID
+          accountUsername: undefined,
           accessToken: newTokens.access_token,
-          refreshToken: googleAccount.refreshToken, // Keep the refresh token
+          refreshToken: googleAccount.refreshToken || "", // Keep the refresh token
           tokenExpiresAt: new Date(Date.now() + newTokens.expires_in * 1000),
           isActive: true,
         });

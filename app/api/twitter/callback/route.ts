@@ -3,7 +3,7 @@
  * Exchanges authorization code for access token and saves to database
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { exchangeCodeForTokens, getTwitterConfig } from "@/utils/twitter/oauth";
 import { GetUserByClerkId, SaveOrUpdateLinkedAccount } from "@/utils/db/actions";

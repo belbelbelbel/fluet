@@ -33,7 +33,7 @@ export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalPr
       await navigator.clipboard.writeText(post.content);
       setCopied(true);
       showToast.success("Copied!", "Content copied to clipboard");
-    } catch (error) {
+    } catch {
       showToast.error("Failed to copy", "Please try again");
     }
   };
@@ -124,8 +124,8 @@ export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalPr
               How to Post:
             </h3>
             <ol className="text-sm text-purple-800 space-y-1 list-decimal list-inside">
-              <li>Click "Copy" to copy your content</li>
-              <li>Click "Open {getPlatformName(post.platform)}" to go to the platform</li>
+              <li>Click &quot;Copy&quot; to copy your content</li>
+              <li>Click &quot;Open {getPlatformName(post.platform)}&quot; to go to the platform</li>
               <li>Paste your content and post</li>
               <li>Come back and mark as posted</li>
             </ol>

@@ -3,7 +3,7 @@
  * Exchanges authorization code for access token and saves to database
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   exchangeCodeForTokens,
@@ -70,7 +70,10 @@ export async function POST(request: Request) {
     }
 
     // Find page with Instagram Business Account
-    let instagramAccount: any = null;
+    let instagramAccount: {
+      id: string;
+      username: string;
+    } | null = null;
     let pageId: string | undefined;
     let instagramAccountId: string | undefined;
     let instagramUsername: string | undefined;
@@ -81,24 +84,28 @@ export async function POST(request: Request) {
         if (igAccount.instagram_business_account) {
           instagramAccount = igAccount.instagram_business_account;
           pageId = page.id;
-          instagramAccountId = instagramAccount.id;
+          
+          // Ensure instagramAccount is not null before accessing properties
+          if (instagramAccount) {
+            instagramAccountId = instagramAccount.id;
 
-          // Get Instagram username
-          try {
-            const igInfo = await fetch(
-              `https://graph.facebook.com/v18.0/${instagramAccountId}?` +
-              `fields=username&` +
-              `access_token=${longLivedToken.access_token}`
-            );
-            if (igInfo.ok) {
-              const igData = await igInfo.json();
-              instagramUsername = igData.username;
+            // Get Instagram username
+            try {
+              const igInfo = await fetch(
+                `https://graph.facebook.com/v18.0/${instagramAccountId}?` +
+                `fields=username&` +
+                `access_token=${longLivedToken.access_token}`
+              );
+              if (igInfo.ok) {
+                const igData = await igInfo.json();
+                instagramUsername = igData.username;
+              }
+            } catch (err) {
+              console.warn("[Instagram Callback] Failed to fetch username:", err);
             }
-          } catch (err) {
-            console.warn("[Instagram Callback] Failed to fetch username:", err);
-          }
 
-          break;
+            break;
+          }
         }
       } catch (err) {
         console.warn(`[Instagram Callback] Page ${page.id} has no Instagram account:`, err);

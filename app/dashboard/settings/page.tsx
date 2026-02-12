@@ -822,8 +822,8 @@ export default function SettingsPage() {
               {!settings.instagramConnected && (
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-800 break-words">
-                    ℹ️ Instagram requires a Facebook Page connection. Don't worry - you don't need to use Facebook personally! 
-                    We'll guide you through creating a Page (takes 2 minutes).
+                    ℹ️ Instagram requires a Facebook Page connection. Don&apos;t worry - you don&apos;t need to use Facebook personally! 
+                    We&apos;ll guide you through creating a Page (takes 2 minutes).
                   </p>
                 </div>
               )}
@@ -922,14 +922,14 @@ export default function SettingsPage() {
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-800 break-words">
                     ℹ️ When you schedule posts for LinkedIn or TikTok (which require manual posting), 
-                    we'll create Google Calendar events so you receive email and push reminders at the right time.
+                    we&apos;ll create Google Calendar events so you receive email and push reminders at the right time.
                   </p>
                 </div>
               )}
               {settings.googleCalendarConnected && (
                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-sm text-green-800 break-words">
-                    ✅ Your Google Calendar is connected. You'll receive email and push reminders for LinkedIn and TikTok posts.
+                    ✅ Your Google Calendar is connected. You&apos;ll receive email and push reminders for LinkedIn and TikTok posts.
                   </p>
                 </div>
               )}

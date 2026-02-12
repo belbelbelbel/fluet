@@ -48,19 +48,19 @@ export async function GET(req: NextRequest) {
     // Exchange code for tokens
     const tokens = await exchangeCodeForTokens(code);
 
-    // Calculate token expiration
+    // Calculate token expiration (default to 1 hour if not provided)
     const tokenExpiresAt = tokens.expires_in
       ? new Date(Date.now() + tokens.expires_in * 1000)
-      : null;
+      : new Date(Date.now() + 3600 * 1000); // 1 hour default
 
     // Save or update linked account
     await SaveOrUpdateLinkedAccount({
       userId: user.id,
       platform: "google_calendar",
-      accountId: null, // Google Calendar doesn't need account ID
-      accountUsername: null,
+      accountId: undefined, // Google Calendar doesn't need account ID
+      accountUsername: undefined,
       accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token || null,
+      refreshToken: tokens.refresh_token || "", // Empty string if no refresh token
       tokenExpiresAt,
       isActive: true,
     });

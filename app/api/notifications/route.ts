@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { GetUserNotifications, MarkNotificationAsRead, CreateNotification } from "@/utils/db/actions";
+import { auth } from "@clerk/nextjs/server";
+import { GetUserNotifications, MarkNotificationAsRead } from "@/utils/db/actions";
 import { GetUserByClerkId } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";

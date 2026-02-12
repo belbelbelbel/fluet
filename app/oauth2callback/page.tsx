@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, CheckCircle2, XCircle, Twitter, PlayIcon, Instagram } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 function OAuthCallbackContent() {
   const router = useRouter();

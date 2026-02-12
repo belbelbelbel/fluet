@@ -54,12 +54,12 @@ export default function Home() {
               <h2 className={`text-4xl sm:text-5xl font-bold mb-6 tracking-tight ${
                 isDark ? "text-white" : "text-gray-950"
               }`}>
-                Everything you need
+                <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">Everything</span> you need
               </h2>
               <p className={`text-xl max-w-2xl mx-auto ${
                 isDark ? "text-gray-400" : "text-gray-600"
               }`}>
-                Powerful features designed for creators who want to grow faster
+                <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">Powerful</span> features designed for <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">creators</span> who want to grow faster
               </p>
             </div>
 
@@ -282,7 +282,7 @@ export default function Home() {
               <p className={`text-xl max-w-2xl mx-auto ${
                 isDark ? "text-gray-400" : "text-gray-600"
               }`}>
-                One tool to rule them all. Create, schedule, and analyze content for every major social platform.
+                One <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">tool</span> to rule them all. Create, schedule, and analyze content for every major social platform.
               </p>
             </div>
 
@@ -357,7 +357,7 @@ export default function Home() {
             <div className="text-center mb-24">
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 tracking-tight text-gray-950">
                 Real results from{" "}
-                <span className="text-gray-950">real creators</span>
+                <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold">real creators</span>
             </h2>
               <p className="text-xl max-w-2xl mx-auto leading-relaxed text-gray-600">
                 See how Flippr AI helps businesses post consistently and grow faster
@@ -441,7 +441,7 @@ export default function Home() {
               <h2 className={`text-4xl sm:text-5xl font-bold mb-6 tracking-tight ${
                 isDark ? "text-white" : "text-gray-950"
               }`}>
-                Built on real creator insights
+                Built on real <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">creator</span> insights
               </h2>
               <p className={`text-xl max-w-3xl mx-auto ${
                 isDark ? "text-gray-400" : "text-gray-600"
@@ -459,7 +459,7 @@ export default function Home() {
                 <p className={`text-lg max-w-2xl mx-auto ${
                   isDark ? "text-gray-400" : "text-gray-600"
                 }`}>
-                  Three questions every creator asks. We answer them with data, not opinions.
+                  Three questions every <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">creator</span> asks. We answer them with data, not opinions.
                 </p>
               </div>
 
@@ -626,7 +626,7 @@ export default function Home() {
                       <p className={`text-base leading-relaxed ${
                         isDark ? "text-gray-400" : "text-gray-600"
                       }`}>
-                        We don&apos;t use global data. Our insights are specifically tuned for Nigerian creators, understanding local context, language, and behavior patterns.
+                        We don&apos;t use global data. Our insights are specifically tuned for Nigerian <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">creators</span>, understanding local context, language, and behavior patterns.
                       </p>
                     </div>
 
@@ -641,7 +641,7 @@ export default function Home() {
                       <p className={`text-base leading-relaxed ${
                         isDark ? "text-gray-400" : "text-gray-600"
                       }`}>
-                        Built around how creators actually work: batch creation, post stacking, and scheduling. Not how tools think they should work.
+                        Built around how <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">creators</span> actually work: batch creation, post stacking, and scheduling. Not how tools think they should work.
                       </p>
                     </div>
 
@@ -674,7 +674,7 @@ export default function Home() {
                 Frequently asked questions
               </h2>
               <p className="text-xl text-gray-600">
-                Everything you need to know about Flippr AI
+                <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">Everything</span> you need to know about Flippr AI
               </p>
             </div>
 
@@ -729,7 +729,7 @@ export default function Home() {
               </h2>
 
               <p className="text-xl sm:text-2xl text-gray-300 mb-16 max-w-3xl mx-auto leading-relaxed">
-                Our cutting-edge, all-in-one social media management platform is meticulously crafted to empower Nigerian creators.
+                Our cutting-edge, all-in-one social media management platform is meticulously crafted to empower Nigerian <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">creators</span>.
               </p>
 
               <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mb-20">
