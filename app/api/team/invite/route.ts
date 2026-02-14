@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { GetUserByClerkId, GetUserByEmail } from "@/utils/db/actions";
+import { GetUserByClerkId, GetUserByEmail, CreateTeamInvitation } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -68,31 +68,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // TODO: Check if user is already a team member (when TeamMembers table is implemented)
-    // const existingMember = await GetTeamMember(inviter.id, invitedUser.id);
-    // if (existingMember) {
-    //   return NextResponse.json(
-    //     { error: "This user is already a team member" },
-    //     { status: 400 }
-    //   );
-    // }
+    // Check if there's already a pending invitation for this email
+    const { GetTeamInvitationsByEmail } = await import("@/utils/db/actions");
+    const existingInvitations = await GetTeamInvitationsByEmail(email);
+    const pendingInvitation = existingInvitations.find(
+      (inv) => inv.status === "pending" && inv.invitedBy === inviter.id
+    );
+    
+    if (pendingInvitation) {
+      return NextResponse.json(
+        { error: "An invitation has already been sent to this email address" },
+        { status: 400 }
+      );
+    }
 
-    // TODO: Implement actual invitation logic
-    // - Create invitation record in database (when team schema is added)
-    // - Send invitation email
-    // - Create notification for inviter and invitee
-    // - Return success
+    // Create invitation record in database
+    const invitation = await CreateTeamInvitation(
+      inviter.id,
+      email,
+      "member" // Default role
+    );
 
-    console.log(`[Team Invite] User ${inviter.id} (${inviter.email}) invited ${invitedUser.id} (${email})`);
+    console.log(`[Team Invite] ✅ Invitation created: User ${inviter.id} (${inviter.email}) invited ${invitedUser.id} (${email})`);
+
+    // TODO: Send invitation email
+    // TODO: Create notification for invitee
 
     return NextResponse.json({
       success: true,
       message: "Invitation sent successfully",
       invitation: {
+        id: invitation.id,
         email,
         invitedUserId: invitedUser.id,
         invitedBy: inviter.id,
-        status: "pending",
+        status: invitation.status,
+        token: invitation.token,
+        expiresAt: invitation.expiresAt,
       },
     });
   } catch (error) {

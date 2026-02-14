@@ -1,12 +1,15 @@
 /**
  * Cron Job: Post Scheduled Posts
  * 
- * This endpoint runs every 1 minute via Vercel Cron
+ * This endpoint can be called by:
+ * 1. Vercel Cron (daily on Hobby plan, or every minute on Pro plan)
+ * 2. External cron service (e.g., cron-job.org) - every minute
+ * 
  * It checks for scheduled posts that are due and posts them to:
  * - Twitter (tweets)
  * - Instagram (photos/videos)
  * 
- * Security: Protected by Vercel Cron secret header
+ * Security: Protected by CRON_SECRET environment variable
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -21,13 +24,18 @@ export const maxDuration = 60; // 1 minute max for cron job
 
 export async function GET(req: NextRequest) {
   try {
-    // Verify this is a legitimate cron request from Vercel
+    // Verify this is a legitimate cron request
+    // Supports both Vercel Cron (authorization header) and external services (CRON_SECRET)
     const authHeader = req.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
+    const secretParam = req.nextUrl.searchParams.get("secret");
 
-    // In production, Vercel automatically adds the authorization header
-    // For local testing, you can set CRON_SECRET in .env.local
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    // Vercel Cron automatically adds authorization header in production
+    // External cron services should use ?secret=CRON_SECRET in the URL
+    const isVercelCron = authHeader === `Bearer ${cronSecret}`;
+    const isExternalCron = cronSecret && secretParam === cronSecret;
+
+    if (cronSecret && !isVercelCron && !isExternalCron) {
       console.warn("[Cron] Unauthorized cron request");
       return NextResponse.json(
         { error: "Unauthorized" },

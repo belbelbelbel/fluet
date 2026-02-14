@@ -6,11 +6,28 @@ import { GeneratedContent, ScheduledPosts } from "@/utils/db/schema";
 import { eq, and, gte, sql, count } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 60; // Cache for 60 seconds
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    // Get userId from query params first (from frontend)
+    const { searchParams } = new URL(req.url);
+    const queryUserId = searchParams.get("userId");
+    
+    // Get authentication from Clerk - try multiple methods
     const authResult = await auth();
-    const userId = authResult?.userId;
+    let userId: string | null | undefined = authResult?.userId || queryUserId || null;
+    
+    // If auth() didn't work, try currentUser() as fallback
+    if (!userId) {
+      try {
+        const { currentUser } = await import("@clerk/nextjs/server");
+        const user = await currentUser();
+        userId = user?.id ?? null;
+      } catch (userError) {
+        console.warn("[Dashboard Stats API] currentUser() failed:", userError);
+      }
+    }
     
     if (!userId) {
       console.warn("[Dashboard Stats API] No userId from auth() - returning default stats");
@@ -91,7 +108,7 @@ export async function GET() {
     // Mock engagement rate (replace with real analytics later)
     const engagementRate = totalContent > 0 ? Math.floor(Math.random() * 10) + 5 : 0;
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       totalContent,
       scheduledPosts,
       teamMembers: 1, // Will be updated when team features are implemented
@@ -99,6 +116,11 @@ export async function GET() {
       engagementRate,
       topPlatform,
     });
+    
+    // Add caching headers
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+    
+    return response;
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
     return NextResponse.json(

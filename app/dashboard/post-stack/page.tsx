@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import {
   BookOpen,
   Film,
   Clock,
+  ArrowRight,
 } from "lucide-react";
 import { showToast } from "@/lib/toast";
 
@@ -37,6 +39,8 @@ interface StackItem {
 
 export default function PostStackPage() {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [stack, setStack] = useState<StackItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -108,32 +112,40 @@ export default function PostStackPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
+        isDark ? "bg-slate-900" : "bg-white"
+      }`}>
         <div className="text-center">
-          <Clock className="w-8 h-8 text-blue-600 animate-pulse mx-auto mb-4" />
-          <p className="text-gray-600">Loading your stack...</p>
+          <Clock className={`w-8 h-8 animate-pulse mx-auto mb-4 ${
+            isDark ? "text-purple-400" : "text-purple-600"
+          }`} />
+          <p className={isDark ? "text-slate-300" : "text-gray-600"}>Loading your stack...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white py-4 sm:py-6 lg:py-8">
-      <div className="max-w-5xl mx-auto">
+    <div className={`min-h-screen py-4 sm:py-6 lg:py-8 transition-colors duration-300 ${
+      isDark ? "bg-slate-900" : "bg-white"
+    }`}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-1 sm:mb-2">
+              <h1 className={`text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 ${
+                isDark ? "text-white" : "text-gray-950"
+              }`}>
                 Post Stack
               </h1>
-              <p className="text-sm sm:text-base text-gray-600">
+              <p className={isDark ? "text-slate-400" : "text-gray-600"}>
                 {stack.length} {stack.length === 1 ? "post" : "posts"} ready to schedule
               </p>
             </div>
             <Button
               onClick={() => router.push("/dashboard/content-ideas")}
-              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white rounded-lg sm:rounded-xl flex items-center justify-center gap-2 text-sm px-4"
+              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-lg sm:rounded-xl flex items-center justify-center gap-2 text-sm px-4 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <Plus className="w-4 h-4" />
               Add More
@@ -143,87 +155,125 @@ export default function PostStackPage() {
 
         {/* Stack List */}
         {stack.length > 0 ? (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-4">
             {stack.map((item, index) => {
               const FormatIcon = getFormatIcon(item.format);
               
               return (
                 <Card
                   key={index}
-                  className="group border border-gray-200 rounded-lg sm:rounded-xl hover:border-gray-300 transition-all duration-300 bg-white"
+                  className={`border rounded-xl hover:border-gray-300 transition-all ${
+                    isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200"
+                  }`}
                 >
-                  <CardContent className="p-4 sm:p-5">
-                    <div className="flex items-start justify-between gap-3 sm:gap-4">
-                      <div className="flex-1 min-w-0">
-                        {/* Topic */}
-                        <div className="flex items-start sm:items-center gap-2 sm:gap-3 mb-3">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0">
-                            <FormatIcon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-                          </div>
-                          <h3 className="text-base sm:text-lg font-bold text-gray-950 tracking-tight flex-1">
-                            {item.topic}
-                          </h3>
-                        </div>
+                  <CardContent className="p-5">
+                    {/* Topic Header */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        isDark ? "bg-purple-500/20" : "bg-purple-100"
+                      }`}>
+                        <FormatIcon className={`w-5 h-5 ${
+                          isDark ? "text-purple-400" : "text-purple-600"
+                        }`} />
+                      </div>
+                      <h3 className={`text-lg font-semibold flex-1 ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>
+                        {item.topic}
+                      </h3>
+                    </div>
 
-                        {/* Caption or Hook */}
-                        {item.caption ? (
-                          <div className="mb-3 sm:mb-4">
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 sm:mb-2">Caption</p>
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5 sm:p-3">
-                              <p className="text-xs sm:text-sm text-gray-950 leading-relaxed">
-                                {item.caption}
-                              </p>
-                            </div>
-                          </div>
-                        ) : item.hookExample ? (
-                          <div className="mb-3 sm:mb-4">
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 sm:mb-2">Hook</p>
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5 sm:p-3">
-                              <p className="text-xs sm:text-sm text-gray-950 italic leading-relaxed">
-                                &ldquo;{item.hookExample}&rdquo;
-                              </p>
-                            </div>
-                          </div>
-                        ) : null}
-
-                        {/* Metadata */}
-                        <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
-                          <Badge className="bg-gray-200 text-gray-800 rounded-lg px-2.5 sm:px-3 py-1 text-xs font-medium">
-                            {item.format.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                          </Badge>
-                          {item.tone && (
-                            <Badge className="bg-gray-200 text-gray-800 rounded-lg px-2.5 sm:px-3 py-1 text-xs font-medium capitalize">
-                              {item.tone} tone
-                            </Badge>
-                          )}
-                          <span className="text-xs text-gray-500">
-                            Saved {formatDate(item.savedAt)}
-                          </span>
+                    {/* Caption or Hook */}
+                    {item.caption ? (
+                      <div className="mb-4">
+                        <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${
+                          isDark ? "text-slate-400" : "text-gray-600"
+                        }`}>Caption</p>
+                        <div className={`border rounded-lg p-3 ${
+                          isDark ? "bg-slate-900/50 border-slate-700" : "bg-gray-50 border-gray-200"
+                        }`}>
+                          <p className={`text-sm leading-relaxed ${
+                            isDark ? "text-slate-200" : "text-gray-950"
+                          }`}>
+                            {item.caption}
+                          </p>
                         </div>
-
-                        {/* Actions */}
-                        <div className="flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4 border-t border-gray-100">
-                          <Button
-                            onClick={() => handleSchedule(item)}
-                            className="w-full sm:w-auto bg-gray-950 hover:bg-gray-900 text-white rounded-lg px-4 py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
-                          >
-                            <Calendar className="w-3.5 h-3.5" />
-                            Schedule
-                          </Button>
-                          <Button
-                            onClick={() => handleEdit(item)}
-                            className="w-full sm:w-auto bg-gray-950 hover:bg-gray-900 text-white rounded-lg px-4 py-2 text-xs font-semibold"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            onClick={() => handleDelete(index)}
-                            className="w-full sm:w-auto bg-gray-950 hover:bg-gray-900 text-white rounded-lg px-4 py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            Remove
-                          </Button>
+                      </div>
+                    ) : item.hookExample ? (
+                      <div className="mb-4">
+                        <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${
+                          isDark ? "text-slate-400" : "text-gray-600"
+                        }`}>Hook Example</p>
+                        <div className={`border rounded-lg p-3 ${
+                          isDark ? "bg-slate-900/50 border-slate-700" : "bg-gray-50 border-gray-200"
+                        }`}>
+                          <p className={`text-sm leading-relaxed ${
+                            isDark ? "text-slate-200" : "text-gray-950"
+                          }`}>
+                            &ldquo;{item.hookExample}&rdquo;
+                          </p>
                         </div>
+                      </div>
+                    ) : null}
+
+                    {/* Badges */}
+                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                      <Badge className={`rounded-lg px-3 py-1 text-xs font-medium ${
+                        isDark 
+                          ? "bg-slate-700 text-slate-200" 
+                          : "bg-gray-200 text-gray-800"
+                      }`}>
+                        {item.format.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </Badge>
+                      {item.tone && (
+                        <Badge className={`rounded-lg px-3 py-1 text-xs font-medium capitalize ${
+                          isDark 
+                            ? "bg-slate-700 text-slate-200" 
+                            : "bg-gray-200 text-gray-800"
+                        }`}>
+                          {item.tone} tone
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 border-t ${
+                      isDark ? "border-slate-700" : "border-gray-200"
+                    }`}>
+                      <Button
+                        onClick={() => handleSchedule(item)}
+                        className={`flex-1 rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md ${
+                          isDark
+                            ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                            : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                        }`}
+                      >
+                        <Calendar className="w-4 h-4" />
+                        Schedule
+                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleEdit(item)}
+                          variant="outline"
+                          className={`flex-1 sm:flex-none rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium transition-all duration-200 ${
+                            isDark
+                              ? "border-slate-600 text-slate-200 hover:bg-slate-700 hover:border-slate-500 hover:text-white active:bg-slate-600"
+                              : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 active:bg-gray-200"
+                          }`}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(index)}
+                          variant="outline"
+                          className={`rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium transition-all duration-200 ${
+                            isDark
+                              ? "border-slate-600 text-red-400 hover:bg-red-950/30 hover:border-red-500 hover:text-red-300 active:bg-red-950/50"
+                              : "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-400 hover:text-red-700 active:bg-red-100"
+                          }`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -232,18 +282,26 @@ export default function PostStackPage() {
             })}
           </div>
         ) : (
-          <Card className="border border-gray-200 rounded-lg sm:rounded-xl">
+          <Card className={`border rounded-xl ${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          }`}>
             <CardContent className="p-8 sm:p-12 text-center">
-              <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-              <h3 className="text-base sm:text-lg font-semibold text-gray-950 mb-2">
+              <Calendar className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 ${
+                isDark ? "text-slate-500" : "text-gray-400"
+              }`} />
+              <h3 className={`text-base sm:text-lg font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-950"
+              }`}>
                 Your stack is empty
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
+              <p className={`text-sm sm:text-base mb-4 sm:mb-6 ${
+                isDark ? "text-slate-400" : "text-gray-600"
+              }`}>
                 Save content ideas to build your post stack
               </p>
               <Button
                 onClick={() => router.push("/dashboard/content-ideas")}
-                className="bg-gray-950 hover:bg-gray-900 text-white rounded-lg sm:rounded-xl text-sm px-4 sm:px-6"
+                className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-lg sm:rounded-xl text-sm px-4 sm:px-6 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Browse Content Ideas

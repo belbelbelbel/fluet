@@ -1,8 +1,9 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Logo } from "@/components/Logo";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -160,13 +161,20 @@ interface UserSettings {
   twitterConnected?: boolean;
   instagramConnected?: boolean;
   googleCalendarConnected?: boolean;
+  emailApprovals?: boolean;
+  emailTasks?: boolean;
+  defaultRequiresApproval?: boolean;
 }
 
 export default function SettingsPage() {
   const { userId } = useAuth();
-  const { theme: currentTheme, setTheme: setCurrentTheme } = useTheme();
+  const { user, isLoaded: userLoaded } = useUser();
+  const { theme: currentTheme, setTheme: setCurrentTheme, resolvedTheme } = useTheme();
   const [settings, setSettings] = useState<UserSettings>({
     defaultAIModel: "gpt-4o-mini",
+    emailApprovals: true,
+    emailTasks: true,
+    defaultRequiresApproval: true,
     autoSave: true,
     notifications: true,
     theme: currentTheme,
@@ -336,649 +344,410 @@ export default function SettingsPage() {
     }
   };
 
-  if (loading) {
+  if (loading || !userLoaded) {
+    const isDarkLoading = resolvedTheme === "dark";
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+      <div className={`flex items-center justify-center min-h-screen transition-colors duration-300 ${
+        isDarkLoading ? "bg-slate-900" : "bg-white"
+      }`}>
+        <div className="text-center">
+          <div className="flex flex-col items-center justify-center mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className={`w-28 h-28 rounded-full animate-pulse ${
+                  isDarkLoading ? "bg-purple-500/20" : "bg-purple-100"
+                }`}></div>
+              </div>
+              <div className="relative w-20 h-20 flex items-center justify-center">
+                <Logo size="lg" variant="icon" />
+              </div>
+            </div>
+            <div className="flex space-x-2 justify-center mt-4">
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          </div>
+          <h2 className={`text-xl font-bold mb-2 ${
+            isDarkLoading ? "text-white" : "text-gray-950"
+          }`}>
+            Loading Settings...
+          </h2>
+          <p className={isDarkLoading ? "text-slate-400" : "text-gray-600"}>
+            Please wait while we load your settings
+          </p>
+        </div>
       </div>
     );
   }
 
+  // Calculate isDark after loading check to ensure resolvedTheme is available
+  const isDark = resolvedTheme ? (currentTheme === "dark" || (currentTheme === "system" && resolvedTheme === "dark")) : false;
+
   return (
-    <div className="space-y-6 pt-6 max-w-4xl mx-auto px-4">
+    <div className={`space-y-6 pt-6 max-w-4xl mx-auto px-4 transition-colors duration-300 ${
+      isDark ? "bg-slate-900" : "bg-white"
+    } min-h-screen`}>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-950 mb-1">Settings</h1>
-        <p className="text-sm text-gray-600">Manage your preferences and AI model selection</p>
+        <h1 className={`text-2xl font-semibold mb-1 ${
+          isDark ? "text-white" : "text-gray-950"
+        }`}>Settings</h1>
+        <p className={`text-sm ${
+          isDark ? "text-gray-400" : "text-gray-600"
+        }`}>Manage your preferences and AI model selection</p>
       </div>
 
       <Tabs defaultValue="ai" className="space-y-6">
-        <div className="border-b border-gray-200">
-          <TabsList className="bg-transparent h-auto p-0 w-full sm:w-auto justify-start gap-0">
-            <TabsTrigger value="ai" className="px-4 py-2 text-sm font-medium data-[state=active]:text-gray-950 data-[state=active]:border-b-2 data-[state=active]:border-gray-950 text-gray-600 border-b-2 border-transparent rounded-none">
-              AI Models
+        <div className={`border-b transition-colors duration-300 ${
+          isDark ? "border-slate-700" : "border-gray-200"
+        }`}>
+          <TabsList className={`bg-transparent h-auto p-0 w-full sm:w-auto justify-start gap-0 flex-wrap border-b transition-colors duration-300 ${
+            isDark ? "border-slate-700" : "border-gray-200"
+          }`}>
+            <TabsTrigger value="agency" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+              isDark
+                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+            }`}>
+              <Bot className="w-4 h-4 mr-2" />
+              Agency Profile
             </TabsTrigger>
-            <TabsTrigger value="general" className="px-4 py-2 text-sm font-medium data-[state=active]:text-gray-950 data-[state=active]:border-b-2 data-[state=active]:border-gray-950 text-gray-600 border-b-2 border-transparent rounded-none">
-              General
+            <TabsTrigger value="integrations" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+              isDark
+                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+            }`}>
+              <LinkIcon className="w-4 h-4 mr-2" />
+              Integrations
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="px-4 py-2 text-sm font-medium data-[state=active]:text-gray-950 data-[state=active]:border-b-2 data-[state=active]:border-gray-950 text-gray-600 border-b-2 border-transparent rounded-none">
+            <TabsTrigger value="team" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+              isDark
+                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+            }`}>
+              <Check className="w-4 h-4 mr-2" />
+              Team
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+              isDark
+                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+            }`}>
+              <Calendar className="w-4 h-4 mr-2" />
               Notifications
             </TabsTrigger>
-            <TabsTrigger value="appearance" className="px-4 py-2 text-sm font-medium data-[state=active]:text-gray-950 data-[state=active]:border-b-2 data-[state=active]:border-gray-950 text-gray-600 border-b-2 border-transparent rounded-none">
-              Appearance
+            <TabsTrigger value="ai" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+              isDark
+                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+            }`}>
+              <Brain className="w-4 h-4 mr-2" />
+              AI Settings
+            </TabsTrigger>
+            <TabsTrigger value="workflow" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+              isDark
+                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+            }`}>
+              <Cpu className="w-4 h-4 mr-2" />
+              Workflow
             </TabsTrigger>
           </TabsList>
         </div>
 
         {/* AI Models Tab */}
-        <TabsContent value="ai" className="space-y-6">
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-950 mb-1">Default AI Model</h2>
-              <p className="text-sm text-gray-600">Choose your preferred AI model for content generation.</p>
-            </div>
-            <div className="p-6">
-              {/* Simple Dropdown Selector */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select AI Model
-                </label>
-                <div className="relative" ref={modelDropdownRef}>
-                  <button
-                    type="button"
-                    onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 bg-white border border-gray-300 rounded-md text-left hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-950 focus:border-gray-950 transition-colors text-sm"
-                  >
-                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                      {(() => {
-                        const selectedModel = aiModels.find(m => m.id === settings.defaultAIModel);
-                        if (!selectedModel) return null;
-                        return (
-                          <>
-                            <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-gray-600">
-                              {selectedModel.icon}
-                            </div>
-                            <span className="font-medium text-gray-950 text-sm">{selectedModel.name}</span>
-                            <span className="text-xs text-gray-500">•</span>
-                            <span className="text-xs text-gray-500">{selectedModel.provider}</span>
-                          </>
-                        );
-                      })()}
-                    </div>
-                    <ChevronDown 
-                      className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform ${isModelDropdownOpen ? 'transform rotate-180' : ''}`}
-                    />
-                  </button>
-
-                  {/* Simple Dropdown Menu */}
-                  {isModelDropdownOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto">
-                      <div className="py-1">
-                {aiModels.map((model) => {
-                  const isSelected = settings.defaultAIModel === model.id;
-                  return (
-                            <button
-                      key={model.id}
-                              type="button"
-                              onClick={() => {
-                                setSettings({ ...settings, defaultAIModel: model.id });
-                                setIsModelDropdownOpen(false);
-                              }}
-                              className={`w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left text-sm ${
-                                isSelected ? "bg-gray-50" : ""
-                              }`}
-                            >
-                              <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-gray-600">
-                            {model.icon}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className={`font-medium ${isSelected ? "text-gray-950" : "text-gray-700"}`}>
-                                    {model.name}
-                                  </span>
-                                  <span className="text-xs text-gray-400">•</span>
-                                  <span className="text-xs text-gray-500">{model.provider}</span>
-                          {isSelected && (
-                                    <Check className="w-4 h-4 text-gray-950 ml-auto flex-shrink-0" />
-                          )}
-                        </div>
-                      </div>
-                            </button>
-                  );
-                })}
-              </div>
-                                </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </TabsContent>
-
-        {/* General Settings */}
-        <TabsContent value="general" className="space-y-6">
-          <Card className="bg-white border border-gray-200 rounded-xl">
-            <CardHeader>
-              <CardTitle className="text-gray-950">Niche Selection</CardTitle>
-              <CardDescription className="text-gray-600">
-                Choose your niche to get personalized content ideas
+        {/* Agency Profile Tab */}
+        <TabsContent value="agency" className="space-y-6">
+          <Card className={`${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          } rounded-xl shadow-sm`}>
+            <CardHeader className={`border-b ${
+              isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"
+            }`}>
+              <CardTitle className={`text-lg font-semibold ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Agency Information</CardTitle>
+              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+                Manage your agency profile and contact details
               </CardDescription>
             </CardHeader>
-            <div className="p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {niches.map((niche) => {
-                  const Icon = niche.icon;
-                  const isSelected = settings.niche === niche.id;
-                  
-                  return (
-                    <button
-                      key={niche.id}
-                      onClick={() => {
-                        const newSettings = { ...settings, niche: niche.id };
-                        setSettings(newSettings);
-                        localStorage.setItem("userNiche", niche.id);
-                        // Trigger storage event for other tabs
-                        window.dispatchEvent(new Event("storage"));
-                        showToast.success("Niche updated!", "Your content ideas will refresh");
-                      }}
-                      className={`relative p-4 rounded-xl border transition-all text-left ${
-                        isSelected
-                          ? "border-purple-600 bg-purple-50 text-purple-900"
-                          : "border-gray-200 bg-white hover:border-gray-300"
-                      }`}
-                    >
-                      {isSelected && (
-                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          isSelected ? "bg-purple-100" : "bg-gray-100"
-                        }`}>
-                          <Icon className={`w-5 h-5 ${
-                            isSelected ? "text-purple-600" : "text-gray-600"
-                          }`} />
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xl">{niche.emoji}</span>
-                            <h3 className={`font-semibold text-sm ${
-                              isSelected ? "text-purple-900" : "text-gray-950"
-                            }`}>
-                              {niche.name}
-                            </h3>
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
+            <div className="p-6 space-y-6">
+        <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDark ? "text-gray-300" : "text-gray-700"
+                }`}>
+                  Agency Name
+                </label>
+                <input
+                  type="text"
+                  value={user?.fullName || ""}
+                  readOnly
+                  className={`w-full px-4 py-2 border rounded-lg ${
+                    isDark
+                      ? "border-slate-600 bg-slate-700 text-slate-200"
+                      : "border-gray-300 bg-gray-50 text-gray-600"
+                  }`}
+                />
+                <p className={`text-xs mt-1 ${
+                  isDark ? "text-gray-500" : "text-gray-500"
+                }`}>
+                  Agency name is managed through your account profile
+          </p>
+        </div>
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDark ? "text-gray-300" : "text-gray-700"
+                }`}>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={user?.primaryEmailAddress?.emailAddress || ""}
+                  readOnly
+                  className={`w-full px-4 py-2 border rounded-lg ${
+                    isDark
+                      ? "border-slate-600 bg-slate-700 text-slate-200"
+                      : "border-gray-300 bg-gray-50 text-gray-600"
+                  }`}
+                />
+              </div>
+              <div className={`pt-4 border-t ${
+                isDark ? "border-gray-800" : "border-gray-200"
+              }`}>
+                <h3 className={`text-sm font-semibold mb-4 ${
+                  isDark ? "text-white" : "text-gray-900"
+                }`}>Quick Stats</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className={`p-4 rounded-lg border ${
+                    isDark
+                      ? "bg-purple-950/50 border-purple-900"
+                      : "bg-purple-50 border-purple-200"
+                  }`}>
+                    <div className={`text-2xl font-bold mb-1 ${
+                      isDark ? "text-purple-300" : "text-purple-900"
+                    }`}>0</div>
+                    <div className={`text-sm ${
+                      isDark ? "text-purple-400" : "text-purple-700"
+                    }`}>Active Clients</div>
+                  </div>
+                  <div className={`p-4 rounded-lg border ${
+                    isDark
+                      ? "bg-blue-950/50 border-blue-900"
+                      : "bg-blue-50 border-blue-200"
+                  }`}>
+                    <div className={`text-2xl font-bold mb-1 ${
+                      isDark ? "text-blue-300" : "text-blue-900"
+                    }`}>0</div>
+                    <div className={`text-sm ${
+                      isDark ? "text-blue-400" : "text-blue-700"
+                    }`}>Team Members</div>
+                  </div>
+                  <div className={`p-4 rounded-lg border ${
+                    isDark
+                      ? "bg-green-950/50 border-green-900"
+                      : "bg-green-50 border-green-200"
+                  }`}>
+                    <div className={`text-2xl font-bold mb-1 ${
+                      isDark ? "text-green-300" : "text-green-900"
+                    }`}>0</div>
+                    <div className={`text-sm ${
+                      isDark ? "text-green-400" : "text-green-700"
+                    }`}>Posts This Month</div>
+                  </div>
+                </div>
               </div>
             </div>
           </Card>
+        </TabsContent>
 
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-950 mb-1">General Settings</h2>
-              <p className="text-sm text-gray-600">Configure your general application preferences</p>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-950 mb-1">Auto-save Content</h3>
-                  <p className="text-sm text-gray-600">
-                    Automatically save generated content to history
-                  </p>
-                </div>
-                <button
-                  onClick={() =>
-                    setSettings({ ...settings, autoSave: !settings.autoSave })
-                  }
-                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                    settings.autoSave ? "bg-purple-600" : "bg-gray-300"
-                  }`}
-                  aria-label="Toggle auto-save"
-                >
-                  <div
-                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.autoSave ? "translate-x-6" : "translate-x-0"
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* YouTube Integration */}
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-4 sm:p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-950 mb-1">YouTube Integration</h2>
-              <p className="text-sm text-gray-600">
-                Connect your YouTube account to enable automated video uploads
-              </p>
-            </div>
-            <div className="p-4 sm:p-6 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
+        {/* Integrations Tab */}
+        <TabsContent value="integrations" className="space-y-6">
+          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-gray-50">
+              <CardTitle className="text-lg font-semibold text-gray-900">Social Media Integrations</CardTitle>
+              <CardDescription className="text-gray-600">
+                Connect your social media accounts for automated posting
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 space-y-6">
+              {/* YouTube Integration */}
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0">
                     <PlayIcon className="w-5 h-5 text-white" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-950 mb-1">YouTube Account</h3>
-                    <p className="text-sm text-gray-600 break-words">
-                      {settings.youtubeConnected 
-                        ? "Connected - Ready for automated uploads"
-                        : "Not connected - Click to connect your YouTube account"}
-                    </p>
+                  <div>
+                    <h3 className={`font-semibold ${
+                      isDark ? "text-white" : "text-gray-950"
+                    }`}>YouTube</h3>
+                    <p className={`text-sm ${
+                      isDark ? "text-gray-400" : "text-gray-600"
+                    }`}>Automated video uploads</p>
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                  {settings.youtubeConnected && (
-                    <Button
-                      onClick={async () => {
-                        try {
-                          const response = await fetch("/api/youtube/disconnect", {
-                            method: "POST",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            credentials: "include",
-                            body: JSON.stringify({ userId }),
-                          });
+                <div className="space-y-4">
+                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
+                    isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+                  }`}>
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm break-words ${
+                          isDark ? "text-gray-300" : "text-gray-600"
+                        }`}>
+                          {settings.youtubeConnected 
+                            ? "✅ Connected - Ready for automated uploads"
+                            : "Not connected - Click to connect your YouTube account"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                      {settings.youtubeConnected && (
+        <Button
+                          onClick={async () => {
+                            try {
+                              const response = await fetch("/api/youtube/disconnect", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                credentials: "include",
+                                body: JSON.stringify({ userId }),
+                              });
 
-                          if (response.ok) {
-                            setSettings(prev => ({ ...prev, youtubeConnected: false }));
-                            // Refresh connection status to ensure UI is updated
-                            await checkYouTubeConnection();
-                            showToast.success("YouTube disconnected", "Your YouTube account has been disconnected");
-                          } else {
-                            const data = await response.json();
-                            throw new Error(data.error || "Failed to disconnect");
-                          }
-                        } catch (error: unknown) {
-                          console.error("Disconnect error:", error);
-                          showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect YouTube");
-                        }
-                      }}
-                      className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
-                    >
-                      <LinkIcon className="w-4 h-4 mr-2" />
-                      Disconnect
-                    </Button>
-                  )}
-                  <Button
-                    onClick={() => {
-                      // Redirect to OAuth flow
-                      window.location.href = "/api/youtube/auth";
-                    }}
-                    className={`w-full sm:w-auto flex-shrink-0 ${
-                      settings.youtubeConnected
-                        ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
-                        : "bg-red-600 hover:bg-red-700 text-white"
-                    }`}
-                  >
-                    {settings.youtubeConnected ? (
-                      <>
-                        <LinkIcon className="w-4 h-4 mr-2" />
-                        Reconnect
-                      </>
-                    ) : (
-                      <>
-                        <LinkIcon className="w-4 h-4 mr-2" />
-                        Connect YouTube
-                      </>
-                    )}
-                  </Button>
+                              if (response.ok) {
+                                setSettings(prev => ({ ...prev, youtubeConnected: false }));
+                                await checkYouTubeConnection();
+                                showToast.success("YouTube disconnected", "Your YouTube account has been disconnected");
+                              } else {
+                                const data = await response.json();
+                                throw new Error(data.error || "Failed to disconnect");
+                              }
+                            } catch (error: unknown) {
+                              console.error("Disconnect error:", error);
+                              showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect YouTube");
+                            }
+                          }}
+                          className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
+                        >
+                          <LinkIcon className="w-4 h-4 mr-2" />
+                          Disconnect
+                        </Button>
+                      )}
+                      <Button
+                        onClick={() => {
+                          window.location.href = "/api/youtube/auth";
+                        }}
+                        className={`w-full sm:w-auto flex-shrink-0 ${
+                          settings.youtubeConnected
+                            ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                            : "bg-red-600 hover:bg-red-700 text-white"
+                        }`}
+                      >
+                        {settings.youtubeConnected ? (
+                          <>
+                            <LinkIcon className="w-4 h-4 mr-2" />
+                            Reconnect
+            </>
+          ) : (
+            <>
+                            <LinkIcon className="w-4 h-4 mr-2" />
+                            Connect YouTube
+            </>
+          )}
+        </Button>
+      </div>
+                  </div>
                 </div>
               </div>
-              {settings.youtubeConnected && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800 break-words">
-                    ✅ Your YouTube account is connected. You can now schedule and upload videos automatically.
-                  </p>
-                </div>
-              )}
             </div>
-          </div>
-
-          {/* Twitter Integration */}
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-4 sm:p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-950 mb-1">Twitter Integration</h2>
-              <p className="text-sm text-gray-600">
-                Connect your Twitter account to enable automated tweet scheduling and posting
-              </p>
-            </div>
-            <div className="p-4 sm:p-6 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center flex-shrink-0">
-                    <Twitter className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-950 mb-1">Twitter Account</h3>
-                    <p className="text-sm text-gray-600 break-words">
-                      {settings.twitterConnected 
-                        ? "Connected - Ready for automated posting"
-                        : "Not connected - Click to connect your Twitter account"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                  {settings.twitterConnected && (
-                    <Button
-                      onClick={async () => {
-                        try {
-                          const response = await fetch("/api/twitter/disconnect", {
-                            method: "POST",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            credentials: "include",
-                            body: JSON.stringify({ userId }),
-                          });
-
-                          if (response.ok) {
-                            setSettings(prev => ({ ...prev, twitterConnected: false }));
-                            // Refresh connection status to ensure UI is updated
-                            await checkTwitterConnection();
-                            showToast.success("Twitter disconnected", "Your Twitter account has been disconnected");
-                          } else {
-                            const data = await response.json();
-                            throw new Error(data.error || "Failed to disconnect");
-                          }
-                        } catch (error: unknown) {
-                          console.error("Disconnect error:", error);
-                          showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect Twitter");
-                        }
-                      }}
-                      className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
-                    >
-                      <LinkIcon className="w-4 h-4 mr-2" />
-                      Disconnect
-                    </Button>
-                  )}
-                  <Button
-                    onClick={() => {
-                      // Redirect to OAuth flow
-                      window.location.href = "/api/twitter/auth";
-                    }}
-                    className={`w-full sm:w-auto flex-shrink-0 ${
-                      settings.twitterConnected
-                        ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
-                        : "bg-sky-500 hover:bg-sky-600 text-white"
-                    }`}
-                  >
-                    {settings.twitterConnected ? (
-                      <>
-                        <LinkIcon className="w-4 h-4 mr-2" />
-                        Reconnect
-                      </>
-                    ) : (
-                      <>
-                        <Twitter className="w-4 h-4 mr-2" />
-                        Connect Twitter
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-              {settings.twitterConnected && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800 break-words">
-                    ✅ Your Twitter account is connected. You can now schedule and post tweets automatically.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Instagram Integration */}
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-4 sm:p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-950 mb-1">Instagram Integration</h2>
-              <p className="text-sm text-gray-600">
-                Connect your Instagram account to enable automated photo and video posting
-              </p>
-            </div>
-            <div className="p-4 sm:p-6 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center flex-shrink-0">
-                    <Instagram className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-950 mb-1">Instagram Account</h3>
-                    <p className="text-sm text-gray-600 break-words">
-                      {settings.instagramConnected 
-                        ? "Connected - Ready for automated posting"
-                        : "Not connected - Requires Facebook Page (we'll guide you)"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                  {settings.instagramConnected && (
-                    <Button
-                      onClick={async () => {
-                        try {
-                          const response = await fetch("/api/instagram/disconnect", {
-                            method: "POST",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            credentials: "include",
-                            body: JSON.stringify({ userId }),
-                          });
-
-                          if (response.ok) {
-                            setSettings(prev => ({ ...prev, instagramConnected: false }));
-                            // Refresh connection status to ensure UI is updated
-                            await checkInstagramConnection();
-                            showToast.success("Instagram disconnected", "Your Instagram account has been disconnected");
-                          } else {
-                            const data = await response.json();
-                            throw new Error(data.error || "Failed to disconnect");
-                          }
-                        } catch (error: unknown) {
-                          console.error("Disconnect error:", error);
-                          showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect Instagram");
-                        }
-                      }}
-                      className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
-                    >
-                      <LinkIcon className="w-4 h-4 mr-2" />
-                      Disconnect
-                    </Button>
-                  )}
-                  <Button
-                    onClick={() => {
-                      // Redirect to OAuth flow
-                      window.location.href = "/api/instagram/auth";
-                    }}
-                    className={`w-full sm:w-auto flex-shrink-0 ${
-                      settings.instagramConnected
-                        ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
-                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                    }`}
-                  >
-                    {settings.instagramConnected ? (
-                      <>
-                        <LinkIcon className="w-4 h-4 mr-2" />
-                        Reconnect
-                      </>
-                    ) : (
-                      <>
-                        <Instagram className="w-4 h-4 mr-2" />
-                        Connect Instagram
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-              {!settings.instagramConnected && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800 break-words">
-                    ℹ️ Instagram requires a Facebook Page connection. Don&apos;t worry - you don&apos;t need to use Facebook personally! 
-                    We&apos;ll guide you through creating a Page (takes 2 minutes).
-                  </p>
-                </div>
-              )}
-              {settings.instagramConnected && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800 break-words">
-                    ✅ Your Instagram account is connected. You can now schedule and post photos/videos automatically.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Google Calendar Integration */}
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-4 sm:p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-950 mb-1">Google Calendar Integration</h2>
-              <p className="text-sm text-gray-600">
-                Connect your Google Calendar to receive email and push reminders for posts that need manual posting
-              </p>
-            </div>
-            <div className="p-4 sm:p-6 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-950 mb-1">Google Calendar</h3>
-                    <p className="text-sm text-gray-600 break-words">
-                      {settings.googleCalendarConnected 
-                        ? "Connected - You'll receive calendar reminders for LinkedIn and TikTok posts"
-                        : "Not connected - Connect to get email reminders for manual posts"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                  {settings.googleCalendarConnected && (
-                    <Button
-                      onClick={async () => {
-                        try {
-                          const response = await fetch("/api/google-calendar/disconnect", {
-                            method: "POST",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            credentials: "include",
-                            body: JSON.stringify({ userId }),
-                          });
-
-                          if (response.ok) {
-                            setSettings(prev => ({ ...prev, googleCalendarConnected: false }));
-                            await checkGoogleCalendarConnection();
-                            showToast.success("Google Calendar disconnected", "Your Google Calendar has been disconnected");
-                          } else {
-                            const data = await response.json();
-                            throw new Error(data.error || "Failed to disconnect");
-                          }
-                        } catch (error: unknown) {
-                          console.error("Disconnect error:", error);
-                          showToast.error("Disconnect failed", error instanceof Error ? error.message : "Failed to disconnect Google Calendar");
-                        }
-                      }}
-                      className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
-                    >
-                      <LinkIcon className="w-4 h-4 mr-2" />
-                      Disconnect
-                    </Button>
-                  )}
-                  <Button
-                    onClick={() => {
-                      // Redirect to OAuth flow
-                      window.location.href = "/api/google-calendar/auth";
-                    }}
-                    className={`w-full sm:w-auto flex-shrink-0 ${
-                      settings.googleCalendarConnected
-                        ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
-                        : "bg-blue-600 hover:bg-blue-700 text-white"
-                    }`}
-                  >
-                    {settings.googleCalendarConnected ? (
-                      <>
-                        <LinkIcon className="w-4 h-4 mr-2" />
-                        Reconnect
-                      </>
-                    ) : (
-                      <>
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Connect Google Calendar
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-              {!settings.googleCalendarConnected && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800 break-words">
-                    ℹ️ When you schedule posts for LinkedIn or TikTok (which require manual posting), 
-                    we&apos;ll create Google Calendar events so you receive email and push reminders at the right time.
-                  </p>
-                </div>
-              )}
-              {settings.googleCalendarConnected && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800 break-words">
-                    ✅ Your Google Calendar is connected. You&apos;ll receive email and push reminders for LinkedIn and TikTok posts.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          </Card>
         </TabsContent>
 
-        {/* Notifications */}
-        <TabsContent value="notifications" className="space-y-6">
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-950 mb-1">Notification Preferences</h2>
-              <p className="text-sm text-gray-600">Control how and when you receive notifications</p>
+        {/* Team Tab */}
+        <TabsContent value="team" className="space-y-6">
+          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-semibold text-gray-900">Team Management</CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Invite team members, assign roles, and manage permissions
+                  </CardDescription>
+        </div>
+                <Button
+                  onClick={() => window.location.href = "/dashboard/team"}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  Manage Team
+                </Button>
+              </div>
+            </CardHeader>
+            <div className="p-6">
+              <div className="text-center py-8">
+                <Check className="w-12 h-12 text-purple-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Collaboration</h3>
+                <p className="text-gray-600 mb-4">
+                  Invite team members, assign roles, and manage permissions for your agency
+                </p>
+                <Button
+                  onClick={() => window.location.href = "/dashboard/team"}
+                  variant="outline"
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                >
+                  Go to Team Page
+                </Button>
+              </div>
             </div>
+          </Card>
+        </TabsContent>
+
+        {/* Workflow Tab */}
+        <TabsContent value="workflow" className="space-y-6">
+          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-gray-50">
+              <CardTitle className="text-lg font-semibold text-gray-900">Workflow Preferences</CardTitle>
+              <CardDescription className="text-gray-600">
+                Configure default workflow settings for your agency
+              </CardDescription>
+            </CardHeader>
             <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-950 mb-1">Email Notifications</h3>
+                  <h3 className="font-semibold text-gray-950 mb-1">Require Approval by Default</h3>
                   <p className="text-sm text-gray-600">
-                    Receive email updates about your content
+                    New posts will require client approval by default (can be changed per post)
                   </p>
                 </div>
                 <button
-                  onClick={() =>
-                    setSettings({ ...settings, notifications: !settings.notifications })
+                      onClick={() =>
+                    setSettings({ ...settings, defaultRequiresApproval: !settings.defaultRequiresApproval })
                   }
                   className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                    settings.notifications ? "bg-purple-600" : "bg-gray-300"
+                    settings.defaultRequiresApproval !== false ? "bg-purple-600" : "bg-gray-300"
                   }`}
-                  aria-label="Toggle notifications"
+                  aria-label="Toggle default approval"
                 >
                   <div
                     className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.notifications ? "translate-x-6" : "translate-x-0"
+                      settings.defaultRequiresApproval !== false ? "translate-x-6" : "translate-x-0"
                     }`}
                   />
                 </button>
               </div>
             </div>
-          </div>
+          </Card>
         </TabsContent>
 
-        {/* Appearance */}
+        {/* Appearance Tab */}
         <TabsContent value="appearance" className="space-y-6">
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-950 mb-1">Appearance</h2>
-              <p className="text-sm text-gray-600">Customize the look and feel of your dashboard</p>
-            </div>
+          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-gray-50">
+              <CardTitle className="text-lg font-semibold text-gray-900">Appearance</CardTitle>
+              <CardDescription className="text-gray-600">
+                Customize the look and feel of your dashboard
+              </CardDescription>
+            </CardHeader>
             <div className="p-6 space-y-4">
               <div>
                 <label className="text-sm font-semibold text-gray-700 mb-3 block">
@@ -1010,20 +779,454 @@ export default function SettingsPage() {
                         currentTheme === theme ? "text-purple-900" : "text-gray-950"
                       }`}>{theme}</p>
                     </button>
+                  )              )}
+                          </div>
+                            </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* Team Tab */}
+        <TabsContent value="team" className="space-y-6">
+          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-semibold text-gray-900">Team Management</CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Invite team members, assign roles, and manage permissions
+                  </CardDescription>
+                </div>
+                <Button
+                  onClick={() => window.location.href = "/dashboard/team"}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  Manage Team
+                </Button>
+              </div>
+            </CardHeader>
+            <div className="p-6">
+              <div className="text-center py-8">
+                <Check className="w-12 h-12 text-purple-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Collaboration</h3>
+                <p className="text-gray-600 mb-4">
+                  Invite team members, assign roles, and manage permissions for your agency
+                </p>
+                <Button
+                  onClick={() => window.location.href = "/dashboard/team"}
+                  variant="outline"
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                >
+                  Go to Team Page
+                </Button>
+                            </div>
+                          </div>
+          </Card>
+        </TabsContent>
+
+        {/* Notifications Tab */}
+        <TabsContent value="notifications" className="space-y-6">
+          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-gray-50">
+              <CardTitle className="text-lg font-semibold text-gray-900">Email Notifications</CardTitle>
+              <CardDescription className="text-gray-600">
+                Configure when you receive email notifications
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-950 mb-1">Approval Notifications</h3>
+                  <p className="text-sm text-gray-600">
+                    Receive emails when clients approve or request changes to posts
+                  </p>
+                        </div>
+                <button
+                  onClick={() =>
+                    setSettings({ ...settings, emailApprovals: !settings.emailApprovals })
+                  }
+                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
+                    settings.emailApprovals !== false ? "bg-purple-600" : "bg-gray-300"
+                  }`}
+                  aria-label="Toggle approval notifications"
+                >
+                  <div
+                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.emailApprovals !== false ? "translate-x-6" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+                            </div>
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${
+                isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"
+              }`}>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`font-semibold mb-1 ${
+                    isDark ? "text-white" : "text-gray-950"
+                  }`}>Task Assignment Notifications</h3>
+                  <p className={`text-sm ${
+                    isDark ? "text-gray-400" : "text-gray-600"
+                  }`}>
+                    Get notified when tasks are assigned to you or your team members
+                  </p>
+                        </div>
+                <button
+                  onClick={() =>
+                    setSettings({ ...settings, emailTasks: !settings.emailTasks })
+                  }
+                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
+                    settings.emailTasks !== false ? "bg-purple-600" : "bg-gray-300"
+                  }`}
+                  aria-label="Toggle task notifications"
+                >
+                  <div
+                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.emailTasks !== false ? "translate-x-6" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+                      </div>
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${
+                isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"
+              }`}>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`font-semibold mb-1 ${
+                    isDark ? "text-white" : "text-gray-950"
+                  }`}>General Notifications</h3>
+                  <p className={`text-sm ${
+                    isDark ? "text-gray-400" : "text-gray-600"
+                  }`}>
+                    Receive email updates about your content and account activity
+                  </p>
+                    </div>
+                <button
+                  onClick={() =>
+                    setSettings({ ...settings, notifications: !settings.notifications })
+                  }
+                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
+                    settings.notifications ? "bg-purple-600" : "bg-gray-300"
+                  }`}
+                  aria-label="Toggle general notifications"
+                >
+                  <div
+                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.notifications ? "translate-x-6" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* AI Settings Tab */}
+        <TabsContent value="ai" className="space-y-6">
+          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <CardHeader className="border-b border-gray-200 bg-gray-50">
+              <CardTitle className="text-lg font-semibold text-gray-900">AI Model Selection</CardTitle>
+              <CardDescription className="text-gray-600">
+                Choose your preferred AI model for content generation
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6">
+              {/* Simple Dropdown Selector */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select AI Model
+                </label>
+                <div className="relative" ref={modelDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 bg-white border border-gray-300 rounded-md text-left hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-950 focus:border-gray-950 transition-colors text-sm"
+                  >
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      {(() => {
+                        const selectedModel = aiModels.find(m => m.id === settings.defaultAIModel);
+                        if (!selectedModel) return null;
+                        return (
+                          <>
+                            <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-gray-600">
+                              {selectedModel.icon}
+                            </div>
+                            <span className={`font-medium text-sm ${
+                              isDark ? "text-white" : "text-gray-950"
+                            }`}>{selectedModel.name}</span>
+                            <span className={`text-xs ${
+                              isDark ? "text-gray-500" : "text-gray-500"
+                            }`}>•</span>
+                            <span className={`text-xs ${
+                              isDark ? "text-gray-500" : "text-gray-500"
+                            }`}>{selectedModel.provider}</span>
+                          </>
+                        );
+                      })()}
+                    </div>
+                    <ChevronDown 
+                      className={`w-4 h-4 flex-shrink-0 transition-transform ${
+                        isDark ? "text-gray-500" : "text-gray-400"
+                      } ${isModelDropdownOpen ? 'transform rotate-180' : ''}`}
+                    />
+                  </button>
+
+                  {/* Simple Dropdown Menu */}
+                  {isModelDropdownOpen && (
+                    <div className={`absolute z-50 w-full mt-1 border rounded-md shadow-lg max-h-64 overflow-y-auto ${
+                      isDark
+                        ? "bg-slate-800 border-slate-700"
+                        : "bg-white border-gray-300"
+                    }`}>
+                      <div className="py-1">
+                        {aiModels.map((model) => {
+                          const isSelected = settings.defaultAIModel === model.id;
+                          return (
+                            <button
+                          key={model.id}
+                              type="button"
+                              onClick={() => {
+                                setSettings({ ...settings, defaultAIModel: model.id });
+                                setIsModelDropdownOpen(false);
+                              }}
+                              className={`w-full flex items-center gap-2.5 px-3 py-2.5 transition-colors text-left text-sm ${
+                                isDark
+                                  ? isSelected ? "bg-slate-700" : "hover:bg-slate-700"
+                                  : isSelected ? "bg-gray-50" : "hover:bg-gray-50"
+                              }`}
+                            >
+                              <div className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ${
+                                isDark ? "text-gray-400" : "text-gray-600"
+                              }`}>
+                                {model.icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                                  <span className={`font-medium ${
+                                    isSelected
+                                      ? isDark ? "text-white" : "text-gray-950"
+                                      : isDark ? "text-gray-300" : "text-gray-700"
+                                  }`}>
+                                    {model.name}
+                                  </span>
+                                  <span className={`text-xs ${
+                                    isDark ? "text-gray-600" : "text-gray-400"
+                                  }`}>•</span>
+                                  <span className={`text-xs ${
+                                    isDark ? "text-gray-500" : "text-gray-500"
+                                  }`}>{model.provider}</span>
+                                  {isSelected && (
+                                    <Check className={`w-4 h-4 ml-auto flex-shrink-0 ${
+                                      isDark ? "text-purple-400" : "text-gray-950"
+                                    }`} />
+                                  )}
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                            </div>
+                </div>
+                  )}
+              </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className={`${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          } rounded-xl shadow-sm`}>
+            <CardHeader className={`border-b ${
+              isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"
+            }`}>
+              <CardTitle className={`text-lg font-semibold ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Niche Selection</CardTitle>
+              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+                Choose your niche to get personalized content ideas
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {niches.map((niche) => {
+                  const Icon = niche.icon;
+                  const isSelected = settings.niche === niche.id;
+                  
+                  return (
+                <button
+                      key={niche.id}
+                      onClick={() => {
+                        const newSettings = { ...settings, niche: niche.id };
+                        setSettings(newSettings);
+                        localStorage.setItem("userNiche", niche.id);
+                        // Trigger storage event for other tabs
+                        window.dispatchEvent(new Event("storage"));
+                        showToast.success("Niche updated!", "Your content ideas will refresh");
+                      }}
+                      className={`relative p-4 rounded-xl border transition-all text-left ${
+                        isSelected
+                          ? isDark
+                            ? "border-purple-600 bg-purple-950/50 text-purple-200"
+                            : "border-purple-600 bg-purple-50 text-purple-900"
+                          : isDark
+                          ? "border-slate-600 bg-slate-700 hover:border-slate-500"
+                          : "border-gray-200 bg-white hover:border-gray-300"
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          isSelected
+                            ? isDark ? "bg-purple-900/50" : "bg-purple-100"
+                            : isDark ? "bg-gray-700" : "bg-gray-100"
+                        }`}>
+                          <Icon className={`w-5 h-5 ${
+                            isSelected
+                              ? isDark ? "text-purple-400" : "text-purple-600"
+                              : isDark ? "text-gray-400" : "text-gray-600"
+                          }`} />
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xl">{niche.emoji}</span>
+                            <h3 className={`font-semibold text-sm ${
+                              isSelected
+                                ? isDark ? "text-purple-200" : "text-purple-900"
+                                : isDark ? "text-white" : "text-gray-950"
+                            }`}>
+                              {niche.name}
+                            </h3>
+                          </div>
+                        </div>
+                      </div>
+                </button>
+                  );
+                })}
+              </div>
+            </div>
+          </Card>
+
+          <Card className={`${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          } rounded-xl shadow-sm`}>
+            <CardHeader className={`border-b ${
+              isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"
+            }`}>
+              <CardTitle className={`text-lg font-semibold ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Content Settings</CardTitle>
+              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+                Configure your content generation preferences
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 space-y-4">
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${
+                isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"
+              }`}>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`font-semibold mb-1 ${
+                    isDark ? "text-white" : "text-gray-950"
+                  }`}>Auto-save Content</h3>
+                  <p className={`text-sm ${
+                    isDark ? "text-gray-400" : "text-gray-600"
+                  }`}>
+                    Automatically save generated content to history
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    setSettings({ ...settings, autoSave: !settings.autoSave })
+                  }
+                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
+                    settings.autoSave ? "bg-purple-600" : "bg-gray-300"
+                  }`}
+                  aria-label="Toggle auto-save"
+                >
+                  <div
+                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.autoSave ? "translate-x-6" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* Appearance Tab */}
+        <TabsContent value="appearance" className="space-y-6">
+          <Card className={`${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          } rounded-xl shadow-sm`}>
+            <CardHeader className={`border-b ${
+              isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"
+            }`}>
+              <CardTitle className={`text-lg font-semibold ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Appearance</CardTitle>
+              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+                Customize the look and feel of your dashboard
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className={`text-sm font-semibold mb-3 block ${
+                  isDark ? "text-gray-300" : "text-gray-700"
+                }`}>
+                  Theme
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {(["dark", "light", "system"] as const).map((theme) => (
+                    <button
+                      key={theme}
+                      onClick={() => {
+                        setSettings({ ...settings, theme });
+                        setCurrentTheme(theme);
+                        // Save immediately
+                        if (userId) {
+                          fetch("/api/settings", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ userId, settings: { ...settings, theme } }),
+                          }).catch(console.error);
+                        }
+                      }}
+                      className={`p-4 rounded-xl border text-center transition-all ${
+                        currentTheme === theme
+                          ? isDark
+                            ? "border-purple-600 bg-purple-950/50"
+                            : "border-purple-600 bg-purple-50"
+                          : isDark
+                          ? "border-slate-600 bg-slate-700 hover:border-slate-500"
+                          : "border-gray-200 bg-white hover:border-gray-300"
+                      }`}
+                    >
+                      <p className={`font-semibold capitalize text-sm ${
+                        currentTheme === theme
+                          ? isDark ? "text-purple-300" : "text-purple-900"
+                          : isDark ? "text-white" : "text-gray-950"
+                      }`}>{theme}</p>
+                    </button>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </TabsContent>
       </Tabs>
 
       {/* Save Button - Bottom Right */}
-      <div className="flex justify-end pt-6 border-t border-gray-200">
+      <div className={`flex justify-end pt-6 border-t ${
+        isDark ? "border-gray-800" : "border-gray-200"
+      }`}>
         <Button
           onClick={saveSettings}
           disabled={saving}
-          className="bg-gray-950 hover:bg-gray-900 text-white rounded-md px-6 py-2 text-sm font-medium"
+          className="bg-purple-600 hover:bg-purple-700 text-white rounded-md px-6 py-2 text-sm font-medium"
         >
           {saving ? (
             <>

@@ -4,11 +4,15 @@ import { GetUserByClerkId } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    // Get userId from query params first (from frontend)
+    const { searchParams } = new URL(req.url);
+    const queryUserId = searchParams.get("userId");
+    
     // Get authentication from Clerk - try multiple methods
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || queryUserId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {

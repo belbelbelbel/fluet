@@ -10,8 +10,8 @@ export function RouteTransition() {
 
   useEffect(() => {
     setIsLoading(true);
-    // Clear loading state after route change completes
-    const timer = setTimeout(() => setIsLoading(false), 150);
+    // Clear loading state quickly - Next.js navigation is fast
+    const timer = setTimeout(() => setIsLoading(false), 50);
     return () => clearTimeout(timer);
   }, [pathname]);
 

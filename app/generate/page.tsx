@@ -490,12 +490,13 @@ export default function GeneratePage() {
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
               <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
                 <div className="text-center">
-                  <div className="flex justify-center mb-6">
-                    <div className="relative">
-                      <Loader2Icon className="w-16 h-16 text-blue-500 animate-spin" />
-                      <Wand2Icon className="w-8 h-8 text-purple-500 absolute -top-2 -right-2 animate-pulse" />
-                    </div>
-                  </div>
+                     <div className="flex justify-center mb-6">
+                       <div className="relative">
+                         <div className="w-24 h-24 animate-spin flex items-center justify-center">
+                           <Logo size="xl" variant="icon" />
+                         </div>
+                       </div>
+                     </div>
                   <h3 className="text-2xl font-bold text-white mb-3">
                     {loadingMessage || "✨ Crafting your perfect content..."}
                   </h3>

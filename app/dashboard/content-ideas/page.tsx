@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,8 @@ const formatLabels: Record<Format, { label: string; icon: LucideIcon }> = {
 
 export default function ContentIdeasPage() {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [niche, setNiche] = useState<Niche | null>(null);
   const [contentIdeas, setContentIdeas] = useState<ContentIdea[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,10 +119,14 @@ export default function ContentIdeasPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
+        isDark ? "bg-slate-900" : "bg-white"
+      }`}>
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading content ideas...</p>
+          <RefreshCw className={`w-8 h-8 animate-spin mx-auto mb-4 ${
+            isDark ? "text-purple-400" : "text-blue-600"
+          }`} />
+          <p className={isDark ? "text-slate-300" : "text-gray-600"}>Loading content ideas...</p>
         </div>
       </div>
     );
@@ -130,60 +137,92 @@ export default function ContentIdeasPage() {
   }
 
   return (
-    <div className="space-y-8 pt-8 max-w-5xl mx-auto">
+    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+      isDark ? "bg-slate-900" : "bg-white"
+    }`}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-2">
+      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 sm:pb-6 border-b transition-colors duration-300 ${
+        isDark ? "border-slate-700" : "border-gray-200"
+      }`}>
+        <div className="flex-1 min-w-0">
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2 ${
+            isDark ? "text-white" : "text-gray-950"
+          }`}>
             Daily Content Ideas
           </h1>
-          <p className="text-base text-gray-600">
+          <p className={`text-sm sm:text-base ${isDark ? "text-slate-400" : "text-gray-600"}`}>
             Fresh ideas tailored for your niche
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <Button
             onClick={() => router.push("/dashboard/settings")}
             variant="outline"
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl"
+            className={`flex-1 sm:flex-none rounded-xl text-xs sm:text-sm transition-all duration-200 ${
+              isDark
+                ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+            }`}
           >
             Change Niche
           </Button>
           <Button
             onClick={handleRefresh}
             variant="outline"
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl"
+            className={`flex-1 sm:flex-none rounded-xl text-xs sm:text-sm transition-all duration-200 ${
+              isDark
+                ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+            }`}
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
+            <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
             Refresh
           </Button>
         </div>
       </div>
 
       {/* Content Ideas List */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {contentIdeas.length > 0 ? (
           contentIdeas.map((idea) => {
             const FormatIcon = formatLabels[idea.format].icon;
             
             return (
-              <Card key={idea.id} className="bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-all">
-                <CardContent className="p-5">
+              <Card key={idea.id} className={`border rounded-xl transition-all duration-200 ${
+                isDark 
+                  ? "bg-slate-800 border-slate-700 hover:border-slate-600" 
+                  : "bg-white border-gray-200 hover:border-gray-300"
+              }`}>
+                <CardContent className="p-4 sm:p-5">
                   {/* Topic Header */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                      <Lightbulb className="w-5 h-5 text-purple-600" />
+                  <div className="flex items-start sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isDark ? "bg-purple-500/20" : "bg-purple-100"
+                    }`}>
+                      <Lightbulb className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                        isDark ? "text-purple-400" : "text-purple-600"
+                      }`} />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-950 flex-1">
+                    <h3 className={`text-base sm:text-lg font-semibold flex-1 leading-tight ${
+                      isDark ? "text-white" : "text-gray-950"
+                    }`}>
                       {idea.topic}
                     </h3>
                   </div>
 
                     {/* Hook Example */}
                     <div className="mb-3 sm:mb-4">
-                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5 sm:mb-2">Hook Example</p>
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5 sm:p-3">
-                        <p className="text-xs sm:text-sm text-gray-950 leading-relaxed">
+                      <p className={`text-xs font-semibold uppercase tracking-wide mb-1.5 sm:mb-2 ${
+                        isDark ? "text-slate-400" : "text-gray-600"
+                      }`}>Hook Example</p>
+                      <div className={`border rounded-lg p-2.5 sm:p-3 ${
+                        isDark 
+                          ? "bg-slate-900/50 border-slate-700" 
+                          : "bg-gray-50 border-gray-200"
+                      }`}>
+                        <p className={`text-xs sm:text-sm leading-relaxed ${
+                          isDark ? "text-slate-200" : "text-gray-950"
+                        }`}>
                           &ldquo;{idea.hookExample}&rdquo;
                         </p>
                       </div>
@@ -191,32 +230,52 @@ export default function ContentIdeasPage() {
 
                   {/* Badges */}
                   <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <Badge variant="secondary" className="bg-gray-100 text-gray-700 border-gray-200">
+                    <Badge className={`${
+                      isDark 
+                        ? "bg-slate-700 text-slate-200 border-slate-600" 
+                        : "bg-gray-100 text-gray-700 border-gray-200"
+                    }`}>
                       {hookStyleLabels[idea.hookStyle]} Hook
                     </Badge>
-                    <Badge variant="secondary" className="bg-gray-100 text-gray-700 border-gray-200 flex items-center gap-1.5">
+                    <Badge className={`flex items-center gap-1.5 ${
+                      isDark 
+                        ? "bg-slate-700 text-slate-200 border-slate-600" 
+                        : "bg-gray-100 text-gray-700 border-gray-200"
+                    }`}>
                       <FormatIcon className="w-3.5 h-3.5" />
                       {formatLabels[idea.format].label}
                     </Badge>
                     {idea.description && (
-                      <p className="text-sm text-gray-600 ml-auto">
+                      <p className={`text-sm ml-auto ${
+                        isDark ? "text-slate-400" : "text-gray-600"
+                      }`}>
                         {idea.description}
                       </p>
                     )}
                   </div>
 
                   {/* Actions */}
-                  <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-gray-200">
+                  <div className={`flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4 border-t transition-colors duration-300 ${
+                    isDark ? "border-slate-700" : "border-gray-200"
+                  }`}>
                     <Button
                       onClick={() => handleGenerateCaption(idea)}
-                      className="flex-1 sm:flex-none bg-black hover:bg-black/90 text-white rounded-xl"
+                      className={`flex-1 text-white rounded-xl py-2.5 sm:py-2 text-sm transition-all duration-200 shadow-sm hover:shadow-md ${
+                        isDark
+                          ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800"
+                          : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950"
+                      }`}
                     >
                       Generate Caption
                     </Button>
                     <Button
                       onClick={() => handleSaveToStack(idea)}
                       variant="outline"
-                      className="flex-1 sm:flex-none border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl flex items-center justify-center gap-2"
+                      className={`flex-1 rounded-xl flex items-center justify-center gap-2 py-2.5 sm:py-2 text-sm transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                      }`}
                     >
                       <Calendar className="w-4 h-4" />
                       Save to Stack
@@ -227,19 +286,31 @@ export default function ContentIdeasPage() {
               );
             })
         ) : (
-          <Card className="bg-white border border-gray-200 rounded-xl">
+          <Card className={`border rounded-xl transition-colors duration-300 ${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          }`}>
             <CardContent className="p-12 text-center">
-              <Lightbulb className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-950 mb-2">
+              <Lightbulb className={`w-12 h-12 mx-auto mb-4 ${
+                isDark ? "text-slate-500" : "text-gray-400"
+              }`} />
+              <h3 className={`text-lg font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-950"
+              }`}>
                 No content ideas yet
               </h3>
-              <p className="text-base text-gray-600 mb-4">
+              <p className={`text-base mb-4 ${
+                isDark ? "text-slate-400" : "text-gray-600"
+              }`}>
                 We&apos;re working on adding more ideas for your niche
               </p>
               <Button
                 onClick={handleRefresh}
                 variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl"
+                className={`rounded-xl transition-all duration-200 ${
+                  isDark
+                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                }`}
               >
                 Try Again
               </Button>
@@ -253,7 +324,11 @@ export default function ContentIdeasPage() {
         <Button
           onClick={() => router.push("/dashboard/post-stack")}
           variant="outline"
-          className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl"
+          className={`rounded-xl transition-all duration-200 ${
+            isDark
+              ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+              : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+          }`}
         >
           View Post Stack
           <ArrowRight className="w-4 h-4 ml-2" />

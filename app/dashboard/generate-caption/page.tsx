@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 // import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -134,52 +135,74 @@ export default function GenerateCaptionPage() {
 
   if (!idea) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
+        isDark ? "bg-slate-900" : "bg-white"
+      }`}>
+        <RefreshCw className={`w-8 h-8 animate-spin ${
+          isDark ? "text-purple-400" : "text-blue-600"
+        }`} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-5xl mx-auto py-8">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDark ? "bg-slate-900" : "bg-white"
+    }`}>
+      <div className="max-w-5xl mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-10">
+        <div className="mb-6 sm:mb-8 lg:mb-10">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-950 mb-6 transition-colors"
+            className={`inline-flex items-center text-sm mb-4 sm:mb-6 transition-all duration-200 ${
+              isDark
+                ? "text-slate-400 hover:text-white"
+                : "text-gray-600 hover:text-gray-950"
+            }`}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-950 mb-2">
+            <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${
+              isDark ? "text-white" : "text-gray-950"
+            }`}>
               Generate Caption
             </h1>
-            <p className="text-gray-600">
+            <p className={`text-sm sm:text-base ${isDark ? "text-slate-400" : "text-gray-600"}`}>
               Choose your Naija tone and create a custom caption
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Left Column - Content & Tone */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* Content Idea Section */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                <p className={`text-xs font-semibold uppercase tracking-wider mb-2 sm:mb-3 ${
+                  isDark ? "text-slate-400" : "text-gray-500"
+                }`}>
                   Content Idea
                 </p>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-950 mb-1">
+                    <h2 className={`text-xl sm:text-2xl font-bold mb-1 ${
+                      isDark ? "text-white" : "text-gray-950"
+                    }`}>
                       {idea.topic}
                     </h2>
                   </div>
-                  <div className="border-l-4 border-purple-600 pl-4 py-2">
-                    <p className="text-sm text-gray-500 mb-1">Hook</p>
-                    <p className="text-base text-gray-950 italic leading-relaxed">
+                  <div className={`border-l-4 pl-3 sm:pl-4 py-2 ${
+                    isDark ? "border-purple-500" : "border-purple-600"
+                  }`}>
+                    <p className={`text-xs sm:text-sm mb-1 ${
+                      isDark ? "text-slate-400" : "text-gray-500"
+                    }`}>Hook</p>
+                    <p className={`text-sm sm:text-base italic leading-relaxed ${
+                      isDark ? "text-slate-200" : "text-gray-950"
+                    }`}>
                       &ldquo;{idea.hookExample}&rdquo;
                     </p>
                   </div>
@@ -189,31 +212,43 @@ export default function GenerateCaptionPage() {
 
             {/* Naija Tone Selector */}
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+              <p className={`text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4 ${
+                isDark ? "text-slate-400" : "text-gray-500"
+              }`}>
                 Select Naija Tone
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 {(["mild", "moderate", "heavy"] as NaijaTone[]).map((tone) => (
                   <button
                     key={tone}
                     onClick={() => setSelectedTone(tone)}
                     disabled={isGenerating}
-                    className={`relative p-5 rounded-xl border-2 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`relative p-4 sm:p-5 rounded-xl border-2 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed ${
                       selectedTone === tone
-                        ? "border-purple-600 bg-purple-50"
+                        ? isDark
+                          ? "border-purple-500 bg-purple-900/50"
+                          : "border-purple-600 bg-purple-50"
+                        : isDark
+                        ? "border-slate-700 bg-slate-800 hover:border-purple-500 hover:bg-purple-900/30"
                         : "border-gray-200 bg-white hover:border-purple-200 hover:bg-purple-50/30"
                     }`}
                   >
                     {selectedTone === tone && (
-                      <div className="absolute top-3 right-3 w-2 h-2 bg-purple-600 rounded-full" />
+                      <div className={`absolute top-3 right-3 w-2 h-2 rounded-full ${
+                        isDark ? "bg-purple-400" : "bg-purple-600"
+                      }`} />
                     )}
                     <div className={`font-bold text-base mb-2 capitalize ${
-                      selectedTone === tone ? "text-purple-700" : "text-gray-950"
+                      selectedTone === tone 
+                        ? isDark ? "text-purple-300" : "text-purple-700"
+                        : isDark ? "text-white" : "text-gray-950"
                     }`}>
                       {tone}
                     </div>
                     <div className={`text-xs leading-relaxed ${
-                      selectedTone === tone ? "text-purple-600" : "text-gray-600"
+                      selectedTone === tone 
+                        ? isDark ? "text-purple-400" : "text-purple-600"
+                        : isDark ? "text-slate-400" : "text-gray-600"
                     }`}>
                       {tone === "mild" && "Professional with local phrases"}
                       {tone === "moderate" && "Mix of English & Pidgin"}
@@ -230,11 +265,15 @@ export default function GenerateCaptionPage() {
                 <Button
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full text-white rounded-xl py-3 sm:py-4 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md ${
+                    isDark
+                      ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800"
+                      : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950"
+                  }`}
                 >
                   {isGenerating ? (
                     <>
-                      <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
                       Generating Caption...
                     </>
                   ) : (
@@ -249,16 +288,30 @@ export default function GenerateCaptionPage() {
           <div className="lg:col-span-1">
             <div className="sticky top-8">
               {!hasGenerated ? (
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-12 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                    <Lightbulb className="w-8 h-8 text-gray-400" />
+                <div className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors duration-300 ${
+                  isDark 
+                    ? "border-slate-700 bg-slate-800/50" 
+                    : "border-gray-200 bg-white"
+                }`}>
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                    isDark ? "bg-slate-700" : "bg-gray-100"
+                  }`}>
+                    <Lightbulb className={`w-8 h-8 ${
+                      isDark ? "text-slate-500" : "text-gray-400"
+                    }`} />
                   </div>
-                  <p className="text-sm text-gray-500">
+                  <p className={`text-sm ${
+                    isDark ? "text-slate-400" : "text-gray-500"
+                  }`}>
                     Your generated caption will appear here
                   </p>
                 </div>
               ) : (
-                <div className="border border-gray-200 rounded-xl bg-white overflow-hidden">
+                <div className={`border rounded-xl overflow-hidden transition-colors duration-300 ${
+                  isDark 
+                    ? "border-slate-700 bg-slate-800" 
+                    : "border-gray-200 bg-white"
+                }`}>
                   <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold text-white">
@@ -268,14 +321,14 @@ export default function GenerateCaptionPage() {
                         <button
                           onClick={handleGenerate}
                           disabled={isGenerating}
-                          className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                          className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-all duration-200 disabled:opacity-50"
                           title="Regenerate"
                         >
                           <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
                         </button>
                         <button
                           onClick={handleCopy}
-                          className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                          className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-all duration-200"
                           title="Copy"
                         >
                           {isCopied ? (
@@ -292,19 +345,29 @@ export default function GenerateCaptionPage() {
                       {isGenerating ? (
                         <div className="flex items-center justify-center py-12">
                           <div className="text-center">
-                            <RefreshCw className="w-6 h-6 text-gray-400 animate-spin mx-auto mb-3" />
-                            <span className="text-sm text-gray-600">Generating...</span>
+                            <RefreshCw className={`w-6 h-6 animate-spin mx-auto mb-3 ${
+                              isDark ? "text-slate-400" : "text-gray-400"
+                            }`} />
+                            <span className={`text-sm ${
+                              isDark ? "text-slate-400" : "text-gray-600"
+                            }`}>Generating...</span>
                           </div>
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-950 leading-relaxed whitespace-pre-wrap">
+                        <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
+                          isDark ? "text-slate-200" : "text-gray-950"
+                        }`}>
                           {generatedCaption}
                         </p>
                       )}
                     </div>
                     {generatedCaption && !isGenerating && (
-                      <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
+                      <div className={`mt-4 pt-4 border-t flex items-center justify-between transition-colors duration-300 ${
+                        isDark ? "border-slate-700" : "border-gray-200"
+                      }`}>
+                        <span className={`text-xs ${
+                          isDark ? "text-slate-400" : "text-gray-500"
+                        }`}>
                           {generatedCaption.length} characters
                         </span>
                         <div className="flex gap-2">
@@ -312,7 +375,7 @@ export default function GenerateCaptionPage() {
                             onClick={handleSave}
                             disabled={isSaving || !generatedCaption}
                             size="sm"
-                            className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-4 py-1.5 text-xs font-medium disabled:opacity-50"
+                            className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-lg px-4 py-1.5 text-xs font-medium disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
                           >
                             <Save className="w-3 h-3 mr-1.5" />
                             {isSaving ? "Saving..." : "Save"}
@@ -321,7 +384,11 @@ export default function GenerateCaptionPage() {
                             onClick={() => router.push("/dashboard/content-ideas")}
                             variant="outline"
                             size="sm"
-                            className="border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg px-4 py-1.5 text-xs font-medium"
+                            className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
+                              isDark
+                                ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                                : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                            }`}
                           >
                             Another
                           </Button>

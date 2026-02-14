@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Logo } from "@/components/Logo";
 import {
   TwitterIcon,
   InstagramIcon,
@@ -35,7 +36,7 @@ export default function Home() {
   return (
     <div className={`min-h-screen overflow-hidden transition-colors duration-300 ${
       isDark 
-        ? "bg-gray-950 text-gray-100" 
+        ? "bg-slate-900 text-white" 
         : "bg-white text-gray-900"
     }`}>
       <Navbar />
@@ -46,7 +47,7 @@ export default function Home() {
 
         {/* Features Section - Right After Hero */}
         <section className={`relative py-32 transition-colors duration-300 ${
-          isDark ? "bg-gray-900" : "bg-white"
+          isDark ? "bg-slate-900" : "bg-white"
         }`}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             {/* Section Header */}
@@ -167,8 +168,14 @@ export default function Home() {
                 <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-xl">
                   <div className="mb-6 pb-4 border-b border-gray-200">
                     <div className="flex items-center gap-2 mb-4">
-                      <Wand2Icon className="w-6 h-6 text-gray-900" />
-                      <span className="text-lg font-bold text-gray-900">Flippr AI</span>
+                      <div className="w-6 h-6 flex items-center justify-center">
+                        <img 
+                          src="/images/Revvylogo/logo-icon.png" 
+                          alt="Revvy Logo" 
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <span className="text-lg font-bold text-gray-900">Revvy</span>
                     </div>
                     <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Menu</div>
                     <div className="space-y-2">
@@ -360,7 +367,7 @@ export default function Home() {
                 <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-bold">real creators</span>
             </h2>
               <p className="text-xl max-w-2xl mx-auto leading-relaxed text-gray-600">
-                See how Flippr AI helps businesses post consistently and grow faster
+                See how Revvy helps Nigerian agencies manage multiple clients and grow faster
               </p>
             </div>
 
@@ -674,7 +681,7 @@ export default function Home() {
                 Frequently asked questions
               </h2>
               <p className="text-xl text-gray-600">
-                <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">Everything</span> you need to know about Flippr AI
+                <span className="bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent font-semibold">Everything</span> you need to know about Revvy
               </p>
             </div>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { showToast } from "@/lib/toast";
@@ -41,6 +42,8 @@ export default function DashboardHistoryPage() {
   const { userId } = useAuth();
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [content, setContent] = useState<GeneratedContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<ContentType | "all">("all");
@@ -190,18 +193,26 @@ export default function DashboardHistoryPage() {
   const contentTypes = useMemo(() => (["twitter", "instagram", "linkedin", "tiktok"] as ContentType[]), []);
 
   return (
-    <div className="space-y-8 pt-8 max-w-5xl mx-auto">
+    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+      isDark ? "bg-slate-900" : "bg-white"
+    }`}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-2">Content History</h1>
-          <p className="text-base text-gray-600">Your generated content</p>
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 ${
+            isDark ? "text-white" : "text-gray-950"
+          }`}>Content History</h1>
+          <p className={isDark ? "text-slate-400" : "text-gray-600"}>Your generated content</p>
         </div>
         <Button
           onClick={fetchContent}
           size="sm"
           variant="outline"
-          className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+          className={`rounded-xl transition-all duration-200 ${
+            isDark
+              ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+              : "border-gray-300 text-gray-700 hover:bg-gray-100"
+          }`}
           title="Refresh"
         >
           <RefreshCwIcon className="w-4 h-4" />
@@ -213,9 +224,11 @@ export default function DashboardHistoryPage() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setFilter("all")}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               filter === "all"
                 ? "bg-purple-600 text-white"
+                : isDark
+                ? "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
                 : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
             }`}
           >
@@ -225,9 +238,11 @@ export default function DashboardHistoryPage() {
             <button
               key={type}
               onClick={() => setFilter(type)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                 filter === type
                   ? "bg-purple-600 text-white"
+                  : isDark
+                  ? "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
@@ -241,26 +256,46 @@ export default function DashboardHistoryPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="bg-white border-gray-200 rounded-xl animate-pulse">
+            <Card key={i} className={`border rounded-xl animate-pulse transition-colors duration-300 ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-gray-200 rounded-xl"></div>
+                  <div className={`w-10 h-10 rounded-xl ${
+                    isDark ? "bg-slate-700" : "bg-gray-200"
+                  }`}></div>
                   <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className={`h-4 rounded w-1/4 mb-2 ${
+                      isDark ? "bg-slate-700" : "bg-gray-200"
+                    }`}></div>
+                    <div className={`h-3 rounded w-1/2 ${
+                      isDark ? "bg-slate-700" : "bg-gray-200"
+                    }`}></div>
                   </div>
                 </div>
-                <div className="h-16 bg-gray-200 rounded mb-2"></div>
-                <div className="h-24 bg-gray-200 rounded"></div>
+                <div className={`h-16 rounded mb-2 ${
+                  isDark ? "bg-slate-700" : "bg-gray-200"
+                }`}></div>
+                <div className={`h-24 rounded ${
+                  isDark ? "bg-slate-700" : "bg-gray-200"
+                }`}></div>
               </CardContent>
             </Card>
           ))}
         </div>
       ) : content.length === 0 ? (
-        <div className="text-center py-12 bg-white border border-gray-200 rounded-xl">
-          <FileTextIcon className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <h3 className="text-lg font-semibold text-gray-950 mb-1.5">No content history yet</h3>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className={`text-center py-12 border rounded-xl transition-colors duration-300 ${
+          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+        }`}>
+          <FileTextIcon className={`w-12 h-12 mx-auto mb-3 ${
+            isDark ? "text-slate-500" : "text-gray-400"
+          }`} />
+          <h3 className={`text-lg font-semibold mb-1.5 ${
+            isDark ? "text-white" : "text-gray-950"
+          }`}>No content history yet</h3>
+          <p className={`text-sm mb-4 ${
+            isDark ? "text-slate-400" : "text-gray-600"
+          }`}>
             {userId 
               ? "Generate your first piece of content to see it here"
               : "Please sign in to view your content history"}
@@ -268,7 +303,7 @@ export default function DashboardHistoryPage() {
           {userId && (
             <Button
               onClick={() => router.push("/dashboard/generate")}
-              className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+              className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Generate Content
             </Button>
@@ -279,26 +314,40 @@ export default function DashboardHistoryPage() {
           {content.map((item) => (
             <Card
               key={item.id}
-              className="bg-white border-gray-200 rounded-xl hover:border-gray-300 transition-colors"
+              className={`border rounded-xl transition-all duration-200 ${
+                isDark
+                  ? "bg-slate-800 border-slate-700 hover:border-slate-600"
+                  : "bg-white border-gray-200 hover:border-gray-300"
+              }`}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gray-100 rounded-xl">
+                    <div className={`p-2 rounded-xl ${
+                      isDark ? "bg-slate-700" : "bg-gray-100"
+                    }`}>
                       {getContentTypeIcon(item.contentType)}
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold capitalize text-sm sm:text-base text-gray-950">
+                        <span className={`font-semibold capitalize text-sm sm:text-base ${
+                          isDark ? "text-white" : "text-gray-950"
+                        }`}>
                           {item.contentType}
                         </span>
                         {item.posted === true && (
-                          <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
+                          <span className={`px-2 py-1 text-xs rounded-full border transition-colors duration-300 ${
+                            isDark
+                              ? "bg-green-950/50 text-green-400 border-green-800"
+                              : "bg-green-50 text-green-700 border-green-200"
+                          }`}>
                             ✓ Posted
                           </span>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600 mt-1">
+                      <div className={`flex flex-wrap items-center gap-2 text-xs mt-1 ${
+                        isDark ? "text-slate-400" : "text-gray-600"
+                      }`}>
                         <div className="flex items-center space-x-1">
                           <CalendarIcon className="w-3 h-3" />
                           <span>{formatDate(item.createdAt)}</span>
@@ -306,7 +355,11 @@ export default function DashboardHistoryPage() {
                         {item.tone && (
                           <>
                             <span>•</span>
-                            <span className="capitalize px-2 py-0.5 bg-gray-100 text-gray-700 rounded-lg">
+                            <span className={`capitalize px-2 py-0.5 rounded-lg ${
+                              isDark
+                                ? "bg-slate-700 text-slate-300"
+                                : "bg-gray-100 text-gray-700"
+                            }`}>
                               {item.tone}
                             </span>
                           </>
@@ -314,7 +367,11 @@ export default function DashboardHistoryPage() {
                         {item.style && (
                           <>
                             <span>•</span>
-                            <span className="capitalize px-2 py-0.5 bg-gray-100 text-gray-700 rounded-lg">
+                            <span className={`capitalize px-2 py-0.5 rounded-lg ${
+                              isDark
+                                ? "bg-slate-700 text-slate-300"
+                                : "bg-gray-100 text-gray-700"
+                            }`}>
                               {item.style}
                             </span>
                           </>
@@ -327,7 +384,11 @@ export default function DashboardHistoryPage() {
                       onClick={() => handleCopy(item.content, item.id)}
                       size="sm"
                       variant="outline"
-                      className="border-gray-300 text-gray-700 hover:bg-gray-50 h-8 w-8 p-0 rounded-xl"
+                      className={`h-8 w-8 p-0 rounded-xl transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
                       title="Copy"
                     >
                       {copiedId === item.id ? (
@@ -340,7 +401,11 @@ export default function DashboardHistoryPage() {
                       onClick={() => setViewingContent(item)}
                       size="sm"
                       variant="outline"
-                      className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+                      className={`rounded-xl transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
                     >
                       View
                     </Button>
@@ -348,7 +413,11 @@ export default function DashboardHistoryPage() {
                       onClick={() => handleDeleteClick(item.id)}
                       size="sm"
                       variant="outline"
-                      className="border-gray-300 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:border-red-300 rounded-xl"
+                      className={`rounded-xl transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-red-400 hover:bg-red-950/30 hover:border-red-500 hover:text-red-300"
+                          : "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300"
+                      }`}
                       title="Delete"
                     >
                       <TrashIcon className="w-4 h-4" />
@@ -356,15 +425,31 @@ export default function DashboardHistoryPage() {
                 </div>
               </div>
               <div className="mb-4">
-                <p className="text-xs text-gray-600 mb-1.5 font-medium">Prompt</p>
-                <p className="text-gray-700 text-sm bg-gray-50 px-3 py-2 rounded-xl border border-gray-200">{item.prompt}</p>
+                <p className={`text-xs mb-1.5 font-medium ${
+                  isDark ? "text-slate-400" : "text-gray-600"
+                }`}>Prompt</p>
+                <p className={`text-sm px-3 py-2 rounded-xl border transition-colors duration-300 ${
+                  isDark
+                    ? "text-slate-200 bg-slate-900/50 border-slate-700"
+                    : "text-gray-700 bg-gray-50 border-gray-200"
+                }`}>{item.prompt}</p>
               </div>
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div className={`p-4 rounded-xl border transition-colors duration-300 ${
+                isDark
+                  ? "bg-slate-900/50 border-slate-700"
+                  : "bg-gray-50 border-gray-200"
+              }`}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-gray-600 font-medium">Content</p>
-                  <span className="text-xs text-gray-500">{item.content.length} chars</span>
+                  <p className={`text-xs font-medium ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>Content</p>
+                  <span className={`text-xs ${
+                    isDark ? "text-slate-500" : "text-gray-500"
+                  }`}>{item.content.length} chars</span>
                 </div>
-                <pre className="whitespace-pre-wrap text-gray-950 text-sm leading-relaxed max-h-40 overflow-y-auto">
+                <pre className={`whitespace-pre-wrap text-sm leading-relaxed max-h-40 overflow-y-auto ${
+                  isDark ? "text-slate-200" : "text-gray-950"
+                }`}>
                   {item.content}
                 </pre>
               </div>
@@ -381,16 +466,26 @@ export default function DashboardHistoryPage() {
           onClick={() => setViewingContent(null)}
         >
           <div 
-            className="bg-white rounded-xl border border-gray-200 max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+            className={`rounded-xl border max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors duration-300 ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-950 capitalize">
+            <div className={`p-4 border-b flex items-center justify-between transition-colors duration-300 ${
+              isDark ? "border-slate-700" : "border-gray-200"
+            }`}>
+              <h3 className={`text-lg font-semibold capitalize ${
+                isDark ? "text-white" : "text-gray-950"
+              }`}>
                 {viewingContent.contentType}
               </h3>
               <button
                 onClick={() => setViewingContent(null)}
-                className="text-gray-600 hover:text-gray-950 transition-colors p-1.5 hover:bg-gray-100 rounded-xl"
+                className={`transition-all duration-200 p-1.5 rounded-xl ${
+                  isDark
+                    ? "text-slate-400 hover:text-white hover:bg-slate-700"
+                    : "text-gray-600 hover:text-gray-950 hover:bg-gray-100"
+                }`}
               >
                 <XIcon className="w-4 h-4" />
               </button>
@@ -398,21 +493,35 @@ export default function DashboardHistoryPage() {
 
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               <div>
-                <p className="text-xs text-gray-600 mb-1.5 font-medium">Prompt</p>
-                <p className="text-gray-700 text-sm bg-gray-50 px-3 py-2 rounded-xl border border-gray-200">
+                <p className={`text-xs mb-1.5 font-medium ${
+                  isDark ? "text-slate-400" : "text-gray-600"
+                }`}>Prompt</p>
+                <p className={`text-sm px-3 py-2 rounded-xl border transition-colors duration-300 ${
+                  isDark
+                    ? "text-slate-200 bg-slate-900/50 border-slate-700"
+                    : "text-gray-700 bg-gray-50 border-gray-200"
+                }`}>
                   {viewingContent.prompt}
                 </p>
               </div>
               {viewingContent.tone && (
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-gray-600">Tone:</span>
-                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-lg capitalize">
+                  <span className={isDark ? "text-slate-400" : "text-gray-600"}>Tone:</span>
+                  <span className={`px-2 py-0.5 rounded-lg capitalize ${
+                    isDark
+                      ? "bg-slate-700 text-slate-300"
+                      : "bg-gray-100 text-gray-700"
+                  }`}>
                     {viewingContent.tone}
                   </span>
                   {viewingContent.style && (
                     <>
-                      <span className="text-gray-600">Style:</span>
-                      <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-lg capitalize">
+                      <span className={isDark ? "text-slate-400" : "text-gray-600"}>Style:</span>
+                      <span className={`px-2 py-0.5 rounded-lg capitalize ${
+                        isDark
+                          ? "bg-slate-700 text-slate-300"
+                          : "bg-gray-100 text-gray-700"
+                      }`}>
                         {viewingContent.style}
                       </span>
                     </>
@@ -421,25 +530,41 @@ export default function DashboardHistoryPage() {
               )}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-xs text-gray-600 font-medium">Content</p>
-                  <span className="text-xs text-gray-600">{viewingContent.content.length} chars</span>
+                  <p className={`text-xs font-medium ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>Content</p>
+                  <span className={`text-xs ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>{viewingContent.content.length} chars</span>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <pre className="whitespace-pre-wrap text-gray-950 text-sm leading-relaxed">
+                <div className={`rounded-xl p-4 border transition-colors duration-300 ${
+                  isDark
+                    ? "bg-slate-900/50 border-slate-700"
+                    : "bg-gray-50 border-gray-200"
+                }`}>
+                  <pre className={`whitespace-pre-wrap text-sm leading-relaxed ${
+                    isDark ? "text-slate-200" : "text-gray-950"
+                  }`}>
                     {viewingContent.content}
                   </pre>
                 </div>
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-2">
+            <div className={`p-4 border-t flex items-center justify-end gap-2 transition-colors duration-300 ${
+              isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"
+            }`}>
               <Button
                 onClick={() => {
                   handleCopy(viewingContent.content, viewingContent.id);
                 }}
                 size="sm"
                 variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+                className={`rounded-xl transition-all duration-200 ${
+                  isDark
+                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                }`}
               >
                 {copiedId === viewingContent.id ? (
                   <CheckIcon className="w-4 h-4" />
@@ -453,7 +578,11 @@ export default function DashboardHistoryPage() {
                   handleSchedule(viewingContent);
                 }}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className={`transition-all duration-200 ${
+                  isDark
+                    ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                    : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white"
+                }`}
               >
                 <CalendarPlusIcon className="w-4 h-4 mr-2" />
                 Schedule
@@ -462,7 +591,11 @@ export default function DashboardHistoryPage() {
                 onClick={() => setViewingContent(null)}
                 size="sm"
                 variant="ghost"
-                className="text-gray-400 hover:text-white hover:bg-gray-800"
+                className={`transition-all duration-200 ${
+                  isDark
+                    ? "text-slate-400 hover:text-white hover:bg-slate-700"
+                    : "text-gray-400 hover:text-gray-950 hover:bg-gray-200"
+                }`}
               >
                 Close
               </Button>

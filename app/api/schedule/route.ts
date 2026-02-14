@@ -1,6 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, CreateScheduledPost, GetUserScheduledPosts, DeleteScheduledPost, UpdateScheduledPost } from "@/utils/db/actions";
+import { CreatePostApproval } from "@/utils/db/actions";
+import { generateApprovalToken } from "@/utils/approvals/token";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +52,7 @@ export async function POST(req: Request) {
   try {
     // Parse body first to get client userId (same pattern as generate API)
     const body = await req.json();
-    const { contentId, platform, content, scheduledFor, userId: clientUserId } = body;
+    const { contentId, platform, content, scheduledFor, userId: clientUserId, clientId, requiresApproval } = body;
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
@@ -95,13 +97,81 @@ export async function POST(req: Request) {
         { status: 404 }
       );
     }
+    // Create scheduled post
     const scheduledPost = await CreateScheduledPost(
       user.id,
       contentId || null,
       platform,
       content,
-      scheduledDate
+      scheduledDate,
+      clientId ? parseInt(clientId) : null,
+      requiresApproval !== false // Default to true if clientId exists
     );
+
+    // If clientId provided and requires approval, create approval record
+    if (clientId && scheduledPost.requiresApproval) {
+      try {
+        const approvalToken = generateApprovalToken();
+        const expiresAt = new Date(scheduledDate);
+        expiresAt.setDate(expiresAt.getDate() - 1); // Expire 1 day before scheduled time
+
+        await CreatePostApproval({
+          scheduledPostId: scheduledPost.id,
+          clientId: parseInt(clientId),
+          approvalToken,
+          expiresAt,
+        });
+
+        // Return approval link in response
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        const approvalLink = `${appUrl}/client-portal/${approvalToken}`;
+
+        // Send email notification to client (if client email available)
+        try {
+          // Get client info
+          const { Clients } = await import("@/utils/db/schema");
+          const { GetClientById } = await import("@/utils/db/actions");
+          const client = await GetClientById(parseInt(clientId), user.id);
+          
+          // In production, you'd get client email from a separate table or user account
+          // For now, we'll send to the agency user as a placeholder
+          if (user.email) {
+            await fetch(`${appUrl}/api/notifications/email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                type: "approval_requested",
+                recipientEmail: user.email, // In production, use client email
+                data: {
+                  clientName: client?.name || "Client",
+                  platform: platform,
+                  scheduledFor: scheduledDate.toISOString(),
+                  content: content,
+                  approvalLink: approvalLink,
+                  expiresAt: expiresAt.toISOString(),
+                },
+              }),
+            }).catch((err) => {
+              console.error("Failed to send approval email:", err);
+            });
+          }
+        } catch (emailError) {
+          console.error("Error sending approval email:", emailError);
+          // Don't fail the post creation if email fails
+        }
+
+        return NextResponse.json({
+          ...scheduledPost,
+          approvalLink,
+          approvalToken,
+        });
+      } catch (approvalError) {
+        console.error("Error creating approval:", approvalError);
+        // Don't fail the post creation if approval creation fails
+      }
+    }
 
     return NextResponse.json(scheduledPost);
   } catch (error) {

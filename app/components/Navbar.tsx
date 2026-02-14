@@ -9,14 +9,19 @@ import {
   SignedIn,
   useAuth,
 } from "@clerk/nextjs";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Logo } from "@/components/Logo";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Menu, X, PenTool } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export function Navbar() {
   const { userId } = useAuth();
   const pathname = usePathname();
+  const { resolvedTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  
+  const isDark = resolvedTheme === "dark";
 
   const handleScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 10);
@@ -54,8 +59,12 @@ export function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b backdrop-blur-sm ${
-          isScrolled 
-            ? "bg-white/80 border-gray-200 shadow-sm" 
+          isDark
+            ? isScrolled
+              ? "bg-gray-950/90 border-gray-800 shadow-lg"
+              : "bg-gray-950/95 border-gray-800/50"
+            : isScrolled
+            ? "bg-white/80 border-gray-200 shadow-sm"
             : "bg-white/95 border-gray-200/50"
         }`}
       >
@@ -64,11 +73,11 @@ export function Navbar() {
             {/* Logo - Left - Matching Dashboard */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm">
-                  <PenTool className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-lg font-bold text-gray-950">
-                  Flippr AI
+                  <Logo size="lg" variant="icon" />
+                <span className={`text-lg font-bold ${
+                  isDark ? "text-white" : "text-gray-950"
+                }`}>
+                  Revvy
                 </span>
               </Link>
             </div>
@@ -92,8 +101,12 @@ export function Navbar() {
                     href={item.href}
                     onClick={handleClick}
                     className={`${
-                      active ? "text-gray-900 font-semibold" : "text-gray-600"
-                    } hover:text-gray-900 transition-colors text-sm font-medium cursor-pointer`}
+                      active 
+                      ? isDark ? "text-white font-semibold" : "text-gray-900 font-semibold"
+                      : isDark ? "text-gray-400" : "text-gray-600"
+                    } ${
+                      isDark ? "hover:text-white" : "hover:text-gray-900"
+                    } transition-colors text-sm font-medium cursor-pointer`}
                   >
                     {item.name}
                   </Link>
@@ -104,7 +117,9 @@ export function Navbar() {
             {/* User Actions - Right */}
             <div className="flex items-center space-x-4">
               <button
-                className="md:hidden text-gray-900 focus:outline-none"
+                className={`md:hidden ${
+                  isDark ? "text-white" : "text-gray-900"
+                } focus:outline-none`}
                 onClick={toggleMenu}
                 aria-label="Toggle menu"
               >
@@ -118,7 +133,11 @@ export function Navbar() {
               <div className="hidden md:flex items-center space-x-4">
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <button className="text-gray-700 hover:text-gray-900 transition-colors text-sm font-medium bg-white border border-gray-200 px-4 py-2 rounded-lg">
+                    <button className={`${
+                      isDark 
+                        ? "text-gray-300 hover:text-white bg-gray-900 border-gray-800"
+                        : "text-gray-700 hover:text-gray-900 bg-white border-gray-200"
+                    } transition-colors text-sm font-medium px-4 py-2 rounded-lg`}>
                       Log in
                     </button>
                   </SignInButton>
@@ -132,8 +151,12 @@ export function Navbar() {
                   <Link
                     href="/dashboard"
                     className={`${
-                      isActive("/dashboard") ? "text-gray-900 font-semibold" : "text-gray-600"
-                    } hover:text-gray-900 transition-colors text-sm font-medium mr-2`}
+                      isActive("/dashboard")
+                        ? isDark ? "text-white font-semibold" : "text-gray-900 font-semibold"
+                        : isDark ? "text-gray-400" : "text-gray-600"
+                    } ${
+                      isDark ? "hover:text-white" : "hover:text-gray-900"
+                    } transition-colors text-sm font-medium mr-2`}
                   >
                     Dashboard
                   </Link>
@@ -167,14 +190,16 @@ export function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 sm:hidden"
+          className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-40 sm:hidden"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white border-l border-gray-200 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out sm:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] ${
+          isDark ? "bg-gray-950 border-gray-800" : "bg-white border-gray-200"
+        } border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out sm:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -182,14 +207,18 @@ export function Navbar() {
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-                <PenTool className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-gray-900">Flippr AI</span>
+              <Logo size="lg" variant="icon" />
+              <span className={`text-lg font-bold ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Revvy</span>
             </div>
             <button
               onClick={() => setIsMenuOpen(false)}
-              className="text-gray-600 hover:text-gray-900 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+              className={`${
+                isDark 
+                  ? "text-gray-400 hover:text-white hover:bg-gray-800"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              } transition-colors p-2 rounded-lg`}
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />

@@ -2,7 +2,11 @@
 
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Logo } from "@/components/Logo";
 import {
   TrendingUp,
   TrendingDown,
@@ -11,7 +15,10 @@ import {
   MapPin,
   MoreVertical,
   Loader2,
+  Plus,
+  Building2,
 } from "lucide-react";
+import { ActivityFeed } from "@/components/ActivityFeed";
 // Chart component will be created inline
 
 interface DashboardStats {
@@ -65,6 +72,7 @@ const commentsData = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { userId, isLoaded: authLoaded } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   const [stats, setStats] = useState<DashboardStats>({
@@ -77,6 +85,42 @@ export default function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
 
+  const [clients, setClients] = useState<any[]>([]);
+  const [hasClients, setHasClients] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
+
+  // Check for clients on mount
+  useEffect(() => {
+    const checkClients = async () => {
+      if (!userId) return;
+      try {
+        const response = await fetch(`/api/clients?userId=${userId}`, {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setClients(data.clients || []);
+          setHasClients((data.clients || []).length > 0);
+          
+          // Auto-redirect to first client if clients exist
+          if (data.clients && data.clients.length > 0 && !redirecting) {
+            const firstClient = data.clients[0];
+            setRedirecting(true);
+            // Use router.push to avoid hooks issues
+            router.push(`/dashboard/clients/${firstClient.id}`);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking clients:", error);
+      }
+    };
+    
+    // Only check if auth is loaded
+    if (authLoaded && userId) {
+      checkClients();
+    }
+  }, [userId, authLoaded]);
+
   const fetchDashboardStats = useCallback(async () => {
     if (!userId) {
       setLoading(false);
@@ -84,11 +128,13 @@ export default function DashboardPage() {
     }
     try {
       setLoading(true);
-      const response = await fetch(`/api/dashboard/stats`, {
+      // Use cache: 'force-cache' for better performance, with revalidation
+      const response = await fetch(`/api/dashboard/stats?userId=${userId}`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
+        next: { revalidate: 60 }, // Revalidate every 60 seconds
       });
       if (response.ok) {
         const data = await response.json();
@@ -132,6 +178,61 @@ export default function DashboardPage() {
   const userName = user?.firstName || user?.fullName || "User";
   // const userEmail = user?.primaryEmailAddress?.emailAddress || "";
 
+  // Show welcome message if no clients
+  if (!hasClients && !loading && userId) {
+    const { resolvedTheme } = useTheme();
+    const isDarkEmpty = resolvedTheme === "dark";
+    return (
+      <div className={`min-h-screen transition-colors duration-300 ${
+        isDarkEmpty ? "bg-slate-900" : "bg-white"
+      }`}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center mb-8">
+            <h1 className={`text-3xl font-bold mb-2 ${
+              isDarkEmpty ? "text-white" : "text-gray-900"
+            }`}>
+              Welcome to Revvy, {userName}!
+            </h1>
+            <p className={`text-lg ${
+              isDarkEmpty ? "text-slate-400" : "text-gray-600"
+            }`}>
+              Get started by creating your first client
+            </p>
+          </div>
+
+          <Card className={`border rounded-xl ${
+            isDarkEmpty ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          }`}>
+            <CardContent className="pt-6">
+              <div className="text-center py-8">
+                <Building2 className={`w-16 h-16 mx-auto mb-4 ${
+                  isDarkEmpty ? "text-purple-400" : "text-purple-600"
+                }`} />
+                <h2 className={`text-xl font-semibold mb-2 ${
+                  isDarkEmpty ? "text-white" : "text-gray-900"
+                }`}>
+                  No clients yet
+                </h2>
+                <p className={`mb-6 ${
+                  isDarkEmpty ? "text-slate-400" : "text-gray-600"
+                }`}>
+                  Create your first client to start managing their social media content
+                </p>
+                <Button
+                  onClick={() => window.location.href = "/dashboard/clients/new"}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Your First Client
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   // Get current week dates
   const getWeekDates = () => {
     const today = new Date();
@@ -153,16 +254,39 @@ export default function DashboardPage() {
 
   const weekDates = getWeekDates();
 
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
   // Show loading state
   if (loading || !authLoaded || !userLoaded) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
+        isDark ? "bg-slate-900" : "bg-white"
+      }`}>
         <div className="text-center max-w-md mx-auto px-4">
-          <Loader2 className="w-12 h-12 text-gray-950 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-950 mb-2">
+          <div className="flex flex-col items-center justify-center mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className={`w-28 h-28 rounded-full animate-pulse ${
+                  isDark ? "bg-purple-500/20" : "bg-purple-100"
+                }`}></div>
+              </div>
+              <div className="relative w-20 h-20 flex items-center justify-center">
+                <Logo size="lg" variant="icon" />
+              </div>
+            </div>
+            <div className="flex space-x-2 justify-center mt-4">
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          </div>
+          <h2 className={`text-xl font-bold mb-2 ${
+            isDark ? "text-white" : "text-gray-950"
+          }`}>
             Loading Dashboard...
           </h2>
-          <p className="text-gray-600">
+          <p className={isDark ? "text-slate-400" : "text-gray-600"}>
             Please wait while we load your dashboard data
           </p>
         </div>
@@ -171,29 +295,51 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white max-w-8xl mx-auto">
+    <div className={`min-h-screen max-w-8xl mx-auto transition-colors duration-300 flex flex-col ${
+      isDark ? "bg-slate-900" : "bg-white"
+    }`}>
       {/* Top Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+      <div className={`sticky top-0 z-10 border-b px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300 ${
+        isDark
+          ? "bg-slate-900 border-slate-700"
+          : "bg-white border-gray-200"
+      }`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-950 truncate">
+            <h1 className={`text-xl sm:text-2xl font-bold truncate ${
+              isDark ? "text-white" : "text-gray-950"
+            }`}>
               Welcome, {userName}
           </h1>
-            <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">{currentDate}</p>
+            <p className={`text-xs sm:text-sm mt-0.5 sm:mt-1 ${
+              isDark ? "text-gray-400" : "text-gray-600"
+            }`}>{currentDate}</p>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="relative">
-              <Bell className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-950" />
+              <Bell className={`w-5 h-5 cursor-pointer ${
+                isDark
+                  ? "text-gray-400 hover:text-white"
+                  : "text-gray-600 hover:text-gray-950"
+              }`} />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </div>
             <div className="relative flex-1 sm:flex-none">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                isDark ? "text-gray-500" : "text-gray-400"
+              }`} />
               <input
                 type="text"
                 placeholder="Search..."
-                className="pl-9 pr-8 py-2 w-full sm:w-48 lg:w-64 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className={`pl-9 pr-8 py-2 w-full sm:w-48 lg:w-64 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+                  isDark
+                    ? "bg-gray-900 border-gray-700 text-white placeholder-gray-500"
+                    : "border-gray-200"
+                }`}
               />
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 hidden sm:inline">
+              <span className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs hidden sm:inline ${
+                isDark ? "text-gray-500" : "text-gray-400"
+              }`}>
                 /
               </span>
             </div>
@@ -202,15 +348,22 @@ export default function DashboardPage() {
       </div>
 
       {/* Main Content */}
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
-        {/* KPI Cards */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="w-full max-w-7xl space-y-4 sm:space-y-6">
+          {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <Card className="bg-white border border-gray-200 rounded-xl">
+          <Card className={`border rounded-xl transition-colors shadow-sm ${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          }`}>
             <CardContent className="p-4 sm:p-6">
-              <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1.5 sm:mb-2">
+              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}>
                 Total posts
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-gray-950 mb-1.5 sm:mb-2">
+              <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 ${
+                isDark ? "text-white" : "text-gray-950"
+              }`}>
                 {loading ? (
                   <div className="h-8 sm:h-9 w-16 sm:w-20 bg-gray-200 rounded animate-pulse" />
                 ) : (
@@ -224,12 +377,18 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white border border-gray-200 rounded-xl">
+          <Card className={`border rounded-xl transition-colors shadow-sm ${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          }`}>
             <CardContent className="p-4 sm:p-6">
-              <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1.5 sm:mb-2">
+              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}>
                 Post likes
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-gray-950 mb-1.5 sm:mb-2">
+              <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 ${
+                isDark ? "text-white" : "text-gray-950"
+              }`}>
                 2.4M
               </div>
               <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-red-600">
@@ -239,12 +398,18 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white border border-gray-200 rounded-xl sm:col-span-2 lg:col-span-1">
+          <Card className={`border rounded-xl sm:col-span-2 lg:col-span-1 transition-colors ${
+            isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"
+          }`}>
             <CardContent className="p-4 sm:p-6">
-              <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1.5 sm:mb-2">
+              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}>
                 Total comments
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-gray-950 mb-1.5 sm:mb-2">
+              <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 ${
+                isDark ? "text-white" : "text-gray-950"
+              }`}>
                 3.5M
               </div>
               <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-green-600">
@@ -255,23 +420,38 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Activity Feed */}
+        <ActivityFeed maxItems={20} autoRefresh={true} />
+
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - 2 spans */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* My Social Overview */}
-            <Card className="bg-white border border-gray-200 rounded-xl">
+            <Card className={`border rounded-xl transition-colors shadow-sm ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
-                  <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
+                  <CardTitle className={`text-base sm:text-lg font-semibold ${
+                    isDark ? "text-white" : "text-gray-950"
+                  }`}>
                     My social overview
                 </CardTitle>
                   <div className="flex items-center gap-2">
-                    <select className="flex-1 sm:flex-none text-xs sm:text-sm border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <select className={`flex-1 sm:flex-none text-xs sm:text-sm border rounded-lg px-2 sm:px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      isDark 
+                        ? "bg-slate-700 border-slate-600 text-slate-200" 
+                        : "bg-white border-gray-200 text-gray-700"
+                    }`}>
                       <option>Jul 2024 - Dec 2024</option>
                       <option>Jan 2024 - Jun 2024</option>
                     </select>
-                    <select className="flex-1 sm:flex-none text-xs sm:text-sm border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <select className={`flex-1 sm:flex-none text-xs sm:text-sm border rounded-lg px-2 sm:px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      isDark 
+                        ? "bg-slate-700 border-slate-600 text-slate-200" 
+                        : "bg-white border-gray-200 text-gray-700"
+                    }`}>
                       <option>Engagement</option>
                       <option>Reach</option>
                       <option>Impressions</option>
@@ -297,14 +477,14 @@ export default function DashboardPage() {
                             y1={180 - (y / 60) * 160}
                             x2="560"
                             y2={180 - (y / 60) * 160}
-                            stroke="#e5e7eb"
+                            stroke={isDark ? "#334155" : "#e5e7eb"}
                             strokeWidth="1"
                             strokeDasharray="3 3"
                           />
                           <text
                             x="35"
                             y={180 - (y / 60) * 160 + 4}
-                            fill="#6b7280"
+                            fill={isDark ? "#94A3B8" : "#6b7280"}
                             fontSize="10"
                             textAnchor="end"
                           >
@@ -319,7 +499,7 @@ export default function DashboardPage() {
                           key={i}
                           x={60 + (i * 100)}
                           y="195"
-                          fill="#6b7280"
+                          fill={isDark ? "#94A3B8" : "#6b7280"}
                           fontSize="11"
                           textAnchor="middle"
                         >
@@ -412,13 +592,23 @@ export default function DashboardPage() {
                   </div>
 
                   {/* World Map Placeholder */}
-                  <div className="h-40 sm:h-48 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center">
+                  <div className={`h-40 sm:h-48 rounded-xl border flex items-center justify-center ${
+                    isDark 
+                      ? "bg-slate-900 border-slate-700" 
+                      : "bg-gray-50 border-gray-200"
+                  }`}>
                     <div className="text-center px-4">
-                      <MapPin className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-2" />
-                      <p className="text-xs sm:text-sm text-gray-600 font-medium">
+                      <MapPin className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 ${
+                        isDark ? "text-slate-500" : "text-gray-400"
+                      }`} />
+                      <p className={`text-xs sm:text-sm font-medium ${
+                        isDark ? "text-slate-300" : "text-gray-600"
+                      }`}>
                         Top geographies
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className={`text-xs mt-1 ${
+                        isDark ? "text-slate-500" : "text-gray-500"
+                      }`}>
                         Map visualization
                       </p>
                     </div>
@@ -428,61 +618,89 @@ export default function DashboardPage() {
             </Card>
 
             {/* Engagement Rate Metrics */}
-            <Card className="bg-white border border-gray-200 rounded-xl">
+            <Card className={`border rounded-xl transition-colors shadow-sm ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
+                <CardTitle className={`text-base sm:text-lg font-semibold ${
+                  isDark ? "text-white" : "text-gray-950"
+                }`}>
                   Engagement rate metrics
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
+                    isDark ? "bg-slate-900 border-slate-800" : "bg-gray-50 border-gray-200"
+                  }`}>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm sm:text-base font-semibold text-gray-950">
+                      <p className={`text-sm sm:text-base font-semibold ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>
                         Engagement rate (per impression)
                       </p>
       </div>
                     <div className="flex items-center gap-3 sm:gap-4">
-                      <p className="text-base sm:text-lg font-bold text-gray-950">5.0%</p>
+                      <p className={`text-base sm:text-lg font-bold ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>5.0%</p>
                       <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
                         ▼12.7%
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
+                    isDark ? "bg-slate-900 border-slate-800" : "bg-gray-50 border-gray-200"
+                  }`}>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm sm:text-base font-semibold text-gray-950">
+                      <p className={`text-sm sm:text-base font-semibold ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>
                         Facebook engagement rate
                       </p>
                     </div>
                     <div className="flex items-center gap-3 sm:gap-4">
-                      <p className="text-base sm:text-lg font-bold text-gray-950">5.0%</p>
+                      <p className={`text-base sm:text-lg font-bold ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>5.0%</p>
                       <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
                         ▼12.7%
                       </span>
         </div>
       </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
+                    isDark ? "bg-slate-900 border-slate-800" : "bg-gray-50 border-gray-200"
+                  }`}>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm sm:text-base font-semibold text-gray-950">
+                      <p className={`text-sm sm:text-base font-semibold ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>
                         Instagram engagement rate
                       </p>
                     </div>
                     <div className="flex items-center gap-3 sm:gap-4">
-                      <p className="text-base sm:text-lg font-bold text-gray-950">12.3%</p>
+                      <p className={`text-base sm:text-lg font-bold ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>12.3%</p>
                       <span className="text-xs sm:text-sm font-medium text-green-600 whitespace-nowrap">
                         ▲3.5%
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
+                    isDark ? "bg-slate-900 border-slate-800" : "bg-gray-50 border-gray-200"
+                  }`}>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm sm:text-base font-semibold text-gray-950">
+                      <p className={`text-sm sm:text-base font-semibold ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>
                         Linkedin engagement rate
                       </p>
                     </div>
                     <div className="flex items-center gap-3 sm:gap-4">
-                      <p className="text-base sm:text-lg font-bold text-gray-950">4.5%</p>
+                      <p className={`text-base sm:text-lg font-bold ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>4.5%</p>
                       <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
                         ▼9.7%
                       </span>
@@ -496,9 +714,13 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-4 sm:space-y-6">
             {/* Top Geographies */}
-            <Card className="bg-white border border-gray-200 rounded-xl">
+            <Card className={`border rounded-xl transition-colors shadow-sm ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
+                <CardTitle className={`text-base sm:text-lg font-semibold ${
+                  isDark ? "text-white" : "text-gray-950"
+                }`}>
                   Top geographies
                 </CardTitle>
               </CardHeader>
@@ -507,14 +729,20 @@ export default function DashboardPage() {
                   {topGeographies.map((geo, idx) => (
                     <div key={idx} className="space-y-1.5 sm:space-y-2">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs sm:text-sm font-medium text-gray-950 truncate flex-1 min-w-0 pr-2">
+                        <p className={`text-xs sm:text-sm font-medium truncate flex-1 min-w-0 pr-2 ${
+                          isDark ? "text-slate-200" : "text-gray-950"
+                        }`}>
                           {geo.country}
                         </p>
-                        <p className="text-xs sm:text-sm font-bold text-gray-950 whitespace-nowrap">
+                        <p className={`text-xs sm:text-sm font-bold whitespace-nowrap ${
+                          isDark ? "text-white" : "text-gray-950"
+                        }`}>
                           {geo.rate}%
                         </p>
               </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2">
+                      <div className={`w-full rounded-full h-1.5 sm:h-2 ${
+                        isDark ? "bg-slate-700" : "bg-gray-200"
+                      }`}>
                         <div
                           className="bg-teal-500 h-1.5 sm:h-2 rounded-full"
                           style={{ width: `${geo.rate}%` }}
@@ -527,9 +755,13 @@ export default function DashboardPage() {
         </Card>
 
             {/* My Post Planner */}
-            <Card className="bg-white border border-gray-200 rounded-xl">
+            <Card className={`border rounded-xl transition-colors shadow-sm ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
+                <CardTitle className={`text-base sm:text-lg font-semibold ${
+                  isDark ? "text-white" : "text-gray-950"
+                }`}>
                   My post planner
             </CardTitle>
           </CardHeader>
@@ -541,6 +773,8 @@ export default function DashboardPage() {
                       className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg text-center min-w-[60px] sm:min-w-[70px] ${
                         date.isToday
                           ? "bg-purple-600 text-white"
+                          : isDark
+                          ? "bg-slate-700 text-slate-200 hover:bg-slate-600"
                           : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                       }`}
                     >
@@ -555,9 +789,13 @@ export default function DashboardPage() {
             </Card>
 
             {/* Comments and Mentions */}
-            <Card className="bg-white border border-gray-200 rounded-xl">
+            <Card className={`border rounded-xl transition-colors shadow-sm ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className="text-base sm:text-lg font-semibold text-gray-950">
+                <CardTitle className={`text-base sm:text-lg font-semibold ${
+                  isDark ? "text-white" : "text-gray-950"
+                }`}>
                   Comments and mentions
                 </CardTitle>
               </CardHeader>
@@ -566,30 +804,46 @@ export default function DashboardPage() {
                   {commentsData.map((comment, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                      className={`flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg transition-colors ${
+                        isDark ? "hover:bg-slate-700" : "hover:bg-gray-50"
+                      }`}
                     >
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs sm:text-sm font-semibold text-blue-700">
+                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        isDark ? "bg-purple-800 text-purple-200" : "bg-blue-100 text-blue-700"
+                      }`}>
+                        <span className={`text-xs sm:text-sm font-semibold ${
+                          isDark ? "text-purple-200" : "text-blue-700"
+                        }`}>
                           {comment.avatar}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
-                          <p className="text-xs sm:text-sm font-semibold text-gray-950">
+                          <p className={`text-xs sm:text-sm font-semibold ${
+                            isDark ? "text-white" : "text-gray-950"
+                          }`}>
                             {comment.name}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className={`text-xs ${
+                            isDark ? "text-slate-400" : "text-gray-500"
+                          }`}>
                             {comment.handle}
                           </p>
               </div>
-                        <p className="text-xs text-gray-600 mb-0.5 sm:mb-1">
+                        <p className={`text-xs mb-0.5 sm:mb-1 ${
+                          isDark ? "text-slate-300" : "text-gray-600"
+                        }`}>
                           {comment.location}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className={`text-xs ${
+                          isDark ? "text-slate-500" : "text-gray-500"
+                        }`}>
                           {comment.time}
                         </p>
                   </div>
-                      <MoreVertical className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600 flex-shrink-0" />
+                      <MoreVertical className={`w-4 h-4 cursor-pointer flex-shrink-0 ${
+                        isDark ? "text-slate-500 hover:text-white" : "text-gray-400 hover:text-gray-600"
+                      }`} />
                 </div>
                   ))}
                 </div>
@@ -597,6 +851,7 @@ export default function DashboardPage() {
             </Card>
               </div>
             </div>
+        </div>
       </div>
     </div>
   );

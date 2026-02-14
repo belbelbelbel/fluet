@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs"
 import { dark } from '@clerk/themes'
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeToaster } from "@/components/ThemeToaster";
+import { GlobalErrorHandler } from "@/components/GlobalErrorHandler";
 import "./globals.css";
 
 const nunito = localFont({
@@ -24,19 +25,19 @@ const nunito = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Flippr AI — Flip Between Platforms, Create Content Instantly",
-  description: "Flip seamlessly between Twitter, Instagram, LinkedIn, and TikTok. Create engaging AI-powered content for all your social platforms in seconds.",
+  title: "Revvy — Social Media Management for Nigerian Agencies",
+  description: "Manage multiple clients, generate AI content, schedule posts, and track performance. Built for Nigerian social media managers and agencies.",
   openGraph: {
-    title: "Flippr AI — Flip Between Platforms, Create Content Instantly",
-    description: "Flip seamlessly between Twitter, Instagram, LinkedIn, and TikTok. Create engaging AI-powered content for all your social platforms in seconds.",
-    url: process.env.NEXT_PUBLIC_APP_URL || "https://fluet.vercel.app",
-    siteName: "Flippr AI",
+    title: "Revvy — Social Media Management for Nigerian Agencies",
+    description: "Manage multiple clients, generate AI content, schedule posts, and track performance. Built for Nigerian social media managers and agencies.",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://revvy.vercel.app",
+    siteName: "Revvy",
     images: [
       {
-        url: "/images/logo.png", // Your logo for social sharing
+        url: "/images/Revvylogo/logo-1-primary.png", // Your logo for social sharing
         width: 1200,
         height: 630,
-        alt: "Flippr AI Logo",
+        alt: "Revvy Logo",
       },
     ],
     locale: "en_US",
@@ -44,13 +45,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Flippr AI — Flip Between Platforms, Create Content Instantly",
-    description: "Flip seamlessly between Twitter, Instagram, LinkedIn, and TikTok. Create engaging AI-powered content for all your social platforms in seconds.",
-    images: ["/images/logo.png"], // Your logo for Twitter cards
+    title: "Revvy — Social Media Management for Nigerian Agencies",
+    description: "Manage multiple clients, generate AI content, schedule posts, and track performance. Built for Nigerian social media managers and agencies.",
+    images: ["/images/Revvylogo/logo-1-primary.png"], // Your logo for Twitter cards
   },
   icons: {
-    icon: "/images/logo.png", // Favicon
-    apple: "/images/logo.png", // Apple touch icon
+    icon: "/images/Revvylogo/logo-icon-dark-transparent.png", // Favicon
+    apple: "/images/Revvylogo/logo-2-square.png", // Apple touch icon
   },
 };
 
@@ -70,6 +71,7 @@ export default function RootLayout({
     >
       <html lang="en" suppressHydrationWarning className={nunito.variable}>
         <body className={`${nunito.className} antialiased`}>
+          <GlobalErrorHandler />
           <ThemeProvider>
             {children}
             <ThemeToaster />

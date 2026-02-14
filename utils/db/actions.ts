@@ -1,12 +1,35 @@
 import { db } from "./dbConfig"
 import { eq, sql, desc, and, gte, lte } from "drizzle-orm"
-import { GeneratedContent, Users, Subscription, ScheduledPosts, LinkedAccounts, Notifications } from "./schema"
+import { 
+    GeneratedContent, 
+    Users, 
+    Subscription, 
+    ScheduledPosts, 
+    LinkedAccounts, 
+    Notifications,
+    Clients,
+    ClientBrandVoice,
+    ClientContentBank,
+    ClientCredits,
+    PostApprovals,
+    Tasks,
+    AgencyTeamMembers,
+    ClientReports,
+    TeamInvitations
+} from "./schema"
 import { sendWelcomeEmail } from "./mailtrap"
 
 export const CreateOrUpdateUser = async (stripecustomerId: string, email: string, name: string) => {
     try {
         const [existingUser] = await db
-            .select()
+            .select({
+                id: Users.id,
+                stripecustomerId: Users.stripecustomerId,
+                email: Users.email,
+                name: Users.name,
+                points: Users.points,
+                timestamp: Users.timestamp,
+            })
             .from(Users)
             .where(eq(Users.stripecustomerId, stripecustomerId))
             .limit(1)
@@ -16,7 +39,14 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
                 .update(Users)
                 .set({ email, name })
                 .where(eq(Users.stripecustomerId, stripecustomerId))
-                .returning()
+                .returning({
+                    id: Users.id,
+                    stripecustomerId: Users.stripecustomerId,
+                    email: Users.email,
+                    name: Users.name,
+                    points: Users.points,
+                    timestamp: Users.timestamp,
+                })
                 .execute();
             console.log(`[CreateOrUpdateUser] User updated successfully:`, updatedUser);
             return updatedUser;
@@ -29,7 +59,14 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
                     stripecustomerId,
                     name
                 })
-                .returning()
+                .returning({
+                    id: Users.id,
+                    stripecustomerId: Users.stripecustomerId,
+                    email: Users.email,
+                    name: Users.name,
+                    points: Users.points,
+                    timestamp: Users.timestamp,
+                })
                 .execute();
 
             console.log(`[CreateOrUpdateUser] Insert operation successful. New user:`, newUser);
@@ -48,22 +85,37 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
 export const GetUserByClerkId = async (clerkUserId: string) => {
     try {
         const [user] = await db
-            .select()
+            .select({
+                id: Users.id,
+                stripecustomerId: Users.stripecustomerId,
+                email: Users.email,
+                name: Users.name,
+                points: Users.points,
+                timestamp: Users.timestamp,
+            })
             .from(Users)
             .where(eq(Users.stripecustomerId, clerkUserId))
             .limit(1)
             .execute();
-        return user;
+        return user || null;
     } catch (error) {
         console.error(`[GetUserByClerkId] Error encountered:`, error);
-        throw new Error("Failed to get user");
+        // Return null instead of throwing so calling code can handle user creation
+        return null;
     }
 };
 
 export const GetUserByEmail = async (email: string) => {
     try {
         const [user] = await db
-            .select()
+            .select({
+                id: Users.id,
+                stripecustomerId: Users.stripecustomerId,
+                email: Users.email,
+                name: Users.name,
+                points: Users.points,
+                timestamp: Users.timestamp,
+            })
             .from(Users)
             .where(eq(Users.email, email))
             .limit(1)
@@ -233,18 +285,23 @@ export const CreateScheduledPost = async (
     contentId: number | null,
     platform: string,
     content: string,
-    scheduledFor: Date
+    scheduledFor: Date,
+    clientId?: number | null,
+    requiresApproval?: boolean
 ) => {
     try {
         const [scheduledPost] = await db
             .insert(ScheduledPosts)
             .values({
                 userId,
+                clientId: clientId || null,
                 contentId: contentId || null,
                 platform,
                 content,
                 scheduledFor,
                 posted: false,
+                approvalStatus: requiresApproval ? "pending" : "approved",
+                requiresApproval: requiresApproval ?? (clientId ? true : false),
             })
             .returning()
             .execute();
@@ -640,5 +697,468 @@ export const GetPostsNeedingReminders = async () => {
     } catch (error) {
         console.error(`[GetPostsNeedingReminders] Error encountered:`, error);
         throw new Error("Failed to get posts needing reminders");
+    }
+};
+
+// ==================== CLIENT MANAGEMENT ====================
+
+/**
+ * Create a new client for an agency
+ */
+export const CreateClient = async (data: {
+    agencyId: number;
+    name: string;
+    logoUrl?: string;
+    status?: string;
+    paymentStatus?: string;
+    paymentDueDate?: Date;
+}) => {
+    try {
+        const [client] = await db
+            .insert(Clients)
+            .values({
+                agencyId: data.agencyId,
+                name: data.name,
+                logoUrl: data.logoUrl,
+                status: data.status || "active",
+                paymentStatus: data.paymentStatus || "paid",
+                paymentDueDate: data.paymentDueDate,
+                updatedAt: new Date(),
+            })
+            .returning()
+            .execute();
+
+        // Create default credits for client
+        await db
+            .insert(ClientCredits)
+            .values({
+                clientId: client.id,
+                postsPerMonth: 12,
+                postsUsed: 0,
+                revisionsPerPost: 3,
+                rushRequests: 2,
+                rushUsed: 0,
+                resetDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+                updatedAt: new Date(),
+            })
+            .execute();
+
+        return client;
+    } catch (error) {
+        console.error(`[CreateClient] Error encountered:`, error);
+        throw new Error("Failed to create client");
+    }
+};
+
+/**
+ * Get all clients for an agency
+ */
+export const GetClientsByAgency = async (agencyId: number) => {
+    try {
+        const clients = await db
+            .select()
+            .from(Clients)
+            .where(eq(Clients.agencyId, agencyId))
+            .orderBy(desc(Clients.createdAt))
+            .execute();
+        return clients;
+    } catch (error) {
+        console.error(`[GetClientsByAgency] Error encountered:`, error);
+        throw new Error("Failed to get clients");
+    }
+};
+
+/**
+ * Get a single client by ID (with agency verification)
+ */
+export const GetClientById = async (clientId: number, agencyId: number) => {
+    try {
+        const [client] = await db
+            .select()
+            .from(Clients)
+            .where(
+                and(
+                    eq(Clients.id, clientId),
+                    eq(Clients.agencyId, agencyId)
+                )
+            )
+            .limit(1)
+            .execute();
+        return client;
+    } catch (error) {
+        console.error(`[GetClientById] Error encountered:`, error);
+        throw new Error("Failed to get client");
+    }
+};
+
+/**
+ * Update a client
+ */
+export const UpdateClient = async (
+    clientId: number,
+    agencyId: number,
+    data: {
+        name?: string;
+        logoUrl?: string;
+        status?: string;
+        paymentStatus?: string;
+        paymentDueDate?: Date;
+    }
+) => {
+    try {
+        const [updated] = await db
+            .update(Clients)
+            .set({
+                ...data,
+                updatedAt: new Date(),
+            })
+            .where(
+                and(
+                    eq(Clients.id, clientId),
+                    eq(Clients.agencyId, agencyId)
+                )
+            )
+            .returning()
+            .execute();
+        return updated;
+    } catch (error) {
+        console.error(`[UpdateClient] Error encountered:`, error);
+        throw new Error("Failed to update client");
+    }
+};
+
+/**
+ * Delete a client (soft delete by setting status to 'deleted')
+ */
+export const DeleteClient = async (clientId: number, agencyId: number) => {
+    try {
+        const [deleted] = await db
+            .update(Clients)
+            .set({
+                status: "deleted",
+                updatedAt: new Date(),
+            })
+            .where(
+                and(
+                    eq(Clients.id, clientId),
+                    eq(Clients.agencyId, agencyId)
+                )
+            )
+            .returning()
+            .execute();
+        return deleted;
+    } catch (error) {
+        console.error(`[DeleteClient] Error encountered:`, error);
+        throw new Error("Failed to delete client");
+    }
+};
+
+// ==================== CLIENT BRAND VOICE ====================
+
+/**
+ * Create or update client brand voice
+ */
+export const SaveClientBrandVoice = async (data: {
+    clientId: number;
+    tone?: string;
+    slangLevel?: string;
+    industry?: string;
+    dos?: string[];
+    donts?: string[];
+    examplePosts?: string[];
+    preferredHashtags?: string[];
+    bannedWords?: string[];
+}) => {
+    try {
+        // Check if brand voice exists
+        const [existing] = await db
+            .select()
+            .from(ClientBrandVoice)
+            .where(eq(ClientBrandVoice.clientId, data.clientId))
+            .limit(1)
+            .execute();
+
+        if (existing) {
+            // Update existing
+            const [updated] = await db
+                .update(ClientBrandVoice)
+                .set({
+                    tone: data.tone,
+                    slangLevel: data.slangLevel,
+                    industry: data.industry,
+                    dos: data.dos as any,
+                    donts: data.donts as any,
+                    examplePosts: data.examplePosts as any,
+                    preferredHashtags: data.preferredHashtags as any,
+                    bannedWords: data.bannedWords as any,
+                    updatedAt: new Date(),
+                })
+                .where(eq(ClientBrandVoice.clientId, data.clientId))
+                .returning()
+                .execute();
+            return updated;
+        } else {
+            // Create new
+            const [created] = await db
+                .insert(ClientBrandVoice)
+                .values({
+                    clientId: data.clientId,
+                    tone: data.tone,
+                    slangLevel: data.slangLevel,
+                    industry: data.industry,
+                    dos: data.dos as any,
+                    donts: data.donts as any,
+                    examplePosts: data.examplePosts as any,
+                    preferredHashtags: data.preferredHashtags as any,
+                    bannedWords: data.bannedWords as any,
+                    updatedAt: new Date(),
+                })
+                .returning()
+                .execute();
+            return created;
+        }
+    } catch (error) {
+        console.error(`[SaveClientBrandVoice] Error encountered:`, error);
+        throw new Error("Failed to save brand voice");
+    }
+};
+
+/**
+ * Get client brand voice
+ */
+export const GetClientBrandVoice = async (clientId: number) => {
+    try {
+        const [brandVoice] = await db
+            .select()
+            .from(ClientBrandVoice)
+            .where(eq(ClientBrandVoice.clientId, clientId))
+            .limit(1)
+            .execute();
+        return brandVoice;
+    } catch (error) {
+        console.error(`[GetClientBrandVoice] Error encountered:`, error);
+        throw new Error("Failed to get brand voice");
+    }
+};
+
+// ==================== CLIENT CREDITS ====================
+
+/**
+ * Get client credits
+ */
+export const GetClientCredits = async (clientId: number) => {
+    try {
+        const [credits] = await db
+            .select()
+            .from(ClientCredits)
+            .where(eq(ClientCredits.clientId, clientId))
+            .limit(1)
+            .execute();
+        return credits;
+    } catch (error) {
+        console.error(`[GetClientCredits] Error encountered:`, error);
+        throw new Error("Failed to get client credits");
+    }
+};
+
+/**
+ * Update client credits (increment posts used, etc.)
+ */
+export const UpdateClientCredits = async (
+    clientId: number,
+    updates: {
+        postsUsed?: number;
+        rushUsed?: number;
+        postsPerMonth?: number;
+        revisionsPerPost?: number;
+        rushRequests?: number;
+    }
+) => {
+    try {
+        const [updated] = await db
+            .update(ClientCredits)
+            .set({
+                ...updates,
+                updatedAt: new Date(),
+            })
+            .where(eq(ClientCredits.clientId, clientId))
+            .returning()
+            .execute();
+        return updated;
+    } catch (error) {
+        console.error(`[UpdateClientCredits] Error encountered:`, error);
+        throw new Error("Failed to update client credits");
+    }
+};
+
+// ==================== POST APPROVALS ====================
+
+/**
+ * Create approval record for a scheduled post
+ */
+export const CreatePostApproval = async (data: {
+    scheduledPostId: number;
+    clientId: number;
+    approvalToken: string;
+    expiresAt: Date;
+}) => {
+    try {
+        const [approval] = await db
+            .insert(PostApprovals)
+            .values({
+                scheduledPostId: data.scheduledPostId,
+                clientId: data.clientId,
+                approvalToken: data.approvalToken,
+                expiresAt: data.expiresAt,
+                status: "pending",
+                updatedAt: new Date(),
+            })
+            .returning()
+            .execute();
+        return approval;
+    } catch (error) {
+        console.error(`[CreatePostApproval] Error encountered:`, error);
+        throw new Error("Failed to create approval");
+    }
+};
+
+/**
+ * Get approval by token
+ */
+export const GetApprovalByToken = async (token: string) => {
+    try {
+        const [approval] = await db
+            .select()
+            .from(PostApprovals)
+            .where(eq(PostApprovals.approvalToken, token))
+            .limit(1)
+            .execute();
+        return approval;
+    } catch (error) {
+        console.error(`[GetApprovalByToken] Error encountered:`, error);
+        throw new Error("Failed to get approval");
+    }
+};
+
+/**
+ * Update approval status
+ */
+export const UpdateApprovalStatus = async (
+    approvalId: number,
+    status: string,
+    clientComment?: string
+) => {
+    try {
+        const [updated] = await db
+            .update(PostApprovals)
+            .set({
+                status,
+                clientComment,
+                approvedAt: status === "approved" ? new Date() : undefined,
+                updatedAt: new Date(),
+            })
+            .where(eq(PostApprovals.id, approvalId))
+            .returning()
+            .execute();
+        return updated;
+    } catch (error) {
+        console.error(`[UpdateApprovalStatus] Error encountered:`, error);
+        throw new Error("Failed to update approval");
+    }
+};
+
+/**
+ * Get pending approvals for a client
+ */
+export const GetPendingApprovalsForClient = async (clientId: number) => {
+    try {
+        const approvals = await db
+            .select()
+            .from(PostApprovals)
+            .where(
+                and(
+                    eq(PostApprovals.clientId, clientId),
+                    eq(PostApprovals.status, "pending")
+                )
+            )
+            .orderBy(desc(PostApprovals.createdAt))
+            .execute();
+        return approvals;
+    } catch (error) {
+        console.error(`[GetPendingApprovalsForClient] Error encountered:`, error);
+        throw new Error("Failed to get pending approvals");
+    }
+};
+
+// ============================================
+// TEAM INVITATIONS
+// ============================================
+
+export const CreateTeamInvitation = async (
+    invitedBy: number,
+    email: string,
+    role: string = "member"
+) => {
+    try {
+        // Generate a unique token for the invitation
+        const token = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+        
+        // Set expiration to 7 days from now
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+        
+        const [invitation] = await db
+            .insert(TeamInvitations)
+            .values({
+                invitedBy,
+                email: email.toLowerCase().trim(),
+                token,
+                role,
+                status: "pending",
+                expiresAt,
+            })
+            .returning()
+            .execute();
+        
+        console.log(`[CreateTeamInvitation] Invitation created:`, invitation);
+        return invitation;
+    } catch (error) {
+        console.error(`[CreateTeamInvitation] Error encountered:`, error);
+        throw new Error("Failed to create team invitation");
+    }
+};
+
+export const GetTeamInvitationsByEmail = async (email: string) => {
+    try {
+        const invitations = await db
+            .select()
+            .from(TeamInvitations)
+            .where(
+                and(
+                    eq(TeamInvitations.email, email.toLowerCase().trim()),
+                    eq(TeamInvitations.status, "pending")
+                )
+            )
+            .orderBy(desc(TeamInvitations.createdAt))
+            .execute();
+        return invitations;
+    } catch (error) {
+        console.error(`[GetTeamInvitationsByEmail] Error encountered:`, error);
+        throw new Error("Failed to get team invitations");
+    }
+};
+
+export const GetTeamInvitationsByInviter = async (invitedBy: number) => {
+    try {
+        const invitations = await db
+            .select()
+            .from(TeamInvitations)
+            .where(eq(TeamInvitations.invitedBy, invitedBy))
+            .orderBy(desc(TeamInvitations.createdAt))
+            .execute();
+        return invitations;
+    } catch (error) {
+        console.error(`[GetTeamInvitationsByInviter] Error encountered:`, error);
+        throw new Error("Failed to get team invitations");
     }
 };

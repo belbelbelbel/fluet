@@ -2,6 +2,7 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState, useCallback } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   TrendingUp,
@@ -39,6 +40,8 @@ interface AnalyticsData {
 
 export default function AnalyticsPage() {
   const { userId } = useAuth();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [data, setData] = useState<AnalyticsData>({
     totalViews: 0,
     totalLikes: 0,
@@ -133,21 +136,29 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className="space-y-8 pb-8 pt-8 max-w-5xl mx-auto">
+    <div className={`space-y-6 sm:space-y-8 pb-8 pt-4 sm:pt-6 lg:pt-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+      isDark ? "bg-slate-900" : "bg-white"
+    }`}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-8 border-b-2 border-gray-200">
+      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 sm:pb-8 border-b-2 transition-colors duration-300 ${
+        isDark ? "border-slate-700" : "border-gray-200"
+      }`}>
         <div className="flex-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-3">Analytics Dashboard</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-3 ${
+            isDark ? "text-white" : "text-gray-950"
+          }`}>Analytics Dashboard</h1>
+          <p className={isDark ? "text-slate-400" : "text-gray-600"}>
             Track your content performance across all platforms
           </p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <button
             onClick={() => setTimeRange("7d")}
-            className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
               timeRange === "7d"
                 ? "bg-purple-600 text-white shadow-md"
+                : isDark
+                ? "bg-slate-800 border-2 border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
                 : "bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
             }`}
           >
@@ -155,9 +166,11 @@ export default function AnalyticsPage() {
           </button>
           <button
             onClick={() => setTimeRange("30d")}
-            className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
               timeRange === "30d"
                 ? "bg-purple-600 text-white shadow-md"
+                : isDark
+                ? "bg-slate-800 border-2 border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
                 : "bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
             }`}
           >
@@ -165,9 +178,11 @@ export default function AnalyticsPage() {
           </button>
           <button
             onClick={() => setTimeRange("90d")}
-            className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
               timeRange === "90d"
                 ? "bg-purple-600 text-white shadow-md"
+                : isDark
+                ? "bg-slate-800 border-2 border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
                 : "bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
             }`}
           >
@@ -178,45 +193,67 @@ export default function AnalyticsPage() {
 
       {/* Key Metrics */}
       <div>
-        <h2 className="text-xl font-bold text-gray-950 mb-6">Key Metrics</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <h2 className={`text-xl font-bold mb-6 ${
+          isDark ? "text-white" : "text-gray-950"
+        }`}>Key Metrics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
             return (
               <Card
                 key={index}
-                className="bg-white border-2 border-gray-200 rounded-xl"
+                className={`border-2 rounded-xl transition-colors duration-300 ${
+                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+                }`}
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <CardTitle className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                  <CardTitle className={`text-sm font-bold uppercase tracking-wide ${
+                    isDark ? "text-slate-300" : "text-gray-700"
+                  }`}>
                     {metric.title}
                   </CardTitle>
-                  <div className="text-gray-700 bg-gray-100 p-3 rounded-xl">
+                  <div className={`p-3 rounded-xl ${
+                    isDark ? "text-slate-300 bg-slate-700" : "text-gray-700 bg-gray-100"
+                  }`}>
                     <Icon className="h-6 w-6" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-950 mb-3">
+                  <div className={`text-2xl font-bold mb-3 ${
+                    isDark ? "text-white" : "text-gray-950"
+                  }`}>
                     {loading ? (
-                      <div className="h-10 w-28 bg-gray-200 rounded animate-pulse" />
+                      <div className={`h-10 w-28 rounded animate-pulse ${
+                        isDark ? "bg-slate-700" : "bg-gray-200"
+                      }`} />
                     ) : (
                       metric.value
                     )}
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     {metric.trend === "up" ? (
-                      <TrendingUp className="w-4 h-4 text-green-600" />
+                      <TrendingUp className={`w-4 h-4 ${
+                        isDark ? "text-green-400" : "text-green-600"
+                      }`} />
                     ) : (
-                      <TrendingDown className="w-4 h-4 text-red-600" />
+                      <TrendingDown className={`w-4 h-4 ${
+                        isDark ? "text-red-400" : "text-red-600"
+                      }`} />
                     )}
                     <span
                       className={
-                        metric.trend === "up" ? "text-green-600 font-semibold" : "text-red-600 font-semibold"
+                        metric.trend === "up" 
+                          ? isDark 
+                            ? "text-green-400 font-semibold" 
+                            : "text-green-600 font-semibold"
+                          : isDark
+                          ? "text-red-400 font-semibold"
+                          : "text-red-600 font-semibold"
                       }
                     >
                       {metric.change}
                     </span>
-                    <span className="text-gray-500">vs last period</span>
+                    <span className={isDark ? "text-slate-400" : "text-gray-500"}>vs last period</span>
                   </div>
                 </CardContent>
               </Card>
@@ -227,16 +264,28 @@ export default function AnalyticsPage() {
 
       {/* Engagement Rate Card */}
       <div>
-        <h2 className="text-xl font-bold text-gray-950 mb-6">Engagement Overview</h2>
-        <Card className="bg-white border-2 border-gray-200 rounded-xl">
+        <h2 className={`text-xl font-bold mb-6 ${
+          isDark ? "text-white" : "text-gray-950"
+        }`}>Engagement Overview</h2>
+        <Card className={`border-2 rounded-xl transition-colors duration-300 ${
+          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+        }`}>
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-gray-950">
-              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-gray-700" />
+            <CardTitle className={`flex items-center gap-3 ${
+              isDark ? "text-white" : "text-gray-950"
+            }`}>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                isDark ? "bg-slate-700" : "bg-gray-100"
+              }`}>
+                <BarChart3 className={`w-6 h-6 ${
+                  isDark ? "text-slate-300" : "text-gray-700"
+                }`} />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Engagement Rate</h3>
-                <CardDescription className="text-gray-600 mt-1">Overall engagement across all platforms</CardDescription>
+                <h3 className={`text-xl font-bold ${
+                  isDark ? "text-white" : "text-gray-950"
+                }`}>Engagement Rate</h3>
+                <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>Overall engagement across all platforms</CardDescription>
               </div>
             </CardTitle>
           </CardHeader>
@@ -244,17 +293,25 @@ export default function AnalyticsPage() {
             <div className="space-y-6">
               <div className="flex items-end gap-6">
                 <div className="flex-1">
-                  <div className="text-3xl font-bold text-gray-950 mb-3">
+                  <div className={`text-3xl font-bold mb-3 ${
+                    isDark ? "text-white" : "text-gray-950"
+                  }`}>
                     {loading ? (
-                      <div className="h-16 w-32 bg-gray-200 rounded animate-pulse" />
+                      <div className={`h-16 w-32 rounded animate-pulse ${
+                        isDark ? "bg-slate-700" : "bg-gray-200"
+                      }`} />
                     ) : (
                       `${data.engagementRate}%`
                     )}
                   </div>
-                  <p className="text-base text-gray-600 font-medium">Average engagement rate</p>
+                  <p className={`text-base font-medium ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>Average engagement rate</p>
                 </div>
                 <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                  <div className={`h-4 rounded-full overflow-hidden ${
+                    isDark ? "bg-slate-700" : "bg-gray-200"
+                  }`}>
                     <div
                       className="h-full bg-purple-600 transition-all duration-1000"
                       style={{ width: `${Math.min(data.engagementRate, 100)}%` }}
@@ -262,13 +319,23 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
-                <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className={`flex items-center gap-3 pt-4 border-t transition-colors duration-300 ${
+                isDark ? "border-slate-700" : "border-gray-200"
+              }`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  isDark ? "bg-green-950/50" : "bg-green-50"
+                }`}>
+                  <TrendingUp className={`w-5 h-5 ${
+                    isDark ? "text-green-400" : "text-green-600"
+                  }`} />
                 </div>
                 <div>
-                  <p className="text-base text-green-600 font-semibold">+2.3% from last period</p>
-                  <p className="text-xs text-gray-500">Positive trend</p>
+                  <p className={`text-base font-semibold ${
+                    isDark ? "text-green-400" : "text-green-600"
+                  }`}>+2.3% from last period</p>
+                  <p className={`text-xs ${
+                    isDark ? "text-slate-400" : "text-gray-500"
+                  }`}>Positive trend</p>
                 </div>
               </div>
             </div>
@@ -278,11 +345,17 @@ export default function AnalyticsPage() {
 
       {/* Platform Performance */}
       <div>
-        <h2 className="text-xl font-bold text-gray-950 mb-6">Platform Performance</h2>
-        <Card className="bg-white border-2 border-gray-200 rounded-xl">
+        <h2 className={`text-xl font-bold mb-6 ${
+          isDark ? "text-white" : "text-gray-950"
+        }`}>Platform Performance</h2>
+        <Card className={`border-2 rounded-xl transition-colors duration-300 ${
+          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+        }`}>
           <CardHeader className="pb-4">
-            <CardTitle className="text-gray-950 text-xl">Performance by Platform</CardTitle>
-            <CardDescription className="text-gray-600">
+            <CardTitle className={`text-xl ${
+              isDark ? "text-white" : "text-gray-950"
+            }`}>Performance by Platform</CardTitle>
+            <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
               See how your content performs across different platforms
             </CardDescription>
           </CardHeader>
@@ -292,36 +365,60 @@ export default function AnalyticsPage() {
                 data.platformStats.map((platform, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-6 bg-gray-50 rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:shadow-md transition-all"
+                    className={`flex items-center justify-between p-4 sm:p-6 rounded-xl border-2 transition-all duration-200 ${
+                      isDark
+                        ? "bg-slate-700/50 border-slate-700 hover:border-slate-600"
+                        : "bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-md"
+                    }`}
                   >
-                    <div className="flex items-center gap-5">
-                      <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center border-2 border-gray-200 text-gray-700">
+                    <div className="flex items-center gap-4 sm:gap-5">
+                      <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center border-2 ${
+                        isDark
+                          ? "bg-slate-800 border-slate-600 text-slate-300"
+                          : "bg-white border-gray-200 text-gray-700"
+                      }`}>
                         {getPlatformIcon(platform.platform)}
                       </div>
                       <div>
-                        <p className="font-bold text-lg text-gray-950 capitalize mb-1">
+                        <p className={`font-bold text-base sm:text-lg capitalize mb-1 ${
+                          isDark ? "text-white" : "text-gray-950"
+                        }`}>
                           {platform.platform}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className={`text-sm ${
+                          isDark ? "text-slate-400" : "text-gray-600"
+                        }`}>
                           {platform.posts} posts • {platform.views.toLocaleString()} views
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-gray-950 mb-1">
+                      <p className={`text-xl sm:text-2xl font-bold mb-1 ${
+                        isDark ? "text-white" : "text-gray-950"
+                      }`}>
                         {platform.engagement}%
                       </p>
-                      <p className="text-xs text-gray-600 font-medium">Engagement</p>
+                      <p className={`text-xs font-medium ${
+                        isDark ? "text-slate-400" : "text-gray-600"
+                      }`}>Engagement</p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-16">
-                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                    <BarChart3 className="w-10 h-10 text-gray-400" />
+                <div className="text-center py-12 sm:py-16">
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                    isDark ? "bg-slate-700" : "bg-gray-100"
+                  }`}>
+                    <BarChart3 className={`w-8 h-8 sm:w-10 sm:h-10 ${
+                      isDark ? "text-slate-400" : "text-gray-400"
+                    }`} />
                   </div>
-                  <p className="text-gray-900 font-bold text-lg mb-2">No analytics data yet</p>
-                  <p className="text-sm text-gray-600">
+                  <p className={`font-bold text-base sm:text-lg mb-2 ${
+                    isDark ? "text-white" : "text-gray-900"
+                  }`}>No analytics data yet</p>
+                  <p className={`text-sm ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>
                     Start posting content to see analytics
                   </p>
                 </div>

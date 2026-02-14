@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -106,6 +107,8 @@ const dummyScheduledPosts: ScheduledPost[] = [
 
 export default function DashboardSchedulePage() {
   const { userId } = useAuth();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -622,12 +625,16 @@ export default function DashboardSchedulePage() {
   // };
 
   return (
-    <div className="space-y-8 pt-8 max-w-5xl mx-auto">
+    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+      isDark ? "bg-slate-900" : "bg-white"
+    }`}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-950 mb-2">Schedule Posts</h1>
-          <p className="text-base text-gray-600">We post for you automatically</p>
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 ${
+            isDark ? "text-white" : "text-gray-950"
+          }`}>Schedule Posts</h1>
+          <p className={isDark ? "text-slate-400" : "text-gray-600"}>We post for you automatically</p>
         </div>
         <Button
           onClick={() => {
@@ -645,7 +652,7 @@ export default function DashboardSchedulePage() {
             setYoutubePrivacy("public");
             setShowScheduleModal(true);
           }}
-          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           New Post
@@ -653,13 +660,19 @@ export default function DashboardSchedulePage() {
       </div>
 
       {/* View Tabs */}
-      <div className="bg-gray-100 rounded-xl p-1 border border-gray-200">
+      <div className={`rounded-xl p-1 border transition-colors duration-300 ${
+        isDark ? "bg-slate-800 border-slate-700" : "bg-gray-100 border-gray-200"
+      }`}>
         <div className="flex gap-1">
           <button
             onClick={() => setViewMode("calendar")}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
               viewMode === "calendar"
-                ? "bg-white text-gray-900 shadow-sm"
+                ? isDark
+                  ? "bg-slate-700 text-white shadow-sm"
+                  : "bg-white text-gray-900 shadow-sm"
+                : isDark
+                ? "text-slate-400 hover:text-white"
                 : "text-gray-600 hover:text-gray-900"
             }`}
           >
@@ -668,9 +681,13 @@ export default function DashboardSchedulePage() {
           </button>
           <button
             onClick={() => setViewMode("list")}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
               viewMode === "list"
-                ? "bg-white text-gray-900 shadow-sm"
+                ? isDark
+                  ? "bg-slate-700 text-white shadow-sm"
+                  : "bg-white text-gray-900 shadow-sm"
+                : isDark
+                ? "text-slate-400 hover:text-white"
                 : "text-gray-600 hover:text-gray-900"
             }`}
           >
@@ -681,44 +698,76 @@ export default function DashboardSchedulePage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="bg-white border-gray-200 rounded-xl">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-2 font-medium">Upcoming</p>
-            <p className="text-2xl font-bold text-gray-900">{upcomingPosts.length}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <Card className={`border rounded-xl transition-colors duration-300 ${
+          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+        }`}>
+          <CardContent className="p-4 sm:p-6">
+            <p className={`text-sm mb-2 font-medium ${
+              isDark ? "text-slate-400" : "text-gray-600"
+            }`}>Upcoming</p>
+            <p className={`text-2xl font-bold ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}>{upcomingPosts.length}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border-gray-200 rounded-xl">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-2 font-medium">Posted</p>
-            <p className="text-2xl font-bold text-gray-900">{pastPosts.filter((p) => p.posted).length}</p>
+        <Card className={`border rounded-xl transition-colors duration-300 ${
+          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+        }`}>
+          <CardContent className="p-4 sm:p-6">
+            <p className={`text-sm mb-2 font-medium ${
+              isDark ? "text-slate-400" : "text-gray-600"
+            }`}>Posted</p>
+            <p className={`text-2xl font-bold ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}>{pastPosts.filter((p) => p.posted).length}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border-gray-200 rounded-xl">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-2 font-medium">Total</p>
-            <p className="text-2xl font-bold text-gray-900">{scheduledPosts.length}</p>
+        <Card className={`border rounded-xl transition-colors duration-300 ${
+          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+        }`}>
+          <CardContent className="p-4 sm:p-6">
+            <p className={`text-sm mb-2 font-medium ${
+              isDark ? "text-slate-400" : "text-gray-600"
+            }`}>Total</p>
+            <p className={`text-2xl font-bold ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}>{scheduledPosts.length}</p>
           </CardContent>
         </Card>
       </div>
 
       {loading ? (
         <div className="text-center py-12">
-          <Loader2Icon className="w-8 h-8 text-gray-700 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading scheduled posts...</p>
+          <Loader2Icon className={`w-8 h-8 animate-spin mx-auto mb-4 ${
+            isDark ? "text-purple-400" : "text-gray-700"
+          }`} />
+          <p className={isDark ? "text-slate-400" : "text-gray-600"}>Loading scheduled posts...</p>
         </div>
       ) : viewMode === "calendar" ? (
         /* Calendar View */
         upcomingPosts.length === 0 ? (
-          <div className="text-center py-12 bg-white border border-gray-200 rounded-xl">
-            <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-1.5">No scheduled posts</h3>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className={`text-center py-12 border rounded-xl transition-colors duration-300 ${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          }`}>
+            <CalendarIcon className={`w-12 h-12 mx-auto mb-3 ${
+              isDark ? "text-slate-500" : "text-gray-400"
+            }`} />
+            <h3 className={`text-lg font-semibold mb-1.5 ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}>No scheduled posts</h3>
+            <p className={`text-sm mb-4 ${
+              isDark ? "text-slate-400" : "text-gray-600"
+            }`}>
               Schedule your first post to see it on the calendar
             </p>
             <Button
               onClick={() => setShowScheduleModal(true)}
-              className="bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
+              className={`rounded-xl transition-all duration-200 ${
+                isDark
+                  ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                  : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+              }`}
             >
               <PlusIcon className="w-4 h-4 mr-2" />
               Schedule Post
@@ -744,20 +793,28 @@ export default function DashboardSchedulePage() {
           {/* List View - Upcoming Posts */}
           {upcomingPosts.length > 0 && (
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Upcoming</h2>
+              <h2 className={`text-xl font-bold mb-6 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Upcoming</h2>
               <div className="space-y-4">
                 {upcomingPosts.map((post) => (
                   <Card
                     key={post.id}
-                    className="bg-white border-gray-200 rounded-xl hover:border-gray-300 transition-colors"
+                    className={`border rounded-xl transition-all duration-200 ${
+                      isDark
+                        ? "bg-slate-800 border-slate-700 hover:border-slate-600"
+                        : "bg-white border-gray-200 hover:border-gray-300"
+                    }`}
                   >
-                    <CardContent className="p-6">
+                    <CardContent className="p-4 sm:p-6">
                       <div className="flex items-start justify-between gap-3 mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                           <div className="flex items-center gap-2">
                             {getPlatformIcon(post.platform)}
-                            <span className="text-sm font-semibold text-gray-900 capitalize">
+                            <span className={`text-sm font-semibold capitalize ${
+                              isDark ? "text-white" : "text-gray-900"
+                            }`}>
                               {post.platform}
                             </span>
                           </div>
@@ -765,9 +822,13 @@ export default function DashboardSchedulePage() {
                             const status = getPlatformPostingStatus(post.platform);
                             return (
                               <span
-                                className={`px-2 py-0.5 text-xs rounded-lg border ${
+                                className={`px-2 py-0.5 text-xs rounded-lg border transition-colors duration-300 ${
                                   status.type === "auto"
-                                    ? "bg-green-50 text-green-700 border-green-200"
+                                    ? isDark
+                                      ? "bg-green-950/50 text-green-400 border-green-800"
+                                      : "bg-green-50 text-green-700 border-green-200"
+                                    : isDark
+                                    ? "bg-orange-950/50 text-orange-400 border-orange-800"
                                     : "bg-orange-50 text-orange-700 border-orange-200"
                                 }`}
                                 title={status.message}
@@ -786,11 +847,17 @@ export default function DashboardSchedulePage() {
                               </span>
                             );
                           })()}
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-lg border border-gray-200">
+                          <span className={`px-2 py-0.5 text-xs rounded-lg border transition-colors duration-300 ${
+                            isDark
+                              ? "bg-slate-700 text-slate-300 border-slate-600"
+                              : "bg-gray-100 text-gray-700 border-gray-200"
+                          }`}>
                             {getTimeUntil(post.scheduledFor)}
                           </span>
                         </div>
-                          <span className="text-xs text-gray-600">
+                          <span className={`text-xs ${
+                            isDark ? "text-slate-400" : "text-gray-600"
+                          }`}>
                           {formatDateTime(post.scheduledFor)}
                         </span>
                       </div>
@@ -798,8 +865,12 @@ export default function DashboardSchedulePage() {
                         <Button
                           onClick={() => handleEdit(post)}
                           size="sm"
-                            variant="outline"
-                            className="border-gray-300 text-gray-700 hover:bg-gray-50 h-8 w-8 p-0 rounded-xl"
+                          variant="outline"
+                          className={`h-8 w-8 p-0 rounded-xl transition-all duration-200 ${
+                            isDark
+                              ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                              : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                          }`}
                           title="Edit"
                         >
                           <EditIcon className="w-4 h-4" />
@@ -807,23 +878,35 @@ export default function DashboardSchedulePage() {
                         <Button
                           onClick={() => handleDeleteClick(post.id)}
                           size="sm"
-                            variant="outline"
-                            className="border-gray-300 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:border-red-300 h-8 w-8 p-0 rounded-xl"
+                          variant="outline"
+                          className={`h-8 w-8 p-0 rounded-xl transition-all duration-200 ${
+                            isDark
+                              ? "border-slate-600 text-red-400 hover:bg-red-950/30 hover:border-red-500 hover:text-red-300"
+                              : "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300"
+                          }`}
                           title="Delete"
                         >
                           <TrashIcon className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                      <div className={`rounded-xl p-4 border transition-colors duration-300 ${
+                        isDark
+                          ? "bg-slate-900/50 border-slate-700"
+                          : "bg-gray-50 border-gray-200"
+                      }`}>
                         {post.platform === "youtube" ? (
-                          <p className="text-gray-900 text-sm leading-relaxed">
+                          <p className={`text-sm leading-relaxed ${
+                            isDark ? "text-slate-200" : "text-gray-900"
+                          }`}>
                             🎬 YouTube Video - {post.content || "Video scheduled"}
                           </p>
                         ) : (
-                          <pre className="whitespace-pre-wrap text-gray-900 text-sm leading-relaxed line-clamp-2">
-                        {post.content}
-                      </pre>
+                          <pre className={`whitespace-pre-wrap text-sm leading-relaxed line-clamp-2 ${
+                            isDark ? "text-slate-200" : "text-gray-900"
+                          }`}>
+                            {post.content}
+                          </pre>
                         )}
                     </div>
                     </CardContent>
@@ -836,36 +919,54 @@ export default function DashboardSchedulePage() {
           {/* Past Posts */}
           {pastPosts.length > 0 && (
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Past</h2>
+              <h2 className={`text-xl font-bold mb-6 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>Past</h2>
               <div className="space-y-4">
                 {pastPosts.map((post) => (
                   <Card
                     key={post.id}
-                    className="bg-gray-50 border-gray-200 rounded-xl opacity-80"
+                    className={`border rounded-xl opacity-80 transition-colors duration-300 ${
+                      isDark
+                        ? "bg-slate-800/50 border-slate-700"
+                        : "bg-gray-50 border-gray-200"
+                    }`}
                   >
                     <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         {getPlatformIcon(post.platform)}
-                          <span className="text-sm font-medium text-gray-700 capitalize">
+                          <span className={`text-sm font-medium capitalize ${
+                            isDark ? "text-slate-300" : "text-gray-700"
+                          }`}>
                           {post.platform}
                         </span>
                         {post.posted && (
-                            <span className="px-2 py-0.5 bg-green-50 text-green-700 text-xs rounded-lg border border-green-200">
+                            <span className={`px-2 py-0.5 text-xs rounded-lg border transition-colors duration-300 ${
+                              isDark
+                                ? "bg-green-950/50 text-green-400 border-green-800"
+                                : "bg-green-50 text-green-700 border-green-200"
+                            }`}>
                             Posted
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-gray-600">
+                      <span className={`text-xs ${
+                        isDark ? "text-slate-400" : "text-gray-600"
+                      }`}>
                         {formatDateTime(post.scheduledFor)}
                       </span>
                     </div>
                       {post.platform === "youtube" ? (
-                        <p className="text-gray-700 text-xs leading-relaxed">
+                        <p className={`text-xs leading-relaxed ${
+                          isDark ? "text-slate-300" : "text-gray-700"
+                        }`}>
                           🎬 YouTube Video - {post.content || "Video scheduled"}
                         </p>
                       ) : (
-                        <pre className="whitespace-pre-wrap text-gray-700 text-xs leading-relaxed line-clamp-2">
+                        <pre className={`whitespace-pre-wrap text-xs leading-relaxed line-clamp-2 ${
+                          isDark ? "text-slate-300" : "text-gray-700"
+                        }`}>
                       {post.content}
                     </pre>
                       )}
@@ -877,15 +978,27 @@ export default function DashboardSchedulePage() {
           )}
 
           {scheduledPosts.length === 0 && (
-            <div className="text-center py-12">
-              <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-1.5">No scheduled posts</h3>
-              <p className="text-sm text-gray-600 mb-4">
+            <div className={`text-center py-12 border rounded-xl transition-colors duration-300 ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}>
+              <CalendarIcon className={`w-12 h-12 mx-auto mb-3 ${
+                isDark ? "text-slate-500" : "text-gray-400"
+              }`} />
+              <h3 className={`text-lg font-semibold mb-1.5 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>No scheduled posts</h3>
+              <p className={`text-sm mb-4 ${
+                isDark ? "text-slate-400" : "text-gray-600"
+              }`}>
                 We post for you automatically
               </p>
               <Button
                 onClick={() => setShowScheduleModal(true)}
-                className="bg-gray-900 hover:bg-gray-800 text-white rounded-xl"
+                className={`rounded-xl transition-all duration-200 ${
+                  isDark
+                    ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                    : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                }`}
               >
                 <PlusIcon className="w-4 h-4 mr-2" />
                 Schedule Post
@@ -912,11 +1025,17 @@ export default function DashboardSchedulePage() {
           }}
         >
           <div
-            className="bg-white border border-gray-200 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl mx-4"
+            className={`border rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl mx-4 transition-colors duration-300 ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+            <div className={`p-4 sm:p-6 border-b flex items-center justify-between transition-colors duration-300 ${
+              isDark ? "border-slate-700" : "border-gray-200"
+            }`}>
+              <h2 className={`text-base sm:text-lg font-semibold ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>
                 {editingPost ? "Edit Post" : "Schedule Post"}
               </h2>
               <button
@@ -931,7 +1050,11 @@ export default function DashboardSchedulePage() {
                   setYoutubeQuality("high");
                   setYoutubePrivacy("public");
                 }}
-                className="text-gray-600 hover:text-gray-900 transition-colors p-1.5 hover:bg-gray-100 rounded-xl"
+                className={`transition-all duration-200 p-1.5 rounded-xl ${
+                  isDark
+                    ? "text-slate-400 hover:text-white hover:bg-slate-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
               >
                 <XIcon className="w-4 h-4" />
               </button>
@@ -939,15 +1062,21 @@ export default function DashboardSchedulePage() {
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2">Platform</label>
+                <label className={`block text-xs font-semibold mb-2 ${
+                  isDark ? "text-slate-300" : "text-gray-700"
+                }`}>Platform</label>
                 <div className="grid grid-cols-2 sm:flex gap-2">
                   {contentTypes.map((type) => (
                     <button
                       key={type}
                       onClick={() => setSelectedPlatform(type)}
-                      className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-xl border transition-colors ${
+                      className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-xl border transition-all duration-200 ${
                         selectedPlatform === type
-                          ? "border-gray-900 bg-gray-50 text-gray-900"
+                          ? isDark
+                            ? "border-purple-500 bg-purple-900/50 text-purple-300"
+                            : "border-gray-900 bg-gray-50 text-gray-900"
+                          : isDark
+                          ? "border-slate-700 bg-slate-700/50 text-slate-400 hover:border-slate-600 hover:bg-slate-700 hover:text-slate-300"
                           : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
                       }`}
                     >
@@ -960,8 +1089,14 @@ export default function DashboardSchedulePage() {
 
               {/* YouTube Connection Warning */}
               {selectedPlatform === "youtube" && !youtubeConnected && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
-                  <p className="text-sm text-yellow-800">
+                <div className={`p-3 border rounded-xl transition-colors duration-300 ${
+                  isDark
+                    ? "bg-yellow-950/30 border-yellow-800"
+                    : "bg-yellow-50 border-yellow-200"
+                }`}>
+                  <p className={`text-sm ${
+                    isDark ? "text-yellow-300" : "text-yellow-800"
+                  }`}>
                     ⚠️ YouTube account not connected. Please connect your YouTube account in Settings first.
                   </p>
                 </div>
@@ -971,34 +1106,52 @@ export default function DashboardSchedulePage() {
               {selectedPlatform === "youtube" ? (
                 <>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-2">Video Title *</label>
+                    <label className={`block text-xs font-semibold mb-2 ${
+                      isDark ? "text-slate-300" : "text-gray-700"
+                    }`}>Video Title *</label>
                     <input
                       type="text"
                       value={youtubeVideoTitle}
                       onChange={(e) => setYoutubeVideoTitle(e.target.value)}
                       placeholder="Enter video title..."
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                      className={`w-full px-4 py-3 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                        isDark
+                          ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
+                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
+                      }`}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-2">Description</label>
+                    <label className={`block text-xs font-semibold mb-2 ${
+                      isDark ? "text-slate-300" : "text-gray-700"
+                    }`}>Description</label>
                     <textarea
                       value={youtubeDescription}
                       onChange={(e) => setYoutubeDescription(e.target.value)}
                       placeholder="Enter video description (optional)..."
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 resize-none text-sm"
+                      className={`w-full px-4 py-3 border rounded-xl resize-none text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                        isDark
+                          ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
+                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
+                      }`}
                       rows={4}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-2">Content Type</label>
+                      <label className={`block text-xs font-semibold mb-2 ${
+                        isDark ? "text-slate-300" : "text-gray-700"
+                      }`}>Content Type</label>
                       <select
                         value={youtubeContentType}
                         onChange={(e) => setYoutubeContentType(e.target.value as "rain_sounds" | "sleep_sounds" | "ambient_sounds" | "white_noise")}
-                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
+                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                          isDark
+                            ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
+                            : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                        }`}
                       >
                         <option value="rain_sounds">Rain Sounds</option>
                         <option value="sleep_sounds">Sleep Sounds</option>
@@ -1008,25 +1161,37 @@ export default function DashboardSchedulePage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-2">Duration (minutes)</label>
+                      <label className={`block text-xs font-semibold mb-2 ${
+                        isDark ? "text-slate-300" : "text-gray-700"
+                      }`}>Duration (minutes)</label>
                       <input
                         type="number"
                         value={youtubeDuration}
                         onChange={(e) => setYoutubeDuration(parseInt(e.target.value) || 30)}
                         min={1}
                         max={480}
-                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
+                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                          isDark
+                            ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
+                            : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                        }`}
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-2">Quality</label>
+                      <label className={`block text-xs font-semibold mb-2 ${
+                        isDark ? "text-slate-300" : "text-gray-700"
+                      }`}>Quality</label>
                       <select
                         value={youtubeQuality}
                         onChange={(e) => setYoutubeQuality(e.target.value as "high" | "medium" | "low")}
-                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
+                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                          isDark
+                            ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
+                            : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                        }`}
                       >
                         <option value="high">High</option>
                         <option value="medium">Medium</option>
@@ -1035,11 +1200,17 @@ export default function DashboardSchedulePage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-2">Privacy</label>
+                      <label className={`block text-xs font-semibold mb-2 ${
+                        isDark ? "text-slate-300" : "text-gray-700"
+                      }`}>Privacy</label>
                       <select
                         value={youtubePrivacy}
                         onChange={(e) => setYoutubePrivacy(e.target.value as "public" | "unlisted" | "private")}
-                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
+                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                          isDark
+                            ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
+                            : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                        }`}
                       >
                         <option value="public">Public</option>
                         <option value="unlisted">Unlisted</option>
@@ -1052,15 +1223,23 @@ export default function DashboardSchedulePage() {
                 /* Regular Text Content Form */
                 <>
               <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-2">Content</label>
+                    <label className={`block text-xs font-semibold mb-2 ${
+                      isDark ? "text-slate-300" : "text-gray-700"
+                    }`}>Content</label>
                 <textarea
                   value={selectedContent}
                   onChange={(e) => setSelectedContent(e.target.value)}
                   placeholder="Paste or type your content here..."
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 resize-none text-sm"
+                      className={`w-full px-4 py-3 border rounded-xl resize-none text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                        isDark
+                          ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
+                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
+                      }`}
                   rows={6}
                 />
-                    <div className="mt-1.5 text-xs text-gray-500 text-right">
+                    <div className={`mt-1.5 text-xs text-right ${
+                      isDark ? "text-slate-400" : "text-gray-500"
+                    }`}>
                   {selectedContent.length} chars
                 </div>
               </div>
@@ -1069,20 +1248,30 @@ export default function DashboardSchedulePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Date</label>
+                  <label className={`block text-xs font-semibold mb-1.5 ${
+                    isDark ? "text-slate-300" : "text-gray-700"
+                  }`}>Date</label>
                   <input
                     type="date"
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     min={getTodayDate()}
-                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
+                    className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                      isDark
+                        ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
+                        : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                    }`}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                  <label className={`block text-xs font-semibold mb-1.5 ${
+                    isDark ? "text-slate-300" : "text-gray-700"
+                  }`}>
                     Time
                     {selectedPlatform === "youtube" && scheduledDate === getTodayDate() && (
-                      <span className="text-gray-500 font-normal ml-1">(min 40 min from now)</span>
+                      <span className={`font-normal ml-1 ${
+                        isDark ? "text-slate-400" : "text-gray-500"
+                      }`}>(min 40 min from now)</span>
                     )}
                   </label>
                   <input
@@ -1104,10 +1293,16 @@ export default function DashboardSchedulePage() {
                       }
                       return getMinTimeForToday();
                     })() : undefined}
-                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
+                    className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                      isDark
+                        ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
+                        : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                    }`}
                   />
                   {selectedPlatform === "youtube" && scheduledDate === getTodayDate() && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className={`text-xs mt-1 ${
+                      isDark ? "text-slate-400" : "text-gray-500"
+                    }`}>
                       YouTube requires scheduled videos to be at least 15 minutes in the future. We require 40+ minutes to account for video generation time (15-20 min), timezone differences, and processing delays.
                     </p>
                   )}
@@ -1117,24 +1312,36 @@ export default function DashboardSchedulePage() {
 
             {/* Progress Display */}
             {progress && currentJobId && (
-              <div className="px-4 sm:px-6 pb-4 border-t border-gray-200 bg-purple-50/50">
+              <div className={`px-4 sm:px-6 pb-4 border-t transition-colors duration-300 ${
+                isDark
+                  ? "border-slate-700 bg-purple-950/30"
+                  : "border-gray-200 bg-purple-50/50"
+              }`}>
                 <div className="space-y-3 pt-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Loader2Icon className="w-4 h-4 animate-spin text-purple-600" />
-                      <span className="text-sm font-semibold text-gray-900">
+                      <Loader2Icon className={`w-4 h-4 animate-spin ${
+                        isDark ? "text-purple-400" : "text-purple-600"
+                      }`} />
+                      <span className={`text-sm font-semibold ${
+                        isDark ? "text-white" : "text-gray-900"
+                      }`}>
                         {progress.status === "generating" ? "Generating Video..." : 
                          progress.status === "uploading" ? "Uploading to YouTube..." :
                          progress.status === "completed" ? "Completed!" :
                          "Processing..."}
                       </span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-700">
+                    <span className={`text-sm font-semibold ${
+                      isDark ? "text-slate-300" : "text-gray-700"
+                    }`}>
                       {progress.percentage}%
                     </span>
                   </div>
                   <Progress value={progress.percentage} className="h-2" />
-                  <div className="flex items-center justify-between text-xs text-gray-600">
+                  <div className={`flex items-center justify-between text-xs ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>
                     <span>
                       {formatTime(progress.currentTime)} / {formatTime(progress.totalDuration)}
                     </span>
@@ -1159,7 +1366,7 @@ export default function DashboardSchedulePage() {
                           fetchScheduledPosts();
                         }}
                         size="sm"
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                        className="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl transition-all duration-200"
                       >
                         Done
                       </Button>
@@ -1169,7 +1376,9 @@ export default function DashboardSchedulePage() {
               </div>
             )}
 
-            <div className="p-4 sm:p-6 border-t border-gray-200 bg-gray-50 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2">
+            <div className={`p-4 sm:p-6 border-t flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 transition-colors duration-300 ${
+              isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"
+            }`}>
               <Button
                 onClick={() => {
                   setShowScheduleModal(false);
@@ -1184,7 +1393,11 @@ export default function DashboardSchedulePage() {
                 }}
                 size="sm"
                 variant="outline"
-                className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+                className={`w-full sm:w-auto rounded-xl transition-all duration-200 ${
+                  isDark
+                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                }`}
               >
                 Cancel
               </Button>
@@ -1199,7 +1412,11 @@ export default function DashboardSchedulePage() {
                     : !selectedContent.trim())
                 }
                 size="sm"
-                className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white disabled:opacity-50 disabled:cursor-not-allowed px-4 rounded-xl"
+                className={`w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed px-4 rounded-xl transition-all duration-200 ${
+                  isDark
+                    ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                    : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                }`}
               >
                 {isSubmitting ? (
                   <>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
@@ -56,14 +57,19 @@ export function Hero() {
         {/* Dashboard Preview Image - Centered Below */}
         <div className="relative w-full flex items-center justify-center mt-12">
           <div className="relative w-full max-w-6xl">
-            <img
-              src="/images/fluetdashboardimg.png"
-              alt="Flippr AI Dashboard Preview"
-              className="rounded-xl shadow-2xl w-full h-auto"
-              style={{
-                objectFit: 'cover',
-              }}
-            />
+            <div className="relative w-full aspect-video bg-gray-100 dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
+              <Image
+                src="/images/fluetdashboardimg.png"
+                alt="Revvy Dashboard Preview"
+                width={1920}
+                height={1080}
+                priority={true}
+                loading="eager"
+                className="rounded-xl shadow-2xl w-full h-auto object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1920px"
+                quality={90}
+              />
+            </div>
           </div>
         </div>
       </div>
