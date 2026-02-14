@@ -1,14 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, StarIcon, Bolt, ShieldIcon, ArrowRightIcon, MinusIcon, PlusIcon, LayersIcon } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
-import { useState, useCallback, useMemo } from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import { CheckIcon, StarIcon, Bolt, ShieldIcon, ArrowRightIcon, LayersIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
-import { showToast } from "@/lib/toast";
-
-type PaymentProvider = "stripe" | "kora";
 
 const pricingPlans = [
   {
@@ -83,115 +79,18 @@ const pricingPlans = [
 // ];
 
 export default function PricingPage() {
-  const { isSignedIn, user } = useUser();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider | null>(null);
-  // const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [showPaymentOptions, setShowPaymentOptions] = useState<string | null>(null);
+  const router = useRouter();
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
-  const [userCount, setUserCount] = useState(1);
 
-  const planMap = useMemo(() => {
-    const map = new Map<string, { name: string; price: string }>();
-    pricingPlans.forEach(plan => {
-      if (plan.priceId) {
-        const monthlyPrice = parseInt(plan.price);
-        const yearlyPrice = billingCycle === "yearly" ? Math.round(monthlyPrice * 10) : monthlyPrice;
-        map.set(plan.priceId, { name: plan.name, price: yearlyPrice.toString() });
-      }
-    });
-    return map;
-  }, [billingCycle]);
-
-  const handlePlanSelect = useCallback((priceId: string | null) => {
+  const handleGetStarted = (planId: string, priceId: string | null) => {
     if (!priceId) {
-      showToast.info("Contact Sales", "Please reach out to our team for enterprise pricing");
+      // Enterprise plan - contact sales
+      window.location.href = "mailto:sales@revvy.com?subject=Enterprise Plan Inquiry";
       return;
     }
-    if (!isSignedIn) {
-      setError("Please sign in to subscribe");
-      showToast.error("Sign in required", "Please sign in to continue with your subscription");
-      return;
-    }
-    setShowPaymentOptions(priceId);
-    // setSelectedPlan(priceId); // Unused - commented out
-    setSelectedProvider(null);
-    setError(null);
-  }, [isSignedIn]);
-
-  const handleSubscribe = useCallback(async (priceId: string, provider: PaymentProvider) => {
-    if (!isSignedIn || !provider) {
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    const planInfo = planMap.get(priceId) || { name: "Unknown", price: "0" };
-
-    try {
-      const endpoint = provider === "stripe" 
-        ? "/api/create-checkout-session" 
-        : "/api/create-kora-checkout";
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          priceId,
-          userId: user?.id,
-          planName: planInfo.name,
-          amount: planInfo.price,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create checkout session");
-      }
-
-      const data = await response.json();
-
-      if (provider === "stripe") {
-        const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-        if (!stripePublishableKey || stripePublishableKey.includes('your_stripe_publishable_key')) {
-          throw new Error("Stripe publishable key is not configured");
-        }
-        
-        const stripe = await loadStripe(stripePublishableKey);
-        if (!stripe) {
-          throw new Error("Failed to load Stripe");
-        }
-        await stripe.redirectToCheckout({ sessionId: data.sessionId });
-      } else if (provider === "kora") {
-        if (data.paymentLink) {
-          window.location.href = data.paymentLink;
-        } else {
-          throw new Error("Kora payment link not received");
-        }
-      }
-    } catch (error) {
-      console.error("Error creating checkout session:", error);
-      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
-      setError(errorMessage);
-      showToast.error("Payment Error", errorMessage);
-      setTimeout(() => setError(null), 5000);
-    } finally {
-      setIsLoading(false);
-      // setSelectedPlan(null); // Unused - commented out
-      setShowPaymentOptions(null);
-      setSelectedProvider(null);
-    }
-  }, [isSignedIn, user?.id, planMap]);
-
-  const handleCancel = useCallback(() => {
-    setShowPaymentOptions(null);
-    // setSelectedPlan(null); // Unused - commented out
-    setSelectedProvider(null);
-  }, []);
+    // Redirect to checkout page with plan info
+    router.push(`/checkout?plan=${planId}&billing=${billingCycle}`);
+  };
 
   const getYearlyPrice = (monthlyPrice: string) => {
     if (monthlyPrice === "Custom") return "Custom";
@@ -243,13 +142,6 @@ export default function PricingPage() {
               </div>
             </div>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="max-w-4xl mx-auto mb-8 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
 
           {/* Pricing Cards - Reference Style */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20">
@@ -315,39 +207,6 @@ export default function PricingPage() {
                       )}
                     </div>
 
-                    {/* User Selector - Reference Style */}
-                    {plan.id !== "enterprise" && (
-                      <div className={`flex items-center justify-between mb-6 p-2 rounded-lg ${
-                        isPopular 
-                          ? "bg-white/10 border border-white/20" 
-                          : "bg-gray-50 border border-gray-200"
-                      }`}>
-                        <button
-                          onClick={() => setUserCount(Math.max(1, userCount - 1))}
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-                            isPopular 
-                              ? "bg-white/20 hover:bg-white/30" 
-                              : "bg-white hover:bg-gray-100 border border-gray-200"
-                          }`}
-                        >
-                          <MinusIcon className={`w-4 h-4 ${isPopular ? "text-white" : "text-gray-700"}`} />
-                        </button>
-                        <span className={`text-sm font-medium ${isPopular ? "text-white" : "text-gray-900"}`}>
-                          {userCount} USER{userCount !== 1 ? "S" : ""}
-                        </span>
-                        <button
-                          onClick={() => setUserCount(userCount + 1)}
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-                            isPopular 
-                              ? "bg-white/20 hover:bg-white/30" 
-                              : "bg-white hover:bg-gray-100 border border-gray-200"
-                          }`}
-                        >
-                          <PlusIcon className={`w-4 h-4 ${isPopular ? "text-white" : "text-gray-700"}`} />
-                        </button>
-                      </div>
-                    )}
-
                     {/* Features List - Reference Style */}
                     <ul className="space-y-3 mb-8">
                       {plan.features.map((feature, idx) => (
@@ -364,80 +223,18 @@ export default function PricingPage() {
                       ))}
                     </ul>
 
-                    {/* CTA Button */}
-                    {showPaymentOptions === plan.priceId ? (
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-3">
-                          <button
-                            onClick={() => setSelectedProvider("stripe")}
-                            className={`p-3 rounded-lg border transition-colors text-sm ${
-                              selectedProvider === "stripe"
-                                ? isPopular
-                                  ? "border-white bg-white/20 text-white"
-                                  : "border-gray-900 bg-gray-50 text-gray-900"
-                                : isPopular
-                                  ? "border-white/30 text-white/80 hover:border-white/50 bg-white/10"
-                                  : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
-                            }`}
-                          >
-                            <div className="font-medium mb-1">Stripe</div>
-                            <div className={`text-xs ${isPopular ? "text-white/70" : "text-gray-500"}`}>Cards</div>
-                          </button>
-                          <button
-                            onClick={() => setSelectedProvider("kora")}
-                            className={`p-3 rounded-lg border transition-colors text-sm ${
-                              selectedProvider === "kora"
-                                ? isPopular
-                                  ? "border-white bg-white/20 text-white"
-                                  : "border-gray-900 bg-gray-50 text-gray-900"
-                                : isPopular
-                                  ? "border-white/30 text-white/80 hover:border-white/50 bg-white/10"
-                                  : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
-                            }`}
-                          >
-                            <div className="font-medium mb-1">Kora</div>
-                            <div className={`text-xs ${isPopular ? "text-white/70" : "text-gray-500"}`}>Local</div>
-                          </button>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={handleCancel}
-                            variant="outline"
-                            className={`flex-1 rounded-xl ${
-                              isPopular
-                                ? "border-white/30 text-white hover:bg-white/20"
-                                : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                            }`}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            onClick={() => plan.priceId && selectedProvider && handleSubscribe(plan.priceId, selectedProvider)}
-                            disabled={isLoading || !selectedProvider}
-                            className={`flex-1 rounded-xl ${
-                              isPopular
-                                ? "bg-white text-purple-900 hover:bg-white/90"
-                                : "bg-gray-900 hover:bg-gray-800 text-white"
-                            }`}
-                          >
-                            {isLoading ? "Processing..." : "Continue"}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <Button
-                        onClick={() => handlePlanSelect(plan.priceId)}
-                        disabled={isLoading}
-                        className={`w-full py-3 font-semibold rounded-xl ${
-                          isPopular
-                            ? "bg-white text-purple-900 hover:bg-white/90"
-                            : "bg-gray-900 hover:bg-gray-800 text-white"
-                        }`}
-                      >
-                        {plan.priceId ? "Get Started" : "Contact Sales"}
-                        {plan.priceId && <ArrowRightIcon className="w-4 h-4 ml-2" />}
-                      </Button>
-                    )}
+                    {/* CTA Button - Simple Get Started */}
+                    <Button
+                      onClick={() => handleGetStarted(plan.id, plan.priceId)}
+                      className={`w-full py-3 font-semibold rounded-xl transition-all ${
+                        isPopular
+                          ? "bg-white text-purple-900 hover:bg-white/90"
+                          : "bg-gray-900 hover:bg-gray-800 text-white"
+                      }`}
+                    >
+                      {plan.priceId ? "Get Started" : "Contact Sales"}
+                      {plan.priceId && <ArrowRightIcon className="w-4 h-4 ml-2" />}
+                    </Button>
                   </div>
                 </div>
               );

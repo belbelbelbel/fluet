@@ -15,8 +15,16 @@ export async function GET(req: Request) {
     const queryUserId = searchParams.get("userId");
     
     // Get authentication from Clerk - try multiple methods
-    const authResult = await auth();
-    let userId: string | null | undefined = authResult?.userId || queryUserId || null;
+    let userId: string | null | undefined = null;
+    
+    // Try auth() first
+    try {
+      const authResult = await auth();
+      userId = authResult?.userId || queryUserId || null;
+    } catch (authError) {
+      console.warn("[Dashboard Stats API] auth() failed:", authError);
+      // Continue to try other methods
+    }
     
     // If auth() didn't work, try currentUser() as fallback
     if (!userId) {
@@ -27,6 +35,11 @@ export async function GET(req: Request) {
       } catch (userError) {
         console.warn("[Dashboard Stats API] currentUser() failed:", userError);
       }
+    }
+    
+    // Use query param as final fallback
+    if (!userId && queryUserId) {
+      userId = queryUserId;
     }
     
     if (!userId) {
@@ -122,11 +135,26 @@ export async function GET(req: Request) {
     
     return response;
   } catch (error) {
-    console.error("Error fetching dashboard stats:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch dashboard stats" },
-      { status: 500 }
-    );
+    console.error("[Dashboard Stats API] Error:", error);
+    // Always return JSON, never HTML
+    try {
+      return NextResponse.json(
+        { 
+          error: "Failed to fetch dashboard stats",
+          details: error instanceof Error ? error.message : String(error)
+        },
+        { status: 500 }
+      );
+    } catch (jsonError) {
+      // If even JSON.stringify fails, return minimal JSON
+      return new NextResponse(
+        JSON.stringify({ error: "Internal server error" }),
+        { 
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+    }
   }
 }
 

@@ -43,15 +43,27 @@ export default function CreateClientPage() {
         }),
       });
 
-          if (response.ok) {
-            const data = await response.json();
-            showToast.success("Client created", "Redirecting to client dashboard...");
-            
-            // Dispatch event to refresh client selector
-            window.dispatchEvent(new CustomEvent('clientCreated', { detail: data.client }));
-            
-            router.push(`/dashboard/clients/${data.client.id}`);
-          } else {
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("[Create Client] Non-JSON response:", text.substring(0, 200));
+        showToast.error(
+          "Server Error",
+          "The server returned an unexpected response. Please try again or refresh the page."
+        );
+        return;
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        showToast.success("Client created", "Redirecting to client dashboard...");
+        
+        // Dispatch event to refresh client selector
+        window.dispatchEvent(new CustomEvent('clientCreated', { detail: data.client }));
+        
+        router.push(`/dashboard/clients/${data.client.id}`);
+      } else {
         const errorData = await response.json().catch(() => ({ error: "Failed to create client" }));
         const errorMessage = errorData.error || errorData.details || "Failed to create client. Please try again.";
         

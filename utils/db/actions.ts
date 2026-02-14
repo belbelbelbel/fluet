@@ -76,9 +76,30 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
         }
     } 
 
-    catch (error) {
+    catch (error: any) {
         console.error(`[CreateOrUpdateUser] Error encountered:`, error);
-        throw new Error("Failed to create or update user");
+        
+        // Provide more detailed error information
+        if (error instanceof Error) {
+            console.error(`[CreateOrUpdateUser] Error message: ${error.message}`);
+            console.error(`[CreateOrUpdateUser] Error stack: ${error.stack}`);
+            
+            // Check for specific database errors
+            if (error.message.includes('relation "users" does not exist') || 
+                error.message.includes('does not exist')) {
+                throw new Error("users table does not exist. Please run: npx drizzle-kit push");
+            }
+            if (error.message.includes('violates') || error.message.includes('constraint')) {
+                throw new Error(`Database constraint violation: ${error.message}`);
+            }
+            if (error.message.includes('connection') || error.message.includes('timeout')) {
+                throw new Error(`Database connection error: ${error.message}`);
+            }
+            
+            throw new Error(`Failed to create or update user: ${error.message}`);
+        }
+        
+        throw new Error(`Failed to create or update user: ${String(error)}`);
     }
 };
 
@@ -714,6 +735,8 @@ export const CreateClient = async (data: {
     paymentDueDate?: Date;
 }) => {
     try {
+        console.log(`[CreateClient] Creating client for agency ${data.agencyId} with name: ${data.name}`);
+        
         const [client] = await db
             .insert(Clients)
             .values({
@@ -728,25 +751,62 @@ export const CreateClient = async (data: {
             .returning()
             .execute();
 
+        if (!client || !client.id) {
+            throw new Error("Client creation returned null or client without id");
+        }
+
+        console.log(`[CreateClient] Client created with ID: ${client.id}`);
+
         // Create default credits for client
-        await db
-            .insert(ClientCredits)
-            .values({
-                clientId: client.id,
-                postsPerMonth: 12,
-                postsUsed: 0,
-                revisionsPerPost: 3,
-                rushRequests: 2,
-                rushUsed: 0,
-                resetDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
-                updatedAt: new Date(),
-            })
-            .execute();
+        try {
+            await db
+                .insert(ClientCredits)
+                .values({
+                    clientId: client.id,
+                    postsPerMonth: 12,
+                    postsUsed: 0,
+                    revisionsPerPost: 3,
+                    rushRequests: 2,
+                    rushUsed: 0,
+                    resetDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+                    updatedAt: new Date(),
+                })
+                .execute();
+            console.log(`[CreateClient] Default credits created for client ${client.id}`);
+        } catch (creditsError) {
+            console.error(`[CreateClient] Error creating default credits:`, creditsError);
+            // Don't fail the whole operation if credits creation fails
+            // The client was created successfully
+        }
 
         return client;
-    } catch (error) {
+    } catch (error: any) {
         console.error(`[CreateClient] Error encountered:`, error);
-        throw new Error("Failed to create client");
+        
+        // Provide more detailed error information
+        if (error instanceof Error) {
+            console.error(`[CreateClient] Error message: ${error.message}`);
+            console.error(`[CreateClient] Error stack: ${error.stack}`);
+            
+            // Check for specific database errors
+            if (error.message.includes('relation "clients" does not exist') || 
+                error.message.includes('does not exist')) {
+                throw new Error("clients table does not exist. Please run: npx drizzle-kit push");
+            }
+            if (error.message.includes('foreign key')) {
+                throw new Error(`Agency with ID ${data.agencyId} does not exist in database`);
+            }
+            if (error.message.includes('violates') || error.message.includes('constraint')) {
+                throw new Error(`Database constraint violation: ${error.message}`);
+            }
+            if (error.message.includes('connection') || error.message.includes('timeout')) {
+                throw new Error(`Database connection error: ${error.message}`);
+            }
+            
+            throw new Error(`Failed to create client: ${error.message}`);
+        }
+        
+        throw new Error(`Failed to create client: ${String(error)}`);
     }
 };
 

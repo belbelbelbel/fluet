@@ -97,6 +97,15 @@ export default function DashboardPage() {
         const response = await fetch(`/api/clients?userId=${userId}`, {
           credentials: "include",
         });
+        
+        // Check if response is JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          const text = await response.text();
+          console.error("[Dashboard] Non-JSON response from /api/clients:", text.substring(0, 200));
+          return;
+        }
+        
         if (response.ok) {
           const data = await response.json();
           setClients(data.clients || []);
@@ -136,6 +145,15 @@ export default function DashboardPage() {
         },
         next: { revalidate: 60 }, // Revalidate every 60 seconds
       });
+      
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("[Dashboard] Non-JSON response from /api/dashboard/stats:", text.substring(0, 200));
+        return;
+      }
+      
       if (response.ok) {
         const data = await response.json();
         setStats({

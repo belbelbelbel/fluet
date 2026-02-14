@@ -137,12 +137,25 @@ export async function GET(req: NextRequest) {
         return response;
     } catch (error) {
         console.error("[Clients API] GET Error:", error);
-        return NextResponse.json(
-            {
-                error: error instanceof Error ? error.message : "Failed to fetch clients",
-            },
-            { status: 500 }
-        );
+        // Always return JSON, never HTML
+        try {
+            return NextResponse.json(
+                {
+                    error: error instanceof Error ? error.message : "Failed to fetch clients",
+                    details: error instanceof Error ? error.stack : String(error)
+                },
+                { status: 500 }
+            );
+        } catch (jsonError) {
+            // If even JSON.stringify fails, return minimal JSON
+            return new NextResponse(
+                JSON.stringify({ error: "Internal server error" }),
+                { 
+                    status: 500,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
+        }
     }
 }
 
@@ -151,6 +164,7 @@ export async function GET(req: NextRequest) {
  * Create a new client
  */
 export async function POST(req: NextRequest) {
+    // Wrap everything to ensure we always return JSON
     try {
         // Get authentication from Clerk - try multiple methods
         let clerkUserId: string | null | undefined = null;
@@ -179,25 +193,25 @@ export async function POST(req: NextRequest) {
             }
         }
         
-        // Try to get from request body as fallback (for POST requests)
+        // Parse request body once (can only be read once)
         let body: any = {};
-        if (!clerkUserId) {
-            try {
-                body = await req.json();
-                if (body.userId) {
-                    clerkUserId = body.userId;
-                    console.log("[Clients API POST] ✅ Got userId from request body:", clerkUserId);
-                }
-            } catch (bodyError) {
-                console.warn("[Clients API POST] Could not parse request body:", bodyError);
+        try {
+            body = await req.json();
+            // If we don't have userId from auth, try to get it from body
+            if (!clerkUserId && body.userId) {
+                clerkUserId = body.userId;
+                console.log("[Clients API POST] ✅ Got userId from request body:", clerkUserId);
             }
-        } else {
-            // If we already have userId, still need to parse body for other fields
-            try {
-                body = await req.json();
-            } catch (bodyError) {
-                console.warn("[Clients API POST] Could not parse request body:", bodyError);
-            }
+        } catch (bodyError) {
+            console.warn("[Clients API POST] Could not parse request body:", bodyError);
+            // If body parsing fails, return error immediately
+            return NextResponse.json(
+                { 
+                    error: "Invalid request body",
+                    details: "Could not parse request data. Please check your input."
+                },
+                { status: 400 }
+            );
         }
         
         // Try to get from request headers as last resort
@@ -243,16 +257,31 @@ export async function POST(req: NextRequest) {
             try {
                 user = await CreateOrUpdateUser(clerkUserId, userEmail, userName);
                 if (!user || !user.id) {
+                    console.error("[Clients API POST] CreateOrUpdateUser returned null or user without id");
                     return NextResponse.json(
-                        { error: "Failed to create user account" },
-                        { status: 500 }
+                        { 
+                            error: "Failed to create user account",
+                            details: "User creation returned invalid data"
+                        },
+                        { 
+                            status: 500,
+                            headers: { "Content-Type": "application/json" }
+                        }
                     );
                 }
+                console.log(`[Clients API POST] ✅ User created/updated successfully: ${user.id}`);
             } catch (createError) {
-                console.error("[Clients API] Error creating user:", createError);
+                console.error("[Clients API POST] Error creating user:", createError);
+                const errorMessage = createError instanceof Error ? createError.message : String(createError);
                 return NextResponse.json(
-                    { error: "Failed to create user account" },
-                    { status: 500 }
+                    { 
+                        error: "Failed to create user account",
+                        details: errorMessage
+                    },
+                    { 
+                        status: 500,
+                        headers: { "Content-Type": "application/json" }
+                    }
                 );
             }
         }
@@ -267,40 +296,131 @@ export async function POST(req: NextRequest) {
 
         // Create client
         try {
+            console.log(`[Clients API POST] Creating client for agency ${user.id} with name: ${name.trim()}`);
+            
+            // Validate user has an ID
+            if (!user || !user.id) {
+                console.error("[Clients API POST] User object is invalid:", user);
+                return NextResponse.json(
+                    {
+                        error: "Invalid user account",
+                        details: "User account is missing required information"
+                    },
+                    { status: 500 }
+                );
+            }
+            
             const client = await CreateClient({
                 agencyId: user.id,
                 name: name.trim(),
-                logoUrl,
-                status,
-                paymentStatus,
+                logoUrl: logoUrl?.trim() || undefined,
+                status: status || "active",
+                paymentStatus: paymentStatus || "paid",
                 paymentDueDate: paymentDueDate ? new Date(paymentDueDate) : undefined,
             });
 
-            console.log(`[Clients API] ✅ Client created successfully: ${client.id}`);
+            if (!client || !client.id) {
+                console.error("[Clients API POST] CreateClient returned null or client without id");
+                return NextResponse.json(
+                    {
+                        error: "Failed to create client",
+                        details: "Client creation returned invalid data"
+                    },
+                    { status: 500 }
+                );
+            }
+
+            console.log(`[Clients API POST] ✅ Client created successfully: ${client.id}`);
 
             return NextResponse.json({
                 success: true,
                 client,
                 message: "Client created successfully",
+            }, {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store"
+                }
             });
         } catch (createError) {
-            console.error("[Clients API] Error creating client:", createError);
-            return NextResponse.json(
-                {
-                    error: "Failed to create client. Please try again.",
-                    details: createError instanceof Error ? createError.message : String(createError)
-                },
-                { status: 500 }
-            );
+            console.error("[Clients API POST] Error creating client:", createError);
+            // Always return JSON, never HTML
+            try {
+                const errorMessage = createError instanceof Error ? createError.message : String(createError);
+                const errorDetails = createError instanceof Error && createError.stack 
+                    ? createError.stack.substring(0, 500) 
+                    : undefined;
+                
+                return NextResponse.json(
+                    {
+                        error: "Failed to create client",
+                        details: errorMessage,
+                        ...(process.env.NODE_ENV === "development" && errorDetails ? { stack: errorDetails } : {})
+                    },
+                    { 
+                        status: 500,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Cache-Control": "no-store"
+                        }
+                    }
+                );
+            } catch (jsonError) {
+                // If even JSON.stringify fails, return minimal JSON
+                console.error("[Clients API POST] Failed to create JSON response:", jsonError);
+                return new Response(
+                    JSON.stringify({ error: "Internal server error" }),
+                    { 
+                        status: 500,
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Cache-Control": "no-store"
+                        }
+                    }
+                );
+            }
         }
     } catch (error) {
-        console.error("[Clients API] POST Error:", error);
-        return NextResponse.json(
-            {
-                error: error instanceof Error ? error.message : "Failed to create client",
-                details: error instanceof Error ? error.stack : String(error)
-            },
-            { status: 500 }
-        );
+        console.error("[Clients API POST] Top-level error:", error);
+        // Always return JSON, never HTML - this is critical
+        try {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorStack = error instanceof Error ? error.stack : undefined;
+            
+            console.error("[Clients API POST] Error details:", {
+                message: errorMessage,
+                stack: errorStack?.substring(0, 500), // Limit stack trace length
+            });
+            
+            return NextResponse.json(
+                {
+                    error: "Failed to create client",
+                    details: errorMessage,
+                    // Only include stack in development
+                    ...(process.env.NODE_ENV === "development" && errorStack ? { stack: errorStack } : {})
+                },
+                { 
+                    status: 500,
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Cache-Control": "no-store"
+                    }
+                }
+            );
+        } catch (jsonError) {
+            // If even JSON.stringify fails, return minimal JSON using raw Response
+            console.error("[Clients API POST] Failed to create JSON response:", jsonError);
+            return new Response(
+                JSON.stringify({ error: "Internal server error" }),
+                { 
+                    status: 500,
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Cache-Control": "no-store"
+                    }
+                }
+            );
+        }
     }
 }
