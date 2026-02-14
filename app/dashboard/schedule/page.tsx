@@ -6,6 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
 import { showToast } from "@/lib/toast";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -149,6 +150,42 @@ export default function DashboardSchedulePage() {
     message?: string;
     timeRemaining?: number;
   } | null>(null);
+
+  // Block schedule when payment overdue or credits exceeded
+  const [alertBanners, setAlertBanners] = useState<AlertBannerItem[]>([]);
+  const actionsBlocked = useMemo(
+    () => alertBanners.some((b) => b.variant === "payment_overdue" || b.variant === "credits_exceeded"),
+    [alertBanners]
+  );
+
+  useEffect(() => {
+    if (!userId) return;
+    const loadAlerts = async () => {
+      try {
+        const res = await fetch("/api/activity", { credentials: "include" });
+        if (!res.ok) return;
+        const ct = res.headers.get("content-type");
+        if (!ct?.includes("application/json")) return;
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : [];
+        const banners: AlertBannerItem[] = list
+          .filter((a: { type: string }) =>
+            ["payment_overdue", "credits_warning", "credits_exceeded"].includes(a.type)
+          )
+          .map((a: { id: string; type: string; message: string; clientName?: string; link?: string }) => ({
+            id: a.id,
+            variant: a.type as AlertBannerItem["variant"],
+            message: a.message,
+            clientName: a.clientName,
+            link: a.link,
+          }));
+        setAlertBanners(banners);
+      } catch {
+        setAlertBanners([]);
+      }
+    };
+    loadAlerts();
+  }, [userId]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -337,6 +374,10 @@ export default function DashboardSchedulePage() {
   }, []);
 
   const handleSchedule = useCallback(async () => {
+    if (actionsBlocked) {
+      showToast.error("Actions blocked", "Resolve payment or credits issues to schedule posts.");
+      return;
+    }
     // YouTube posts require different handling
     if (selectedPlatform === "youtube") {
       if (!youtubeVideoTitle.trim() || !scheduledDate || !scheduledTime) {
@@ -510,6 +551,7 @@ export default function DashboardSchedulePage() {
     youtubeQuality,
     youtubePrivacy,
     youtubeConnected,
+    actionsBlocked,
   ]);
 
   const handleDeleteClick = useCallback((id: number) => {
@@ -638,6 +680,10 @@ export default function DashboardSchedulePage() {
         </div>
         <Button
           onClick={() => {
+            if (actionsBlocked) {
+              showToast.error("Actions blocked", "Resolve payment or credits issues to schedule posts.");
+              return;
+            }
             setEditingPost(null);
             setSelectedContent("");
             setSelectedPlatform("twitter");
@@ -652,12 +698,15 @@ export default function DashboardSchedulePage() {
             setYoutubePrivacy("public");
             setShowScheduleModal(true);
           }}
-          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+          disabled={actionsBlocked}
+          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           New Post
         </Button>
       </div>
+
+      <AlertBanner items={alertBanners} blockActions={actionsBlocked} className="mb-2" />
 
       {/* View Tabs */}
       <div className={`rounded-xl p-1 border transition-colors duration-300 ${
@@ -1404,6 +1453,7 @@ export default function DashboardSchedulePage() {
               <Button
                 onClick={handleSchedule}
                 disabled={
+                  actionsBlocked ||
                   isSubmitting || 
                   !scheduledDate || 
                   !scheduledTime ||

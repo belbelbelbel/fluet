@@ -160,7 +160,7 @@ export default function CalendarPage() {
             className={`p-2 transition-colors duration-200 ${
               isDark 
                 ? "text-slate-300 hover:text-white hover:bg-slate-800" 
-                : "text-gray-700 hover:text-gray-950 hover:bg-gray-100"
+                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
             }`}
           >
             <ArrowLeft className="w-5 h-5" />
@@ -200,7 +200,7 @@ export default function CalendarPage() {
                 className={`p-2 transition-all duration-200 ${
                   isDark
                     ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"
                 }`}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -212,7 +212,7 @@ export default function CalendarPage() {
                 className={`px-3 transition-all duration-200 ${
                   isDark
                     ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"
                 }`}
               >
                 Today
@@ -224,7 +224,7 @@ export default function CalendarPage() {
                 className={`p-2 transition-all duration-200 ${
                   isDark
                     ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"
                 }`}
               >
                 <ChevronRight className="w-4 h-4" />

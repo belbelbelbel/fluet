@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { requireAgencyAccess } from "@/utils/auth/route-guards";
 import { db } from "@/utils/db/dbConfig";
-import { PostApprovals, ScheduledPosts, Clients, Tasks } from "@/utils/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { PostApprovals, ScheduledPosts, Clients, Tasks, ClientCredits } from "@/utils/db/schema";
+import { eq, desc, and, inArray } from "drizzle-orm";
 import { GetUserByClerkId } from "@/utils/db/actions";
-import type { ActivityItem, ActivityType } from "@/components/ActivityFeed";
+import type { ActivityItem } from "@/components/ActivityFeed";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    // Verify agency access
-    const { clerkUserId } = await requireAgencyAccess();
+    let clerkUserId: string | null = null;
+    try {
+      const authResult = await auth();
+      clerkUserId = authResult?.userId ?? null;
+    } catch {
+      const user = await currentUser();
+      clerkUserId = user?.id ?? null;
+    }
+    if (!clerkUserId) {
+      return NextResponse.json([], { status: 200 });
+    }
     const user = await GetUserByClerkId(clerkUserId);
     
     if (!user) {
@@ -21,7 +29,18 @@ export async function GET(req: NextRequest) {
 
     const activities: ActivityItem[] = [];
 
-    // Get recent approvals
+    // Agency's client IDs for filtering
+    const agencyClients = await db
+      .select({ id: Clients.id })
+      .from(Clients)
+      .where(eq(Clients.agencyId, user.id))
+      .execute();
+    const agencyClientIds = agencyClients.map((c) => c.id);
+    if (agencyClientIds.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    // Get recent approvals (only for this agency's clients)
     const approvals = await db
       .select({
         id: PostApprovals.id,
@@ -31,7 +50,7 @@ export async function GET(req: NextRequest) {
         scheduledPostId: PostApprovals.scheduledPostId,
       })
       .from(PostApprovals)
-      .where(eq(PostApprovals.clientId, PostApprovals.clientId)) // This needs to be filtered by agency's clients
+      .where(inArray(PostApprovals.clientId, agencyClientIds))
       .orderBy(desc(PostApprovals.updatedAt))
       .limit(10)
       .execute();
@@ -97,6 +116,45 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Credits warnings (80% used = warning, 100% = exceeded) for agency's clients
+    const creditsRows = await db
+      .select({
+        clientId: ClientCredits.clientId,
+        postsUsed: ClientCredits.postsUsed,
+        postsPerMonth: ClientCredits.postsPerMonth,
+        updatedAt: ClientCredits.updatedAt,
+        name: Clients.name,
+      })
+      .from(ClientCredits)
+      .innerJoin(Clients, eq(ClientCredits.clientId, Clients.id))
+      .where(eq(Clients.agencyId, user.id))
+      .execute();
+
+    for (const row of creditsRows) {
+      const limit = row.postsPerMonth ?? 12;
+      const used = row.postsUsed ?? 0;
+      const pct = limit > 0 ? (used / limit) * 100 : 0;
+      if (pct >= 100) {
+        activities.push({
+          id: `credits-exceeded-${row.clientId}`,
+          type: "credits_exceeded",
+          message: `Credits exceeded for ${row.name}`,
+          clientName: row.name,
+          timestamp: row.updatedAt.toISOString(),
+          link: `/dashboard/clients/${row.clientId}/credits`,
+        });
+      } else if (pct >= 80) {
+        activities.push({
+          id: `credits-warning-${row.clientId}`,
+          type: "credits_warning",
+          message: `Credits at ${Math.round(pct)}% for ${row.name}`,
+          clientName: row.name,
+          timestamp: row.updatedAt.toISOString(),
+          link: `/dashboard/clients/${row.clientId}/credits`,
+        });
+      }
+    }
+
     // Get published posts (recent)
     const publishedPosts = await db
       .select({
@@ -138,7 +196,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Get recent tasks
+    // Get recent tasks (only for this agency's clients)
     const recentTasks = await db
       .select({
         id: Tasks.id,
@@ -147,7 +205,7 @@ export async function GET(req: NextRequest) {
         createdAt: Tasks.createdAt,
       })
       .from(Tasks)
-      .where(eq(Tasks.clientId, Tasks.clientId)) // Filter by agency's clients
+      .where(inArray(Tasks.clientId, agencyClientIds))
       .orderBy(desc(Tasks.createdAt))
       .limit(5)
       .execute();

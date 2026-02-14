@@ -93,7 +93,7 @@ export default function CreateClientPage() {
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className={`p-2 transition-all duration-200 ${isDark ? "text-slate-400 hover:text-white hover:bg-slate-800" : "text-gray-700 hover:text-gray-950 hover:bg-gray-100"}`}
+            className={`p-2 transition-all duration-200 ${isDark ? "text-slate-400 hover:text-white hover:bg-slate-800" : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"}`}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -158,7 +158,7 @@ export default function CreateClientPage() {
                   variant="outline"
                   onClick={() => router.back()}
                   disabled={loading}
-                  className={`flex-1 sm:flex-none transition-all duration-200 py-2.5 sm:py-2 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"}`}
+                  className={`flex-1 sm:flex-none transition-all duration-200 py-2.5 sm:py-2 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"}`}
                 >
                   Cancel
                 </Button>

@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TaskDetailModal } from "@/components/TaskDetailModal";
+import { showToast } from "@/lib/toast";
 import {
   ArrowLeft,
   Plus,
@@ -29,9 +31,30 @@ interface Task {
   createdAt: string;
 }
 
+/** Normalize API task (camelCase or snake_case) to Task shape */
+function normalizeTask(row: Record<string, unknown>): Task {
+  const due = row.dueDate ?? row.due_date;
+  const assignedToVal = row.assignedTo ?? row.assigned_to;
+  const assignedByVal = row.assignedBy ?? row.assigned_by;
+  const assignedToNameVal = row.assignedToName ?? row.assigned_to_name;
+  const createdAtVal = row.createdAt ?? row.created_at;
+  return {
+    id: Number(row.id),
+    type: String(row.type ?? ""),
+    status: String(row.status ?? "assigned"),
+    description: row.description != null ? String(row.description) : undefined,
+    dueDate: due != null ? String(due) : undefined,
+    assignedTo: assignedToVal != null ? Number(assignedToVal) : undefined,
+    assignedBy: assignedByVal != null ? Number(assignedByVal) : undefined,
+    assignedToName: assignedToNameVal != null ? String(assignedToNameVal) : undefined,
+    createdAt: createdAtVal != null ? String(createdAtVal) : "",
+  };
+}
+
 export default function TasksPage() {
   const params = useParams();
   const router = useRouter();
+  const { userId } = useAuth();
   const clientId = params?.clientId ? parseInt(params.clientId as string) : null;
 
   const [loading, setLoading] = useState(true);
@@ -41,30 +64,39 @@ export default function TasksPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teamMembers, setTeamMembers] = useState<Array<{ id: number; name: string; email: string }>>([]);
 
+  const fetchTasks = useCallback(async () => {
+    if (!clientId) return;
+    try {
+      setLoading(true);
+      const url = userId ? `/api/clients/${clientId}/tasks?userId=${encodeURIComponent(userId)}` : `/api/clients/${clientId}/tasks`;
+      const response = await fetch(url, {
+        credentials: "include",
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && Array.isArray(data.tasks)) {
+        setTasks(data.tasks.map((t: Record<string, unknown>) => normalizeTask(t)));
+      } else {
+        setTasks([]);
+        if (!response.ok) {
+          showToast.error("Could not load tasks", data?.error || "Please try again.");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch tasks:", error);
+      setTasks([]);
+      showToast.error("Could not load tasks", "Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [clientId, userId]);
+
   useEffect(() => {
     if (!clientId) return;
 
-    const fetchTasks = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/clients/${clientId}/tasks`, {
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setTasks(data.tasks || []);
-        }
-      } catch (error) {
-        console.error("Failed to fetch tasks:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch("/api/team", {
+        const teamUrl = userId ? `/api/team?userId=${encodeURIComponent(userId)}` : "/api/team";
+        const response = await fetch(teamUrl, {
           credentials: "include",
         });
         if (response.ok) {
@@ -78,7 +110,15 @@ export default function TasksPage() {
 
     fetchTasks();
     fetchTeamMembers();
-  }, [clientId]);
+  }, [clientId, fetchTasks]);
+
+  // Refetch when page becomes visible (e.g. returning from Create Task)
+  useEffect(() => {
+    if (!clientId) return;
+    const onFocus = () => fetchTasks();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [clientId, fetchTasks]);
 
   const handleTaskSave = async (updatedTask: Task) => {
     try {
@@ -88,17 +128,18 @@ export default function TasksPage() {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(updatedTask),
+        body: JSON.stringify({ ...updatedTask, ...(userId && { userId }) }),
       });
 
       if (response.ok) {
         // Refresh tasks list
-        const tasksResponse = await fetch(`/api/clients/${clientId}/tasks`, {
+        const refreshUrl = userId ? `/api/clients/${clientId}/tasks?userId=${encodeURIComponent(userId)}` : `/api/clients/${clientId}/tasks`;
+        const tasksResponse = await fetch(refreshUrl, {
           credentials: "include",
         });
         if (tasksResponse.ok) {
           const data = await tasksResponse.json();
-          setTasks(data.tasks || []);
+          setTasks(Array.isArray(data.tasks) ? data.tasks.map((t: Record<string, unknown>) => normalizeTask(t)) : []);
         }
       } else {
         throw new Error("Failed to update task");

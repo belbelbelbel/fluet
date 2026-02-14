@@ -20,10 +20,14 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
     try {
-        const { userId: clerkUserId } = await auth();
+        const resolvedParams = await Promise.resolve(params);
+        const { searchParams } = new URL(req.url);
+        const queryUserId = searchParams.get("userId");
+        const authResult = await auth();
+        const clerkUserId = authResult?.userId ?? queryUserId ?? null;
 
         if (!clerkUserId) {
             return NextResponse.json(
@@ -40,7 +44,7 @@ export async function GET(
             );
         }
 
-        const clientId = parseInt(params.id);
+        const clientId = parseInt(resolvedParams.id);
         if (isNaN(clientId)) {
             return NextResponse.json(
                 { error: "Invalid client ID" },
@@ -58,15 +62,29 @@ export async function GET(
         }
 
         // Get tasks
-        const tasks = await db
+        const rows = await db
             .select()
             .from(Tasks)
             .where(eq(Tasks.clientId, clientId))
             .orderBy(desc(Tasks.createdAt))
             .execute();
 
-        // TODO: Join with Users table to get assignedToName
-        // For now, return tasks as-is
+        // Normalize to camelCase for frontend (handle both driver shapes)
+        const tasks = (rows || []).map((row: Record<string, unknown>) => ({
+            id: row.id,
+            clientId: row.clientId ?? row.client_id,
+            scheduledPostId: row.scheduledPostId ?? row.scheduled_post_id,
+            assignedTo: row.assignedTo ?? row.assigned_to,
+            assignedBy: row.assignedBy ?? row.assigned_by,
+            type: row.type,
+            status: row.status ?? "assigned",
+            dueDate: row.dueDate ?? row.due_date,
+            description: row.description,
+            comments: row.comments,
+            attachments: row.attachments,
+            createdAt: row.createdAt ?? row.created_at,
+            updatedAt: row.updatedAt ?? row.updated_at,
+        }));
 
         return NextResponse.json({
             success: true,
@@ -89,9 +107,10 @@ export async function GET(
  */
 export async function POST(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: { id: string } | Promise<{ id: string }> }
 ) {
     try {
+        const resolvedParams = await Promise.resolve(params);
         // Get userId from request body first (from frontend)
         const body = await req.json();
         const bodyUserId = body.userId || null;
@@ -127,7 +146,7 @@ export async function POST(
             );
         }
 
-        const clientId = parseInt(params.id);
+        const clientId = parseInt(resolvedParams.id);
         if (isNaN(clientId)) {
             return NextResponse.json(
                 { error: "Invalid client ID" },

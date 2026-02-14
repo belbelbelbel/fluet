@@ -6,6 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
 import { showToast } from "@/lib/toast";
 import { contentTemplates, ContentTemplate } from "@/lib/templates";
 import {
@@ -65,6 +66,42 @@ export default function DashboardGeneratePage() {
   // Recent content - fetch from API
   const [recentContent, setRecentContent] = useState<RecentContent[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(false);
+
+  // Block generate when payment overdue or credits exceeded (from dashboard banners)
+  const [alertBanners, setAlertBanners] = useState<AlertBannerItem[]>([]);
+  const actionsBlocked = useMemo(
+    () => alertBanners.some((b) => b.variant === "payment_overdue" || b.variant === "credits_exceeded"),
+    [alertBanners]
+  );
+
+  useEffect(() => {
+    if (!userId) return;
+    const loadAlerts = async () => {
+      try {
+        const res = await fetch("/api/activity", { credentials: "include" });
+        if (!res.ok) return;
+        const ct = res.headers.get("content-type");
+        if (!ct?.includes("application/json")) return;
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : [];
+        const banners: AlertBannerItem[] = list
+          .filter((a: { type: string }) =>
+            ["payment_overdue", "credits_warning", "credits_exceeded"].includes(a.type)
+          )
+          .map((a: { id: string; type: string; message: string; clientName?: string; link?: string }) => ({
+            id: a.id,
+            variant: a.type as AlertBannerItem["variant"],
+            message: a.message,
+            clientName: a.clientName,
+            link: a.link,
+          }));
+        setAlertBanners(banners);
+      } catch {
+        setAlertBanners([]);
+      }
+    };
+    loadAlerts();
+  }, [userId]);
 
   const fetchRecentContent = useCallback(async () => {
     if (!userId) {
@@ -157,6 +194,10 @@ export default function DashboardGeneratePage() {
   }, [showContentModal, userId, fetchRecentContent]);
 
   const handleGenerate = useCallback(async () => {
+    if (actionsBlocked) {
+      showToast.error("Actions blocked", "Resolve payment or credits issues to generate content.");
+      return;
+    }
     if (!prompt.trim()) {
       showToast.error("Prompt required", "Please enter what you want to generate");
       return;
@@ -213,7 +254,7 @@ export default function DashboardGeneratePage() {
       setIsGenerating(false);
       // setLoadingMessage(""); // Unused - commented out
     }
-  }, [prompt, contentType, tone, style, length, userId, fetchRecentContent]);
+  }, [prompt, contentType, tone, style, length, userId, fetchRecentContent, actionsBlocked]);
 
   const handleCopy = useCallback(async () => {
     if (generatedContent) {
@@ -358,6 +399,8 @@ export default function DashboardGeneratePage() {
             Create engaging content for your social media platforms
           </p>
         </div>
+
+        <AlertBanner items={alertBanners} blockActions={actionsBlocked} className="mb-4" />
 
         {/* Main Content */}
         <div className="space-y-6">
@@ -525,7 +568,7 @@ export default function DashboardGeneratePage() {
               {/* Generate Button */}
               <Button
                 onClick={handleGenerate}
-                disabled={isGenerating || !prompt.trim()}
+                disabled={isGenerating || !prompt.trim() || actionsBlocked}
                 className="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl py-4 sm:py-6 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 {isGenerating ? (

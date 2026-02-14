@@ -247,6 +247,7 @@ export const AgencyTeamMembers = pgTable("agency_team_members", {
   invitedAt: timestamp("invited_at").defaultNow().notNull(),
   joinedAt: timestamp("joined_at"),
   status: varchar("status", { length: 50 }).default("pending"), // pending, active, inactive
+  createdAt: timestamp("created_at").defaultNow().notNull(), // keep in sync with existing DB column
 });
 
 export const ClientReports = pgTable("client_reports", {

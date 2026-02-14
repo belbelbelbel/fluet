@@ -3,11 +3,13 @@
 import { ClientSelector } from "@/components/ClientSelector";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function DashboardHeader() {
+  const { userId } = useAuth();
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const pathname = usePathname();
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -36,10 +38,11 @@ export function DashboardHeader() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <ClientSelector
+              userId={userId}
               selectedClientId={currentClientId || selectedClientId}
               onClientChange={(clientId) => {
                 setSelectedClientId(clientId);
-                if (clientId) {
+                if (clientId && currentClientId !== clientId) {
                   window.location.href = `/dashboard/clients/${clientId}`;
                 }
               }}
@@ -56,6 +59,7 @@ export function DashboardHeader() {
                   : "text-gray-600 hover:text-gray-950 hover:bg-gray-100"
               }`}
               aria-label="Toggle theme"
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
             >
               {isDark ? (
                 <Sun className="h-5 w-5" />

@@ -18,11 +18,11 @@ export function ClientDashboardHeader({ clientId }: ClientDashboardHeaderProps) 
   const isDark = resolvedTheme === "dark";
 
   useEffect(() => {
-    // Fetch client name
-    fetch(`/api/clients/${clientId}`)
-      .then((res) => res.json())
+    fetch(`/api/clients/${clientId}`, { credentials: "include" })
+      .then((res) => res.ok ? res.json() : null)
       .then((data) => {
-        if (data.name) setClientName(data.name);
+        const name = data?.client?.name;
+        if (name) setClientName(name);
       })
       .catch(() => {});
   }, [clientId]);

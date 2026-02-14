@@ -17,8 +17,6 @@ import {
   BarChart3,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
-import { Logo } from "@/components/Logo";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { showToast } from "@/lib/toast";
@@ -115,25 +113,13 @@ export default function ClientDashboardPage() {
       <div className={`flex items-center justify-center min-h-[400px] transition-colors duration-300 ${
         isDark ? "bg-slate-900" : "bg-white"
       }`}>
-        <div className="text-center">
-          <div className="flex flex-col items-center justify-center mb-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className={`w-28 h-28 rounded-full animate-pulse ${
-                  isDark ? "bg-purple-500/20" : "bg-purple-100"
-                }`}></div>
-              </div>
-              <div className="relative w-20 h-20 flex items-center justify-center">
-                <Logo size="lg" variant="icon" />
-              </div>
-            </div>
-            <div className="flex space-x-2 justify-center mt-4">
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-            </div>
+        <div className="text-center flex flex-col items-center">
+          <div className="w-28 h-28 flex items-center justify-center animate-pulse">
+            <Building2 className={`w-28 h-28 ${
+              isDark ? "text-slate-500" : "text-gray-300"
+            }`} />
           </div>
-          <p className={isDark ? "text-slate-400" : "text-gray-600"}>
+          <p className={`mt-4 text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
             Loading client data...
           </p>
         </div>
@@ -206,21 +192,21 @@ export default function ClientDashboardPage() {
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/brand-voice`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50"}`}
+            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"}`}
           >
             Brand Voice
           </Button>
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/credits`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50"}`}
+            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"}`}
           >
             Credits
           </Button>
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/tasks`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50"}`}
+            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"}`}
           >
             Tasks
           </Button>

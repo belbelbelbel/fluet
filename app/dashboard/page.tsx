@@ -17,9 +17,11 @@ import {
   Loader2,
   Plus,
   Building2,
+  ChevronRight,
+  Users,
 } from "lucide-react";
 import { ActivityFeed } from "@/components/ActivityFeed";
-// Chart component will be created inline
+import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
 
 interface DashboardStats {
   totalContent: number;
@@ -87,46 +89,34 @@ export default function DashboardPage() {
 
   const [clients, setClients] = useState<any[]>([]);
   const [hasClients, setHasClients] = useState(false);
-  const [redirecting, setRedirecting] = useState(false);
+  const [alertBanners, setAlertBanners] = useState<AlertBannerItem[]>([]);
 
-  // Check for clients on mount
+  // Load clients on mount (no redirect — dashboard always shows overview)
   useEffect(() => {
-    const checkClients = async () => {
+    const loadClients = async () => {
       if (!userId) return;
       try {
         const response = await fetch(`/api/clients?userId=${userId}`, {
           credentials: "include",
         });
-        
-        // Check if response is JSON
         const contentType = response.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           const text = await response.text();
           console.error("[Dashboard] Non-JSON response from /api/clients:", text.substring(0, 200));
           return;
         }
-        
         if (response.ok) {
           const data = await response.json();
-          setClients(data.clients || []);
-          setHasClients((data.clients || []).length > 0);
-          
-          // Auto-redirect to first client if clients exist
-          if (data.clients && data.clients.length > 0 && !redirecting) {
-            const firstClient = data.clients[0];
-            setRedirecting(true);
-            // Use router.push to avoid hooks issues
-            router.push(`/dashboard/clients/${firstClient.id}`);
-          }
+          const list = data.clients || [];
+          setClients(list);
+          setHasClients(list.length > 0);
         }
       } catch (error) {
-        console.error("Error checking clients:", error);
+        console.error("Error loading clients:", error);
       }
     };
-    
-    // Only check if auth is loaded
     if (authLoaded && userId) {
-      checkClients();
+      loadClients();
     }
   }, [userId, authLoaded]);
 
@@ -173,18 +163,46 @@ export default function DashboardPage() {
   }, [userId]);
 
   useEffect(() => {
-    // Wait for auth to load first
     if (!authLoaded || !userLoaded) {
       setLoading(true);
       return;
     }
-
     if (userId) {
       fetchDashboardStats();
     } else {
       setLoading(false);
     }
   }, [userId, authLoaded, userLoaded, fetchDashboardStats]);
+
+  // Fetch activity to show payment/credits banners (overdue = red block, credits 80% = yellow, 100% = red)
+  useEffect(() => {
+    if (!userId) return;
+    const loadAlerts = async () => {
+      try {
+        const res = await fetch("/api/activity", { credentials: "include" });
+        if (!res.ok) return;
+        const contentType = res.headers.get("content-type");
+        if (!contentType?.includes("application/json")) return;
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : [];
+        const banners: AlertBannerItem[] = list
+          .filter((a: { type: string }) =>
+            ["payment_overdue", "credits_warning", "credits_exceeded"].includes(a.type)
+          )
+          .map((a: { id: string; type: string; message: string; clientName?: string; link?: string }) => ({
+            id: a.id,
+            variant: a.type as AlertBannerItem["variant"],
+            message: a.message,
+            clientName: a.clientName,
+            link: a.link,
+          }));
+        setAlertBanners(banners);
+      } catch {
+        setAlertBanners([]);
+      }
+    };
+    loadAlerts();
+  }, [userId]);
 
   const currentDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -194,62 +212,6 @@ export default function DashboardPage() {
   });
 
   const userName = user?.firstName || user?.fullName || "User";
-  // const userEmail = user?.primaryEmailAddress?.emailAddress || "";
-
-  // Show welcome message if no clients
-  if (!hasClients && !loading && userId) {
-    const { resolvedTheme } = useTheme();
-    const isDarkEmpty = resolvedTheme === "dark";
-    return (
-      <div className={`min-h-screen transition-colors duration-300 ${
-        isDarkEmpty ? "bg-slate-900" : "bg-white"
-      }`}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center mb-8">
-            <h1 className={`text-3xl font-bold mb-2 ${
-              isDarkEmpty ? "text-white" : "text-gray-900"
-            }`}>
-              Welcome to Revvy, {userName}!
-            </h1>
-            <p className={`text-lg ${
-              isDarkEmpty ? "text-slate-400" : "text-gray-600"
-            }`}>
-              Get started by creating your first client
-            </p>
-          </div>
-
-          <Card className={`border rounded-xl ${
-            isDarkEmpty ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          }`}>
-            <CardContent className="pt-6">
-              <div className="text-center py-8">
-                <Building2 className={`w-16 h-16 mx-auto mb-4 ${
-                  isDarkEmpty ? "text-purple-400" : "text-purple-600"
-                }`} />
-                <h2 className={`text-xl font-semibold mb-2 ${
-                  isDarkEmpty ? "text-white" : "text-gray-900"
-                }`}>
-                  No clients yet
-                </h2>
-                <p className={`mb-6 ${
-                  isDarkEmpty ? "text-slate-400" : "text-gray-600"
-                }`}>
-                  Create your first client to start managing their social media content
-                </p>
-                <Button
-                  onClick={() => window.location.href = "/dashboard/clients/new"}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Your First Client
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   // Get current week dates
   const getWeekDates = () => {
@@ -368,6 +330,13 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         <div className="w-full max-w-7xl space-y-4 sm:space-y-6">
+          {/* Payment / credits banners: overdue or exceeded = hard block */}
+          <AlertBanner
+            items={alertBanners}
+            blockActions={alertBanners.some(
+              (b) => b.variant === "payment_overdue" || b.variant === "credits_exceeded"
+            )}
+          />
           {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Card className={`border rounded-xl transition-colors shadow-sm ${
@@ -437,6 +406,109 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Your clients — always visible; shows list or "No clients" */}
+        {!loading && userId && (
+          <Card className={`border rounded-xl transition-colors shadow-sm ${
+            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          }`}>
+            <CardHeader className="pb-3 px-4 sm:px-6 pt-4 sm:pt-6 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className={`text-base sm:text-lg font-semibold flex items-center gap-2 ${
+                isDark ? "text-white" : "text-gray-950"
+              }`}>
+                <Users className="w-5 h-5 text-purple-500" />
+                Your clients
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                {hasClients && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => router.push("/dashboard/clients")}
+                    className={`text-xs sm:text-sm ${
+                      isDark ? "text-slate-300 hover:text-white hover:bg-slate-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    }`}
+                  >
+                    Manage all
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  onClick={() => router.push("/dashboard/clients/new")}
+                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1.5" />
+                  Add client
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
+              {hasClients && clients.length > 0 ? (
+                <>
+                  <div className="flex flex-wrap gap-3">
+                    {clients.slice(0, 6).map((client: { id: number; name: string; status?: string }) => (
+                      <button
+                        key={client.id}
+                        onClick={() => router.push(`/dashboard/clients/${client.id}`)}
+                        className={`flex items-center gap-2 px-4 py-3 rounded-lg border text-left min-w-0 transition-colors ${
+                          isDark
+                            ? "bg-slate-900/50 border-slate-700 hover:bg-slate-700 hover:border-slate-600"
+                            : "bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300"
+                        }`}
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          isDark ? "bg-purple-900/50 text-purple-300" : "bg-purple-100 text-purple-700"
+                        }`}>
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <span className={`font-medium truncate text-sm ${
+                          isDark ? "text-slate-200" : "text-gray-900"
+                        }`}>
+                          {client.name}
+                        </span>
+                        <ChevronRight className={`w-4 h-4 flex-shrink-0 ${
+                          isDark ? "text-slate-500" : "text-gray-400"
+                        }`} />
+                      </button>
+                    ))}
+                  </div>
+                  {clients.length > 6 && (
+                    <p className={`text-xs mt-3 ${
+                      isDark ? "text-slate-500" : "text-gray-500"
+                    }`}>
+                      +{clients.length - 6} more —{" "}
+                      <button
+                        type="button"
+                        onClick={() => router.push("/dashboard/clients")}
+                        className="font-medium text-purple-600 hover:text-purple-700 underline"
+                      >
+                        view all clients
+                      </button>
+                    </p>
+                  )}
+                </>
+              ) : (
+                <div className={`py-6 text-center rounded-lg border border-dashed ${
+                  isDark ? "border-slate-600 bg-slate-900/30" : "border-gray-200 bg-gray-50"
+                }`}>
+                  <Building2 className={`w-10 h-10 mx-auto mb-2 ${
+                    isDark ? "text-slate-500" : "text-gray-400"
+                  }`} />
+                  <p className={`text-sm font-medium ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>
+                    No clients yet
+                  </p>
+                  <p className={`text-xs mt-1 ${
+                    isDark ? "text-slate-500" : "text-gray-500"
+                  }`}>
+                    Create your first client to get started
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Activity Feed */}
         <ActivityFeed maxItems={20} autoRefresh={true} />

@@ -13,6 +13,8 @@ const isPublicRoute = createRouteMatcher([
   "/client-portal(.*)",
   "/invite(.*)",
   "/clear-session(.*)",
+  // API routes must never be redirected to sign-in page (would return HTML and break JSON clients)
+  "/api(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

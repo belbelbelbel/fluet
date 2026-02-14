@@ -24,73 +24,110 @@ interface Client {
 }
 
 interface ClientSelectorProps {
+  /** Clerk userId – when passed, fetch uses ?userId= so API always gets auth even if cookies lag */
+  userId?: string | null;
   selectedClientId?: number | null;
   onClientChange?: (clientId: number | null) => void;
 }
 
-export function ClientSelector({ selectedClientId, onClientChange }: ClientSelectorProps) {
+export function ClientSelector({ userId, selectedClientId, onClientChange }: ClientSelectorProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const retryRef = useRef(false);
   const router = useRouter();
   const pathname = usePathname();
 
-  // Fetch clients function - memoized
   const fetchClients = useCallback(async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      const response = await fetch("/api/clients", {
-        credentials: "include",
-        next: { revalidate: 30 }, // Cache for 30 seconds
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const fetchedClients = data.clients || [];
-        setClients(fetchedClients);
-        
-        // Set selected client if ID is provided
-        if (selectedClientId) {
-          const client = fetchedClients.find((c: Client) => c.id === selectedClientId);
-          if (client) {
-            setSelectedClient(client);
-          } else if (fetchedClients.length > 0) {
-            // If selected client not found, select first one
-            setSelectedClient(fetchedClients[0]);
-            onClientChange?.(fetchedClients[0].id);
-          }
-        } else if (fetchedClients.length > 0 && !selectedClient) {
-          // Auto-select first client if none selected
-          setSelectedClient(fetchedClients[0]);
-          onClientChange?.(fetchedClients[0].id);
+      const url = `/api/clients?userId=${encodeURIComponent(userId)}`;
+      const response = await fetch(url, { credentials: "include" });
+      const contentType = response.headers.get("content-type");
+      const isJson = contentType && contentType.includes("application/json");
+      if (!isJson) {
+        if (!retryRef.current) {
+          retryRef.current = true;
+          setTimeout(() => fetchClients(), 600);
+        } else {
+          setClients([]);
         }
+        setLoading(false);
+        return;
+      }
+      const data = await response.json();
+      if (!response.ok) {
+        if (response.status === 401 && !retryRef.current) {
+          retryRef.current = true;
+          setTimeout(() => fetchClients(), 600);
+        } else {
+          setClients([]);
+        }
+        setLoading(false);
+        return;
+      }
+      retryRef.current = false;
+      const fetchedClients = Array.isArray(data.clients) ? data.clients : [];
+      setClients(fetchedClients);
+
+      const norm = (id: unknown) => (typeof id === "number" ? id : Number(id));
+      const currentId = selectedClientId != null ? norm(selectedClientId) : null;
+
+      // Only set selection for display; never call onClientChange here (would redirect away from Reports etc.)
+      if (currentId != null) {
+        const client = fetchedClients.find((c: Client) => norm(c.id) === currentId);
+        if (client) {
+          setSelectedClient(client);
+        } else if (fetchedClients.length > 0) {
+          setSelectedClient(fetchedClients[0]);
+        }
+      } else if (fetchedClients.length > 0) {
+        setSelectedClient(fetchedClients[0]);
       }
     } catch (error) {
       console.error("Failed to fetch clients:", error);
+      if (!retryRef.current) {
+        retryRef.current = true;
+        setTimeout(() => fetchClients(), 600);
+      } else {
+        setClients([]);
+      }
     } finally {
       setLoading(false);
     }
-  }, [selectedClientId, onClientChange]);
+  }, [userId, selectedClientId, onClientChange]);
 
-  // Fetch clients on mount and when selectedClientId changes
+  // Fetch when we have userId (from header); refetch when selectedClientId or userId changes
   useEffect(() => {
+    if (userId == null || userId === "") {
+      setLoading(true);
+      setClients([]);
+      setSelectedClient(null);
+      return;
+    }
+    retryRef.current = false;
     fetchClients();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClientId]); // Removed onClientChange to prevent blinking
+  }, [userId, selectedClientId]);
+
+  // When clients load and we have no selection, show first client (display only)
+  useEffect(() => {
+    if (clients.length > 0 && !selectedClient) {
+      setSelectedClient(clients[0]);
+    }
+  }, [clients, selectedClient]);
 
   // Listen for client creation events to refresh the list
   useEffect(() => {
-    const handleClientCreated = () => {
-      fetchClients();
-    };
-
-    window.addEventListener('clientCreated', handleClientCreated);
-    return () => {
-      window.removeEventListener('clientCreated', handleClientCreated);
-    };
+    const handleClientCreated = () => fetchClients();
+    window.addEventListener("clientCreated", handleClientCreated);
+    return () => window.removeEventListener("clientCreated", handleClientCreated);
   }, []);
 
   const handleClientSelect = (client: Client) => {
@@ -191,7 +228,7 @@ export function ClientSelector({ selectedClientId, onClientChange }: ClientSelec
             }`} />
           )}
           <span className="truncate">
-            {selectedClient ? selectedClient.name : "Select Client"}
+            {selectedClient ? selectedClient.name : clients.length === 0 ? "No clients" : "Select client"}
           </span>
         </div>
         <ChevronDown className={cn(
@@ -299,17 +336,13 @@ export function ClientSelector({ selectedClientId, onClientChange }: ClientSelec
                     onClick={handleCreateClient}
                     className={`w-full px-3 py-2.5 rounded-lg text-left transition-all duration-200 focus:outline-none ${
                       isDark
-                        ? "hover:bg-slate-700 focus:bg-slate-700"
-                        : "hover:bg-gray-50 focus:bg-gray-50"
+                        ? "hover:bg-slate-700 focus:bg-slate-700 text-purple-400 hover:text-purple-300"
+                        : "hover:bg-gray-50 focus:bg-gray-50 text-purple-600 hover:text-purple-700"
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <Plus className={`w-4 h-4 ${
-                        isDark ? "text-purple-400" : "text-purple-600"
-                      }`} />
-                      <span className={`text-sm font-medium ${
-                        isDark ? "text-purple-400" : "text-purple-600"
-                      }`}>Create New Client</span>
+                      <Plus className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-sm font-medium">Create New Client</span>
                     </div>
                   </button>
                 </div>

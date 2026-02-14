@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +34,6 @@ interface Post {
 
 export default function ClientApprovalPage() {
   const params = useParams();
-  const router = useRouter();
   const token = params?.token as string;
 
   const [approval, setApproval] = useState<Approval | null>(null);
@@ -326,6 +326,22 @@ export default function ClientApprovalPage() {
                   "Submit Decision"
                 )}
               </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {isProcessed && (
+          <Card className="border-purple-200 bg-purple-50/50 mt-6">
+            <CardContent className="pt-6">
+              <p className="text-sm text-gray-700 mb-3">
+                Create an account to view all your scheduled posts and approvals in one place.
+              </p>
+              <Link
+                href="/sign-up"
+                className="inline-flex items-center text-sm font-medium text-purple-700 hover:text-purple-800"
+              >
+                Sign up for full dashboard access →
+              </Link>
             </CardContent>
           </Card>
         )}

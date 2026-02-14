@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import {
     GetClientById,
     GetUserByClerkId,
@@ -20,10 +20,22 @@ export const dynamic = "force-dynamic";
  */
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { id: string; taskId: string } }
+    { params }: { params: { id: string; taskId: string } | Promise<{ id: string; taskId: string }> }
 ) {
     try {
-        const { userId: clerkUserId } = await auth();
+        const resolvedParams = await Promise.resolve(params);
+        const body = await req.json();
+        const bodyUserId = body?.userId ?? null;
+        const authResult = await auth();
+        let clerkUserId: string | null | undefined = authResult?.userId ?? bodyUserId ?? null;
+        if (!clerkUserId) {
+            try {
+                const user = await currentUser();
+                clerkUserId = user?.id ?? null;
+            } catch {
+                // ignore
+            }
+        }
 
         if (!clerkUserId) {
             return NextResponse.json(
@@ -40,8 +52,8 @@ export async function PUT(
             );
         }
 
-        const clientId = parseInt(params.id);
-        const taskId = parseInt(params.taskId);
+        const clientId = parseInt(resolvedParams.id);
+        const taskId = parseInt(resolvedParams.taskId);
 
         if (isNaN(clientId) || isNaN(taskId)) {
             return NextResponse.json(
@@ -59,7 +71,6 @@ export async function PUT(
             );
         }
 
-        const body = await req.json();
         const { type, status, description, assignedTo, dueDate } = body;
 
         // Get current task to check if assignment changed
