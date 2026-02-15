@@ -108,8 +108,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       throw new Error("Missing userId in checkout session");
     }
 
-    // Get the subscription from Stripe to determine the plan
-    let planName = session.metadata?.planName?.toLowerCase() || "basic";
+    // Plan names must match utils/subscription/limits.ts PLAN_CONFIG: basic, pro, enterprise
+    const priceIdToPlan: Record<string, string> = {
+      "price_1PyFKGBibz3ZDixDAaJ3HO74": "basic",
+      "price_1PyFN0Bibz3ZDixDqm9eYL8W": "pro",
+    };
+    function normalizePlanName(raw: string | undefined): string {
+      if (!raw) return "basic";
+      const lower = raw.toLowerCase();
+      if (lower.includes("enterprise")) return "enterprise";
+      if (lower.includes("business") || lower.includes("pro")) return "pro";
+      return "basic";
+    }
+
+    let planName = normalizePlanName(session.metadata?.planName);
     let subscriptionId: string | null = null;
     let startDate = new Date();
     let endDate = new Date();
@@ -121,10 +133,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           ? session.subscription
           : session.subscription.id;
 
-      // NOTE: The Stripe SDK types for this API version don't expose
-      // `current_period_start` / `current_period_end` strongly typed,
-      // but the fields are present at runtime. Cast through unknown first
-      // to avoid type conflicts with database Subscription type.
       const stripe = getStripe();
       const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
       const subscription = stripeSubscription as unknown as Stripe.Subscription & {
@@ -132,29 +140,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         current_period_end: number;
       };
       
-      // Extract plan name from subscription
-      const priceId = subscription.items?.data?.[0]?.price?.id as
-        | string
-        | undefined;
-      
-      // Map price IDs to plan names (comprehensive mapping)
-      const priceIdToPlan: Record<string, string> = {
-        "price_1PyFKGBibz3ZDixDAaJ3HO74": "starter",
-        "price_1PyFN0Bibz3ZDixDqm9eYL8W": "professional",
-        // Add more price IDs as needed
-      };
-      
+      const priceId = subscription.items?.data?.[0]?.price?.id as string | undefined;
       if (priceId && priceIdToPlan[priceId]) {
         planName = priceIdToPlan[priceId];
       }
       
-      // Use actual subscription dates (Unix timestamps from Stripe)
       if (subscription.current_period_start && subscription.current_period_end) {
         startDate = new Date(subscription.current_period_start * 1000);
         endDate = new Date(subscription.current_period_end * 1000);
       }
     } else {
-      // For one-time payments, set 30-day period
       endDate.setMonth(endDate.getMonth() + 1);
     }
 
@@ -250,16 +245,12 @@ async function handleSubscriptionUpdated(subscriptionParam: Stripe.Subscription)
       return;
     }
 
-    // Extract plan name from subscription
-    const priceId = subscription.items.data[0]?.price.id;
     const priceIdToPlan: Record<string, string> = {
-      "price_1PyFKGBibz3ZDixDAaJ3HO74": "starter",
-      "price_1PyFN0Bibz3ZDixDqm9eYL8W": "professional",
+      "price_1PyFKGBibz3ZDixDAaJ3HO74": "basic",
+      "price_1PyFN0Bibz3ZDixDqm9eYL8W": "pro",
     };
-    
-    const planName = priceId && priceIdToPlan[priceId] 
-      ? priceIdToPlan[priceId] 
-      : "basic";
+    const priceId = subscription.items.data[0]?.price.id;
+    const planName = priceId && priceIdToPlan[priceId] ? priceIdToPlan[priceId] : "basic";
 
     // Update subscription in database
     await db

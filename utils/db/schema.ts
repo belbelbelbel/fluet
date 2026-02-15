@@ -25,6 +25,7 @@ export const GeneratedContent = pgTable("generated_content", {
   userId: integer("user_id")
     .references(() => Users.id)
     .notNull(),
+  clientId: integer("client_id"), // optional: when set, content is for this client (FK to clients.id)
   content: text("content").notNull(),
   prompt: text("prompt").notNull(),
   contentType: varchar("content_type", { length: 50 }).notNull(),

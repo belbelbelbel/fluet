@@ -89,9 +89,10 @@ export default function DashboardPage() {
 
   const [clients, setClients] = useState<any[]>([]);
   const [hasClients, setHasClients] = useState(false);
+  const [clientsLoaded, setClientsLoaded] = useState(false);
   const [alertBanners, setAlertBanners] = useState<AlertBannerItem[]>([]);
 
-  // Load clients on mount (no redirect — dashboard always shows overview)
+  // Load clients on mount; redirect to onboarding if none
   useEffect(() => {
     const loadClients = async () => {
       if (!userId) return;
@@ -103,6 +104,7 @@ export default function DashboardPage() {
         if (!contentType || !contentType.includes("application/json")) {
           const text = await response.text();
           console.error("[Dashboard] Non-JSON response from /api/clients:", text.substring(0, 200));
+          setClientsLoaded(true);
           return;
         }
         if (response.ok) {
@@ -111,14 +113,23 @@ export default function DashboardPage() {
           setClients(list);
           setHasClients(list.length > 0);
         }
+        setClientsLoaded(true);
       } catch (error) {
         console.error("Error loading clients:", error);
+        setClientsLoaded(true);
       }
     };
     if (authLoaded && userId) {
       loadClients();
     }
   }, [userId, authLoaded]);
+
+  // Redirect to onboarding when user has no clients
+  useEffect(() => {
+    if (authLoaded && userId && clientsLoaded && !hasClients) {
+      router.replace("/dashboard/onboarding");
+    }
+  }, [authLoaded, userId, clientsLoaded, hasClients, router]);
 
   const fetchDashboardStats = useCallback(async () => {
     if (!userId) {
@@ -511,7 +522,7 @@ export default function DashboardPage() {
         )}
 
         {/* Activity Feed */}
-        <ActivityFeed maxItems={20} autoRefresh={true} />
+        <ActivityFeed maxItems={3} autoRefresh={true} />
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">

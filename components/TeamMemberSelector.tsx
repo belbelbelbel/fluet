@@ -17,6 +17,8 @@ interface TeamMemberSelectorProps {
   onSelect: (memberId: number | null) => void;
   allowUnassign?: boolean;
   className?: string;
+  /** Pre-fetched members (e.g. from parent); when provided, skips internal fetch */
+  members?: Array<{ id: number; name: string; email: string }>;
 }
 
 export function TeamMemberSelector({
@@ -24,12 +26,17 @@ export function TeamMemberSelector({
   onSelect,
   allowUnassign = true,
   className,
+  members: membersProp,
 }: TeamMemberSelectorProps) {
-  const [members, setMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [members, setMembers] = useState<TeamMember[]>(membersProp || []);
+  const [loading, setLoading] = useState(!membersProp);
 
   useEffect(() => {
+    if (membersProp) {
+      setMembers(membersProp);
+      setLoading(false);
+      return;
+    }
     const fetchMembers = async () => {
       try {
         setLoading(true);
@@ -49,7 +56,7 @@ export function TeamMemberSelector({
     };
 
     fetchMembers();
-  }, []);
+  }, [membersProp]);
 
   const selectedMember = members.find((m) => m.id === selectedMemberId);
 

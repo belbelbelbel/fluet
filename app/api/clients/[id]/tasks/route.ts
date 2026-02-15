@@ -8,9 +8,9 @@ import {
     GetClientById,
     GetUserByClerkId,
 } from "@/utils/db/actions";
-import { Tasks } from "@/utils/db/schema";
+import { Tasks, Users } from "@/utils/db/schema";
 import { db } from "@/utils/db/dbConfig";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
@@ -61,10 +61,26 @@ export async function GET(
             );
         }
 
-        // Get tasks
+        // Get tasks with assignee name (left join Users)
         const rows = await db
-            .select()
+            .select({
+                id: Tasks.id,
+                clientId: Tasks.clientId,
+                scheduledPostId: Tasks.scheduledPostId,
+                assignedTo: Tasks.assignedTo,
+                assignedBy: Tasks.assignedBy,
+                type: Tasks.type,
+                status: Tasks.status,
+                dueDate: Tasks.dueDate,
+                description: Tasks.description,
+                comments: Tasks.comments,
+                attachments: Tasks.attachments,
+                createdAt: Tasks.createdAt,
+                updatedAt: Tasks.updatedAt,
+                assignedToName: Users.name,
+            })
             .from(Tasks)
+            .leftJoin(Users, eq(Tasks.assignedTo, Users.id))
             .where(eq(Tasks.clientId, clientId))
             .orderBy(desc(Tasks.createdAt))
             .execute();
@@ -76,6 +92,7 @@ export async function GET(
             scheduledPostId: row.scheduledPostId ?? row.scheduled_post_id,
             assignedTo: row.assignedTo ?? row.assigned_to,
             assignedBy: row.assignedBy ?? row.assigned_by,
+            assignedToName: row.assignedToName ?? row.assigned_to_name ?? null,
             type: row.type,
             status: row.status ?? "assigned",
             dueDate: row.dueDate ?? row.due_date,

@@ -285,7 +285,7 @@ export async function POST(req: NextRequest) {
                 );
             }
         }
-        const { name, logoUrl, status, paymentStatus, paymentDueDate } = body;
+        const { name, logoUrl, email, status, paymentStatus, paymentDueDate } = body;
 
         if (!name || name.trim() === "") {
             return NextResponse.json(
@@ -314,6 +314,7 @@ export async function POST(req: NextRequest) {
                 agencyId: user.id,
                 name: name.trim(),
                 logoUrl: logoUrl?.trim() || undefined,
+                email: email?.trim() || undefined,
                 status: status || "active",
                 paymentStatus: paymentStatus || "paid",
                 paymentDueDate: paymentDueDate ? new Date(paymentDueDate) : undefined,

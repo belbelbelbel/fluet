@@ -29,6 +29,7 @@ interface Task {
   assignedBy?: number;
   assignedToName?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 /** Normalize API task (camelCase or snake_case) to Task shape */
@@ -38,6 +39,7 @@ function normalizeTask(row: Record<string, unknown>): Task {
   const assignedByVal = row.assignedBy ?? row.assigned_by;
   const assignedToNameVal = row.assignedToName ?? row.assigned_to_name;
   const createdAtVal = row.createdAt ?? row.created_at;
+  const updatedAtVal = row.updatedAt ?? row.updated_at;
   return {
     id: Number(row.id),
     type: String(row.type ?? ""),
@@ -48,7 +50,49 @@ function normalizeTask(row: Record<string, unknown>): Task {
     assignedBy: assignedByVal != null ? Number(assignedByVal) : undefined,
     assignedToName: assignedToNameVal != null ? String(assignedToNameVal) : undefined,
     createdAt: createdAtVal != null ? String(createdAtVal) : "",
+    updatedAt: updatedAtVal != null ? String(updatedAtVal) : undefined,
   };
+}
+
+/** Calendar-day only: same YYYY-MM-DD in local time */
+function toLocalDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** e.g. "Overdue (2 days ago)", "Due in 3 days", "Due: Jan 15", "No due date", "Completed Jan 10" */
+function getDueOrCompletedLabel(task: Task): { text: string; isOverdue: boolean; isCompleted: boolean } {
+  const isCompleted = task.status === "completed";
+  if (isCompleted && task.updatedAt) {
+    const d = new Date(task.updatedAt);
+    return { text: `Completed ${d.toLocaleDateString()}`, isOverdue: false, isCompleted: true };
+  }
+  if (!task.dueDate) {
+    return { text: "No due date", isOverdue: false, isCompleted: false };
+  }
+  const dueDate = new Date(task.dueDate);
+  const today = new Date();
+  const dueKey = toLocalDateKey(dueDate);
+  const todayKey = toLocalDateKey(today);
+  // Overdue only when the due *day* has passed (not time-of-day), so "due today" never shows overdue
+  const dueTime = dueDate.getTime();
+  const now = today.getTime();
+  const oneDay = 24 * 60 * 60 * 1000;
+  const daysFromNow = Math.round((dueTime - now) / oneDay);
+  const isOverdue = dueKey < todayKey;
+  if (isOverdue) {
+    const dueOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate()).getTime();
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    const absDays = Math.round((todayOnly - dueOnly) / oneDay);
+    return { text: `Overdue (${absDays} day${absDays !== 1 ? "s" : ""} ago)`, isOverdue: true, isCompleted: false };
+  }
+  if (dueKey === todayKey) return { text: "Due today", isOverdue: false, isCompleted: false };
+  if (daysFromNow === 1) return { text: "Due tomorrow", isOverdue: false, isCompleted: false };
+  if (daysFromNow > 0 && daysFromNow <= 7) return { text: `Due in ${daysFromNow} days`, isOverdue: false, isCompleted: false };
+  if (daysFromNow > 7) return { text: `Due: ${dueDate.toLocaleDateString()}`, isOverdue: false, isCompleted: false };
+  return { text: `Due: ${dueDate.toLocaleDateString()}`, isOverdue: false, isCompleted: false };
 }
 
 export default function TasksPage() {
@@ -155,13 +199,34 @@ export default function TasksPage() {
     setIsModalOpen(true);
   };
 
-  const filteredTasks = tasks.filter((task) => {
-    if (filter === "all") return true;
-    if (filter === "assigned") return task.status === "assigned";
-    if (filter === "in_progress") return task.status === "in_progress";
-    if (filter === "completed") return task.status === "completed";
-    return true;
-  });
+  const filteredTasks = tasks
+    .filter((task) => {
+      if (filter === "all") return true;
+      if (filter === "assigned") return task.status === "assigned";
+      if (filter === "in_progress") return task.status === "in_progress";
+      if (filter === "completed") return task.status === "completed";
+      return true;
+    })
+    .sort((a, b) => {
+      // Overdue (incomplete + due *day* has passed) first, then by due date (soonest), then completed by completed date
+      const todayKey = toLocalDateKey(new Date());
+      const aCompleted = a.status === "completed";
+      const bCompleted = b.status === "completed";
+      const aDueKey = a.dueDate ? toLocalDateKey(new Date(a.dueDate)) : "";
+      const bDueKey = b.dueDate ? toLocalDateKey(new Date(b.dueDate)) : "";
+      const aOverdue = !aCompleted && a.dueDate && aDueKey < todayKey;
+      const bOverdue = !bCompleted && b.dueDate && bDueKey < todayKey;
+      if (aOverdue && !bOverdue) return -1;
+      if (!aOverdue && bOverdue) return 1;
+      if (aCompleted && !bCompleted) return 1;
+      if (!aCompleted && bCompleted) return -1;
+      const aDue = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+      const bDue = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+      if (aDue !== bDue) return aDue - bDue;
+      const aTime = new Date((aCompleted ? a.updatedAt : a.createdAt) || a.createdAt).getTime();
+      const bTime = new Date((bCompleted ? b.updatedAt : b.createdAt) || b.createdAt).getTime();
+      return bTime - aTime;
+    });
 
   const getTaskTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
@@ -275,8 +340,8 @@ export default function TasksPage() {
             </h3>
             <p className="text-gray-600 mb-6">
               {filter === "all"
-                ? "Create your first task to get started"
-                : `No tasks with status "${filter}"`}
+                ? "Create and assign tasks from the Create Task page to see them here."
+                : `No tasks with status "${filter.replace("_", " ")}" yet.`}
             </p>
             {filter === "all" && (
               <Button
@@ -299,7 +364,7 @@ export default function TasksPage() {
               <CardContent className="pt-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
                       <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded text-xs font-medium">
                         {getTaskTypeLabel(task.type)}
                       </span>
@@ -311,25 +376,34 @@ export default function TasksPage() {
                       >
                         {task.status.replace("_", " ").toUpperCase()}
                       </span>
+                      {getDueOrCompletedLabel(task).isOverdue && (
+                        <span className="px-2 py-1 rounded text-xs font-medium border bg-red-50 text-red-700 border-red-200">
+                          OVERDUE
+                        </span>
+                      )}
                     </div>
                     {task.description && (
                       <p className="text-sm text-gray-700 mb-3">{task.description}</p>
                     )}
                     <div className="flex items-center gap-4 text-xs text-gray-500">
-                      {task.assignedToName && (
+                      {task.assignedToName ? (
                         <div className="flex items-center gap-1">
                           <User className="w-3 h-3" />
                           <span>{task.assignedToName}</span>
                         </div>
-                      )}
-                      {task.dueDate && (
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>
-                            Due: {new Date(task.dueDate).toLocaleDateString()}
-                          </span>
+                      ) : (
+                        <div className="flex items-center gap-1 text-gray-400">
+                          <User className="w-3 h-3" />
+                          <span>Unassigned</span>
                         </div>
                       )}
+                      <div className={cn(
+                        "flex items-center gap-1",
+                        getDueOrCompletedLabel(task).isOverdue && "text-red-600 font-medium"
+                      )}>
+                        <Clock className="w-3 h-3" />
+                        <span>{getDueOrCompletedLabel(task).text}</span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4">

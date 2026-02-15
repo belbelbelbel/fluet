@@ -42,70 +42,6 @@ interface ScheduledPost {
   createdAt: string;
 }
 
-// Dummy data for calendar view
-const dummyScheduledPosts: ScheduledPost[] = [
-  {
-    id: 1,
-    contentId: null,
-    platform: "linkedin",
-    content: "Excited to share our latest product update! 🚀",
-    scheduledFor: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().replace(/T\d{2}:\d{2}:\d{2}/, "T09:00:00"),
-    posted: false,
-    postedAt: null,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    contentId: null,
-    platform: "twitter",
-    content: "Just launched a new feature! Check it out 👇",
-    scheduledFor: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().replace(/T\d{2}:\d{2}:\d{2}/, "T13:30:00"),
-    posted: false,
-    postedAt: null,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    contentId: null,
-    platform: "instagram",
-    content: "Beautiful sunset today! 🌅 #photography",
-    scheduledFor: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().replace(/T\d{2}:\d{2}:\d{2}/, "T12:30:00"),
-    posted: false,
-    postedAt: null,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 4,
-    contentId: null,
-    platform: "tiktok",
-    content: "Quick tutorial on how to use our new feature!",
-    scheduledFor: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString().replace(/T\d{2}:\d{2}:\d{2}/, "T16:00:00"),
-    posted: false,
-    postedAt: null,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 5,
-    contentId: null,
-    platform: "linkedin",
-    content: "Industry insights: What's trending in 2024",
-    scheduledFor: new Date(new Date().setDate(new Date().getDate() + 4)).toISOString().replace(/T\d{2}:\d{2}:\d{2}/, "T18:30:00"),
-    posted: false,
-    postedAt: null,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 6,
-    contentId: null,
-    platform: "twitter",
-    content: "Weekend vibes! What are you working on? 💻",
-    scheduledFor: new Date(new Date().setDate(new Date().getDate() + 6)).toISOString().replace(/T\d{2}:\d{2}:\d{2}/, "T10:00:00"),
-    posted: false,
-    postedAt: null,
-    createdAt: new Date().toISOString(),
-  },
-];
-
 export default function DashboardSchedulePage() {
   const { userId } = useAuth();
   const { resolvedTheme } = useTheme();
@@ -317,16 +253,13 @@ export default function DashboardSchedulePage() {
       });
       if (response.ok) {
         const data = await response.json();
-        // Use dummy data if no posts exist, otherwise use real data
-        setScheduledPosts(data.length > 0 ? data : dummyScheduledPosts);
+        setScheduledPosts(Array.isArray(data) ? data : []);
       } else {
-        // If API fails, use dummy data
-        setScheduledPosts(dummyScheduledPosts);
+        setScheduledPosts([]);
       }
     } catch (error) {
       console.error("Error fetching scheduled posts:", error);
-      // Use dummy data on error
-      setScheduledPosts(dummyScheduledPosts);
+      setScheduledPosts([]);
     } finally {
       setLoading(false);
     }

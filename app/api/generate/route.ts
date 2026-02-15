@@ -11,7 +11,9 @@ export async function POST(req: Request) {
   try {
     // Parse body first to get client userId
     const body = await req.json();
-    const { prompt, contentType, tone, style, length, userId: clientUserId } = body;
+    const { prompt, contentType, tone, style, length, userId: clientUserId, clientId: bodyClientId } = body;
+    const clientId = bodyClientId != null ? parseInt(String(bodyClientId), 10) : null;
+    const validClientId = Number.isNaN(clientId) ? null : clientId;
 
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
@@ -96,7 +98,7 @@ export async function POST(req: Request) {
         console.log(`[Generate API] User not found, creating new user for Clerk ID: ${clerkUserId}`);
         
         // Try to get user details from Clerk
-        let userEmail = `${clerkUserId}@flippr.local`;
+        let userEmail = `${clerkUserId}@revvy.local`;
         let userName = `User ${clerkUserId}`;
         
         try {
@@ -247,7 +249,8 @@ export async function POST(req: Request) {
         contentType,
         tone || null,
         style || null,
-        length || null
+        length || null,
+        validClientId ?? undefined
       );
       
       if (!savedContent || !savedContent.id) {

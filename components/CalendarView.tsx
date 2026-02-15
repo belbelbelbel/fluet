@@ -133,7 +133,7 @@ export function CalendarView({ events, onEventClick }: CalendarViewProps) {
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* Header Bar - Dark gradient like reference */}
       <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 flex items-center justify-between">
-        <h2 className="text-white font-semibold text-lg">Flippr Schedule</h2>
+        <h2 className="text-white font-semibold text-lg">Revvy Schedule</h2>
         <div className="flex items-center gap-2">
           <Button
             onClick={goToToday}

@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   FileText,
   Download,
   Calendar,
-  Building2,
   Loader2,
   AlertCircle,
   Plus,
@@ -17,27 +15,52 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 import { showToast } from "@/lib/toast";
 
+interface ReportData {
+  postsScheduled: number;
+  postsPublished: number;
+  contentGenerated: number;
+  tasksCompleted: number;
+  tasksTotal: number;
+}
+
 interface Report {
   id: number;
   clientId: number;
   clientName: string;
   periodStart: string;
   periodEnd: string;
+  reportData?: ReportData;
   createdAt: string;
   pdfUrl?: string;
   sentToClient: boolean;
 }
 
 export default function ReportsPage() {
-  const router = useRouter();
   const { userId } = useAuth();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
   const [reports, setReports] = useState<Report[]>([]);
-  const [clients, setClients] = useState<any[]>([]);
+  const [clients, setClients] = useState<{ id: number; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
+
+  const fetchReports = useCallback(async () => {
+    if (!userId) return;
+    try {
+      const url = `/api/reports?userId=${encodeURIComponent(userId)}${selectedClientId ? `&clientId=${selectedClientId}` : ""}`;
+      const res = await fetch(url, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setReports(data.reports || []);
+      } else {
+        setReports([]);
+      }
+    } catch {
+      setReports([]);
+    }
+  }, [userId, selectedClientId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,49 +68,85 @@ export default function ReportsPage() {
         setLoading(false);
         return;
       }
-
       try {
         setLoading(true);
-
-        // Fetch clients
-        const clientsResponse = await fetch(`/api/clients?userId=${userId}`, {
+        const clientsRes = await fetch(`/api/clients?userId=${userId}`, {
           credentials: "include",
         });
-
-        if (clientsResponse.ok) {
-          const clientsData = await clientsResponse.json();
+        if (clientsRes.ok) {
+          const clientsData = await clientsRes.json();
           setClients(clientsData.clients || []);
         }
-
-        // TODO: Fetch reports from API
-        // For now, use empty array
-        setReports([]);
+        await fetchReports();
       } catch (error) {
         console.error("Failed to fetch data:", error);
-        // Silent fail - don't show unnecessary toast
         setReports([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
-  }, [userId]);
+  }, [userId, fetchReports]);
 
-  const handleGenerateReport = () => {
+  useEffect(() => {
+    if (!userId || loading) return;
+    fetchReports();
+  }, [selectedClientId, userId, loading, fetchReports]);
+
+  const handleGenerateReport = async () => {
     if (!selectedClientId) {
       showToast.error("Select Client", "Please select a client first");
       return;
     }
-    // TODO: Implement report generation
-    showToast.info("Coming Soon", "Report generation will be available soon");
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/reports", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientId: selectedClientId,
+          userId,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to create report");
+      }
+      const data = await res.json();
+      setReports((prev) => [data.report, ...prev]);
+      showToast.success("Report generated", `${data.report.clientName} – last 30 days`);
+    } catch (e) {
+      showToast.error("Error", e instanceof Error ? e.message : "Could not generate report");
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const handleDownloadReport = (report: Report) => {
     if (report.pdfUrl) {
       window.open(report.pdfUrl, "_blank");
     } else {
-      showToast.error("No PDF", "PDF not available for this report");
+      const data = report.reportData;
+      const text = data
+        ? [
+            `${report.clientName} – ${report.periodStart} to ${report.periodEnd}`,
+            "",
+            "Summary",
+            `Posts scheduled: ${data.postsScheduled}`,
+            `Posts published: ${data.postsPublished}`,
+            `Content generated: ${data.contentGenerated}`,
+            `Tasks completed: ${data.tasksCompleted} / ${data.tasksTotal}`,
+          ].join("\n")
+        : "No data";
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `report-${report.clientName.replace(/\s+/g, "-")}-${report.periodStart}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast.success("Downloaded", "Report saved as text file");
     }
   };
 
@@ -148,10 +207,14 @@ export default function ReportsPage() {
           <Button
             onClick={handleGenerateReport}
             className="bg-purple-600 hover:bg-purple-700 text-white"
-            disabled={!selectedClientId}
+            disabled={!selectedClientId || generating}
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Generate Report
+            {generating ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Plus className="w-4 h-4 mr-2" />
+            )}
+            {generating ? "Generating…" : "Generate Report"}
           </Button>
         </div>
       </div>
@@ -248,6 +311,16 @@ export default function ReportsPage() {
                 </div>
               </CardHeader>
               <CardContent>
+                {report.reportData && (
+                  <div className={`grid grid-cols-2 gap-2 mb-3 text-xs ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>
+                    <span>Scheduled: {report.reportData.postsScheduled}</span>
+                    <span>Published: {report.reportData.postsPublished}</span>
+                    <span>Content: {report.reportData.contentGenerated}</span>
+                    <span>Tasks: {report.reportData.tasksCompleted}/{report.reportData.tasksTotal}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span
                     className={`text-xs ${
@@ -267,7 +340,7 @@ export default function ReportsPage() {
                     }`}
                   >
                     <Download className="w-4 h-4 mr-1" />
-                    Download
+                    {report.pdfUrl ? "Download PDF" : "Download"}
                   </Button>
                 </div>
               </CardContent>

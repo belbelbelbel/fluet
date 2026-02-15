@@ -5,6 +5,7 @@ import { X, Save, Calendar, User, FileText, Loader2, AlertCircle } from "lucide-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TeamMemberSelector } from "@/components/TeamMemberSelector";
+import { showToast } from "@/lib/toast";
 
 interface Task {
   id: number;
@@ -56,7 +57,21 @@ export function TaskDetailModal({
     }
   }, [task]);
 
-  if (!isOpen || !task || !formData) return null;
+  // Show loading state when modal is open and we're syncing task into formData
+  if (!isOpen) return null;
+  if (task && !formData) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <Card className="w-full max-w-2xl border-gray-200 shadow-xl">
+          <CardContent className="flex items-center justify-center py-16">
+            <Loader2 className="w-10 h-10 text-purple-600 animate-spin" />
+            <span className="ml-3 text-gray-600">Loading task...</span>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  if (!task || !formData) return null;
 
   const handleSave = async () => {
     // Validation
@@ -76,10 +91,11 @@ export function TaskDetailModal({
     try {
       setSaving(true);
       await onSave(formData);
+      showToast.success("Task updated", "Your changes have been saved.");
       onClose();
     } catch (error) {
       console.error("Error saving task:", error);
-      alert("Failed to save task. Please try again.");
+      showToast.error("Failed to save task", "Please try again.");
     } finally {
       setSaving(false);
     }
@@ -174,6 +190,7 @@ export function TaskDetailModal({
                   })
                 }
                 allowUnassign={true}
+                members={teamMembers}
               />
             </div>
 

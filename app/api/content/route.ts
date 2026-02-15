@@ -10,6 +10,9 @@ export async function GET(req: Request) {
     // Parse query params first to get client userId (same pattern as generate API)
     const { searchParams } = new URL(req.url);
     const clientUserId = searchParams.get("userId");
+    const clientIdParam = searchParams.get("clientId");
+    const clientId = clientIdParam != null ? parseInt(clientIdParam, 10) : undefined;
+    const validClientId = Number.isNaN(clientId) ? undefined : clientId;
     const filter = searchParams.get("filter") || "all";
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam, 10) : 100;
@@ -49,7 +52,7 @@ export async function GET(req: Request) {
 
     let content;
     try {
-      content = await GetUserGeneratedContent(user.id, limit);
+      content = await GetUserGeneratedContent(user.id, limit, validClientId);
     } catch (dbError) {
       console.error("[Content API] ❌ Database error fetching content:", dbError);
       if (dbError instanceof Error) {

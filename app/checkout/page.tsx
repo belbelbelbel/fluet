@@ -16,6 +16,7 @@ const pricingPlans = [
   {
     id: "basic",
     name: "Basic plan",
+    description: "Perfect for freelance social media managers. AI content, scheduling, and basic analytics.",
     price: "10000",
     priceDisplay: "₦10,000",
     priceId: "price_1PyFKGBibz3ZDixDAaJ3HO74",
@@ -31,6 +32,7 @@ const pricingPlans = [
   {
     id: "pro",
     name: "Business plan",
+    description: "For small agencies managing 3–10 clients. Advanced reporting, team collaboration, all platforms.",
     price: "25000",
     priceDisplay: "₦25,000",
     priceId: "price_1PyFN0Bibz3ZDixDqm9eYL8W",
@@ -46,6 +48,7 @@ const pricingPlans = [
   {
     id: "enterprise",
     name: "Enterprise plan",
+    description: "For agencies and large teams. Unlimited users, dedicated support, API, white-label.",
     price: "Custom",
     priceDisplay: "Custom",
     priceId: null,
@@ -65,30 +68,32 @@ const pricingPlans = [
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
   
   const planId = searchParams.get("plan") || "basic";
   const billingCycle = (searchParams.get("billing") || "monthly") as "monthly" | "yearly";
   
   const [selectedPlan, setSelectedPlan] = useState(
-    pricingPlans.find(p => p.id === planId) || pricingPlans[0]
+    () => pricingPlans.find(p => p.id === planId) || pricingPlans[0]
   );
   const [selectedProvider, setSelectedProvider] = useState<PaymentProvider | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Payment form fields
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
   const [country, setCountry] = useState("NG");
 
+  // Keep selected plan in sync with URL (e.g. when returning from pricing with different plan)
   useEffect(() => {
-    if (!isSignedIn) {
-      showToast.error("Sign in required", "Please sign in to continue with checkout");
-      router.push(`/sign-in?redirect_url=${encodeURIComponent("/checkout")}`);
-    }
-  }, [isSignedIn, router]);
+    const plan = pricingPlans.find(p => p.id === planId) || pricingPlans[0];
+    setSelectedPlan(plan);
+  }, [planId]);
+
+  // Do NOT redirect to sign-in from here - same as dashboard: causes refresh loop for authenticated users.
+  // Only show loading until Clerk is loaded; then show form or sign-in prompt.
 
   const getYearlyPrice = (monthlyPrice: string) => {
     if (monthlyPrice === "Custom") return "Custom";
@@ -213,8 +218,40 @@ function CheckoutContent() {
     }
   }, [selectedProvider, selectedPlan, displayPrice, billingCycle, user?.id, cardNumber, expiry, cvc]);
 
+  // Same as dashboard: only wait for Clerk to load, never auto-redirect (prevents loop)
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading checkout...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!isSignedIn) {
-    return null; // Will redirect
+    const signInUrl = `/sign-in?redirect_url=${encodeURIComponent(`/checkout?plan=${planId}&billing=${billingCycle}`)}`;
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh] px-4">
+          <div className="text-center max-w-md">
+            <h1 className="text-xl font-semibold text-gray-900 mb-2">Sign in to continue</h1>
+            <p className="text-gray-600 mb-6">You need to sign in to complete your purchase.</p>
+            <Button
+              onClick={() => router.push(signInUrl)}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium"
+            >
+              Go to sign in
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -231,59 +268,69 @@ function CheckoutContent() {
               <ArrowLeftIcon className="w-4 h-4" />
               <span className="text-sm">Back to pricing</span>
             </button>
-            <h1 className="text-3xl font-bold text-gray-900">Complete Your Purchase</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
+            <p className="text-gray-600 mt-1">Review your plan and complete payment securely.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Payment Form */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Plan Selection */}
-              <Card className="border border-gray-200">
+            {/* Left Column - Order Summary (details & description) */}
+            <div className="lg:col-span-1 order-2 lg:order-1">
+              <Card className="border border-gray-200 sticky top-24">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Choose your plan</h2>
-                  <div className="space-y-3">
-                    {pricingPlans.map((plan) => {
-                      const isSelected = selectedPlan.id === plan.id;
-                      const planPrice = billingCycle === "yearly" && plan.price !== "Custom"
-                        ? getYearlyPrice(plan.price)
-                        : plan.price;
-                      
-                      return (
-                        <button
-                          key={plan.id}
-                          onClick={() => setSelectedPlan(plan)}
-                          className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                            isSelected
-                              ? "border-purple-600 bg-purple-50"
-                              : "border-gray-200 hover:border-gray-300 bg-white"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="font-semibold text-gray-900">{plan.name}</div>
-                              <div className="text-sm text-gray-600">
-                                {plan.price === "Custom" ? "Custom pricing" : `₦${parseInt(planPrice).toLocaleString('en-NG')}/${billingCycle === "yearly" ? "year" : "month"}`}
-                              </div>
-                            </div>
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                              isSelected
-                                ? "border-purple-600 bg-purple-600"
-                                : "border-gray-300"
-                            }`}>
-                              {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
+                  <h2 className="text-lg font-semibold text-gray-900 mb-1">Subscribe to {selectedPlan.name}</h2>
+                  {"description" in selectedPlan && selectedPlan.description && (
+                    <p className="text-sm text-gray-600 mb-4">{selectedPlan.description}</p>
+                  )}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{selectedPlan.name}</span>
+                      <span className="font-medium text-gray-900">
+                        {selectedPlan.price === "Custom"
+                          ? "Contact Sales"
+                          : `₦${parseInt(displayPrice).toLocaleString("en-NG")}`}
+                      </span>
+                    </div>
+                    {selectedPlan.price !== "Custom" && (
+                      <p className="text-xs text-gray-500">
+                        {billingCycle === "yearly"
+                          ? "Billed annually. Then ₦" + parseInt(displayPrice).toLocaleString("en-NG") + "/year."
+                          : "Then ₦" + parseInt(displayPrice).toLocaleString("en-NG") + "/month."}
+                      </p>
+                    )}
+                  </div>
+                  <div className="py-3 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-gray-900">Total due today</span>
+                      <span className="text-xl font-bold text-gray-900">
+                        {selectedPlan.price === "Custom"
+                          ? "Contact Sales"
+                          : `₦${parseInt(displayPrice).toLocaleString("en-NG")}`}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push("/pricing")}
+                    className="text-sm text-purple-600 hover:text-purple-700 mt-2"
+                  >
+                    Change plan
+                  </button>
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <p className="text-xs text-gray-500">Add promotion code (coming soon)</p>
+                  </div>
+                  <div className="mt-6 flex items-center gap-2">
+                    <ShieldIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <span className="text-xs text-gray-500">Secure payment. Pay with Stripe or Kora on the right.</span>
                   </div>
                 </CardContent>
               </Card>
+            </div>
 
-              {/* Payment Provider Selection */}
+            {/* Right Column - Payment method (Stripe / Kora) and form */}
+            <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
               <Card className="border border-gray-200">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Pay with</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment method</h2>
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <button
                       onClick={() => setSelectedProvider("stripe")}
@@ -430,60 +477,6 @@ function CheckoutContent() {
                     <p className="text-xs text-gray-500 text-center">
                       By providing your card information, you allow Revvy to charge your card for future payments in accordance with our terms.
                     </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Column - Plan Details */}
-            <div className="lg:col-span-1">
-              <Card className="border border-gray-200 sticky top-24">
-                <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Plan details</h2>
-                  
-                  <div className="mb-6">
-                    <div className="font-semibold text-gray-900">{selectedPlan.name}</div>
-                    <div className="text-sm text-gray-600 capitalize">
-                      {billingCycle === "yearly" ? "Annual" : "Monthly"} Subscription
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Renews {new Date(Date.now() + (billingCycle === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 mb-6">
-                    {selectedPlan.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-start gap-3">
-                        <CheckIcon className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-700">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="pt-6 border-t border-gray-200 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-700">{selectedPlan.name}</span>
-                      <span className="font-semibold text-gray-900">
-                        {selectedPlan.price === "Custom" 
-                          ? "Custom" 
-                          : `₦${parseInt(displayPrice).toLocaleString('en-NG')}`}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center pt-3 border-t border-gray-200">
-                      <span className="font-semibold text-gray-900">Total Due Today</span>
-                      <span className="text-xl font-bold text-gray-900">
-                        {selectedPlan.price === "Custom" 
-                          ? "Contact Sales" 
-                          : `₦${parseInt(displayPrice).toLocaleString('en-NG')}`}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-6 border-t border-gray-200 flex items-center gap-2">
-                    <ShieldIcon className="w-5 h-5 text-gray-400" />
-                    <span className="text-xs text-gray-500">
-                      Secure payment processing
-                    </span>
                   </div>
                 </CardContent>
               </Card>

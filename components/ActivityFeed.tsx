@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@clerk/nextjs";
 import {
   CheckCircle2,
-  XCircle,
   MessageSquare,
   AlertTriangle,
   TrendingUp,
   UserPlus,
   Calendar,
+  Inbox,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -16,6 +18,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 export type ActivityType =
   | "client_approved"
   | "client_requested_changes"
+  | "client_created"
   | "payment_overdue"
   | "credits_warning"
   | "credits_exceeded"
@@ -40,35 +43,44 @@ export function ActivityFeed({
   maxItems = 20,
   autoRefresh = true,
 }: ActivityFeedProps) {
+  const { userId } = useAuth();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+
+  const fetchActivities = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const url = userId ? `/api/activity?userId=${encodeURIComponent(userId)}` : "/api/activity";
+      const response = await fetch(url, { credentials: "include" });
+      if (response.ok) {
+        const data = await response.json();
+        setActivities(Array.isArray(data) ? data.slice(0, maxItems) : []);
+      } else {
+        setActivities([]);
+        setError("Couldn't load activity");
+      }
+    } catch (err) {
+      console.error("Error fetching activities:", err);
+      setActivities([]);
+      setError("Couldn't load activity");
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, maxItems]);
 
   useEffect(() => {
     fetchActivities();
 
     if (autoRefresh) {
-      const interval = setInterval(fetchActivities, 60000); // Refresh every 60 seconds
+      const interval = setInterval(fetchActivities, 60000);
       return () => clearInterval(interval);
     }
-  }, [autoRefresh]);
-
-  const fetchActivities = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("/api/activity");
-      if (response.ok) {
-        const data = await response.json();
-        setActivities(data.slice(0, maxItems));
-      }
-    } catch (error) {
-      console.error("Error fetching activities:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [autoRefresh, fetchActivities]);
 
   const getActivityIcon = (type: ActivityType) => {
     switch (type) {
@@ -76,6 +88,8 @@ export function ActivityFeed({
         return <CheckCircle2 className="w-4 h-4 text-green-600" />;
       case "client_requested_changes":
         return <MessageSquare className="w-4 h-4 text-yellow-600" />;
+      case "client_created":
+        return <Building2 className="w-4 h-4 text-blue-600" />;
       case "payment_overdue":
         return <AlertTriangle className="w-4 h-4 text-red-600" />;
       case "credits_warning":
@@ -113,13 +127,10 @@ export function ActivityFeed({
           isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
         )}
       >
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Recent Activity</h3>
         <p className="text-sm text-gray-500">Loading activity...</p>
       </div>
     );
-  }
-
-  if (activities.length === 0) {
-    return null;
   }
 
   return (
@@ -133,15 +144,34 @@ export function ActivityFeed({
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
           Recent Activity
         </h3>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-        >
-          {isCollapsed ? "Expand" : "Collapse"}
-        </button>
+        {activities.length > 0 && (
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            {isCollapsed ? "Expand" : "Collapse"}
+          </button>
+        )}
       </div>
 
       {!isCollapsed && (
+        activities.length === 0 ? (
+          <div className="p-6 text-center">
+            {error ? (
+              <p className="text-sm text-amber-600 dark:text-amber-400">{error}</p>
+            ) : (
+              <>
+                <Inbox className={cn("w-10 h-10 mx-auto mb-3", isDark ? "text-slate-500" : "text-gray-400")} />
+                <p className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                  No recent activity
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Add a client, create tasks, get approvals, or schedule posts to see updates here.
+                </p>
+              </>
+            )}
+          </div>
+        ) : (
         <div className="divide-y divide-gray-200 dark:divide-slate-700">
           {activities.map((activity) => (
             <div
@@ -170,6 +200,7 @@ export function ActivityFeed({
             </div>
           ))}
         </div>
+        )
       )}
     </div>
   );

@@ -220,6 +220,10 @@
 └──────────────────────────────────────────────┘
 ```
 
+### **Pricing & upgrades**
+- **Pricing flow:** See **[PRICING_FLOW.md](./PRICING_FLOW.md)** for the single flow: entry points (Nav, Footer, home section), plan IDs (basic/pro/enterprise), checkout (`/checkout?plan=&billing=`), and where limits are enforced (generate, schedule, banners).
+- **Entry:** Navbar "Pricing" → `#pricing` on home, `/pricing` elsewhere; Footer → `/pricing`; "Get Started" on pricing → `/checkout`.
+
 ### **Pages & Routes**
 - `/dashboard` → Main overview (redirects to first client if only one)
 - `/dashboard/clients` → Client list (if multiple)

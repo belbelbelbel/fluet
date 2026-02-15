@@ -9,7 +9,7 @@ function SignInForm() {
   const { isSignedIn, isLoaded } = useUser()
   const [redirecting, setRedirecting] = useState(false)
   
-  // Get redirect URL from search params
+  // Get redirect URL from search params (e.g. /checkout?plan=pro&billing=monthly)
   const rawRedirectUrl = searchParams.get('redirect_url') || '/dashboard'
   let redirectUrl = '/dashboard'
   
@@ -19,19 +19,25 @@ function SignInForm() {
       if (decoded.startsWith('/') && !decoded.startsWith('//') && !decoded.includes('sign-in')) {
         redirectUrl = decoded
       }
-    } catch (e) {
+    } catch {
       redirectUrl = '/dashboard'
     }
   }
+
+  const isRedirectingToCheckout = redirectUrl.includes('/checkout')
+  const redirectMessage = isRedirectingToCheckout
+    ? 'Redirecting to checkout...'
+    : redirectUrl.includes('/dashboard')
+      ? 'Redirecting to dashboard...'
+      : 'Redirecting...'
 
   // Auto-redirect if user is already signed in
   useEffect(() => {
     if (isLoaded && isSignedIn && !redirecting) {
       setRedirecting(true)
-      // Small delay to show the redirecting message
       setTimeout(() => {
         window.location.href = redirectUrl
-      }, 500)
+      }, 600)
     }
   }, [isLoaded, isSignedIn, redirectUrl, redirecting])
 
@@ -41,7 +47,7 @@ function SignInForm() {
       <div className='flex justify-center min-h-screen items-center bg-white dark:bg-slate-900'>
         <div className='text-center'>
           <div className='w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4'></div>
-          <p className='text-gray-600 dark:text-gray-400'>Redirecting to dashboard...</p>
+          <p className='text-gray-600 dark:text-gray-400'>{redirectMessage}</p>
         </div>
       </div>
     )

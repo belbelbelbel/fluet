@@ -3,209 +3,212 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-// import { Card, CardContent } from "@/components/ui/card";
-import { 
-  UtensilsCrossed, 
-  ShoppingBag, 
-  Cake, 
-  Shirt, 
-  Scissors, 
-  Briefcase,
-  Store,
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Building2,
   Check,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  CreditCard,
+  LayoutDashboard,
 } from "lucide-react";
-import { Niche } from "@/lib/content-ideas";
 import { showToast } from "@/lib/toast";
 
-const niches = [
-  {
-    id: "home_food_vendor" as Niche,
-    name: "Home Food Vendor",
-    icon: UtensilsCrossed,
-    description: "Selling home-cooked meals",
-    emoji: "🍲"
-  },
-  {
-    id: "street_food_seller" as Niche,
-    name: "Street Food Seller",
-    icon: ShoppingBag,
-    description: "Street food & snacks",
-    emoji: "🍔"
-  },
-  {
-    id: "baker_cake_vendor" as Niche,
-    name: "Baker / Cake Vendor",
-    icon: Cake,
-    description: "Baked goods & cakes",
-    emoji: "🎂"
-  },
-  {
-    id: "fashion_seller" as Niche,
-    name: "Fashion Seller",
-    icon: Shirt,
-    description: "Clothing & accessories",
-    emoji: "👗"
-  },
-  {
-    id: "beauty_hair_vendor" as Niche,
-    name: "Beauty / Hair Vendor",
-    icon: Scissors,
-    description: "Hair, beauty & salon",
-    emoji: "💇🏽"
-  },
-  {
-    id: "business_coach" as Niche,
-    name: "Business / Coach",
-    icon: Briefcase,
-    description: "Coaching & business tips",
-    emoji: "💼"
-  },
-  {
-    id: "online_vendor" as Niche,
-    name: "Online Vendor (IG Shop)",
-    icon: Store,
-    description: "Online store & products",
-    emoji: "📱"
-  },
-];
+type Step = "welcome" | "create_client" | "plan";
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [selectedNiche, setSelectedNiche] = useState<Niche | null>(null);
+  const [step, setStep] = useState<Step>("welcome");
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [hasClients, setHasClients] = useState<boolean | null>(null);
 
-  // Check if user already has a niche
+  // Check if user already has clients → skip to dashboard
   useEffect(() => {
-    const savedNiche = localStorage.getItem("userNiche");
-    if (savedNiche) {
-      // User already has a niche, redirect to content ideas
-      router.push("/dashboard/content-ideas");
-    }
+    const check = async () => {
+      try {
+        const res = await fetch("/api/clients", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          const list = data.clients || [];
+          setHasClients(list.length > 0);
+          if (list.length > 0) {
+            router.replace("/dashboard");
+            return;
+          }
+        }
+      } catch {
+        setHasClients(false);
+      }
+    };
+    check();
   }, [router]);
 
-  const handleContinue = async () => {
-    if (!selectedNiche) {
-      showToast.error("Select a niche", "Please choose who you're creating for");
+  const handleCreateClient = async () => {
+    const name = clientName.trim();
+    if (!name) {
+      showToast.error("Name required", "Enter your first client's name");
       return;
     }
-
     setIsSaving(true);
-    
     try {
-      // Save niche to user settings (you'll implement this API)
-      const response = await fetch("/api/settings", {
-        method: "PATCH",
+      const response = await fetch("/api/clients", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ niche: selectedNiche }),
+        body: JSON.stringify({
+          name,
+          email: clientEmail.trim() || undefined,
+        }),
       });
-
-      if (response.ok) {
-        // Store in localStorage as fallback
-        localStorage.setItem("userNiche", selectedNiche);
-        showToast.success("Niche selected!", "Let's get started");
-        router.push("/dashboard/content-ideas");
-      } else {
-        // Still save to localStorage and continue
-        localStorage.setItem("userNiche", selectedNiche);
-        router.push("/dashboard/content-ideas");
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        showToast.error("Couldn't create client", err?.error || "Please try again");
+        return;
       }
+      showToast.success("Client created!", "You can add more from the dashboard.");
+      setStep("plan");
     } catch {
-      // Fallback to localStorage
-      localStorage.setItem("userNiche", selectedNiche);
-      router.push("/dashboard/content-ideas");
+      showToast.error("Error", "Failed to create client. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
 
+  const handleGoToDashboard = () => {
+    router.replace("/dashboard");
+  };
+
+  if (hasClients === null) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-pulse text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  if (hasClients) {
+    return null; // redirecting
+  }
+
   return (
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
-      <div className="w-full max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
-            Who are you creating for?
-          </h1>
-          <p className="text-lg text-gray-600">
-            Select your niche to get personalized content ideas
-          </p>
-        </div>
-
-        {/* Niche Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {niches.map((niche) => {
-            const Icon = niche.icon;
-            const isSelected = selectedNiche === niche.id;
-            
-            return (
-              <button
-                key={niche.id}
-                onClick={() => setSelectedNiche(niche.id)}
-                className={`relative p-6 rounded-2xl border-2 transition-all text-left hover:shadow-lg ${
-                  isSelected
-                    ? "border-gray-950 bg-gray-950 text-white shadow-md"
-                    : "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                {isSelected && (
-                  <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm">
-                    <Check className="w-4 h-4 text-gray-950" />
-                  </div>
-                )}
-                
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isSelected ? "bg-white/20" : "bg-gray-100"
-                  }`}>
-                    <Icon className={`w-6 h-6 ${
-                      isSelected ? "text-white" : "text-gray-600"
-                    }`} />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-2xl">{niche.emoji}</span>
-                      <h3 className={`font-bold text-base ${
-                        isSelected ? "text-white" : "text-gray-950"
-                      }`}>
-                        {niche.name}
-                      </h3>
-                    </div>
-                    <p className={`text-sm ${
-                      isSelected ? "text-gray-200" : "text-gray-600"
-                    }`}>
-                      {niche.description}
-                    </p>
-                  </div>
+      <div className="w-full max-w-lg">
+        {step === "welcome" && (
+          <Card className="border-2 shadow-lg">
+            <CardContent className="pt-8 pb-8 px-8">
+              <div className="flex justify-center mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-gray-950 flex items-center justify-center">
+                  <Sparkles className="w-7 h-7 text-white" />
                 </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Continue Button */}
-        <div className="flex justify-center">
-          <Button
-            onClick={handleContinue}
-            disabled={!selectedNiche || isSaving}
-            className="bg-gray-950 hover:bg-gray-900 text-white px-8 py-6 text-base font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
-          >
-            {isSaving ? (
-              "Saving..."
-            ) : (
-              <>
-                Continue
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                Welcome to Revvy
+              </h1>
+              <p className="text-gray-600 text-center mb-8">
+                Get started by adding your first client. You can always add more later.
+              </p>
+              <Button
+                onClick={() => setStep("create_client")}
+                className="w-full bg-gray-950 hover:bg-gray-900 text-white py-6 rounded-xl font-semibold flex items-center justify-center gap-2"
+              >
+                Create first client
                 <ArrowRight className="w-5 h-5" />
-              </>
-            )}
-          </Button>
-        </div>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Helper Text */}
-        <p className="text-center text-sm text-gray-500 mt-6">
-          You can change this later in settings
-        </p>
+        {step === "create_client" && (
+          <Card className="border-2 shadow-lg">
+            <CardContent className="pt-8 pb-8 px-8">
+              <div className="flex justify-center mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
+                  <Building2 className="w-7 h-7 text-gray-700" />
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Create your first client</h2>
+              <p className="text-gray-600 text-sm mb-6">
+                Add a name and optional email (for approval notifications).
+              </p>
+              <div className="space-y-4 mb-6">
+                <div>
+                  <Label htmlFor="client-name">Client name</Label>
+                  <Input
+                    id="client-name"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    placeholder="e.g. Acme Co"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="client-email">Email (optional)</Label>
+                  <Input
+                    id="client-email"
+                    type="email"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    placeholder="client@example.com"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setStep("welcome")}
+                  className="flex-1 rounded-xl"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handleCreateClient}
+                  disabled={!clientName.trim() || isSaving}
+                  className="flex-1 bg-gray-950 hover:bg-gray-900 text-white rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSaving ? "Creating..." : "Create client"}
+                  <Check className="w-4 h-5" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {step === "plan" && (
+          <Card className="border-2 shadow-lg">
+            <CardContent className="pt-8 pb-8 px-8">
+              <div className="flex justify-center mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
+                  <CreditCard className="w-7 h-7 text-gray-700" />
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Pick a plan (optional)</h2>
+              <p className="text-gray-600 text-sm mb-6">
+                Choose a plan that fits your team. You can start with the dashboard and upgrade anytime.
+              </p>
+              <div className="flex flex-col gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/pricing")}
+                  className="w-full rounded-xl flex items-center justify-center gap-2"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  View pricing
+                </Button>
+                <Button
+                  onClick={handleGoToDashboard}
+                  className="w-full bg-gray-950 hover:bg-gray-900 text-white py-6 rounded-xl font-semibold flex items-center justify-center gap-2"
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                  Go to dashboard
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

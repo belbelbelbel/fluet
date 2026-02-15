@@ -59,8 +59,8 @@ export async function POST(req: Request) {
     const koraPayload = {
       amount: amountInCents,
       currency: process.env.KORA_CURRENCY || "NGN", // Default to NGN for African market
-      description: `Flippr AI - ${planName} Plan Subscription`,
-      reference: `flippr_${userId}_${Date.now()}`, // Unique reference
+      description: `Revvy - ${planName} Plan Subscription`,
+      reference: `revvy_${userId}_${Date.now()}`, // Unique reference
       customer: {
         email: undefined, // Will be collected during checkout
         name: undefined,

@@ -36,6 +36,7 @@ export function Navbar() {
     setIsMenuOpen((prev) => !prev);
   }, []);
 
+  // Keep dependency array empty so hook count/order never changes (avoids "more hooks" error with Router).
   const navItems = useMemo(() => [
     { name: "Home", href: "/", isAnchor: false },
     { name: "Features", href: "#features", isAnchor: true },
@@ -85,9 +86,12 @@ export function Navbar() {
             {/* Navigation Links - Center */}
             <div className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
               {navItems.map((item) => {
-                const active = item.isAnchor ? false : isActive(item.href);
+                const isPricingOnHome = item.name === "Pricing" && pathname === "/";
+                const href = item.name === "Pricing" && pathname !== "/" ? "/pricing" : item.href;
+                const useAnchor = item.name === "Pricing" ? isPricingOnHome : item.isAnchor;
+                const active = useAnchor ? false : isActive(href);
                 const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                  if (item.isAnchor) {
+                  if (useAnchor) {
                     e.preventDefault();
                     const element = document.querySelector(item.href);
                     if (element) {
@@ -98,7 +102,7 @@ export function Navbar() {
                 return (
                   <Link
                     key={item.name}
-                    href={item.href}
+                    href={href}
                     onClick={handleClick}
                     className={`${
                       active 
@@ -233,10 +237,13 @@ export function Navbar() {
                 Navigation
               </p>
               {navItems.map((item) => {
-                const active = item.isAnchor ? false : isActive(item.href);
+                const isPricingOnHome = item.name === "Pricing" && pathname === "/";
+                const href = item.name === "Pricing" && pathname !== "/" ? "/pricing" : item.href;
+                const useAnchor = item.name === "Pricing" ? isPricingOnHome : item.isAnchor;
+                const active = useAnchor ? false : isActive(href);
                 const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
                   setIsMenuOpen(false);
-                  if (item.isAnchor) {
+                  if (useAnchor) {
                     e.preventDefault();
                     setTimeout(() => {
                       const element = document.querySelector(item.href);
@@ -249,7 +256,7 @@ export function Navbar() {
                 return (
                   <Link
                     key={item.name}
-                    href={item.href}
+                    href={href}
                     onClick={handleClick}
                     className={`block px-4 py-3 rounded-lg transition-colors ${
                       active

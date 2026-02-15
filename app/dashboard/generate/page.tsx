@@ -1,7 +1,7 @@
 "use client";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, Suspense } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,11 +38,33 @@ interface RecentContent {
   scheduledDate?: string;
 }
 
-export default function DashboardGeneratePage() {
+function DashboardGeneratePageInner() {
   const { userId } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const clientIdFromQuery = searchParams?.get("clientId") ?? null;
+  const [clientName, setClientName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!clientIdFromQuery) {
+      setClientName(null);
+      return;
+    }
+    const fetchClient = async () => {
+      try {
+        const res = await fetch(`/api/clients/${clientIdFromQuery}`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setClientName(data?.client?.name ?? data?.name ?? null);
+        }
+      } catch {
+        setClientName(null);
+      }
+    };
+    fetchClient();
+  }, [clientIdFromQuery]);
 
   // Generation form state
   const [contentType, setContentType] = useState<ContentType>("twitter");
@@ -110,7 +132,7 @@ export default function DashboardGeneratePage() {
     }
     try {
       setLoadingRecent(true);
-      const url = `/api/content?limit=5${userId ? '&userId=' + userId : ''}`;
+      const url = `/api/content?limit=5${userId ? '&userId=' + userId : ''}${clientIdFromQuery ? '&clientId=' + clientIdFromQuery : ''}`;
       const response = await fetch(url, {
         credentials: "include",
         headers: {
@@ -168,7 +190,7 @@ export default function DashboardGeneratePage() {
     } finally {
       setLoadingRecent(false);
     }
-  }, [userId]);
+  }, [userId, clientIdFromQuery]);
 
   useEffect(() => {
     // Only fetch if userId exists (user is authenticated)
@@ -226,6 +248,7 @@ export default function DashboardGeneratePage() {
           style,
           length,
           userId,
+          ...(clientIdFromQuery && { clientId: clientIdFromQuery }),
         }),
       });
 
@@ -254,7 +277,7 @@ export default function DashboardGeneratePage() {
       setIsGenerating(false);
       // setLoadingMessage(""); // Unused - commented out
     }
-  }, [prompt, contentType, tone, style, length, userId, fetchRecentContent, actionsBlocked]);
+  }, [prompt, contentType, tone, style, length, userId, fetchRecentContent, actionsBlocked, clientIdFromQuery]);
 
   const handleCopy = useCallback(async () => {
     if (generatedContent) {
@@ -394,6 +417,9 @@ export default function DashboardGeneratePage() {
         <div className="mb-6 sm:mb-8">
           <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${isDark ? "text-white" : "text-gray-950"}`}>
             Generate Content
+            {clientName && (
+              <span className="text-purple-600 dark:text-purple-400 font-semibold ml-2">for {clientName}</span>
+            )}
           </h1>
           <p className={isDark ? "text-slate-400" : "text-gray-600"}>
             Create engaging content for your social media platforms
@@ -814,5 +840,17 @@ export default function DashboardGeneratePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function DashboardGeneratePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
+        <p className="text-gray-500 dark:text-slate-400">Loading...</p>
+      </div>
+    }>
+      <DashboardGeneratePageInner />
+    </Suspense>
   );
 }

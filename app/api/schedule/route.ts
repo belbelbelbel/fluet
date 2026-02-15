@@ -126,16 +126,12 @@ export async function POST(req: Request) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
         const approvalLink = `${appUrl}/client-portal/${approvalToken}`;
 
-        // Send email notification to client (if client email available)
+        // Send email notification: prefer client email so they get the approval link
         try {
-          // Get client info
-          const { Clients } = await import("@/utils/db/schema");
           const { GetClientById } = await import("@/utils/db/actions");
           const client = await GetClientById(parseInt(clientId), user.id);
-          
-          // In production, you'd get client email from a separate table or user account
-          // For now, we'll send to the agency user as a placeholder
-          if (user.email) {
+          const recipientEmail = (client?.email && client.email.trim()) ? client.email.trim() : (user.email || null);
+          if (recipientEmail) {
             await fetch(`${appUrl}/api/notifications/email`, {
               method: "POST",
               headers: {
@@ -143,7 +139,7 @@ export async function POST(req: Request) {
               },
               body: JSON.stringify({
                 type: "approval_requested",
-                recipientEmail: user.email, // In production, use client email
+                recipientEmail,
                 data: {
                   clientName: client?.name || "Client",
                   platform: platform,

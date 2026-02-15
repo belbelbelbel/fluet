@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { PenTool, Twitter, Instagram, Linkedin, Mail } from "lucide-react";
+import { Twitter, Instagram, Linkedin, Mail, PenTool } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -37,7 +38,7 @@ export function Footer() {
     { name: "Twitter", href: "https://twitter.com", icon: Twitter },
     { name: "Instagram", href: "https://instagram.com", icon: Instagram },
     { name: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
-    { name: "Email", href: "mailto:hello@flipprai.com", icon: Mail },
+    { name: "Email", href: "mailto:hello@revvy.com", icon: Mail },
   ];
 
   return (
@@ -45,14 +46,14 @@ export function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="py-12 lg:py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
-            {/* Brand Section */}
+            {/* Brand Section - same logo and name as Navbar */}
             <div className="lg:col-span-2">
               <Link href="/" className="flex items-center space-x-2 mb-4">
-                <PenTool className="w-8 h-8 text-gray-900" />
-                <span className="text-xl font-bold text-gray-900">Flippr AI</span>
+                <Logo size="lg" variant="icon" />
+                <span className="text-xl font-bold text-gray-900">Revvy</span>
               </Link>
               <p className="text-sm text-gray-600 mb-6 max-w-sm">
-                The all-in-one AI platform for Nigerian creators. Generate, schedule, and post content across all your social media platforms.
+                Social media management for Nigerian agencies. Generate, schedule, and manage content across all your clients and platforms.
               </p>
               {/* Social Links */}
               <div className="flex items-center gap-4">
@@ -148,7 +149,7 @@ export function Footer() {
         <div className="py-6 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-600">
-              © {currentYear} Flippr AI. All rights reserved.
+              © {currentYear} Revvy. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-sm text-gray-600">
               <span>Made with ❤️ for Nigerian creators</span>

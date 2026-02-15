@@ -148,24 +148,20 @@ export const GetUserByEmail = async (email: string) => {
     }
 };
 
-export const GetUserGeneratedContent = async (userId: number, limit: number = 10) => {
+export const GetUserGeneratedContent = async (userId: number, limit: number = 10, clientId?: number | null) => {
     try {
-        console.log(`[GetUserGeneratedContent] Querying for user ID: ${userId}, limit: ${limit}`);
+        const conditions = clientId != null
+            ? and(eq(GeneratedContent.userId, userId), eq(GeneratedContent.clientId, clientId))
+            : eq(GeneratedContent.userId, userId);
         const content = await db
             .select()
             .from(GeneratedContent)
-            .where(eq(GeneratedContent.userId, userId))
+            .where(conditions)
             .orderBy(desc(GeneratedContent.createdAt))
             .limit(limit)
             .execute();
-        console.log(`[GetUserGeneratedContent] Found ${content.length} items for user ${userId}`);
-        if (content.length > 0) {
-            console.log(`[GetUserGeneratedContent] First content item:`, {
-                id: content[0].id,
-                contentType: content[0].contentType,
-                createdAt: content[0].createdAt,
-                userId: content[0].userId
-            });
+        if (content.length > 0 && process.env.NODE_ENV === "development") {
+            console.log(`[GetUserGeneratedContent] Found ${content.length} items for user ${userId}${clientId != null ? `, client ${clientId}` : ""}`);
         }
         return content;
     } catch (error) {
@@ -184,7 +180,8 @@ export const SaveGeneratedContent = async (
     contentType: string,
     tone?: string,
     style?: string,
-    length?: string
+    length?: string,
+    clientId?: number | null
 ) => {
     try {
         // Validate inputs
@@ -214,6 +211,7 @@ export const SaveGeneratedContent = async (
             .insert(GeneratedContent)
             .values({
                 userId,
+                clientId: clientId ?? null,
                 prompt: truncatedPrompt,
                 content: truncatedContent,
                 contentType,
@@ -730,6 +728,7 @@ export const CreateClient = async (data: {
     agencyId: number;
     name: string;
     logoUrl?: string;
+    email?: string;
     status?: string;
     paymentStatus?: string;
     paymentDueDate?: Date;
@@ -743,6 +742,7 @@ export const CreateClient = async (data: {
                 agencyId: data.agencyId,
                 name: data.name,
                 logoUrl: data.logoUrl,
+                email: data.email,
                 status: data.status || "active",
                 paymentStatus: data.paymentStatus || "paid",
                 paymentDueDate: data.paymentDueDate,
@@ -1051,6 +1051,153 @@ export const UpdateClientCredits = async (
     }
 };
 
+// ==================== CLIENT REPORTS ====================
+
+export type ReportData = {
+    postsScheduled: number;
+    postsPublished: number;
+    contentGenerated: number;
+    tasksCompleted: number;
+    tasksTotal: number;
+    byPlatform?: Record<string, { scheduled: number; published: number }>;
+};
+
+/**
+ * Create a client report for a given period (aggregates scheduled posts, content, tasks)
+ */
+export const CreateClientReport = async (
+    agencyId: number,
+    clientId: number,
+    periodStart: Date,
+    periodEnd: Date
+) => {
+    try {
+        const periodStartStr = periodStart.toISOString();
+        const periodEndStr = periodEnd.toISOString();
+
+        const [scheduledCount] = await db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(ScheduledPosts)
+            .where(
+                and(
+                    eq(ScheduledPosts.clientId, clientId),
+                    gte(ScheduledPosts.scheduledFor, periodStart),
+                    lte(ScheduledPosts.scheduledFor, periodEnd)
+                )
+            )
+            .execute();
+        const postsScheduled = Number(scheduledCount?.count) || 0;
+
+        const [publishedCount] = await db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(ScheduledPosts)
+            .where(
+                and(
+                    eq(ScheduledPosts.clientId, clientId),
+                    eq(ScheduledPosts.posted, true),
+                    gte(ScheduledPosts.scheduledFor, periodStart),
+                    lte(ScheduledPosts.scheduledFor, periodEnd)
+                )
+            )
+            .execute();
+        const postsPublished = Number(publishedCount?.count) || 0;
+
+        const [contentCount] = await db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(GeneratedContent)
+            .where(
+                and(
+                    eq(GeneratedContent.clientId, clientId),
+                    gte(GeneratedContent.createdAt, periodStart),
+                    lte(GeneratedContent.createdAt, periodEnd)
+                )
+            )
+            .execute();
+        const contentGenerated = Number(contentCount?.count) || 0;
+
+        const [tasksTotalRow] = await db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(Tasks)
+            .where(
+                and(
+                    eq(Tasks.clientId, clientId),
+                    gte(Tasks.createdAt, periodStart),
+                    lte(Tasks.createdAt, periodEnd)
+                )
+            )
+            .execute();
+        const tasksTotal = Number(tasksTotalRow?.count) || 0;
+
+        const [tasksCompletedRow] = await db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(Tasks)
+            .where(
+                and(
+                    eq(Tasks.clientId, clientId),
+                    eq(Tasks.status, "completed"),
+                    gte(Tasks.createdAt, periodStart),
+                    lte(Tasks.createdAt, periodEnd)
+                )
+            )
+            .execute();
+        const tasksCompleted = Number(tasksCompletedRow?.count) || 0;
+
+        const reportData: ReportData = {
+            postsScheduled,
+            postsPublished,
+            contentGenerated,
+            tasksCompleted,
+            tasksTotal,
+        };
+
+        const periodStartDate = periodStartStr.slice(0, 10);
+        const periodEndDate = periodEndStr.slice(0, 10);
+        const [report] = await db
+            .insert(ClientReports)
+            .values({
+                clientId,
+                agencyId,
+                periodStart: periodStartDate,
+                periodEnd: periodEndDate,
+                reportData,
+                sentToClient: false,
+            })
+            .returning()
+            .execute();
+        return report;
+    } catch (error) {
+        console.error(`[CreateClientReport] Error:`, error);
+        throw new Error("Failed to create report");
+    }
+};
+
+/**
+ * List reports for an agency, optionally filtered by client
+ */
+export const GetClientReportsForAgency = async (
+    agencyId: number,
+    clientId?: number | null,
+    limit: number = 50
+) => {
+    try {
+        const conditions = [eq(ClientReports.agencyId, agencyId)];
+        if (clientId != null) {
+            conditions.push(eq(ClientReports.clientId, clientId));
+        }
+        const reports = await db
+            .select()
+            .from(ClientReports)
+            .where(and(...conditions))
+            .orderBy(desc(ClientReports.createdAt))
+            .limit(limit)
+            .execute();
+        return reports;
+    } catch (error) {
+        console.error(`[GetClientReportsForAgency] Error:`, error);
+        throw new Error("Failed to get reports");
+    }
+};
+
 // ==================== POST APPROVALS ====================
 
 /**
@@ -1124,6 +1271,24 @@ export const UpdateApprovalStatus = async (
     } catch (error) {
         console.error(`[UpdateApprovalStatus] Error encountered:`, error);
         throw new Error("Failed to update approval");
+    }
+};
+
+/**
+ * Get scheduled posts for a client (for client dashboard view)
+ */
+export const GetScheduledPostsByClientId = async (clientId: number) => {
+    try {
+        const posts = await db
+            .select()
+            .from(ScheduledPosts)
+            .where(eq(ScheduledPosts.clientId, clientId))
+            .orderBy(desc(ScheduledPosts.scheduledFor))
+            .execute();
+        return posts;
+    } catch (error) {
+        console.error(`[GetScheduledPostsByClientId] Error:`, error);
+        throw new Error("Failed to get scheduled posts");
     }
 };
 

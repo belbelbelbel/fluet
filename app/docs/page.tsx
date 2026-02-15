@@ -303,7 +303,7 @@ export default function DocsPage() {
             <p className={`text-base max-w-2xl mx-auto ${
               isDark ? "text-gray-300" : "text-gray-600"
             }`}>
-              Everything you need to know about using Flippr AI to create amazing social media content
+              Everything you need to know about using Revvy to create amazing social media content
             </p>
           </div>
 
@@ -351,7 +351,7 @@ export default function DocsPage() {
                 <p className={`mb-4 ${
                   isDark ? "text-gray-300" : "text-gray-600"
                 }`}>
-                  New to Flippr AI? Follow these steps to create your first post:
+                  New to Revvy? Follow these steps to create your first post:
                 </p>
                 <ol className={`space-y-3 ${
                   isDark ? "text-gray-300" : "text-gray-700"
