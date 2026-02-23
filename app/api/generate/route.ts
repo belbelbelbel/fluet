@@ -3,6 +3,8 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, SaveGeneratedContent, CreateOrUpdateUser, GetClientBrandVoice } from "@/utils/db/actions";
 import { checkUsageLimit } from "@/utils/subscription/limits";
+import { shouldBlockAction } from "@/utils/payment/enforcement";
+import { checkCostAlert } from "@/utils/economic/cost-alert";
 import { getAIGenerator } from "@/utils/ai/optimized-generator";
 
 export const dynamic = "force-dynamic";
@@ -58,6 +60,15 @@ export async function POST(req: Request) {
           details: "Please sign in to generate content. If you're already signed in, please try refreshing the page."
         },
         { status: 401 }
+      );
+    }
+
+    // Payment enforcement: block generate if agency subscription or client payment is overdue
+    const blockCheck = await shouldBlockAction(clerkUserId, "generate", validClientId ?? undefined);
+    if (blockCheck.blocked) {
+      return NextResponse.json(
+        { error: blockCheck.reason || "Action blocked. Resolve payment or subscription to continue." },
+        { status: 403 }
       );
     }
 
@@ -282,7 +293,9 @@ export async function POST(req: Request) {
         tone || null,
         style || null,
         length || null,
-        validClientId ?? undefined
+        validClientId ?? undefined,
+        generationResult.tokensUsed,
+        generationResult.cost
       );
       
       if (!savedContent || !savedContent.id) {
@@ -291,6 +304,9 @@ export async function POST(req: Request) {
       
       savedContentId = savedContent.id;
       console.log("✅ Content saved to database with ID:", savedContentId);
+
+      // Cost alert: log if agency AI spend exceeds threshold (operational visibility)
+      checkCostAlert(user.id).catch(() => {});
     } catch (saveError) {
       console.error("❌ Error saving content to database:", saveError);
       // Log detailed error for debugging

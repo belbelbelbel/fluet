@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, CreateScheduledPost, GetUserScheduledPosts, DeleteScheduledPost, UpdateScheduledPost } from "@/utils/db/actions";
+import { shouldBlockAction } from "@/utils/payment/enforcement";
 import { CreatePostApproval } from "@/utils/db/actions";
 import { generateApprovalToken } from "@/utils/approvals/token";
 
@@ -79,6 +80,17 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "Missing required fields: platform, content, scheduledFor" },
         { status: 400 }
+      );
+    }
+
+    // Payment enforcement: block schedule if agency subscription or client payment is overdue
+    const parsedClientId = clientId ? parseInt(String(clientId), 10) : undefined;
+    const validClientIdForBlock = parsedClientId != null && !Number.isNaN(parsedClientId) ? parsedClientId : undefined;
+    const blockCheck = await shouldBlockAction(clerkUserId, "schedule", validClientIdForBlock);
+    if (blockCheck.blocked) {
+      return NextResponse.json(
+        { error: blockCheck.reason || "Action blocked. Resolve payment or subscription to continue." },
+        { status: 403 }
       );
     }
 

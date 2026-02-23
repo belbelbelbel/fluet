@@ -1,4 +1,4 @@
-import { varchar, pgTable, integer, serial, text, timestamp, boolean, jsonb, date } from 'drizzle-orm/pg-core'
+import { varchar, pgTable, integer, serial, text, timestamp, boolean, jsonb, date, real } from 'drizzle-orm/pg-core'
 
 export const Users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -34,6 +34,8 @@ export const GeneratedContent = pgTable("generated_content", {
   length: varchar("length", { length: 50 }),
   posted: boolean("posted").default(false),
   postedAt: timestamp("posted_at"),
+  aiTokensUsed: integer("ai_tokens_used"),
+  aiCostUsd: real("ai_cost_usd"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

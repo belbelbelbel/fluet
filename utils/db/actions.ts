@@ -1,5 +1,5 @@
 import { db } from "./dbConfig"
-import { eq, sql, desc, and, gte, lte } from "drizzle-orm"
+import { eq, sql, desc, and, gte, lte, or } from "drizzle-orm"
 import { 
     GeneratedContent, 
     Users, 
@@ -183,7 +183,9 @@ export const SaveGeneratedContent = async (
     tone?: string,
     style?: string,
     length?: string,
-    clientId?: number | null
+    clientId?: number | null,
+    aiTokensUsed?: number,
+    aiCostUsd?: number
 ) => {
     try {
         // Validate inputs
@@ -220,6 +222,8 @@ export const SaveGeneratedContent = async (
                 tone: truncatedTone || null,
                 style: truncatedStyle || null,
                 length: truncatedLength || null,
+                aiTokensUsed: aiTokensUsed ?? null,
+                aiCostUsd: aiCostUsd != null ? aiCostUsd : null,
             })
             .returning()
             .execute();
@@ -296,6 +300,43 @@ export const GetUserUsageCount = async (userId: number) => {
     } catch (error) {
         console.error(`[GetUserUsageCount] Error encountered:`, error);
         return 0;
+    }
+};
+
+/**
+ * Get AI cost for an agency (userId = agency owner) over a period
+ */
+export const GetAgencyAICostForPeriod = async (
+    userId: number,
+    startDate: Date,
+    endDate?: Date
+): Promise<{ totalCostUsd: number; totalTokens: number; count: number }> => {
+    try {
+        const conditions = [
+            eq(GeneratedContent.userId, userId),
+            gte(GeneratedContent.createdAt, startDate),
+        ];
+        if (endDate) {
+            conditions.push(lte(GeneratedContent.createdAt, endDate));
+        }
+        const result = await db
+            .select({
+                totalCost: sql<number>`COALESCE(SUM(${GeneratedContent.aiCostUsd}), 0)::real`,
+                totalTokens: sql<number>`COALESCE(SUM(${GeneratedContent.aiTokensUsed}), 0)::int`,
+                count: sql<number>`count(*)::int`,
+            })
+            .from(GeneratedContent)
+            .where(and(...conditions))
+            .execute();
+        const row = result[0];
+        return {
+            totalCostUsd: Number(row?.totalCost) || 0,
+            totalTokens: Number(row?.totalTokens) || 0,
+            count: Number(row?.count) || 0,
+        };
+    } catch (error) {
+        console.error(`[GetAgencyAICostForPeriod] Error:`, error);
+        return { totalCostUsd: 0, totalTokens: 0, count: 0 };
     }
 };
 
@@ -564,7 +605,7 @@ export const DisconnectLinkedAccount = async (
 
 /**
  * Get all scheduled posts that are due to be posted
- * (scheduledFor <= now AND posted = false)
+ * (scheduledFor <= now AND posted = false AND (no approval required OR approved))
  */
 export const GetPendingScheduledPosts = async () => {
     try {
@@ -575,7 +616,11 @@ export const GetPendingScheduledPosts = async () => {
             .where(
                 and(
                     lte(ScheduledPosts.scheduledFor, now),
-                    eq(ScheduledPosts.posted, false)
+                    eq(ScheduledPosts.posted, false),
+                    or(
+                        eq(ScheduledPosts.requiresApproval, false),
+                        eq(ScheduledPosts.approvalStatus, "approved")
+                    )
                 )
             )
             .orderBy(ScheduledPosts.scheduledFor)
