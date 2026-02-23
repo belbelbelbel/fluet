@@ -1,7 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { GetUserByClerkId, SaveGeneratedContent, CreateOrUpdateUser } from "@/utils/db/actions";
+import { GetUserByClerkId, SaveGeneratedContent, CreateOrUpdateUser, GetClientBrandVoice } from "@/utils/db/actions";
 import { checkUsageLimit } from "@/utils/subscription/limits";
 import { getAIGenerator } from "@/utils/ai/optimized-generator";
 
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   try {
     // Parse body first to get client userId
     const body = await req.json();
-    const { prompt, contentType, tone, style, length, userId: clientUserId, clientId: bodyClientId } = body;
+    const { prompt, contentType, tone, style, length, userId: clientUserId, clientId: bodyClientId, generationMode } = body;
     const clientId = bodyClientId != null ? parseInt(String(bodyClientId), 10) : null;
     const validClientId = Number.isNaN(clientId) ? null : clientId;
 
@@ -166,7 +166,9 @@ export async function POST(req: Request) {
     // ============================================
     // PROFESSIONAL SUBSCRIPTION ENFORCEMENT
     // ============================================
-    if (!usageStatus.canGenerate) {
+    // In development, BYPASS_USAGE_LIMIT=true skips quota checks for easier testing
+    const bypassLimit = process.env.NODE_ENV === "development" && process.env.BYPASS_USAGE_LIMIT === "true";
+    if (!bypassLimit && !usageStatus.canGenerate) {
       const isFreeTier = usageStatus.planName === "Free";
       const message = usageStatus.isInGracePeriod
         ? `You've exceeded your ${usageStatus.planName} plan limit (${usageCount}/${monthlyLimit}). You have ${usageStatus.gracePeriodDaysRemaining} days of grace period remaining. Upgrade now to avoid interruption.`
@@ -203,12 +205,42 @@ export async function POST(req: Request) {
     // PROFESSIONAL AI CONTENT GENERATION
     // ============================================
     const aiGenerator = getAIGenerator();
+
+    // Fetch brand voice when generating for a client (for client_voice and consistent tone)
+    let brandVoice = null;
+    if (validClientId && user) {
+      try {
+        const bv = await GetClientBrandVoice(validClientId);
+        if (bv) {
+          brandVoice = {
+            brandDescription: bv.brandDescription,
+            targetAudience: bv.targetAudience,
+            tone: bv.tone,
+            industry: bv.industry,
+            slangLevel: bv.slangLevel,
+            dos: Array.isArray(bv.dos) ? bv.dos : null,
+            donts: Array.isArray(bv.donts) ? bv.donts : null,
+            examplePosts: Array.isArray(bv.examplePosts) ? bv.examplePosts : null,
+            preferredHashtags: Array.isArray(bv.preferredHashtags) ? bv.preferredHashtags : null,
+            bannedWords: Array.isArray(bv.bannedWords) ? bv.bannedWords : null,
+          };
+        }
+      } catch (e) {
+        console.warn("[Generate API] Could not load brand voice:", e);
+      }
+    }
+
+    const validModes = ["standard", "viral_hook", "client_voice", "carousel", "cta", "authority", "strategy", "trend_adaptation", "content_repurpose", "audience_research"];
+    const mode = generationMode && validModes.includes(generationMode) ? generationMode : "standard";
+
     const generationResult = await aiGenerator.generate(prompt, {
       contentType,
       tone: tone || "professional",
       style: style || "concise",
       length: length || "medium",
-      usePremium: usageStatus.planName === "Enterprise", // Use premium model for enterprise
+      usePremium: usageStatus.planName === "Enterprise",
+      generationMode: mode,
+      brandVoice,
     });
     
     const generatedContent = generationResult.content;

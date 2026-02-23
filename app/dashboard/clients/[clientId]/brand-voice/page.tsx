@@ -5,8 +5,20 @@ import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, Loader2, Plus, X, AlertCircle } from "lucide-react";
+import {
+  PRIMARY_INDUSTRY_OPTIONS,
+  NICHE_OPTIONS,
+  primaryIndustryToNiche,
+  type Niche,
+  type PrimaryIndustry,
+} from "@/lib/content-ideas";
 
 interface BrandVoice {
+  brandDescription?: string;
+  targetAudience?: string;
+  niche?: string;
+  primaryIndustry?: string;
+  nicheDescription?: string;
   tone?: string;
   slangLevel?: string;
   industry?: string;
@@ -25,6 +37,11 @@ export default function BrandVoicePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [brandVoice, setBrandVoice] = useState<BrandVoice>({
+    brandDescription: "",
+    targetAudience: "",
+    niche: "",
+    primaryIndustry: "",
+    nicheDescription: "",
     tone: "",
     slangLevel: "none",
     industry: "",
@@ -54,6 +71,11 @@ export default function BrandVoicePage() {
           const data = await response.json();
           if (data.brandVoice) {
             setBrandVoice({
+              brandDescription: data.brandVoice.brandDescription || "",
+              targetAudience: data.brandVoice.targetAudience || "",
+              niche: data.brandVoice.niche || "",
+              primaryIndustry: data.brandVoice.primaryIndustry || "",
+              nicheDescription: data.brandVoice.nicheDescription || "",
               tone: data.brandVoice.tone || "",
               slangLevel: data.brandVoice.slangLevel || "none",
               industry: data.brandVoice.industry || "",
@@ -156,6 +178,116 @@ export default function BrandVoicePage() {
           </p>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
+          {/* Brand Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Brand Description
+            </label>
+            <textarea
+              value={brandVoice.brandDescription || ""}
+              onChange={(e) => setBrandVoice({ ...brandVoice, brandDescription: e.target.value })}
+              placeholder="What makes your brand unique? Personality, positioning, emotional tone..."
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none resize-none"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Used by AI to match your brand voice in generated content
+            </p>
+          </div>
+
+          {/* Target Audience */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Target Audience
+            </label>
+            <textarea
+              value={brandVoice.targetAudience || ""}
+              onChange={(e) => setBrandVoice({ ...brandVoice, targetAudience: e.target.value })}
+              placeholder="Who do you serve? Demographics, goals, pain points, language patterns..."
+              rows={2}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none resize-none"
+            />
+          </div>
+
+          {/* Primary Industry + Specific Niche (for Content Ideas) */}
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Primary Industry
+              </label>
+              <select
+                value={brandVoice.primaryIndustry || ""}
+                onChange={(e) => {
+                  const v = e.target.value as PrimaryIndustry | "";
+                  const mapped = v ? primaryIndustryToNiche(v) : "";
+                  setBrandVoice({
+                    ...brandVoice,
+                    primaryIndustry: v,
+                    niche: mapped === "custom" ? "custom" : mapped || "",
+                    nicheDescription: mapped === "custom" ? (brandVoice.nicheDescription || "") : "",
+                  });
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none bg-white"
+              >
+                <option value="">Select industry</option>
+                {PRIMARY_INDUSTRY_OPTIONS.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.emoji} {opt.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {(brandVoice.primaryIndustry === "other" ||
+              brandVoice.primaryIndustry === "health_fitness" ||
+              brandVoice.primaryIndustry === "real_estate" ||
+              brandVoice.primaryIndustry === "creative_services" ||
+              brandVoice.primaryIndustry === "tech_startups") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Specific Niche (describe your client&apos;s business)
+                </label>
+                <input
+                  type="text"
+                  value={brandVoice.nicheDescription || ""}
+                  onChange={(e) =>
+                    setBrandVoice({
+                      ...brandVoice,
+                      nicheDescription: e.target.value,
+                      niche: "custom",
+                    })
+                  }
+                  placeholder="e.g. Online Fitness Coach for Women, Real Estate Agent in Lagos"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  AI will generate tailored content ideas for this niche
+                </p>
+              </div>
+            )}
+            {brandVoice.primaryIndustry &&
+              !["other", "health_fitness", "real_estate", "creative_services", "tech_startups"].includes(
+                brandVoice.primaryIndustry
+              ) && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Specific Niche (optional – e.g. Jollof specialist, Wedding cakes)
+                </label>
+                <input
+                  type="text"
+                  value={brandVoice.nicheDescription || ""}
+                  onChange={(e) =>
+                    setBrandVoice({ ...brandVoice, nicheDescription: e.target.value })
+                  }
+                  placeholder="Optional: narrow down for better ideas"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                />
+              </div>
+            )}
+            <p className="text-xs text-gray-500">
+              Powers content ideas for this client. Custom niches get AI-generated ideas.
+            </p>
+          </div>
+
           {/* Tone */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

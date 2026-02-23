@@ -119,6 +119,11 @@ export async function POST(
 
         const body = await req.json();
         const {
+            brandDescription,
+            targetAudience,
+            niche,
+            primaryIndustry,
+            nicheDescription,
             tone,
             slangLevel,
             industry,
@@ -131,6 +136,11 @@ export async function POST(
 
         const brandVoice = await SaveClientBrandVoice({
             clientId,
+            brandDescription,
+            targetAudience,
+            niche,
+            primaryIndustry,
+            nicheDescription,
             tone,
             slangLevel,
             industry,

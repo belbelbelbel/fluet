@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { XIcon, CopyIcon, CheckIcon, ExternalLinkIcon } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { showToast } from "@/lib/toast";
 
@@ -17,6 +18,8 @@ interface PostReminderModalProps {
 }
 
 export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -73,57 +76,59 @@ export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl mx-4 bg-white rounded-2xl shadow-xl border border-gray-200">
+      <div className={`relative w-full max-w-2xl mx-4 rounded-2xl shadow-xl border ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className={`flex items-center justify-between p-6 border-b ${isDark ? "border-slate-700" : "border-gray-200"}`}>
           <div>
-            <h2 className="text-2xl font-semibold text-gray-950">
+            <h2 className={`text-2xl font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
               Time to Post on {getPlatformName(post.platform)}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
               Scheduled for {formatDate(post.scheduledFor)}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className={`p-2 rounded-lg transition-colors ${isDark ? "hover:bg-slate-700" : "hover:bg-gray-100"}`}
           >
-            <XIcon className="w-5 h-5 text-gray-600" />
+            <XIcon className={`w-5 h-5 ${isDark ? "text-slate-400" : "text-gray-600"}`} />
           </button>
         </div>
 
         {/* Content */}
         <div className="p-6">
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
               Your Content (Ready to Copy)
             </label>
             <div className="relative">
               <textarea
                 readOnly
                 value={post.content}
-                className="w-full h-32 p-4 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className={`w-full h-32 p-4 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  isDark ? "border-slate-600 bg-slate-700 text-white placeholder-slate-500" : "border-gray-300 bg-gray-50 text-gray-900"
+                }`}
               />
               <button
                 onClick={handleCopy}
-                className="absolute top-3 right-3 p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className={`absolute top-3 right-3 p-2 border rounded-lg transition-colors ${isDark ? "bg-slate-700 border-slate-600 hover:bg-slate-600" : "bg-white border-gray-300 hover:bg-gray-50"}`}
                 title="Copy to clipboard"
               >
                 {copied ? (
-                  <CheckIcon className="w-4 h-4 text-green-600" />
+                  <CheckIcon className={`w-4 h-4 ${isDark ? "text-green-400" : "text-green-600"}`} />
                 ) : (
-                  <CopyIcon className="w-4 h-4 text-gray-600" />
+                  <CopyIcon className={`w-4 h-4 ${isDark ? "text-slate-400" : "text-gray-600"}`} />
                 )}
               </button>
             </div>
           </div>
 
           {/* Instructions */}
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
-            <h3 className="text-sm font-semibold text-purple-900 mb-2">
+          <div className={`rounded-lg p-4 mb-6 border ${isDark ? "bg-purple-900/30 border-purple-800" : "bg-purple-50 border-purple-200"}`}>
+            <h3 className={`text-sm font-semibold mb-2 ${isDark ? "text-purple-300" : "text-purple-900"}`}>
               How to Post:
             </h3>
-            <ol className="text-sm text-purple-800 space-y-1 list-decimal list-inside">
+            <ol className={`text-sm space-y-1 list-decimal list-inside ${isDark ? "text-purple-200" : "text-purple-800"}`}>
               <li>Click &quot;Copy&quot; to copy your content</li>
               <li>Click &quot;Open {getPlatformName(post.platform)}&quot; to go to the platform</li>
               <li>Paste your content and post</li>
@@ -163,8 +168,8 @@ export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalPr
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-2xl">
-          <p className="text-xs text-gray-600 text-center">
+        <div className={`px-6 py-4 border-t rounded-b-2xl ${isDark ? "bg-slate-800/80 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+          <p className={`text-xs text-center ${isDark ? "text-slate-400" : "text-gray-600"}`}>
             Tip: Connect your {getPlatformName(post.platform)} account in Settings to enable auto-posting
           </p>
         </div>

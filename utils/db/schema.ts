@@ -157,6 +157,11 @@ export const ClientBrandVoice = pgTable("client_brand_voice", {
   clientId: integer("client_id")
     .references(() => Clients.id, { onDelete: "cascade" })
     .notNull(),
+  brandDescription: text("brand_description"), // Brand positioning, personality, what makes it unique
+  targetAudience: text("target_audience"), // Who they serve, demographics, psychographics
+  niche: varchar("niche", { length: 50 }), // Content-ideas niche (home_food_vendor, fashion_seller, custom, etc.)
+  primaryIndustry: varchar("primary_industry", { length: 50 }), // food_beverage, health_fitness, other, etc.
+  nicheDescription: text("niche_description"), // For custom: "Online Fitness Coach for Women"
   tone: varchar("tone", { length: 100 }), // formal, casual, funny, professional
   slangLevel: varchar("slang_level", { length: 50 }), // none, light, moderate, heavy
   industry: varchar("industry", { length: 100 }),
@@ -291,4 +296,22 @@ export const ClientInvitations = pgTable("client_invitations", {
   status: varchar("status", { length: 50 }).default("pending"), // pending, accepted, expired
   createdAt: timestamp("created_at").defaultNow().notNull(),
   acceptedAt: timestamp("accepted_at"),
+});
+
+// Ideas cache: AI-generated ideas keyed by niche string (shared across clients)
+export const IdeasCache = pgTable("ideas_cache", {
+  id: serial("id").primaryKey(),
+  nicheString: varchar("niche_string", { length: 255 }).notNull().unique(),
+  ideas: jsonb("ideas").notNull(), // Array of ContentIdea-shaped objects
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Track idea refresh count per client per month (for quota limits)
+export const ClientIdeaRefreshes = pgTable("client_idea_refreshes", {
+  id: serial("id").primaryKey(),
+  clientId: integer("client_id")
+    .references(() => Clients.id, { onDelete: "cascade" })
+    .notNull(),
+  refreshedAt: timestamp("refreshed_at").defaultNow().notNull(),
+  nicheString: varchar("niche_string", { length: 255 }),
 });

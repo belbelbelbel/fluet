@@ -1,36 +1,19 @@
 /**
  * Professional AI Content Generator
  * Optimized for cost, quality, and token efficiency
- * Implements industry best practices and emerging trends
+ * Uses prompt-builder for generation modes (viral hook, client voice, carousel, etc.)
  */
 
 import OpenAI from "openai";
+import { buildPrompt } from "./prompt-builder";
+import type { GenerationMode, BrandVoiceContext } from "./prompt-builder";
 
 // Cost-optimized model selection based on content complexity
 const MODEL_CONFIG = {
-  // Primary: GPT-4o-mini - Best cost/performance ratio (10x cheaper than GPT-4)
   primary: "gpt-4o-mini",
-  // Fallback: GPT-3.5-turbo for simple content (even cheaper)
   fallback: "gpt-3.5-turbo",
-  // Premium: GPT-4o for complex content (when quality is critical)
   premium: "gpt-4o",
 } as const;
-
-// Token-optimized prompt templates (reduced by 40% vs standard prompts)
-const PLATFORM_PROMPTS: Record<string, (prompt: string, tone: string, style: string, length: string) => string> = {
-  twitter: (p, t, s, l) => `Twitter thread: "${p}". Format: numbered (1/, 2/, 3/). Tone: ${t}. Style: ${s}. Length: ${l}. Include hashtags. NO EMOJIS. Plain text only, no markdown.`,
-  
-  instagram: (p, t, s, l) => `Instagram caption: "${p}". Engaging, visual. Tone: ${t}. Style: ${s}. Length: ${l}. Include hashtags. NO EMOJIS. Plain text only.`,
-  
-  linkedin: (p, t, s, l) => `LinkedIn post: "${p}". Professional, valuable. Tone: ${t}. Style: ${s}. Length: ${l}. Clear structure. NO EMOJIS. Plain text only.`,
-  
-  tiktok: (p, t, s, l) => `TikTok content: "${p}". Script: Hook (0-3s), Body (3-15s), CTA (15-30s). Caption + hashtags. Tone: ${t}. NO EMOJIS. Plain text only.`,
-  
-  youtube: (p, t, s, l) => `YouTube video description: "${p}". SEO-optimized, engaging. Tone: ${t}. Style: ${s}. Length: ${l}. Include keywords, timestamps if applicable, call-to-action. NO EMOJIS. Plain text only.`,
-};
-
-// System prompt optimized for minimal tokens (reduced from 200 to 80 tokens)
-const SYSTEM_PROMPT = `Expert social media creator. Generate platform-optimized content. Output PLAIN TEXT only - no markdown, asterisks, formatting, or emojis. Ready to copy-paste.`;
 
 interface GenerationOptions {
   contentType: string;
@@ -39,6 +22,8 @@ interface GenerationOptions {
   length: string;
   usePremium?: boolean;
   maxRetries?: number;
+  generationMode?: GenerationMode;
+  brandVoice?: BrandVoiceContext | null;
 }
 
 interface GenerationResult {
@@ -90,14 +75,22 @@ export class OptimizedAIGenerator {
     const model = this.selectModel(options);
     const maxRetries = options.maxRetries || 3;
 
-    // Optimize prompt to reduce tokens
-    const optimizedPrompt = this.optimizePrompt(prompt, options);
+    // Build prompts via prompt-builder (handles generation modes + brand voice)
+    const { systemPrompt, userPrompt } = buildPrompt({
+      mode: options.generationMode ?? "standard",
+      userPrompt: prompt,
+      platform: options.contentType,
+      tone: options.tone,
+      style: options.style,
+      length: options.length,
+      brandVoice: options.brandVoice ?? null,
+    });
 
     // Generate with retry logic
     let lastError: Error | null = null;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const result = await this.callAPI(optimizedPrompt, model, options);
+        const result = await this.callAPI(systemPrompt, userPrompt, model, options);
         
         // Cache successful results
         this.cache.set(cacheKey, result.content);
@@ -131,20 +124,21 @@ export class OptimizedAIGenerator {
   }
 
   private async callAPI(
-    prompt: string,
+    systemPrompt: string,
+    userPrompt: string,
     model: string,
     options: GenerationOptions
   ): Promise<GenerationResult> {
     const startTime = Date.now();
-    
+
     const completion = await this.openai.chat.completions.create({
       model,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: prompt },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
       temperature: this.getTemperature(options.tone),
-      max_tokens: this.getMaxTokens(options.length),
+      max_tokens: this.getMaxTokens(options.length, options),
       // Response format optimization
       response_format: { type: "text" },
     });
@@ -174,30 +168,14 @@ export class OptimizedAIGenerator {
   }
 
   private selectModel(options: GenerationOptions): string {
-    // Premium model for complex/long content
     if (options.usePremium || options.length === "long") {
       return MODEL_CONFIG.premium;
     }
-
-    // Primary model (cost-optimized) for most content
-    if (options.length === "short" || options.contentType === "twitter") {
-      return MODEL_CONFIG.primary;
+    const complexModes: GenerationMode[] = ["strategy", "audience_research", "content_repurpose"];
+    if (options.generationMode && complexModes.includes(options.generationMode)) {
+      return MODEL_CONFIG.premium;
     }
-
-    // Default to primary (gpt-4o-mini)
     return MODEL_CONFIG.primary;
-  }
-
-  private optimizePrompt(
-    prompt: string,
-    options: GenerationOptions
-  ): string {
-    const template = PLATFORM_PROMPTS[options.contentType];
-    if (!template) {
-      throw new Error(`Unsupported content type: ${options.contentType}`);
-    }
-
-    return template(prompt, options.tone, options.style, options.length);
   }
 
   private getTemperature(tone: string): number {
@@ -212,14 +190,18 @@ export class OptimizedAIGenerator {
     return tempMap[tone] || 0.8;
   }
 
-  private getMaxTokens(length: string): number {
-    // Optimize max_tokens to reduce costs
-    const tokenMap: Record<string, number> = {
-      short: 200,   // ~150 words
-      medium: 500,  // ~375 words
-      long: 1000,   // ~750 words
+  private getMaxTokens(length: string, options: GenerationOptions): number {
+    const baseMap: Record<string, number> = {
+      short: 200,
+      medium: 500,
+      long: 1000,
     };
-    return tokenMap[length] || 500;
+    const base = baseMap[length] || 500;
+    const highOutputModes: GenerationMode[] = ["viral_hook", "cta", "strategy", "audience_research", "content_repurpose"];
+    if (options.generationMode && highOutputModes.includes(options.generationMode)) {
+      return Math.max(base, 1200);
+    }
+    return base;
   }
 
   private calculateCost(
@@ -243,6 +225,8 @@ export class OptimizedAIGenerator {
   private cleanContent(content: string): string {
     // Remove markdown formatting and emojis (optimized regex)
     return content
+      // Replace em dash (—) or en dash (–) before numbers/percentages with comma (e.g. "fast—60%" → "fast, 60%")
+      .replace(/\s*[—–]\s*(?=\d)/g, ", ")
       .replace(/\*\*(.*?)\*\*/g, '$1')      // Bold
       .replace(/__(.*?)__/g, '$1')          // Bold alt
       .replace(/\*(.*?)\*/g, '$1')          // Italic
@@ -264,7 +248,8 @@ export class OptimizedAIGenerator {
   }
 
   private getCacheKey(prompt: string, options: GenerationOptions): string {
-    return `${options.contentType}:${options.tone}:${options.style}:${options.length}:${prompt.slice(0, 100)}`;
+    const mode = options.generationMode ?? "standard";
+    return `${options.contentType}:${mode}:${options.tone}:${options.style}:${options.length}:${prompt.slice(0, 100)}`;
   }
 
   private isRateLimitError(error: unknown): boolean {

@@ -401,56 +401,58 @@ export default function SettingsPage() {
       <Tabs defaultValue="ai" className="space-y-6">
         <div className={`border-b transition-colors duration-300 ${
           isDark ? "border-slate-700" : "border-gray-200"
-        }`}>
-          <TabsList className={`bg-transparent h-auto p-0 w-full sm:w-auto justify-start gap-0 flex-wrap border-b transition-colors duration-300 ${
-            isDark ? "border-slate-700" : "border-gray-200"
+        } -mx-4 sm:mx-0 px-4 sm:px-0`}>
+          <TabsList className={`bg-transparent h-auto p-0 w-full justify-start gap-0 flex-wrap sm:flex-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide border-0 ${
+            isDark ? "" : ""
           }`}>
-            <TabsTrigger value="agency" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+            <TabsTrigger value="agency" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
-                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
-              <Bot className="w-4 h-4 mr-2" />
-              Agency Profile
+              <Bot className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Agency Profile</span>
+              <span className="sm:hidden">Agency</span>
             </TabsTrigger>
-            <TabsTrigger value="integrations" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+            <TabsTrigger value="integrations" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
-                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
-              <LinkIcon className="w-4 h-4 mr-2" />
+              <LinkIcon className="w-4 h-4 mr-2 flex-shrink-0" />
               Integrations
             </TabsTrigger>
-            <TabsTrigger value="team" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+            <TabsTrigger value="team" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
-                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
-              <Check className="w-4 h-4 mr-2" />
+              <Check className="w-4 h-4 mr-2 flex-shrink-0" />
               Team
             </TabsTrigger>
-            <TabsTrigger value="notifications" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+            <TabsTrigger value="notifications" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
-                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
-              <Calendar className="w-4 h-4 mr-2" />
-              Notifications
+              <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="hidden md:inline">Notifications</span>
+              <span className="md:hidden">Notify</span>
             </TabsTrigger>
-            <TabsTrigger value="ai" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+            <TabsTrigger value="ai" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
-                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
-              <Brain className="w-4 h-4 mr-2" />
-              AI Settings
+              <Brain className="w-4 h-4 mr-2 flex-shrink-0" />
+              AI
             </TabsTrigger>
-            <TabsTrigger value="workflow" className={`px-4 py-2 text-sm font-medium border-b-2 border-transparent rounded-none transition-all duration-200 ${
+            <TabsTrigger value="workflow" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
-                ? "data-[state=active]:text-purple-400 data-[state=active]:border-purple-600 text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-gray-950 data-[state=active]:border-purple-600 data-[state=active]:text-purple-600 text-gray-600 hover:text-gray-950"
+                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
-              <Cpu className="w-4 h-4 mr-2" />
+              <Cpu className="w-4 h-4 mr-2 flex-shrink-0" />
               Workflow
             </TabsTrigger>
           </TabsList>
@@ -563,16 +565,16 @@ export default function SettingsPage() {
 
         {/* Integrations Tab */}
         <TabsContent value="integrations" className="space-y-6">
-          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-gray-200 bg-gray-50">
-              <CardTitle className="text-lg font-semibold text-gray-900">Social Media Integrations</CardTitle>
-              <CardDescription className="text-gray-600">
+          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
+            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Social Media Integrations</CardTitle>
+              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Connect your social media accounts for automated posting
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-6">
               {/* YouTube Integration */}
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+              <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0">
                     <PlayIcon className="w-5 h-5 text-white" />
@@ -666,12 +668,12 @@ export default function SettingsPage() {
 
         {/* Team Tab */}
         <TabsContent value="team" className="space-y-6">
-          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-gray-200 bg-gray-50">
+          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
+            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">Team Management</CardTitle>
-                  <CardDescription className="text-gray-600">
+                  <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Team Management</CardTitle>
+                  <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                     Invite team members, assign roles, and manage permissions
                   </CardDescription>
         </div>
@@ -685,15 +687,15 @@ export default function SettingsPage() {
             </CardHeader>
             <div className="p-6">
               <div className="text-center py-8">
-                <Check className="w-12 h-12 text-purple-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Collaboration</h3>
-                <p className="text-gray-600 mb-4">
+                <Check className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
+                <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Team Collaboration</h3>
+                <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
                   Invite team members, assign roles, and manage permissions for your agency
                 </p>
                 <Button
                   onClick={() => window.location.href = "/dashboard/team"}
                   variant="outline"
-                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                  className={isDark ? "border-slate-600 text-purple-300 hover:bg-slate-700" : "border-purple-200 text-purple-700 hover:bg-purple-50"}
                 >
                   Go to Team Page
                 </Button>
@@ -704,18 +706,18 @@ export default function SettingsPage() {
 
         {/* Workflow Tab */}
         <TabsContent value="workflow" className="space-y-6">
-          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-gray-200 bg-gray-50">
-              <CardTitle className="text-lg font-semibold text-gray-900">Workflow Preferences</CardTitle>
-              <CardDescription className="text-gray-600">
+          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
+            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Workflow Preferences</CardTitle>
+              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Configure default workflow settings for your agency
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-950 mb-1">Require Approval by Default</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-950"}`}>Require Approval by Default</h3>
+                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
                     New posts will require client approval by default (can be changed per post)
                   </p>
                 </div>
@@ -741,16 +743,16 @@ export default function SettingsPage() {
 
         {/* Appearance Tab */}
         <TabsContent value="appearance" className="space-y-6">
-          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-gray-200 bg-gray-50">
-              <CardTitle className="text-lg font-semibold text-gray-900">Appearance</CardTitle>
-              <CardDescription className="text-gray-600">
+          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
+            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Appearance</CardTitle>
+              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Customize the look and feel of your dashboard
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-4">
               <div>
-                <label className="text-sm font-semibold text-gray-700 mb-3 block">
+                <label className={`text-sm font-semibold mb-3 block ${isDark ? "text-slate-300" : "text-gray-700"}`}>
                   Theme
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -771,12 +773,12 @@ export default function SettingsPage() {
                       }}
                       className={`p-4 rounded-xl border text-center transition-all ${
                         currentTheme === theme
-                          ? "border-purple-600 bg-purple-50"
-                          : "border-gray-200 bg-white hover:border-gray-300"
+                          ? isDark ? "border-purple-500 bg-purple-900/40" : "border-purple-600 bg-purple-50"
+                          : isDark ? "border-slate-700 bg-slate-800 hover:border-slate-600" : "border-gray-200 bg-white hover:border-gray-300"
                       }`}
                     >
                       <p className={`font-semibold capitalize text-sm ${
-                        currentTheme === theme ? "text-purple-900" : "text-gray-950"
+                        currentTheme === theme ? (isDark ? "text-purple-300" : "text-purple-900") : (isDark ? "text-white" : "text-gray-950")
                       }`}>{theme}</p>
                     </button>
                   )              )}
@@ -788,12 +790,12 @@ export default function SettingsPage() {
 
         {/* Team Tab */}
         <TabsContent value="team" className="space-y-6">
-          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-gray-200 bg-gray-50">
+          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
+            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">Team Management</CardTitle>
-                  <CardDescription className="text-gray-600">
+                  <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Team Management</CardTitle>
+                  <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                     Invite team members, assign roles, and manage permissions
                   </CardDescription>
                 </div>
@@ -807,15 +809,15 @@ export default function SettingsPage() {
             </CardHeader>
             <div className="p-6">
               <div className="text-center py-8">
-                <Check className="w-12 h-12 text-purple-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Collaboration</h3>
-                <p className="text-gray-600 mb-4">
+                <Check className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
+                <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Team Collaboration</h3>
+                <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
                   Invite team members, assign roles, and manage permissions for your agency
                 </p>
                 <Button
                   onClick={() => window.location.href = "/dashboard/team"}
                   variant="outline"
-                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                  className={isDark ? "border-slate-600 text-purple-300 hover:bg-slate-700" : "border-purple-200 text-purple-700 hover:bg-purple-50"}
                 >
                   Go to Team Page
                 </Button>
@@ -826,18 +828,18 @@ export default function SettingsPage() {
 
         {/* Notifications Tab */}
         <TabsContent value="notifications" className="space-y-6">
-          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-gray-200 bg-gray-50">
-              <CardTitle className="text-lg font-semibold text-gray-900">Email Notifications</CardTitle>
-              <CardDescription className="text-gray-600">
+          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
+            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Email Notifications</CardTitle>
+              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Configure when you receive email notifications
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-950 mb-1">Approval Notifications</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-950"}`}>Approval Notifications</h3>
+                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
                     Receive emails when clients approve or request changes to posts
                   </p>
                         </div>
@@ -921,24 +923,24 @@ export default function SettingsPage() {
 
         {/* AI Settings Tab */}
         <TabsContent value="ai" className="space-y-6">
-          <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <CardHeader className="border-b border-gray-200 bg-gray-50">
-              <CardTitle className="text-lg font-semibold text-gray-900">AI Model Selection</CardTitle>
-              <CardDescription className="text-gray-600">
+          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
+            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>AI Model Selection</CardTitle>
+              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Choose your preferred AI model for content generation
               </CardDescription>
             </CardHeader>
             <div className="p-6">
               {/* Simple Dropdown Selector */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
                   Select AI Model
                 </label>
                 <div className="relative" ref={modelDropdownRef}>
                   <button
                     type="button"
                     onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 bg-white border border-gray-300 rounded-md text-left hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-950 focus:border-gray-950 transition-colors text-sm"
+                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-md text-left focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm ${isDark ? "bg-slate-700 border-slate-600 hover:border-slate-500" : "bg-white border-gray-300 hover:border-gray-400"}`}
                   >
                     <div className="flex items-center gap-2.5 flex-1 min-w-0">
                       {(() => {
@@ -946,7 +948,7 @@ export default function SettingsPage() {
                         if (!selectedModel) return null;
                         return (
                           <>
-                            <div className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-gray-600">
+                            <div className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
                               {selectedModel.icon}
                             </div>
                             <span className={`font-medium text-sm ${

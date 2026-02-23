@@ -19,6 +19,9 @@ import {
   Building2,
   ChevronRight,
   Users,
+  AlertCircle,
+  FileCheck,
+  CreditCard,
 } from "lucide-react";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
@@ -91,6 +94,11 @@ export default function DashboardPage() {
   const [hasClients, setHasClients] = useState(false);
   const [clientsLoaded, setClientsLoaded] = useState(false);
   const [alertBanners, setAlertBanners] = useState<AlertBannerItem[]>([]);
+  const [needsAttention, setNeedsAttention] = useState<{
+    pendingApprovals: { clientId: number; clientName: string; count: number }[];
+    overduePayments: { clientId: number; clientName: string }[];
+    creditsWarnings: { clientId: number; clientName: string; percentage: number }[];
+  } | null>(null);
 
   // Load clients on mount; redirect to onboarding if none
   useEffect(() => {
@@ -184,6 +192,25 @@ export default function DashboardPage() {
       setLoading(false);
     }
   }, [userId, authLoaded, userLoaded, fetchDashboardStats]);
+
+  // Fetch needs-attention for triage panel (pending approvals, overdue payments, credits warnings)
+  useEffect(() => {
+    if (!userId) return;
+    const loadNeedsAttention = async () => {
+      try {
+        const res = await fetch(`/api/dashboard/needs-attention?userId=${encodeURIComponent(userId)}`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setNeedsAttention(data);
+        }
+      } catch {
+        setNeedsAttention(null);
+      }
+    };
+    loadNeedsAttention();
+  }, [userId]);
 
   // Fetch activity to show payment/credits banners (overdue = red block, credits 80% = yellow, 100% = red)
   useEffect(() => {
@@ -348,6 +375,141 @@ export default function DashboardPage() {
               (b) => b.variant === "payment_overdue" || b.variant === "credits_exceeded"
             )}
           />
+          {/* Needs Attention — triage panel when agency has items to act on */}
+          {needsAttention &&
+            (needsAttention.pendingApprovals.length > 0 ||
+              needsAttention.overduePayments.length > 0 ||
+              needsAttention.creditsWarnings.length > 0) && (
+              <Card className={`border rounded-xl transition-colors shadow-sm ${
+                isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+              }`}>
+                <CardHeader className="pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+                  <CardTitle className={`text-base sm:text-lg font-semibold flex items-center gap-2 ${
+                    isDark ? "text-white" : "text-gray-950"
+                  }`}>
+                    <AlertCircle className={`w-5 h-5 ${isDark ? "text-amber-400" : "text-amber-600"}`} />
+                    Needs attention
+                  </CardTitle>
+                  <p className={`text-sm mt-1 ${
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  }`}>
+                    Clients that need your action
+                  </p>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                    {needsAttention.pendingApprovals.length > 0 && (
+                      <div className="flex-1 min-w-0">
+                        <div className={`flex items-center gap-2 mb-2 text-sm font-medium ${
+                          isDark ? "text-slate-300" : "text-gray-700"
+                        }`}>
+                          <FileCheck className="w-4 h-4 text-purple-500" />
+                          Awaiting approval
+                        </div>
+                        <div className="space-y-1.5">
+                          {needsAttention.pendingApprovals.slice(0, 3).map((item) => (
+                            <button
+                              key={item.clientId}
+                              onClick={() => router.push(`/dashboard/schedule`)}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
+                                isDark
+                                  ? "bg-slate-900/50 hover:bg-slate-700 border border-slate-700"
+                                  : "bg-purple-50/50 hover:bg-purple-50 border border-purple-100"
+                              }`}
+                            >
+                              <span className={`font-medium truncate text-sm ${
+                                isDark ? "text-slate-200" : "text-gray-900"
+                              }`}>
+                                {item.clientName}
+                              </span>
+                              <span className={`text-xs shrink-0 ${
+                                isDark ? "text-slate-500" : "text-gray-500"
+                              }`}>
+                                {item.count} post{item.count !== 1 ? "s" : ""}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {needsAttention.overduePayments.length > 0 && (
+                      <div className="flex-1 min-w-0">
+                        <div className={`flex items-center gap-2 mb-2 text-sm font-medium ${
+                          isDark ? "text-slate-300" : "text-gray-700"
+                        }`}>
+                          <CreditCard className="w-4 h-4 text-red-500" />
+                          Payment overdue
+                        </div>
+                        <div className="space-y-1.5">
+                          {needsAttention.overduePayments.slice(0, 3).map((item) => (
+                            <button
+                              key={item.clientId}
+                              onClick={() => router.push(`/dashboard/clients/${item.clientId}`)}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
+                                isDark
+                                  ? "bg-slate-900/50 hover:bg-slate-700 border border-slate-700"
+                                  : "bg-red-50/50 hover:bg-red-50 border border-red-100"
+                              }`}
+                            >
+                              <span className={`font-medium truncate text-sm ${
+                                isDark ? "text-slate-200" : "text-gray-900"
+                              }`}>
+                                {item.clientName}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {needsAttention.creditsWarnings.length > 0 && (
+                      <div className="flex-1 min-w-0">
+                        <div className={`flex items-center gap-2 mb-2 text-sm font-medium ${
+                          isDark ? "text-slate-300" : "text-gray-700"
+                        }`}>
+                          <AlertCircle className="w-4 h-4 text-amber-500" />
+                          Credits warning
+                        </div>
+                        <div className="space-y-1.5">
+                          {needsAttention.creditsWarnings.slice(0, 3).map((item) => (
+                            <button
+                              key={item.clientId}
+                              onClick={() => router.push(`/dashboard/clients/${item.clientId}/credits`)}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
+                                isDark
+                                  ? "bg-slate-900/50 hover:bg-slate-700 border border-slate-700"
+                                  : "bg-amber-50/50 hover:bg-amber-50 border border-amber-100"
+                              }`}
+                            >
+                              <span className={`font-medium truncate text-sm ${
+                                isDark ? "text-slate-200" : "text-gray-900"
+                              }`}>
+                                {item.clientName}
+                              </span>
+                              <span className={`text-xs shrink-0 ${
+                                isDark ? "text-amber-400" : "text-amber-700"
+                              }`}>
+                                {item.percentage}% used
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => router.push("/dashboard/clients")}
+                    className={`mt-4 ${
+                      isDark ? "text-slate-400 hover:text-white hover:bg-slate-700" : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    View all clients
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Card className={`border rounded-xl transition-colors shadow-sm ${

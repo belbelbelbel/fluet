@@ -15,7 +15,9 @@ import {
     Tasks,
     AgencyTeamMembers,
     ClientReports,
-    TeamInvitations
+    TeamInvitations,
+    IdeasCache,
+    ClientIdeaRefreshes,
 } from "./schema"
 import { sendWelcomeEmail } from "./mailtrap"
 
@@ -920,6 +922,11 @@ export const DeleteClient = async (clientId: number, agencyId: number) => {
  */
 export const SaveClientBrandVoice = async (data: {
     clientId: number;
+    brandDescription?: string;
+    targetAudience?: string;
+    niche?: string;
+    primaryIndustry?: string;
+    nicheDescription?: string;
     tone?: string;
     slangLevel?: string;
     industry?: string;
@@ -943,6 +950,11 @@ export const SaveClientBrandVoice = async (data: {
             const [updated] = await db
                 .update(ClientBrandVoice)
                 .set({
+                    brandDescription: data.brandDescription,
+                    targetAudience: data.targetAudience,
+                    niche: data.niche,
+                    primaryIndustry: data.primaryIndustry,
+                    nicheDescription: data.nicheDescription,
                     tone: data.tone,
                     slangLevel: data.slangLevel,
                     industry: data.industry,
@@ -963,6 +975,11 @@ export const SaveClientBrandVoice = async (data: {
                 .insert(ClientBrandVoice)
                 .values({
                     clientId: data.clientId,
+                    brandDescription: data.brandDescription,
+                    targetAudience: data.targetAudience,
+                    niche: data.niche,
+                    primaryIndustry: data.primaryIndustry,
+                    nicheDescription: data.nicheDescription,
                     tone: data.tone,
                     slangLevel: data.slangLevel,
                     industry: data.industry,
@@ -998,6 +1015,141 @@ export const GetClientBrandVoice = async (clientId: number) => {
     } catch (error) {
         console.error(`[GetClientBrandVoice] Error encountered:`, error);
         throw new Error("Failed to get brand voice");
+    }
+};
+
+// ==================== IDEAS CACHE ====================
+
+export const GetIdeasFromCache = async (nicheString: string) => {
+    try {
+        const normalized = nicheString.toLowerCase().trim().replace(/\s+/g, " ");
+        const [row] = await db
+            .select()
+            .from(IdeasCache)
+            .where(eq(IdeasCache.nicheString, normalized))
+            .limit(1)
+            .execute();
+        return row?.ideas as Record<string, unknown>[] | null ?? null;
+    } catch (error) {
+        console.error(`[GetIdeasFromCache] Error:`, error);
+        return null;
+    }
+};
+
+export const UpsertIdeasCache = async (
+    nicheString: string,
+    ideas: Record<string, unknown>[],
+) => {
+    try {
+        const normalized = nicheString.toLowerCase().trim().replace(/\s+/g, " ");
+        const [existing] = await db
+            .select({ id: IdeasCache.id })
+            .from(IdeasCache)
+            .where(eq(IdeasCache.nicheString, normalized))
+            .limit(1)
+            .execute();
+
+        if (existing) {
+            const ideasWithIds = ideas.map((idea, i) => ({
+                ...idea,
+                id: `cache_${existing.id}_${i}`,
+            }));
+            await db
+                .update(IdeasCache)
+                .set({
+                    ideas: ideasWithIds as any,
+                    createdAt: new Date(),
+                })
+                .where(eq(IdeasCache.id, existing.id))
+                .execute();
+            return existing.id;
+        } else {
+            const tempIdeas = ideas.map((idea, i) => ({ ...idea, id: `temp_${i}` }));
+            const [inserted] = await db
+                .insert(IdeasCache)
+                .values({
+                    nicheString: normalized,
+                    ideas: tempIdeas as any,
+                })
+                .returning({ id: IdeasCache.id })
+                .execute();
+            const id = inserted?.id;
+            if (id) {
+                const ideasWithProperIds = ideas.map((idea, i) => ({
+                    ...idea,
+                    id: `cache_${id}_${i}`,
+                }));
+                await db
+                    .update(IdeasCache)
+                    .set({ ideas: ideasWithProperIds as any })
+                    .where(eq(IdeasCache.id, id))
+                    .execute();
+            }
+            return id ?? 0;
+        }
+    } catch (error) {
+        console.error(`[UpsertIdeasCache] Error:`, error);
+        throw new Error("Failed to cache ideas");
+    }
+};
+
+export const GetCachedIdeaById = async (ideaId: string) => {
+    const match = ideaId.match(/^cache_(\d+)_(\d+)$/);
+    if (!match) return null;
+    const [, cacheIdStr, indexStr] = match;
+    const cacheId = parseInt(cacheIdStr!, 10);
+    const index = parseInt(indexStr!, 10);
+    if (isNaN(cacheId) || isNaN(index)) return null;
+    try {
+        const [row] = await db
+            .select({ ideas: IdeasCache.ideas })
+            .from(IdeasCache)
+            .where(eq(IdeasCache.id, cacheId))
+            .limit(1)
+            .execute();
+        const ideas = row?.ideas as Record<string, unknown>[] | null;
+        if (!Array.isArray(ideas) || index < 0 || index >= ideas.length) return null;
+        return ideas[index];
+    } catch {
+        return null;
+    }
+};
+
+export const GetClientIdeaRefreshCountThisMonth = async (clientId: number) => {
+    try {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const result = await db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(ClientIdeaRefreshes)
+            .where(
+                and(
+                    eq(ClientIdeaRefreshes.clientId, clientId),
+                    gte(ClientIdeaRefreshes.refreshedAt, startOfMonth)
+                )
+            )
+            .execute();
+        return result[0]?.count ?? 0;
+    } catch (error) {
+        console.error(`[GetClientIdeaRefreshCount] Error:`, error);
+        return 0;
+    }
+};
+
+export const RecordClientIdeaRefresh = async (
+    clientId: number,
+    nicheString?: string
+) => {
+    try {
+        await db
+            .insert(ClientIdeaRefreshes)
+            .values({
+                clientId,
+                nicheString: nicheString ?? null,
+            })
+            .execute();
+    } catch (error) {
+        console.error(`[RecordClientIdeaRefresh] Error:`, error);
     }
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { 
@@ -9,7 +9,8 @@ import {
   Building2, 
   Check,
   AlertCircle,
-  Clock
+  Clock,
+  Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ interface Client {
   id: number;
   name: string;
   logoUrl?: string;
+  email?: string;
   status: string;
   paymentStatus: string;
   createdAt: string;
@@ -37,7 +39,10 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "payment_due" | "on_hold">("all");
   const retryRef = useRef(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -133,6 +138,8 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
   const handleClientSelect = (client: Client) => {
     setSelectedClient(client);
     setOpen(false);
+    setSearchQuery("");
+    setStatusFilter("all");
     onClientChange?.(client.id);
     
     // Update URL if on client-specific page
@@ -143,8 +150,41 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
 
   const handleCreateClient = () => {
     setOpen(false);
+    setSearchQuery("");
+    setStatusFilter("all");
     router.push("/dashboard/clients/new");
   };
+
+  // Filter clients by search and status
+  const filteredClients = useMemo(() => {
+    let list = clients;
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+            c.email?.toLowerCase().includes(q)
+      );
+    }
+    if (statusFilter !== "all") {
+      list = list.filter((c) => {
+        if (statusFilter === "active") return c.status === "active" && c.paymentStatus === "paid";
+        if (statusFilter === "payment_due") return c.paymentStatus === "overdue";
+        if (statusFilter === "on_hold") return c.status === "paused" || c.status === "inactive";
+        return true;
+      });
+    }
+    return list;
+  }, [clients, searchQuery, statusFilter]);
+
+  // Focus search when dropdown opens
+  useEffect(() => {
+    if (open && clients.length > 0) {
+      setSearchQuery("");
+      setStatusFilter("all");
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    }
+  }, [open, clients.length]);
 
   const getStatusBadge = (client: Client) => {
     if (client.paymentStatus === "overdue") {
@@ -244,17 +284,63 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
             className="fixed inset-0 z-40"
             onClick={() => setOpen(false)}
           />
-          <div className={`absolute z-50 mt-2 w-[280px] rounded-lg border shadow-lg ${
+          <div className={`absolute z-50 mt-2 w-[320px] rounded-lg border shadow-lg ${
             isDark 
               ? "bg-slate-800 border-slate-700 shadow-xl" 
               : "bg-white border-gray-200"
           }`}>
             <div className="p-2">
-              <div className={`px-2 py-1.5 text-xs font-semibold uppercase tracking-wider ${
-                isDark ? "text-slate-400" : "text-gray-500"
-              }`}>
-                Clients
+              <div className="flex items-center justify-between px-2 py-1.5">
+                <span className={`text-xs font-semibold uppercase tracking-wider ${
+                  isDark ? "text-slate-400" : "text-gray-500"
+                }`}>
+                  Clients {clients.length > 0 && (
+                    <span className="font-normal normal-case ml-1">({clients.length})</span>
+                  )}
+                </span>
               </div>
+              {clients.length > 5 && (
+                <>
+                  <div className="relative px-2 mb-2">
+                    <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${
+                      isDark ? "text-slate-500" : "text-gray-400"
+                    }`} />
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="Search clients..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()}
+                      className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                        isDark
+                          ? "bg-slate-900 border-slate-600 text-white placeholder-slate-500"
+                          : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"
+                      }`}
+                      aria-label="Search clients"
+                    />
+                  </div>
+                  <div className="flex gap-1 px-2 mb-2 overflow-x-auto">
+                    {(["all", "active", "payment_due", "on_hold"] as const).map((f) => (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => setStatusFilter(f)}
+                        className={cn(
+                          "shrink-0 px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
+                          statusFilter === f
+                            ? "bg-purple-600 text-white"
+                            : isDark
+                              ? "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        )}
+                      >
+                        {f === "all" ? "All" : f === "active" ? "Active" : f === "payment_due" ? "Payment Due" : "On Hold"}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
               <div className={`h-px my-1 ${
                 isDark ? "bg-slate-700" : "bg-gray-200"
               }`} />
@@ -277,8 +363,15 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
                   </Button>
                 </div>
               ) : (
-                <div className="max-h-[400px] overflow-y-auto">
-                  {clients.map((client) => (
+                <div className="max-h-[360px] overflow-y-auto">
+                  {filteredClients.length === 0 ? (
+                    <div className={`px-3 py-8 text-center text-sm ${
+                      isDark ? "text-slate-400" : "text-gray-500"
+                    }`}>
+                      No clients match your search.
+                    </div>
+                  ) : (
+                  filteredClients.map((client) => (
                     <button
                       key={client.id}
                       onClick={() => handleClientSelect(client)}
@@ -328,7 +421,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
                         )}
                       </div>
                     </button>
-                  ))}
+                  )))}
                   <div className={`h-px my-1 ${
                     isDark ? "bg-slate-700" : "bg-gray-200"
                   }`} />

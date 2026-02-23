@@ -9,16 +9,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gray-950 text-white hover:bg-gray-900 shadow-md hover:shadow-lg transition-all",
+        default: "bg-gray-950 dark:bg-purple-600 text-white hover:bg-gray-900 dark:hover:bg-purple-700 shadow-md hover:shadow-lg transition-all",
         destructive:
           "bg-red-600 text-white hover:bg-red-700 shadow-md hover:shadow-lg transition-all",
         outline:
-          "border-2 border-gray-300 bg-white text-gray-950 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-950 transition-all dark:border-gray-600 dark:bg-transparent dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:border-gray-500 dark:hover:text-white",
+          "border-2 border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-950 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-700 hover:border-gray-400 dark:hover:border-slate-500 transition-all",
         ghost:
-          "hover:bg-gray-100 hover:text-gray-950 text-gray-700 transition-all",
+          "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-200 hover:text-gray-950 dark:hover:text-white transition-all",
         secondary:
-          "bg-gray-100 text-gray-950 hover:bg-gray-200 transition-all",
-        link: "text-neutral-900 underline-offset-4 hover:underline dark:text-neutral-50",
+          "bg-gray-100 dark:bg-slate-700 text-gray-950 dark:text-slate-100 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all",
+        link: "text-neutral-900 dark:text-neutral-100 underline-offset-4 hover:underline",
       },
       size: {
         default: "h-auto px-4 py-2",

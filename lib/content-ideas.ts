@@ -1,18 +1,124 @@
 // Content Ideas Database Structure
-// This will be expanded with real curated content
+// Primary Industry → Niche mapping (expert-recommended scalable design)
 
-export type Niche = 
+export type Niche =
   | "home_food_vendor"
   | "street_food_seller"
   | "baker_cake_vendor"
   | "fashion_seller"
   | "beauty_hair_vendor"
   | "business_coach"
-  | "online_vendor";
+  | "online_vendor"
+  | "custom"; // AI-powered ideas for niches not in our 7
+
+/** Primary industry options (broad layer) - maps to supported niches or custom */
+export type PrimaryIndustry =
+  | "food_beverage"
+  | "fashion_beauty"
+  | "coaching_consulting"
+  | "health_fitness"
+  | "real_estate"
+  | "retail_ecommerce"
+  | "creative_services"
+  | "tech_startups"
+  | "other";
+
+export const PRIMARY_INDUSTRY_OPTIONS: { id: PrimaryIndustry; name: string; emoji: string; mapsTo?: Niche[] }[] = [
+  { id: "food_beverage", name: "Food & Beverage", emoji: "🍲", mapsTo: ["home_food_vendor", "street_food_seller", "baker_cake_vendor"] },
+  { id: "fashion_beauty", name: "Fashion & Beauty", emoji: "💄", mapsTo: ["fashion_seller", "beauty_hair_vendor"] },
+  { id: "coaching_consulting", name: "Coaching & Consulting", emoji: "💼", mapsTo: ["business_coach"] },
+  { id: "retail_ecommerce", name: "Retail & E-commerce", emoji: "🛒", mapsTo: ["online_vendor"] },
+  { id: "health_fitness", name: "Health & Fitness", emoji: "💪", mapsTo: [] }, // custom → AI
+  { id: "real_estate", name: "Real Estate", emoji: "🏠", mapsTo: [] }, // custom → AI
+  { id: "creative_services", name: "Creative Services", emoji: "🎨", mapsTo: [] }, // custom → AI
+  { id: "tech_startups", name: "Tech & Startups", emoji: "🚀", mapsTo: [] }, // custom → AI
+  { id: "other", name: "Other (type your niche)", emoji: "✨", mapsTo: [] }, // custom → AI
+];
+
+/** Map primary industry to a single niche for supported industries, or "custom" for AI */
+export function primaryIndustryToNiche(industry: PrimaryIndustry | string): Niche | "custom" {
+  const opt = PRIMARY_INDUSTRY_OPTIONS.find((o) => o.id === industry);
+  if (!opt || !opt.mapsTo || opt.mapsTo.length === 0) return "custom";
+  // For industries with multiple niches, default to first (user can refine via specific niche)
+  return opt.mapsTo[0];
+}
+
+/** Check if niche is one of our 7 supported (has pre-built ideas) */
+export function isSupportedNiche(niche: Niche | string): niche is Niche {
+  return niche !== "custom" && NICHE_OPTIONS.some((o) => o.id === niche);
+}
+
+/** Normalize niche string for cache key (lowercase, trim, collapse spaces) */
+export function normalizeNicheString(s: string | null | undefined): string {
+  if (!s || !String(s).trim()) return "";
+  return String(s)
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+/** Universal content frameworks for AI generation (guarantees diversity) */
+export const UNIVERSAL_FRAMEWORKS = [
+  "educational_tip",
+  "behind_the_scenes",
+  "client_testimonial",
+  "myth_busting",
+  "engagement_question",
+  "process_explanation",
+  "value_breakdown",
+  "case_study",
+  "before_after",
+  "personal_story",
+] as const;
+
+/** Infer niche from industry string (fuzzy match). Returns null if no match. */
+export function inferNicheFromIndustry(industry: string | null | undefined): Niche | null {
+  if (!industry || !industry.trim()) return null;
+  const s = industry.toLowerCase().trim();
+  if (s.includes("food") || s.includes("jollof") || s.includes("cook")) return "home_food_vendor";
+  if (s.includes("street") || s.includes("suya") || s.includes("snack")) return "street_food_seller";
+  if (s.includes("bak") || s.includes("cake") || s.includes("pastry")) return "baker_cake_vendor";
+  if (s.includes("fashion") || s.includes("cloth") || s.includes("style")) return "fashion_seller";
+  if (s.includes("beauty") || s.includes("hair") || s.includes("salon")) return "beauty_hair_vendor";
+  if (s.includes("coach") || s.includes("business") || s.includes("consult")) return "business_coach";
+  if (s.includes("online") || s.includes("ecom") || s.includes("shop") || s.includes("vendor")) return "online_vendor";
+  return null;
+}
+
+/** Niche options for the content ideas picker */
+export const NICHE_OPTIONS: { id: Niche; name: string; emoji: string }[] = [
+  { id: "home_food_vendor", name: "Home Food Vendor", emoji: "🍲" },
+  { id: "street_food_seller", name: "Street Food Seller", emoji: "🍔" },
+  { id: "baker_cake_vendor", name: "Baker / Cake Vendor", emoji: "🎂" },
+  { id: "fashion_seller", name: "Fashion Seller", emoji: "👗" },
+  { id: "beauty_hair_vendor", name: "Beauty / Hair Vendor", emoji: "💇🏽" },
+  { id: "business_coach", name: "Business / Coach", emoji: "💼" },
+  { id: "online_vendor", name: "Online Vendor (IG Shop)", emoji: "📱" },
+];
 
 export type HookStyle = "story" | "question" | "shock" | "value" | "tip";
 export type Format = "text_only" | "text_image" | "carousel" | "video";
 export type NaijaTone = "mild" | "moderate" | "heavy";
+
+/** Content strategies aligned with professional frameworks (viral hooks, authority, trend adaptation, etc.) */
+export type ContentStrategy =
+  | "viral_hook"       // Curiosity gaps, pain points, pattern interrupts
+  | "authority"        // Experience-based insights, credibility
+  | "trend_adaptation" // Leverage trending topics/formats for niche
+  | "audience_research"// Psychological triggers, desires, fears
+  | "carousel"         // Structured: hook slide, value, CTA
+  | "cta"              // High-converting calls-to-action
+  | "client_voice";    // Brand-aligned, emotionally engaging
+
+export const CONTENT_STRATEGIES: { id: ContentStrategy; name: string; tip: string }[] = [
+  { id: "viral_hook", name: "Viral Hooks", tip: "Curiosity gaps, pain points, bold claims" },
+  { id: "authority", name: "Authority", tip: "Experience-based, credible insights" },
+  { id: "trend_adaptation", name: "Trend Adaptation", tip: "Leverage what's trending" },
+  { id: "audience_research", name: "Audience Psychology", tip: "Desires, fears, language" },
+  { id: "carousel", name: "Carousel", tip: "Hook slide → value → CTA" },
+  { id: "cta", name: "Call-to-Action", tip: "High-converting engagement" },
+  { id: "client_voice", name: "Brand Voice", tip: "Emotionally engaging, on-brand" },
+];
 
 export interface ContentIdea {
   id: string;
@@ -21,6 +127,8 @@ export interface ContentIdea {
   hookStyle: HookStyle;
   hookExample: string;
   format: Format;
+  strategy?: ContentStrategy;
+  strategyTip?: string; // Why this idea works (professional framing)
   naijaTone: {
     mild: string;
     moderate: string;
@@ -31,14 +139,16 @@ export interface ContentIdea {
 
 // Sample content ideas for MVP (will be expanded)
 export const contentIdeasDatabase: ContentIdea[] = [
-  // Home Food Vendor Ideas
+  // Home Food Vendor Ideas (strategy-aligned, professional hooks)
   {
     id: "1",
     niche: "home_food_vendor",
     topic: "Quick breakfast ideas",
     hookStyle: "story",
-    hookExample: "I used to skip breakfast until I discovered...",
+    hookExample: "The one thing that changed my breakfast routine (and my sales)...",
     format: "text_image",
+    strategy: "viral_hook",
+    strategyTip: "Curiosity gap + bold claim. Creates scroll-stopping intrigue in first 3 seconds.",
     naijaTone: {
       mild: "Quick breakfast ideas for busy mornings. Start your day right with these simple, nutritious options that take less than 10 minutes to prepare.",
       moderate: "Omo, breakfast no be joke o! See these quick breakfast ideas wey go make your morning sharp sharp. No time to waste, but you must chop well.",
@@ -51,8 +161,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "home_food_vendor",
     topic: "Nigerian jollof rice tips",
     hookStyle: "value",
-    hookExample: "The secret to perfect jollof rice is...",
+    hookExample: "Most home cooks get jollof wrong. After 8 years, here's what actually works.",
     format: "text_image",
+    strategy: "authority",
+    strategyTip: "Authority positioning + pattern interrupt. Positions you as the expert who knows better.",
     naijaTone: {
       mild: "The secret to perfect jollof rice is in the timing and spice blend. Here's how to get that authentic taste every time.",
       moderate: "Abeg, make I tell you the secret to perfect jollof rice. This one go make your jollof stand out for real.",
@@ -65,8 +177,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "home_food_vendor",
     topic: "Daily special announcement",
     hookStyle: "shock",
-    hookExample: "Today's special: Fresh pepper soup ready!",
+    hookExample: "Limited to 10 orders. Pepper soup that sells out by 2pm. Today's batch is ready.",
     format: "text_image",
+    strategy: "cta",
+    strategyTip: "Scarcity + urgency. Drives immediate action and FOMO.",
     naijaTone: {
       mild: "Today's special: Fresh pepper soup ready! Limited quantity available. Order now to avoid missing out.",
       moderate: "Omo, today's special don ready! Fresh pepper soup wey go make you forget your name. Limited quantity o, make you order sharp sharp.",
@@ -80,8 +194,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "home_food_vendor",
     topic: "Customer testimonial post",
     hookStyle: "story",
-    hookExample: "Just got this message from a customer...",
+    hookExample: "This DM made my week. (And it'll show your audience why they should order.)",
     format: "text_image",
+    strategy: "audience_research",
+    strategyTip: "Social proof + emotional trigger. People buy from people others trust.",
     naijaTone: {
       mild: "Just got this message from a customer: 'Your jollof rice is the best I've ever tasted!' Nothing makes me happier than seeing people enjoy my food. Thank you for the support!",
       moderate: "Omo, see message wey customer send me: 'Your jollof na fire!' This one dey make me happy pass. Thank you for supporting my small business.",
@@ -94,8 +210,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "home_food_vendor",
     topic: "Behind-the-scenes cooking process",
     hookStyle: "value",
-    hookExample: "Ever wondered how I make my stew?",
+    hookExample: "Slide 1: The secret to my stew. Slide 2–4: Step-by-step. Slide 5: Save this for later.",
     format: "carousel",
+    strategy: "carousel",
+    strategyTip: "Carousel structure: curiosity hook → value slides → save-worthy CTA. Builds swipe momentum.",
     naijaTone: {
       mild: "Ever wondered how I make my stew? Here's a quick behind-the-scenes look at my cooking process. Fresh ingredients, proper seasoning, and lots of love!",
       moderate: "Abeg, you don dey wonder how I dey make my stew? See small behind-the-scenes wey I snap. Fresh ingredients, proper seasoning, and love full ground!",
@@ -152,8 +270,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "street_food_seller",
     topic: "Location update",
     hookStyle: "shock",
-    hookExample: "I'm at [Location] today!",
+    hookExample: "I'm at [Location] for the next 4 hours. Last week we sold out by 3pm.",
     format: "text_image",
+    strategy: "cta",
+    strategyTip: "Urgency + FOMO. Drives foot traffic with time-bound scarcity.",
     naijaTone: {
       mild: "I'm at Ikeja today! Come get your fresh suya, puff-puff, and buns. Look for the red umbrella. See you there!",
       moderate: "Omo, I dey Ikeja today o! Come get your fresh suya, puff-puff, and buns. Look for red umbrella. See you there!",
@@ -166,8 +286,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "street_food_seller",
     topic: "Quick snack recommendation",
     hookStyle: "question",
-    hookExample: "What's your go-to street snack?",
+    hookExample: "What's your go-to street snack? (Drop yours below – I'll reply to everyone.)",
     format: "text_image",
+    strategy: "cta",
+    strategyTip: "Community-driven CTA. Boosts comments and algorithm reach.",
     naijaTone: {
       mild: "What's your go-to street snack? Mine is definitely suya with a cold drink. What about you? Drop your favorite in the comments!",
       moderate: "Wetin be your go-to street snack? Mine na suya with cold drink. Wetin be yours? Drop am for comment!",
@@ -224,8 +346,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "baker_cake_vendor",
     topic: "Custom cake order showcase",
     hookStyle: "story",
-    hookExample: "Just finished this custom birthday cake...",
+    hookExample: "Before you book a baker, see what goes into a custom cake. (Swipe to see the process.)",
     format: "carousel",
+    strategy: "carousel",
+    strategyTip: "Curiosity-driven carousel. Shows value before asking for the order.",
     naijaTone: {
       mild: "Just finished this custom birthday cake for a client. Every cake tells a story, and I love bringing your vision to life. Order yours today!",
       moderate: "Omo, I just finish this custom birthday cake for client. Every cake get story, and I love make your vision come alive. Order yours today!",
@@ -238,8 +362,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "baker_cake_vendor",
     topic: "Baking tip of the day",
     hookStyle: "tip",
-    hookExample: "Baking tip: Always preheat your oven",
+    hookExample: "Stop skipping this step. It's why your cakes sink. (3-year baker, trust me.)",
     format: "text_only",
+    strategy: "authority",
+    strategyTip: "Pattern interrupt + authority. Positions you as the expert who fixes common mistakes.",
     naijaTone: {
       mild: "Baking tip: Always preheat your oven for at least 15 minutes before baking. This ensures even cooking and perfect results every time!",
       moderate: "Small baking tip: Make you preheat your oven for at least 15 minutes before you bake. This one go make your cake bake well well.",
@@ -252,8 +378,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "baker_cake_vendor",
     topic: "Price transparency for custom cakes",
     hookStyle: "value",
-    hookExample: "How I price my custom cakes",
+    hookExample: "Stop guessing. Here's exactly how I price custom cakes (and why).",
     format: "text_image",
+    strategy: "authority",
+    strategyTip: "Authority + transparency. Builds trust by addressing the #1 objection upfront.",
     naijaTone: {
       mild: "How I price my custom cakes: Size, design complexity, and ingredients all factor in. Starting from ₦15,000. DM for a quote!",
       moderate: "See how I dey price my custom cakes: Size, design, and ingredients dey matter. Starting from ₦15,000. DM me for quote!",
@@ -266,8 +394,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "baker_cake_vendor",
     topic: "Behind-the-scenes baking process",
     hookStyle: "story",
-    hookExample: "This is how I make my cakes...",
+    hookExample: "POV: You asked how I make my cakes. (Swipe for the full process.)",
     format: "video",
+    strategy: "client_voice",
+    strategyTip: "POV + behind-the-scenes. Feels personal, builds connection.",
     naijaTone: {
       mild: "This is how I make my cakes. From mixing ingredients to final decoration, every step is done with care and attention to detail.",
       moderate: "See how I dey make my cakes. From mixing ingredients to final decoration, every step dey important. I dey do am with care.",
@@ -296,8 +426,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "fashion_seller",
     topic: "Outfit of the day",
     hookStyle: "story",
-    hookExample: "Today's outfit inspiration...",
+    hookExample: "This combo gets the most saves. Here's why (and how to copy it).",
     format: "carousel",
+    strategy: "trend_adaptation",
+    strategyTip: "Data-backed hook. Tells audience what works before they scroll.",
     naijaTone: {
       mild: "Today's outfit inspiration: Mix and match pieces to create a unique look. Fashion is about expressing yourself!",
       moderate: "See today outfit inspiration: Mix and match pieces to create unique look. Fashion na about expressing yourself!",
@@ -310,8 +442,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "fashion_seller",
     topic: "New arrival announcement",
     hookStyle: "shock",
-    hookExample: "New arrivals just dropped!",
+    hookExample: "New drop. Limited stock. These won't last the weekend. (Link in bio.)",
     format: "carousel",
+    strategy: "viral_hook",
+    strategyTip: "Bold claim + urgency. Short, punchy, scroll-stopping.",
     naijaTone: {
       mild: "New arrivals just dropped! Fresh styles, latest trends, and quality pieces. Check them out before they're gone!",
       moderate: "Omo, new arrivals just drop! Fresh styles, latest trends, and quality pieces. Check them before dem finish!",
@@ -324,8 +458,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "fashion_seller",
     topic: "Styling tip",
     hookStyle: "tip",
-    hookExample: "Styling tip: Accessorize to elevate your look",
+    hookExample: "One change that turns a basic outfit into a statement. (Takes 30 seconds.)",
     format: "text_image",
+    strategy: "authority",
+    strategyTip: "Value + quick win. Low effort, high impact – drives engagement.",
     naijaTone: {
       mild: "Styling tip: Accessorize to elevate your look. A simple outfit becomes stunning with the right accessories. Less is more!",
       moderate: "Small styling tip: Add accessories to make your look better. Simple outfit go become stunning with right accessories.",
@@ -368,8 +504,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "beauty_hair_vendor",
     topic: "Before and after transformation",
     hookStyle: "shock",
-    hookExample: "Look at this transformation!",
+    hookExample: "From damaged to this in 3 months. (The routine nobody talks about.)",
     format: "carousel",
+    strategy: "audience_research",
+    strategyTip: "Pain point + curiosity. Speaks to frustrated clients with damaged hair.",
     naijaTone: {
       mild: "Look at this transformation! From damaged hair to healthy, beautiful locks. Book your appointment today!",
       moderate: "Omo, see this transformation! From damaged hair to healthy, beautiful hair. Book your appointment today!",
@@ -382,8 +520,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "beauty_hair_vendor",
     topic: "Booking reminder",
     hookStyle: "value",
-    hookExample: "Don't forget to book your appointment",
+    hookExample: "Slots for next week are 60% full. Book now or wait 2 weeks. (Link in bio.)",
     format: "text_only",
+    strategy: "cta",
+    strategyTip: "Scarcity + direct CTA. Converts followers into bookings.",
     naijaTone: {
       mild: "Don't forget to book your appointment! Slots are filling up fast. Book now to secure your preferred time.",
       moderate: "Make you no forget to book your appointment! Slots dey finish fast. Book now to secure your time.",
@@ -396,8 +536,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "beauty_hair_vendor",
     topic: "Hair care tip",
     hookStyle: "tip",
-    hookExample: "Hair care tip: Moisturize daily",
+    hookExample: "The one thing your hair needs daily. (Most people skip it.)",
     format: "text_image",
+    strategy: "viral_hook",
+    strategyTip: "Curiosity gap + authority. Creates scroll stop and positions you as expert.",
     naijaTone: {
       mild: "Hair care tip: Moisturize daily to keep your hair healthy and strong. Healthy hair starts with proper care!",
       moderate: "Small hair care tip: Make you moisturize daily to keep your hair healthy and strong. Healthy hair start with proper care!",
@@ -410,8 +552,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "beauty_hair_vendor",
     topic: "Style trend showcase",
     hookStyle: "story",
-    hookExample: "This style is trending right now...",
+    hookExample: "Trending on my page this week. Here's how to get it – and why it works.",
     format: "carousel",
+    strategy: "trend_adaptation",
+    strategyTip: "Adapt trending format to your niche. Stays relevant and on-brand.",
     naijaTone: {
       mild: "This style is trending right now. Want to try it? Book an appointment and let's create this look for you!",
       moderate: "See style wey dey trend now. You want try am? Book appointment make we create this look for you!",
@@ -454,8 +598,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "business_coach",
     topic: "Business tip of the day",
     hookStyle: "tip",
-    hookExample: "Business tip: Focus on one thing at a time",
+    hookExample: "Stop multitasking. Here's what 100+ clients taught me about focus.",
     format: "text_only",
+    strategy: "authority",
+    strategyTip: "Pattern interrupt + social proof. Positions you as the expert with real experience.",
     naijaTone: {
       mild: "Business tip: Focus on one thing at a time. Multitasking reduces productivity. Master one skill, then move to the next.",
       moderate: "Small business tip: Focus on one thing at a time. Multitasking no good. Master one skill, then move to next.",
@@ -496,8 +642,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "business_coach",
     topic: "Coaching service announcement",
     hookStyle: "value",
-    hookExample: "Ready to take your business to the next level?",
+    hookExample: "3 spots left this month. If you're tired of guessing, reply 'COACH'.",
     format: "text_image",
+    strategy: "cta",
+    strategyTip: "Scarcity + soft CTA. Converts without feeling pushy.",
     naijaTone: {
       mild: "Ready to take your business to the next level? I'm offering 1-on-1 coaching sessions. Limited slots available. DM to book!",
       moderate: "You ready to take your business to next level? I dey offer 1-on-1 coaching sessions. Limited slots dey available. DM to book!",
@@ -512,8 +660,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "online_vendor",
     topic: "Flash sale announcement",
     hookStyle: "shock",
-    hookExample: "Flash sale! Limited time only",
+    hookExample: "48 hours only. 20% off. First 10 get free delivery. (Link in bio.)",
     format: "text_image",
+    strategy: "viral_hook",
+    strategyTip: "Time-bound + scarcity. Creates immediate action.",
     naijaTone: {
       mild: "Flash sale! Limited time only. 20% off on selected items. First 10 customers get free delivery. Don't miss out!",
       moderate: "Omo, flash sale don start! Limited time only. 20% off on selected items. First 10 customers get free delivery. No miss am!",
@@ -554,8 +704,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "online_vendor",
     topic: "WhatsApp order reminder",
     hookStyle: "value",
-    hookExample: "Order via WhatsApp for faster service",
+    hookExample: "DM me 'READY' and I'll send you the fastest way to order. (No forms, no hassle.)",
     format: "text_only",
+    strategy: "cta",
+    strategyTip: "Soft CTA + friction removal. Makes ordering feel easy.",
     naijaTone: {
       mild: "Order via WhatsApp for faster service. Send me a message with what you need, and I'll respond immediately. Link in bio!",
       moderate: "Make you order via WhatsApp for faster service. Send me message with wetin you need, I go reply immediately. Link for bio!",
@@ -568,8 +720,10 @@ export const contentIdeasDatabase: ContentIdea[] = [
     niche: "online_vendor",
     topic: "New product launch",
     hookStyle: "shock",
-    hookExample: "New product just arrived!",
+    hookExample: "New drop. Limited to 50 pieces. Last launch sold out in 3 days.",
     format: "carousel",
+    strategy: "viral_hook",
+    strategyTip: "Scarcity + social proof. Creates urgency and FOMO.",
     naijaTone: {
       mild: "New product just arrived! Fresh stock, limited quantity. Get yours before it's sold out. DM to order!",
       moderate: "Omo, new product just arrive! Fresh stock, limited quantity. Get yours before e finish. DM to order!",
@@ -586,18 +740,29 @@ export function getContentIdeasForNiche(niche: Niche, limit: number = 5): Conten
     .slice(0, limit);
 }
 
-// Get daily content ideas (rotates based on date)
-export function getDailyContentIdeas(niche: Niche, count: number = 5): ContentIdea[] {
-  const allIdeas = contentIdeasDatabase.filter(idea => idea.niche === niche);
-  
-  // Simple rotation based on day of year
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-  const startIndex = dayOfYear % allIdeas.length;
-  
+// Get daily content ideas (rotates based on date, optional strategy filter)
+export function getDailyContentIdeas(
+  niche: Niche,
+  count: number = 5,
+  strategy?: ContentStrategy
+): ContentIdea[] {
+  let allIdeas = contentIdeasDatabase.filter((idea) => idea.niche === niche);
+  if (strategy) {
+    allIdeas = allIdeas.filter((idea) => idea.strategy === strategy);
+    if (allIdeas.length === 0) {
+      allIdeas = contentIdeasDatabase.filter((idea) => idea.niche === niche);
+    }
+  }
+
+  const dayOfYear = Math.floor(
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const startIndex = allIdeas.length > 0 ? dayOfYear % allIdeas.length : 0;
+
   const rotated = [
     ...allIdeas.slice(startIndex),
-    ...allIdeas.slice(0, startIndex)
+    ...allIdeas.slice(0, startIndex),
   ];
-  
+
   return rotated.slice(0, count);
 }

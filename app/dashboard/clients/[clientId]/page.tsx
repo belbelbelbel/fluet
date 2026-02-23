@@ -15,6 +15,7 @@ import {
   Plus,
   FileText,
   BarChart3,
+  Lightbulb,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -209,6 +210,16 @@ export default function ClientDashboardPage() {
             className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"}`}
           >
             Tasks
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.push(`/dashboard/content-ideas?clientId=${clientId}`)}
+            className={`transition-all duration-200 ${
+              isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"
+            }`}
+          >
+            <Lightbulb className="w-4 h-4 mr-2" />
+            Content Ideas
           </Button>
           <Button
             onClick={() => router.push(`/dashboard/clients/${clientId}/generate`)}

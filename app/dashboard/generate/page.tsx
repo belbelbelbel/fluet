@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useMemo, useEffect, Suspense } from "react";
 import { useAuth } from "@clerk/nextjs";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
 import { showToast } from "@/lib/toast";
 import { contentTemplates, ContentTemplate } from "@/lib/templates";
+import { GENERATION_MODE_LABELS, type GenerationMode } from "@/utils/ai/prompt-builder";
 import {
   TwitterIcon,
   InstagramIcon,
@@ -46,21 +48,44 @@ function DashboardGeneratePageInner() {
   const isDark = resolvedTheme === "dark";
   const clientIdFromQuery = searchParams?.get("clientId") ?? null;
   const [clientName, setClientName] = useState<string | null>(null);
+  const [brandVoice, setBrandVoice] = useState<{ brandDescription?: string; targetAudience?: string } | null>(null);
+  const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
 
   useEffect(() => {
     if (!clientIdFromQuery) {
       setClientName(null);
+      setBrandVoice(null);
       return;
     }
     const fetchClient = async () => {
       try {
-        const res = await fetch(`/api/clients/${clientIdFromQuery}`, { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
+        const [clientRes, bvRes] = await Promise.all([
+          fetch(`/api/clients/${clientIdFromQuery}`, { credentials: "include" }),
+          fetch(`/api/clients/${clientIdFromQuery}/brand-voice`, { credentials: "include" }),
+        ]);
+        if (clientRes.ok) {
+          const data = await clientRes.json();
           setClientName(data?.client?.name ?? data?.name ?? null);
+        } else {
+          setClientName(null);
+        }
+        if (bvRes.ok) {
+          const bvData = await bvRes.json();
+          const bv = bvData?.brandVoice;
+          if (bv && (bv.brandDescription || bv.targetAudience || bv.tone || bv.industry)) {
+            setBrandVoice({
+              brandDescription: bv.brandDescription,
+              targetAudience: bv.targetAudience,
+            });
+          } else {
+            setBrandVoice(null);
+          }
+        } else {
+          setBrandVoice(null);
         }
       } catch {
         setClientName(null);
+        setBrandVoice(null);
       }
     };
     fetchClient();
@@ -72,7 +97,7 @@ function DashboardGeneratePageInner() {
   const [tone, setTone] = useState<Tone>("professional");
   const [style, setStyle] = useState<Style>("concise");
   const [length, setLength] = useState<Length>("medium");
-  const [showCustomization, setShowCustomization] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [editedContent, setEditedContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -248,6 +273,7 @@ function DashboardGeneratePageInner() {
           style,
           length,
           userId,
+          generationMode,
           ...(clientIdFromQuery && { clientId: clientIdFromQuery }),
         }),
       });
@@ -277,7 +303,7 @@ function DashboardGeneratePageInner() {
       setIsGenerating(false);
       // setLoadingMessage(""); // Unused - commented out
     }
-  }, [prompt, contentType, tone, style, length, userId, fetchRecentContent, actionsBlocked, clientIdFromQuery]);
+  }, [prompt, contentType, tone, style, length, generationMode, userId, fetchRecentContent, actionsBlocked, clientIdFromQuery]);
 
   const handleCopy = useCallback(async () => {
     if (generatedContent) {
@@ -421,8 +447,23 @@ function DashboardGeneratePageInner() {
               <span className="text-purple-600 dark:text-purple-400 font-semibold ml-2">for {clientName}</span>
             )}
           </h1>
-          <p className={isDark ? "text-slate-400" : "text-gray-600"}>
-            Create engaging content for your social media platforms
+          <p className={`${isDark ? "text-slate-400" : "text-gray-600"} flex flex-wrap items-center gap-x-2 gap-y-1`}>
+            <span>Create engaging content for your social media platforms</span>
+            {clientIdFromQuery && (
+              <>
+                <span className={isDark ? "text-slate-500" : "text-gray-400"}>·</span>
+                {brandVoice ? (
+                  <span className={isDark ? "text-green-400" : "text-green-600"}>Using brand voice</span>
+                ) : (
+                  <Link
+                    href={`/dashboard/clients/${clientIdFromQuery}/brand-voice`}
+                    className="text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300"
+                  >
+                    Add brand voice
+                  </Link>
+                )}
+              </>
+            )}
           </p>
         </div>
 
@@ -460,37 +501,6 @@ function DashboardGeneratePageInner() {
                 </CardContent>
               </Card>
 
-              {/* Templates */}
-              <Card className={`border rounded-xl transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <label className={`block text-sm font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>Templates</label>
-                    <button
-                      onClick={() => setShowTemplates(!showTemplates)}
-                      className={`text-xs transition-colors duration-200 ${isDark ? "text-slate-400 hover:text-white" : "text-gray-600 hover:text-gray-950"}`}
-                    >
-                      {showTemplates ? "Hide" : "Show"} Templates
-                    </button>
-                  </div>
-                  {showTemplates && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                      {contentTemplates
-                        .filter((t) => t.contentType === contentType)
-                        .map((template) => (
-                          <button
-                            key={template.id}
-                            onClick={() => handleUseTemplate(template)}
-                            className={`text-left p-3 rounded-lg border transition-all duration-200 ${isDark ? "border-slate-700 bg-slate-700/50 hover:border-slate-600 hover:bg-slate-700" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}`}
-                          >
-                            <div className={`text-sm font-semibold mb-1 ${isDark ? "text-white" : "text-gray-950"}`}>{template.name}</div>
-                            <div className={`text-xs ${isDark ? "text-slate-400" : "text-gray-600"}`}>{template.description}</div>
-                          </button>
-                        ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
               {/* Prompt Input */}
               <Card className={`border rounded-xl transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
                 <CardContent className="p-4 sm:p-6">
@@ -516,21 +526,118 @@ function DashboardGeneratePageInner() {
                 </CardContent>
               </Card>
 
-              {/* Customization Options */}
+              {/* Generate Button - Sticky on scroll */}
+              <div className="sticky top-4 z-10">
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !prompt.trim() || actionsBlocked}
+                  className="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl py-4 sm:py-6 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                {isGenerating ? (
+                  <>
+                    <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  "Generate Content"
+                )}
+                </Button>
+              </div>
+
+              {/* Options (collapsible) */}
               <Card className={`border rounded-xl transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
                 <CardContent className="p-4 sm:p-6">
                   <button
-                    onClick={() => setShowCustomization(!showCustomization)}
-                    className="flex items-center justify-between w-full mb-4"
+                    onClick={() => setShowOptions(!showOptions)}
+                    className="flex items-center justify-between w-full"
                   >
-                    <label className={`block text-sm font-semibold ${
-                      isDark ? "text-white" : "text-gray-950"
-                    }`}>Customization</label>
-                    <span className={`text-xs transition-colors duration-200 ${isDark ? "text-slate-400 hover:text-white" : "text-gray-600 hover:text-gray-950"}`}>{showCustomization ? "Hide" : "Show"} Options</span>
+                    <label className={`block text-sm font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                      Options
+                    </label>
+                    <span className={`text-xs transition-colors duration-200 ${isDark ? "text-slate-400 hover:text-white" : "text-gray-600 hover:text-gray-950"}`}>
+                      {showOptions ? "Hide" : "Show"}
+                    </span>
                   </button>
 
-                  {showCustomization && (
-                    <div className="space-y-4">
+                  {showOptions && (
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700 space-y-5">
+                      {/* Brand Voice (when client) */}
+                      {clientIdFromQuery && (
+                        <div>
+                          <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                            Brand Voice
+                          </label>
+                          <p className={`text-xs mb-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                            {brandVoice ? (
+                              brandVoice.brandDescription
+                                ? `${brandVoice.brandDescription.slice(0, 100)}${brandVoice.brandDescription.length > 100 ? "…" : ""}`
+                                : "Using brand voice settings"
+                            ) : (
+                              "No brand description set"
+                            )}
+                          </p>
+                          <Link
+                            href={`/dashboard/clients/${clientIdFromQuery}/brand-voice`}
+                            className="text-xs text-purple-600 hover:text-purple-500 dark:text-purple-400"
+                          >
+                            {brandVoice ? "Edit brand voice" : "Add brand voice"}
+                          </Link>
+                        </div>
+                      )}
+
+                      {/* Generation Mode */}
+                      <div>
+                        <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                          Generation Mode
+                        </label>
+                        <select
+                          value={generationMode}
+                          onChange={(e) => setGenerationMode(e.target.value as GenerationMode)}
+                          className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                            isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-200 text-gray-900"
+                          }`}
+                        >
+                          {(Object.entries(GENERATION_MODE_LABELS) as [GenerationMode, string][]).map(([mode, label]) => (
+                            <option key={mode} value={mode}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Templates */}
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className={`block text-xs font-medium ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                            Templates
+                          </label>
+                          <button
+                            onClick={() => setShowTemplates(!showTemplates)}
+                            className={`text-xs ${isDark ? "text-slate-400 hover:text-white" : "text-gray-600 hover:text-gray-950"}`}
+                          >
+                            {showTemplates ? "Hide" : "Show"}
+                          </button>
+                        </div>
+                        {showTemplates && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {contentTemplates
+                              .filter((t) => t.contentType === contentType)
+                              .map((template) => (
+                                <button
+                                  key={template.id}
+                                  onClick={() => handleUseTemplate(template)}
+                                  className={`text-left p-2.5 rounded-lg border text-sm ${
+                                    isDark ? "border-slate-700 bg-slate-700/50 hover:border-slate-600" : "border-gray-200 hover:border-gray-300"
+                                  }`}
+                                >
+                                  <div className={`font-medium ${isDark ? "text-white" : "text-gray-950"}`}>{template.name}</div>
+                                  <div className={`text-xs truncate ${isDark ? "text-slate-400" : "text-gray-600"}`}>{template.description}</div>
+                                </button>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+
                       {/* Tone */}
                       <div>
                         <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>Tone</label>
@@ -539,7 +646,7 @@ function DashboardGeneratePageInner() {
                             <button
                               key={t}
                               onClick={() => setTone(t)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${tone === t ? "bg-purple-600 text-white" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${tone === t ? "bg-purple-600 text-white" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                             >
                               {t}
                             </button>
@@ -555,7 +662,7 @@ function DashboardGeneratePageInner() {
                             <button
                               key={s}
                               onClick={() => setStyle(s)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${style === s ? "bg-purple-600 text-white" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${style === s ? "bg-purple-600 text-white" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                             >
                               {s}
                             </button>
@@ -565,20 +672,14 @@ function DashboardGeneratePageInner() {
 
                       {/* Length */}
                       <div>
-                        <label className={`block text-xs font-medium mb-2 ${
-                          isDark ? "text-slate-300" : "text-gray-700"
-                        }`}>Length</label>
+                        <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>Length</label>
                         <div className="flex flex-wrap gap-2">
                           {lengths.map((l) => (
                             <button
                               key={l}
                               onClick={() => setLength(l)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                                length === l
-                                  ? "bg-purple-600 text-white"
-                                  : isDark
-                                  ? "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
+                                length === l ? "bg-purple-600 text-white" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                               }`}
                             >
                               {l}
@@ -590,22 +691,6 @@ function DashboardGeneratePageInner() {
                   )}
                 </CardContent>
               </Card>
-
-              {/* Generate Button */}
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating || !prompt.trim() || actionsBlocked}
-                className="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl py-4 sm:py-6 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  "Generate Content"
-                )}
-              </Button>
 
             {/* Generated Content - Now shown in modal, keeping this for reference if needed */}
 

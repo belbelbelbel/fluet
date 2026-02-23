@@ -3,9 +3,14 @@
  * Implements quota management, grace periods, and usage analytics
  */
 
-import { GetUserByClerkId, GetUserSubscription, GetUserUsageCount } from "@/utils/db/actions";
+import {
+  GetUserByClerkId,
+  GetUserSubscription,
+  GetUserUsageCount,
+  GetClientIdeaRefreshCountThisMonth,
+} from "@/utils/db/actions";
 import { db } from "@/utils/db/dbConfig";
-import { GeneratedContent } from "@/utils/db/schema";
+import { GeneratedContent, Clients } from "@/utils/db/schema";
 import { eq, and, gte, sql } from "drizzle-orm";
 
 export interface PlanLimits {
@@ -14,6 +19,16 @@ export interface PlanLimits {
   features: string[];
   gracePeriod: number; // Days of grace period after limit
 }
+
+/** Idea refresh limits per client per month (AI-generated ideas for custom niches) */
+export const IDEA_REFRESH_LIMITS: Record<string, number> = {
+  free: 2,
+  starter: 3,
+  basic: 3,
+  professional: 10,
+  pro: 10,
+  enterprise: Infinity,
+};
 
 export const PLAN_CONFIG: Record<string, PlanLimits> = {
   free: {
@@ -144,6 +159,42 @@ export async function checkUsageLimit(
     planName: effectiveConfig.name,
     upgradeRecommended,
   };
+}
+
+/**
+ * Get idea refresh limit for a client (based on agency's plan)
+ */
+export async function getIdeaRefreshLimitForClient(clientId: number): Promise<{
+  limit: number;
+  used: number;
+  remaining: number;
+  planName: string;
+  canRefresh: boolean;
+}> {
+  try {
+    const [clientRow] = await db
+      .select({ agencyId: Clients.agencyId })
+      .from(Clients)
+      .where(eq(Clients.id, clientId))
+      .limit(1)
+      .execute();
+
+    if (!clientRow) {
+      return { limit: 2, used: 0, remaining: 2, planName: "Free", canRefresh: true };
+    }
+
+    const subscription = await GetUserSubscription(clientRow.agencyId);
+    const planName = (subscription?.plan?.toLowerCase() || "free") as string;
+    const limit = IDEA_REFRESH_LIMITS[planName] ?? 2;
+    const used = await GetClientIdeaRefreshCountThisMonth(clientId);
+    const remaining = Math.max(0, limit === Infinity ? 999 : limit - used);
+    const canRefresh = limit === Infinity || used < limit;
+
+    return { limit, used, remaining, planName, canRefresh };
+  } catch (error) {
+    console.error("[getIdeaRefreshLimitForClient] Error:", error);
+    return { limit: 2, used: 0, remaining: 2, planName: "Free", canRefresh: true };
+  }
 }
 
 /**

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,9 +12,11 @@ import {
   Clock,
   CheckCircle2,
   Loader2,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { showToast } from "@/lib/toast";
 
 interface Client {
   id: number;
@@ -34,6 +36,11 @@ export default function ClientsPage() {
 
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "payment_due" | "on_hold">("all");
+  const [sortBy, setSortBy] = useState<"recent" | "name" | "payment">("recent");
+  const [page, setPage] = useState(1);
+  const CLIENTS_PER_PAGE = 12;
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -72,6 +79,51 @@ export default function ClientsPage() {
 
     fetchClients();
   }, [userId]);
+
+  // Filter, sort, and paginate clients
+  const { filteredAndSortedClients, totalPages, paginatedClients, totalFiltered } = useMemo(() => {
+    let list = clients;
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          c.email?.toLowerCase().includes(q)
+      );
+    }
+    if (statusFilter !== "all") {
+      list = list.filter((c) => {
+        if (statusFilter === "active") return c.status === "active" && c.paymentStatus === "paid";
+        if (statusFilter === "payment_due") return c.paymentStatus === "overdue";
+        if (statusFilter === "on_hold") return c.status === "paused" || c.status === "inactive";
+        return true;
+      });
+    }
+    const sorted = [...list].sort((a, b) => {
+      if (sortBy === "recent") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      if (sortBy === "payment") {
+        const order = { overdue: 0, pending: 1, paid: 2 };
+        return (order[a.paymentStatus as keyof typeof order] ?? 2) - (order[b.paymentStatus as keyof typeof order] ?? 2);
+      }
+      return 0;
+    });
+    const total = sorted.length;
+    const pages = Math.max(1, Math.ceil(total / CLIENTS_PER_PAGE));
+    const start = (page - 1) * CLIENTS_PER_PAGE;
+    const paginated = sorted.slice(start, start + CLIENTS_PER_PAGE);
+    return {
+      filteredAndSortedClients: sorted,
+      totalPages: pages,
+      paginatedClients: paginated,
+      totalFiltered: total,
+    };
+  }, [clients, searchQuery, statusFilter, sortBy, page]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, statusFilter, sortBy]);
 
   const getStatusBadge = (client: Client) => {
     if (client.paymentStatus === "overdue") {
@@ -132,7 +184,7 @@ export default function ClientsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1
             className={`text-3xl font-bold ${
@@ -146,17 +198,84 @@ export default function ClientsPage() {
               isDark ? "text-slate-400" : "text-gray-600"
             }`}
           >
-            Manage all your client accounts
+            {clients.length} {clients.length === 1 ? "client" : "clients"} — manage all your accounts
           </p>
         </div>
         <Button
           onClick={() => router.push("/dashboard/clients/new")}
-          className="bg-purple-600 hover:bg-purple-700 text-white"
+          className="bg-purple-600 hover:bg-purple-700 text-white shrink-0"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Client
         </Button>
       </div>
+
+      {/* Search, filters, sort */}
+      {clients.length > 0 && (
+        <div className={`rounded-xl border p-4 ${
+          isDark ? "bg-slate-800/50 border-slate-700" : "bg-white border-gray-200"
+        }`}>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
+                isDark ? "text-slate-500" : "text-gray-400"
+              }`} />
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                  isDark
+                    ? "bg-slate-900 border-slate-600 text-white placeholder-slate-500"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"
+                }`}
+                aria-label="Search clients"
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div className="flex gap-1">
+                {(["all", "active", "payment_due", "on_hold"] as const).map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setStatusFilter(f)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      statusFilter === f
+                        ? "bg-purple-600 text-white"
+                        : isDark
+                          ? "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {f === "all" ? "All" : f === "active" ? "Active" : f === "payment_due" ? "Payment Due" : "On Hold"}
+                  </button>
+                ))}
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as "recent" | "name" | "payment")}
+                className={`px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                  isDark
+                    ? "bg-slate-800 border-slate-600 text-white"
+                    : "bg-white border-gray-200 text-gray-900"
+                }`}
+              >
+                <option value="recent">Recently added</option>
+                <option value="name">Name A–Z</option>
+                <option value="payment">Payment status</option>
+              </select>
+            </div>
+          </div>
+          {(searchQuery || statusFilter !== "all") && (
+            <p className={`mt-3 text-sm ${
+              isDark ? "text-slate-400" : "text-gray-600"
+            }`}>
+              Showing {totalFiltered} of {clients.length} clients
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Clients List */}
       {clients.length === 0 ? (
@@ -198,9 +317,37 @@ export default function ClientsPage() {
             </div>
           </CardContent>
         </Card>
+      ) : totalFiltered === 0 ? (
+        <Card className={isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}>
+          <CardContent className="pt-12 pb-12">
+            <div className="text-center">
+              <Search className={`w-12 h-12 mx-auto mb-4 ${
+                isDark ? "text-slate-500" : "text-gray-400"
+              }`} />
+              <h2 className={`text-lg font-semibold mb-2 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}>
+                No clients match your search
+              </h2>
+              <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                Try adjusting your search or filters
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("all");
+                }}
+              >
+                Clear filters
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       ) : (
+        <>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {clients.map((client) => (
+          {paginatedClients.map((client) => (
             <Card
               key={client.id}
               className={`cursor-pointer transition-all hover:shadow-lg ${
@@ -260,6 +407,39 @@ export default function ClientsPage() {
             </Card>
           ))}
         </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className={`flex items-center justify-between pt-6 ${
+            isDark ? "text-slate-400" : "text-gray-600"
+          }`}>
+            <p className="text-sm">
+              Page {page} of {totalPages} · {totalFiltered} clients
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className={isDark ? "border-slate-600" : ""}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className={isDark ? "border-slate-600" : ""}
+              >
+                Next
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
+        </>
       )}
     </div>
   );

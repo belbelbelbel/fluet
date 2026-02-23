@@ -102,3 +102,29 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/** PATCH: Accept niche (used by content-ideas). Persists to localStorage on client; API success for future DB. */
+export async function PATCH(req: NextRequest) {
+  try {
+    const authResult = await auth();
+    let userId: string | null | undefined = authResult?.userId || null;
+    if (!userId) {
+      try {
+        const user = await currentUser();
+        userId = user?.id ?? null;
+      } catch {
+        // ignore
+      }
+    }
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const body = await req.json();
+    const { niche } = body;
+    // TODO: Save niche to user settings in DB when table exists
+    return NextResponse.json({ success: true, niche: niche ?? null });
+  } catch (error) {
+    console.error("[Settings PATCH]", error);
+    return NextResponse.json({ error: "Failed to update settings" }, { status: 500 });
+  }
+}
+

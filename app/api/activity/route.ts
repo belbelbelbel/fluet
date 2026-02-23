@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
         activities.push({
           id: `client-created-${client.id}`,
           type: "client_created",
-          message: `You added ${client.name}`,
+          message: `You added ${client.name} as a client`,
           clientName: client.name,
           timestamp: client.createdAt.toISOString(),
           link: `/dashboard/clients/${client.id}`,

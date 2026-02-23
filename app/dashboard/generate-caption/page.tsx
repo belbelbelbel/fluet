@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -17,13 +17,17 @@ import {
 import { contentIdeasDatabase, ContentIdea, NaijaTone } from "@/lib/content-ideas";
 import { showToast } from "@/lib/toast";
 
-export default function GenerateCaptionPage() {
+function GenerateCaptionPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userId } = useAuth();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const ideaId = searchParams.get("id");
+  const clientIdFromQuery = searchParams?.get("clientId") ?? null;
 
   const [idea, setIdea] = useState<ContentIdea | null>(null);
+  const [clientName, setClientName] = useState<string | null>(null);
   const [selectedTone, setSelectedTone] = useState<NaijaTone>("mild");
   const [generatedCaption, setGeneratedCaption] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
@@ -32,19 +36,53 @@ export default function GenerateCaptionPage() {
   const [hasGenerated, setHasGenerated] = useState(false);
 
   useEffect(() => {
-    if (ideaId) {
-      const foundIdea = contentIdeasDatabase.find((i) => i.id === ideaId);
-      if (foundIdea) {
-        setIdea(foundIdea);
-        // Don't auto-set caption - user needs to click Generate
-        setGeneratedCaption("");
-        setHasGenerated(false);
-      } else {
-        showToast.error("Not found", "Content idea not found");
-        router.push("/dashboard/content-ideas");
-      }
+    if (!ideaId) return;
+
+    const foundInDb = contentIdeasDatabase.find((i) => i.id === ideaId);
+    if (foundInDb) {
+      setIdea(foundInDb as ContentIdea);
+      setGeneratedCaption("");
+      setHasGenerated(false);
+      return;
     }
-  }, [ideaId, router]);
+
+    if (ideaId.startsWith("cache_")) {
+      fetch(`/api/content-ideas/${ideaId}`, { credentials: "include" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (data?.idea) {
+            setIdea(data.idea as ContentIdea);
+            setGeneratedCaption("");
+            setHasGenerated(false);
+          } else {
+            showToast.error("Not found", "Content idea not found");
+            const base = "/dashboard/content-ideas";
+            router.push(clientIdFromQuery ? `${base}?clientId=${clientIdFromQuery}` : base);
+          }
+        })
+        .catch(() => {
+          showToast.error("Not found", "Content idea not found");
+          const base = "/dashboard/content-ideas";
+          router.push(clientIdFromQuery ? `${base}?clientId=${clientIdFromQuery}` : base);
+        });
+      return;
+    }
+
+    showToast.error("Not found", "Content idea not found");
+    const base = "/dashboard/content-ideas";
+    router.push(clientIdFromQuery ? `${base}?clientId=${clientIdFromQuery}` : base);
+  }, [ideaId, router, clientIdFromQuery]);
+
+  useEffect(() => {
+    if (clientIdFromQuery) {
+      fetch(`/api/clients/${clientIdFromQuery}`, { credentials: "include" })
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => setClientName(d?.client?.name ?? null))
+        .catch(() => setClientName(null));
+    } else {
+      setClientName(null);
+    }
+  }, [clientIdFromQuery]);
 
   const handleGenerate = async () => {
     if (!idea) return;
@@ -77,11 +115,12 @@ export default function GenerateCaptionPage() {
         credentials: "include",
         body: JSON.stringify({
           prompt,
-          contentType: "instagram", // Default to Instagram for captions
+          contentType: "instagram",
           tone: toneMap[selectedTone],
           style: "engaging",
           length: "medium",
-          userId: userId, // Include userId in request body
+          userId: userId,
+          ...(clientIdFromQuery && { clientId: clientIdFromQuery }),
         }),
       });
 
@@ -168,6 +207,11 @@ export default function GenerateCaptionPage() {
               isDark ? "text-white" : "text-gray-950"
             }`}>
               Generate Caption
+              {clientName && (
+                <span className="text-purple-600 dark:text-purple-400 font-semibold ml-2">
+                  for {clientName}
+                </span>
+              )}
             </h1>
             <p className={`text-sm sm:text-base ${isDark ? "text-slate-400" : "text-gray-600"}`}>
               Choose your Naija tone and create a custom caption
@@ -381,7 +425,13 @@ export default function GenerateCaptionPage() {
                             {isSaving ? "Saving..." : "Save"}
                           </Button>
                           <Button
-                            onClick={() => router.push("/dashboard/content-ideas")}
+                            onClick={() =>
+                              router.push(
+                                clientIdFromQuery
+                                  ? `/dashboard/content-ideas?clientId=${clientIdFromQuery}`
+                                  : "/dashboard/content-ideas"
+                              )
+                            }
                             variant="outline"
                             size="sm"
                             className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
@@ -403,5 +453,17 @@ export default function GenerateCaptionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GenerateCaptionPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
+        <p className="text-gray-500 dark:text-slate-400">Loading...</p>
+      </div>
+    }>
+      <GenerateCaptionPageInner />
+    </Suspense>
   );
 }

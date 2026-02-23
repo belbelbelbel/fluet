@@ -164,12 +164,12 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header - stacks on mobile */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1
-            className={`text-3xl font-bold ${
+            className={`text-2xl sm:text-3xl font-bold ${
               isDark ? "text-white" : "text-gray-900"
             }`}
           >
@@ -183,7 +183,7 @@ export default function ReportsPage() {
             Exportable reports and client-facing summaries
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 w-full sm:w-auto">
           <select
             value={selectedClientId || ""}
             onChange={(e) =>
@@ -191,7 +191,7 @@ export default function ReportsPage() {
                 e.target.value ? parseInt(e.target.value) : null
               )
             }
-            className={`px-4 py-2 rounded-lg border text-sm ${
+            className={`w-full sm:w-auto min-w-0 px-4 py-2.5 sm:py-2 rounded-lg border text-sm ${
               isDark
                 ? "bg-slate-800 border-slate-700 text-white"
                 : "bg-white border-gray-300 text-gray-900"
@@ -206,7 +206,7 @@ export default function ReportsPage() {
           </select>
           <Button
             onClick={handleGenerateReport}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white py-2.5 sm:py-2 min-h-[44px] touch-manipulation"
             disabled={!selectedClientId || generating}
           >
             {generating ? (
@@ -261,7 +261,7 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {reports.map((report) => (
             <Card
               key={report.id}
@@ -269,7 +269,7 @@ export default function ReportsPage() {
                 isDark
                   ? "bg-slate-800 border-slate-700"
                   : "bg-white border-gray-200"
-              }`}
+              } min-w-0`}
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -312,7 +312,7 @@ export default function ReportsPage() {
               </CardHeader>
               <CardContent>
                 {report.reportData && (
-                  <div className={`grid grid-cols-2 gap-2 mb-3 text-xs ${
+                  <div className={`grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3 text-xs ${
                     isDark ? "text-slate-400" : "text-gray-600"
                   }`}>
                     <span>Scheduled: {report.reportData.postsScheduled}</span>
@@ -321,7 +321,7 @@ export default function ReportsPage() {
                     <span>Tasks: {report.reportData.tasksCompleted}/{report.reportData.tasksTotal}</span>
                   </div>
                 )}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <span
                     className={`text-xs ${
                       isDark ? "text-slate-500" : "text-gray-400"
@@ -333,7 +333,7 @@ export default function ReportsPage() {
                     onClick={() => handleDownloadReport(report)}
                     variant="outline"
                     size="sm"
-                    className={`${
+                    className={`w-full sm:w-auto min-h-[40px] touch-manipulation ${
                       isDark
                         ? "border-slate-600 text-slate-300 hover:bg-slate-700"
                         : "border-gray-300 text-gray-700 hover:bg-gray-50"
