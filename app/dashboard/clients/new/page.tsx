@@ -17,6 +17,7 @@ export default function CreateClientPage() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     logoUrl: "",
   });
 
@@ -38,6 +39,7 @@ export default function CreateClientPage() {
         credentials: "include",
         body: JSON.stringify({
           name: formData.name.trim(),
+          email: formData.email.trim() || undefined,
           logoUrl: formData.logoUrl.trim() || undefined,
           userId: userId, // Include userId as fallback
         }),
@@ -128,6 +130,28 @@ export default function CreateClientPage() {
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200 ${isDark ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500" : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"}`}
                   placeholder="Enter client name"
                 />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}
+                >
+                  Client Email (Optional)
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200 ${isDark ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500" : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"}`}
+                  placeholder="client@example.com"
+                />
+                <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                  Used for sending approval links directly to your client
+                </p>
               </div>
 
               <div>

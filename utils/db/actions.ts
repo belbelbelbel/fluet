@@ -906,10 +906,11 @@ export const UpdateClient = async (
     agencyId: number,
     data: {
         name?: string;
-        logoUrl?: string;
+        email?: string | null;
+        logoUrl?: string | null;
         status?: string;
         paymentStatus?: string;
-        paymentDueDate?: Date;
+        paymentDueDate?: Date | string | null;
     }
 ) => {
     try {

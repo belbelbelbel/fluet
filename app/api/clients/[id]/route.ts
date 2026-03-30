@@ -142,10 +142,11 @@ export async function PUT(
         }
 
         const body = await req.json();
-        const { name, logoUrl, status, paymentStatus, paymentDueDate } = body;
+        const { name, email, logoUrl, status, paymentStatus, paymentDueDate } = body;
 
         const updatedClient = await UpdateClient(clientId, user.id, {
             name,
+            email: email !== undefined ? (email?.trim() || null) : undefined,
             logoUrl,
             status,
             paymentStatus,

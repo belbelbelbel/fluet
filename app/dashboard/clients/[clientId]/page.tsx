@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,9 @@ import {
   FileText,
   BarChart3,
   Lightbulb,
+  Pencil,
+  X,
+  Loader2,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -25,7 +29,8 @@ import { showToast } from "@/lib/toast";
 interface Client {
   id: number;
   name: string;
-  logoUrl?: string;
+  email?: string | null;
+  logoUrl?: string | null;
   status: string;
   paymentStatus: string;
   createdAt: string;
@@ -48,6 +53,9 @@ export default function ClientDashboardPage() {
   const clientId = params?.clientId ? parseInt(params.clientId as string) : null;
 
   const [client, setClient] = useState<Client | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ name: "", email: "", logoUrl: "" });
+  const [editSaving, setEditSaving] = useState(false);
   const [stats, setStats] = useState<ClientStats>({
     postsThisMonth: 0,
     postsLimit: 12,
@@ -107,7 +115,48 @@ export default function ClientDashboardPage() {
     };
 
     fetchClientData();
-  }, [clientId, router]);
+  }, [clientId, userId, router]);
+
+  const openEditModal = () => {
+    if (client) {
+      setEditForm({
+        name: client.name,
+        email: client.email || "",
+        logoUrl: client.logoUrl || "",
+      });
+      setEditModalOpen(true);
+    }
+  };
+
+  const handleEditSave = async () => {
+    if (!clientId || !userId) return;
+    setEditSaving(true);
+    try {
+      const res = await fetch(`/api/clients/${clientId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          name: editForm.name.trim(),
+          email: editForm.email.trim() || null,
+          logoUrl: editForm.logoUrl.trim() || null,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setClient(data.client);
+        setEditModalOpen(false);
+        showToast.success("Client updated", "Changes saved successfully.");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast.error("Update failed", err?.error || "Could not save changes.");
+      }
+    } catch {
+      showToast.error("Error", "Failed to update client.");
+    } finally {
+      setEditSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -167,7 +216,23 @@ export default function ClientDashboardPage() {
             </div>
           )}
           <div>
-            <h1 className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{client.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{client.name}</h1>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={openEditModal}
+                className={`h-8 w-8 shrink-0 ${isDark ? "text-slate-400 hover:text-white hover:bg-slate-700" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
+                aria-label="Edit client"
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+            </div>
+            {client.email && (
+              <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                {client.email}
+              </p>
+            )}
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {client.paymentStatus === "overdue" && (
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${isDark ? "bg-red-950/50 text-red-400" : "bg-red-100 text-red-700"}`}>
@@ -506,6 +571,95 @@ export default function ClientDashboardPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Client Modal */}
+      {editModalOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 sm:p-6"
+          onClick={() => !editSaving && setEditModalOpen(false)}
+        >
+          <Card
+            className={`w-full max-w-md border shadow-2xl mx-4 transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader className={`flex flex-row items-center justify-between pb-4 ${isDark ? "border-slate-700" : "border-gray-200"}`}>
+              <CardTitle className={`text-lg ${isDark ? "text-white" : "text-gray-950"}`}>Edit Client</CardTitle>
+              <button
+                onClick={() => !editSaving && setEditModalOpen(false)}
+                className={`p-2 rounded-lg transition-colors ${isDark ? "text-slate-400 hover:text-white hover:bg-slate-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"}`}
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                  Client Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  placeholder="Client name"
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                  Client Email (Optional)
+                </label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  placeholder="client@example.com"
+                />
+                <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                  Used for sending approval links directly to your client
+                </p>
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                  Logo URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  value={editForm.logoUrl}
+                  onChange={(e) => setEditForm({ ...editForm, logoUrl: e.target.value })}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  placeholder="https://example.com/logo.png"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => !editSaving && setEditModalOpen(false)}
+                  disabled={editSaving}
+                  className={isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700" : ""}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleEditSave}
+                  disabled={editSaving || !editForm.name.trim()}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  {editSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save"
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
