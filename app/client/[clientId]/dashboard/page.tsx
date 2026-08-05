@@ -124,19 +124,19 @@ export default function ClientDashboardPage() {
       {/* Tabs: Posts | Approvals | Analytics | Preferences */}
       <Tabs defaultValue={stats.pendingApprovals > 0 ? "approvals" : "posts"} className="space-y-4">
         <TabsList className={cn("p-0 h-auto gap-0 border-b rounded-none bg-transparent", isDark ? "border-slate-700" : "border-gray-200")}>
-          <TabsTrigger value="posts" className={tabClass} variant="ghost">
+          <TabsTrigger value="posts" className={tabClass}>
             <Calendar className="w-4 h-4 mr-2" />
             Posts
           </TabsTrigger>
-          <TabsTrigger value="approvals" className={tabClass} variant="ghost">
+          <TabsTrigger value="approvals" className={tabClass}>
             <CheckCircle2 className="w-4 h-4 mr-2" />
             Approvals
           </TabsTrigger>
-          <TabsTrigger value="analytics" className={tabClass} variant="ghost">
+          <TabsTrigger value="analytics" className={tabClass}>
             <BarChart3 className="w-4 h-4 mr-2" />
             Analytics
           </TabsTrigger>
-          <TabsTrigger value="preferences" className={tabClass} variant="ghost">
+          <TabsTrigger value="preferences" className={tabClass}>
             <Settings className="w-4 h-4 mr-2" />
             Preferences
           </TabsTrigger>

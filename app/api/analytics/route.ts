@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { GetUserByClerkId } from "@/utils/db/actions";
 import { db } from "@/utils/db/dbConfig";
-import { ContentAnalytics } from "@/utils/db/schema";
+import { ContentAnalytics, GeneratedContent, ScheduledPosts } from "@/utils/db/schema";
 import { eq, and, gte, sql, sum, count } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -23,22 +23,73 @@ export async function GET(req: NextRequest) {
     const user = await GetUserByClerkId(userId);
     if (!user || !user.id) {
       return NextResponse.json({
+        contentActivity: {
+          totalContent: 0,
+          scheduledPosts: 0,
+          thisWeekContent: 0,
+          topPlatform: null,
+        },
+        engagementMetricsAvailable: false,
         totalViews: 0,
         totalLikes: 0,
         totalShares: 0,
         totalComments: 0,
-        engagementRate: 0,
+        engagementRate: null,
         platformStats: [],
         recentPerformance: [],
       });
     }
 
-    // Calculate date range
     const daysAgo = range === "7d" ? 7 : range === "30d" ? 30 : 90;
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysAgo);
 
-    // Get analytics data
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const [totalContentResult] = await db
+      .select({ count: count() })
+      .from(GeneratedContent)
+      .where(eq(GeneratedContent.userId, user.id));
+
+    const [scheduledResult] = await db
+      .select({ count: count() })
+      .from(ScheduledPosts)
+      .where(
+        and(
+          eq(ScheduledPosts.userId, user.id),
+          eq(ScheduledPosts.posted, false)
+        )
+      );
+
+    const [weekContentResult] = await db
+      .select({ count: count() })
+      .from(GeneratedContent)
+      .where(
+        and(
+          eq(GeneratedContent.userId, user.id),
+          gte(GeneratedContent.createdAt, oneWeekAgo)
+        )
+      );
+
+    const [topPlatformResult] = await db
+      .select({
+        platform: GeneratedContent.contentType,
+        count: count(),
+      })
+      .from(GeneratedContent)
+      .where(eq(GeneratedContent.userId, user.id))
+      .groupBy(GeneratedContent.contentType)
+      .orderBy(sql`count DESC`)
+      .limit(1);
+
+    const contentActivity = {
+      totalContent: totalContentResult?.count || 0,
+      scheduledPosts: scheduledResult?.count || 0,
+      thisWeekContent: weekContentResult?.count || 0,
+      topPlatform: topPlatformResult?.platform || null,
+    };
+
     const analytics = await db
       .select({
         views: sum(ContentAnalytics.views),
@@ -59,13 +110,6 @@ export async function GET(req: NextRequest) {
     const totalShares = Number(analytics[0]?.shares || 0);
     const totalComments = Number(analytics[0]?.comments || 0);
 
-    // Calculate engagement rate
-    const totalEngagements = totalLikes + totalShares + totalComments;
-    const engagementRate = totalViews > 0 
-      ? Math.round((totalEngagements / totalViews) * 100 * 10) / 10 
-      : 0;
-
-    // Get platform stats
     const platformStats = await db
       .select({
         platform: ContentAnalytics.platform,
@@ -89,31 +133,26 @@ export async function GET(req: NextRequest) {
       engagement: Math.round(Number(stat.engagement || 0) * 10) / 10,
     }));
 
-    // Mock recent performance (replace with real data later)
-    const recentPerformance = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - (6 - i));
-      return {
-        date: date.toISOString().split("T")[0],
-        views: Math.floor(Math.random() * 1000) + 100,
-        engagement: Math.floor(Math.random() * 10) + 3,
-      };
-    });
+    const hasEngagementData =
+      totalViews + totalLikes + totalShares + totalComments > 0 ||
+      formattedPlatformStats.some((stat) => stat.posts > 0);
+
+    const totalEngagements = totalLikes + totalShares + totalComments;
+    const engagementRate =
+      hasEngagementData && totalViews > 0
+        ? Math.round((totalEngagements / totalViews) * 100 * 10) / 10
+        : null;
 
     return NextResponse.json({
-      totalViews,
-      totalLikes,
-      totalShares,
-      totalComments,
+      contentActivity,
+      engagementMetricsAvailable: hasEngagementData,
+      totalViews: hasEngagementData ? totalViews : 0,
+      totalLikes: hasEngagementData ? totalLikes : 0,
+      totalShares: hasEngagementData ? totalShares : 0,
+      totalComments: hasEngagementData ? totalComments : 0,
       engagementRate,
-      platformStats: formattedPlatformStats.length > 0 
-        ? formattedPlatformStats 
-        : [
-            { platform: "Twitter", posts: 0, views: 0, engagement: 0 },
-            { platform: "Instagram", posts: 0, views: 0, engagement: 0 },
-            { platform: "LinkedIn", posts: 0, views: 0, engagement: 0 },
-          ],
-      recentPerformance,
+      platformStats: hasEngagementData ? formattedPlatformStats : [],
+      recentPerformance: [],
     });
   } catch (error) {
     console.error("Error fetching analytics:", error);
@@ -123,4 +162,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

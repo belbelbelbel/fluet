@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
+import { LoadingScreen } from "@/components/LoadingScreen";
 // import { Card, CardContent } from "@/components/ui/card";
 import {
   Copy,
@@ -459,9 +460,7 @@ function GenerateCaptionPageInner() {
 export default function GenerateCaptionPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
-        <p className="text-gray-500 dark:text-slate-400">Loading...</p>
-      </div>
+      <LoadingScreen variant="inline" message="Loading caption tool..." />
     }>
       <GenerateCaptionPageInner />
     </Suspense>

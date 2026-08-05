@@ -25,7 +25,7 @@ const nunito = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Revvy — Social Media Management for Nigerian Agencies",
+  title: "Revvy - Social Media Management for Nigerian Agencies",
   description: "Manage multiple clients, generate AI content, schedule posts, and track performance. Built for Nigerian social media managers and agencies.",
   openGraph: {
     title: "Revvy — Social Media Management for Nigerian Agencies",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Revvy — Social Media Management for Nigerian Agencies",
+    title: "Revvy - Social Media Management for Nigerian Agencies",
     description: "Manage multiple clients, generate AI content, schedule posts, and track performance. Built for Nigerian social media managers and agencies.",
     images: ["/images/Revvylogo/logo-1-primary.png"], // Your logo for Twitter cards
   },
@@ -77,6 +77,20 @@ export default function RootLayout({
       signUpUrl="/sign-up"
     >
       <html lang="en" suppressHydrationWarning className={nunito.variable}>
+        <head>
+          <link
+            rel="preload"
+            href="/images/fluetdashboardimg.png"
+            as="image"
+            fetchPriority="high"
+          />
+          <link
+            rel="preload"
+            href="/images/Revvylogo/logo-icon.png"
+            as="image"
+            fetchPriority="high"
+          />
+        </head>
         <body className={`${nunito.className} antialiased`}>
           <GlobalErrorHandler />
           <ThemeProvider>

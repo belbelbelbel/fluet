@@ -74,7 +74,7 @@ export function Navbar() {
             {/* Logo - Left - Matching Dashboard */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
-                  <Logo size="lg" variant="icon" />
+                  <Logo size="lg" variant="icon" priority />
                 <span className={`text-lg font-bold ${
                   isDark ? "text-white" : "text-gray-950"
                 }`}>
@@ -211,7 +211,7 @@ export function Navbar() {
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-2">
-              <Logo size="lg" variant="icon" />
+              <Logo size="lg" variant="icon" priority />
               <span className={`text-lg font-bold ${
                 isDark ? "text-white" : "text-gray-900"
               }`}>Revvy</span>

@@ -95,7 +95,7 @@ export default function NewTaskPage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         showToast.success("Task created", "Task has been created successfully");
         router.push(`/dashboard/clients/${clientId}/tasks`);
       } else {

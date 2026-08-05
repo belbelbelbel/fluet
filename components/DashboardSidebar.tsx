@@ -161,7 +161,7 @@ export function DashboardSidebar({ onWidthChange }: DashboardSidebarProps) {
             onClick={() => handleNavigation("/dashboard")}
             className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
           >
-            <Logo size="lg" variant="icon" />
+            <Logo size="lg" variant="icon" priority />
             <span className={`text-lg font-bold ${
               isDark ? "text-white" : "text-gray-950"
             }`}>Revvy</span>

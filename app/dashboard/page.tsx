@@ -6,15 +6,12 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Logo } from "@/components/Logo";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import {
   TrendingUp,
-  TrendingDown,
   Bell,
   Search,
   MapPin,
-  MoreVertical,
-  Loader2,
   Plus,
   Building2,
   ChevronRight,
@@ -22,75 +19,36 @@ import {
   AlertCircle,
   FileCheck,
   CreditCard,
+  BarChart3,
 } from "lucide-react";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
+import { FeatureComingSoon } from "@/components/FeatureComingSoon";
 
 interface DashboardStats {
   totalContent: number;
   scheduledPosts: number;
   teamMembers: number;
   thisWeekContent: number;
-  engagementRate: number;
-  topPlatform: string;
+  engagementRate: number | null;
+  topPlatform: string | null;
 }
-
-// Dummy data for charts
-const engagementData = [
-  { month: "Jul", Facebook: 45, Instagram: 38, LinkedIn: 32 },
-  { month: "Aug", Facebook: 48, Instagram: 42, LinkedIn: 35 },
-  { month: "Sep", Facebook: 52, Instagram: 45, LinkedIn: 38 },
-  { month: "Oct", Facebook: 50, Instagram: 48, LinkedIn: 40 },
-  { month: "Nov", Facebook: 55, Instagram: 52, LinkedIn: 42 },
-  { month: "Dec", Facebook: 58, Instagram: 55, LinkedIn: 45 },
-];
-
-const topGeographies = [
-  { country: "Lagos, Nigeria", rate: 65.1 },
-  { country: "Abuja, Nigeria", rate: 50.5 },
-  { country: "Port Harcourt, Nigeria", rate: 39.2 },
-  { country: "Ibadan, Nigeria", rate: 9.2 },
-];
-
-const commentsData = [
-  {
-    name: "Amina Okafor",
-    handle: "@amina_social",
-    location: "Lagos, Nigeria",
-    time: "31 Jan 12.30 AM",
-    avatar: "A",
-  },
-  {
-    name: "Chukwu Emeka",
-    handle: "@chukwu_digital",
-    location: "Abuja, Nigeria",
-    time: "30 Jan 3.45 PM",
-    avatar: "C",
-  },
-  {
-    name: "Fatima Bello",
-    handle: "@fatima_media",
-    location: "Port Harcourt, Nigeria",
-    time: "30 Jan 11.20 AM",
-    avatar: "F",
-  },
-];
 
 export default function DashboardPage() {
   const router = useRouter();
   const { userId, isLoaded: authLoaded } = useAuth();
   const { user, isLoaded: userLoaded } = useUser();
   const [stats, setStats] = useState<DashboardStats>({
-    totalContent: 224,
-    scheduledPosts: 12,
+    totalContent: 0,
+    scheduledPosts: 0,
     teamMembers: 1,
-    thisWeekContent: 18,
-    engagementRate: 8,
-    topPlatform: "Instagram",
+    thisWeekContent: 0,
+    engagementRate: null,
+    topPlatform: null,
   });
   const [loading, setLoading] = useState(true);
 
-  const [clients, setClients] = useState<any[]>([]);
+  const [clients, setClients] = useState<{ id: number; name: string; status?: string }[]>([]);
   const [hasClients, setHasClients] = useState(false);
   const [clientsLoaded, setClientsLoaded] = useState(false);
   const [alertBanners, setAlertBanners] = useState<AlertBannerItem[]>([]);
@@ -166,12 +124,12 @@ export default function DashboardPage() {
       if (response.ok) {
         const data = await response.json();
         setStats({
-          totalContent: data.totalContent || 224,
-          scheduledPosts: data.scheduledPosts || 12,
-          teamMembers: data.teamMembers || 1,
-          thisWeekContent: data.thisWeekContent || 18,
-          engagementRate: data.engagementRate || 8,
-          topPlatform: data.topPlatform || "Instagram",
+          totalContent: data.totalContent ?? 0,
+          scheduledPosts: data.scheduledPosts ?? 0,
+          teamMembers: data.teamMembers ?? 1,
+          thisWeekContent: data.thisWeekContent ?? 0,
+          engagementRate: data.engagementRate ?? null,
+          topPlatform: data.topPlatform ?? null,
         });
       }
     } catch (error) {
@@ -278,37 +236,11 @@ export default function DashboardPage() {
   // Show loading state
   if (loading || !authLoaded || !userLoaded) {
     return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}>
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="flex flex-col items-center justify-center mb-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className={`w-28 h-28 rounded-full animate-pulse ${
-                  isDark ? "bg-purple-500/20" : "bg-purple-100"
-                }`}></div>
-              </div>
-              <div className="relative w-20 h-20 flex items-center justify-center">
-                <Logo size="lg" variant="icon" />
-              </div>
-            </div>
-            <div className="flex space-x-2 justify-center mt-4">
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-            </div>
-          </div>
-          <h2 className={`text-xl font-bold mb-2 ${
-            isDark ? "text-white" : "text-gray-950"
-          }`}>
-            Loading Dashboard...
-          </h2>
-          <p className={isDark ? "text-slate-400" : "text-gray-600"}>
-            Please wait while we load your dashboard data
-          </p>
-        </div>
-      </div>
+      <LoadingScreen
+        variant="inline"
+        message="Loading dashboard..."
+        subtitle="Please wait while we load your dashboard data"
+      />
     );
   }
 
@@ -532,7 +464,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-green-600">
                 <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="truncate">▲+55% since last month</span>
+                <span className="truncate">{stats.thisWeekContent} created this week</span>
               </div>
             </CardContent>
           </Card>
@@ -544,16 +476,19 @@ export default function DashboardPage() {
               <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
                 isDark ? "text-gray-400" : "text-gray-600"
               }`}>
-                Post likes
+                Scheduled posts
               </div>
               <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 ${
                 isDark ? "text-white" : "text-gray-950"
               }`}>
-                2.4M
+                {loading ? (
+                  <div className="h-8 sm:h-9 w-16 sm:w-20 bg-gray-200 rounded animate-pulse" />
+                ) : (
+                  stats.scheduledPosts
+                )}
               </div>
-              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-red-600">
-                <TrendingDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="truncate">▼-25% since last month</span>
+              <div className={`text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                Upcoming in your queue
               </div>
             </CardContent>
           </Card>
@@ -565,16 +500,19 @@ export default function DashboardPage() {
               <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
                 isDark ? "text-gray-400" : "text-gray-600"
               }`}>
-                Total comments
+                Top platform
               </div>
-              <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 ${
+              <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 capitalize ${
                 isDark ? "text-white" : "text-gray-950"
               }`}>
-                3.5M
+                {loading ? (
+                  <div className="h-8 sm:h-9 w-16 sm:w-20 bg-gray-200 rounded animate-pulse" />
+                ) : (
+                  stats.topPlatform ?? "—"
+                )}
               </div>
-              <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-green-600">
-                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="truncate">▲+15% since last month</span>
+              <div className={`text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                Based on content you&apos;ve created
               </div>
             </CardContent>
           </Card>
@@ -723,160 +661,12 @@ export default function DashboardPage() {
                 </div>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <div className="space-y-4 sm:space-y-6">
-                  {/* Line Chart */}
-                  <div className="h-48 sm:h-64 relative overflow-x-auto">
-                    <svg
-                      width="100%"
-                      height="100%"
-                      viewBox="0 0 600 200"
-                      className="overflow-visible"
-                    >
-                      {/* Grid lines */}
-                      {[0, 15, 30, 45, 60].map((y, i) => (
-                        <g key={i}>
-                          <line
-                            x1="40"
-                            y1={180 - (y / 60) * 160}
-                            x2="560"
-                            y2={180 - (y / 60) * 160}
-                            stroke={isDark ? "#334155" : "#e5e7eb"}
-                            strokeWidth="1"
-                            strokeDasharray="3 3"
-                          />
-                          <text
-                            x="35"
-                            y={180 - (y / 60) * 160 + 4}
-                            fill={isDark ? "#94A3B8" : "#6b7280"}
-                            fontSize="10"
-                            textAnchor="end"
-                          >
-                            {y}%
-                          </text>
-                        </g>
-                      ))}
-
-                      {/* X-axis labels */}
-                      {engagementData.map((item, i) => (
-                        <text
-                          key={i}
-                          x={60 + (i * 100)}
-                          y="195"
-                          fill={isDark ? "#94A3B8" : "#6b7280"}
-                          fontSize="11"
-                          textAnchor="middle"
-                        >
-                          {item.month}
-                        </text>
-                      ))}
-
-                      {/* Facebook line (blue) */}
-                      <polyline
-                        points={engagementData
-                          .map(
-                            (item, i) =>
-                              `${60 + i * 100},${180 - (item.Facebook / 60) * 160}`
-                          )
-                          .join(" ")}
-                        fill="none"
-                        stroke="#3b82f6"
-                        strokeWidth="2"
-                      />
-                      {engagementData.map((item, i) => (
-                        <circle
-                          key={`fb-${i}`}
-                          cx={60 + i * 100}
-                          cy={180 - (item.Facebook / 60) * 160}
-                          r="4"
-                          fill="#3b82f6"
-                        />
-                      ))}
-
-                      {/* Instagram line (black) */}
-                      <polyline
-                        points={engagementData
-                          .map(
-                            (item, i) =>
-                              `${60 + i * 100},${180 - (item.Instagram / 60) * 160}`
-                          )
-                          .join(" ")}
-                        fill="none"
-                        stroke="#1f2937"
-                        strokeWidth="2"
-                      />
-                      {engagementData.map((item, i) => (
-                        <circle
-                          key={`ig-${i}`}
-                          cx={60 + i * 100}
-                          cy={180 - (item.Instagram / 60) * 160}
-                          r="4"
-                          fill="#1f2937"
-                        />
-                      ))}
-
-                      {/* LinkedIn line (teal) */}
-                      <polyline
-                        points={engagementData
-                          .map(
-                            (item, i) =>
-                              `${60 + i * 100},${180 - (item.LinkedIn / 60) * 160}`
-                          )
-                          .join(" ")}
-                        fill="none"
-                        stroke="#14b8a6"
-                        strokeWidth="2"
-                      />
-                      {engagementData.map((item, i) => (
-                        <circle
-                          key={`li-${i}`}
-                          cx={60 + i * 100}
-                          cy={180 - (item.LinkedIn / 60) * 160}
-                          r="4"
-                          fill="#14b8a6"
-                        />
-                      ))}
-                    </svg>
-
-                    {/* Legend */}
-                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-3 sm:gap-6 mt-2 flex-wrap">
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-blue-500"></div>
-                        <span className="text-xs text-gray-600">Facebook</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-purple-600"></div>
-                        <span className="text-xs text-gray-600">Instagram</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-teal-500"></div>
-                        <span className="text-xs text-gray-600">LinkedIn</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* World Map Placeholder */}
-                  <div className={`h-40 sm:h-48 rounded-xl border flex items-center justify-center ${
-                    isDark 
-                      ? "bg-slate-900 border-slate-700" 
-                      : "bg-gray-50 border-gray-200"
-                  }`}>
-                    <div className="text-center px-4">
-                      <MapPin className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 ${
-                        isDark ? "text-slate-500" : "text-gray-400"
-                      }`} />
-                      <p className={`text-xs sm:text-sm font-medium ${
-                        isDark ? "text-slate-300" : "text-gray-600"
-                      }`}>
-                        Top geographies
-                      </p>
-                      <p className={`text-xs mt-1 ${
-                        isDark ? "text-slate-500" : "text-gray-500"
-                      }`}>
-                        Map visualization
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <FeatureComingSoon
+                  isDark={isDark}
+                  icon={TrendingUp}
+                  title="Real-time analytics coming soon"
+                  description="Engagement charts and geography breakdowns will appear here once social platform analytics are connected."
+                />
               </CardContent>
             </Card>
 
@@ -892,84 +682,13 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <div className="space-y-3 sm:space-y-4">
-                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
-                    isDark ? "bg-slate-900 border-slate-800" : "bg-gray-50 border-gray-200"
-                  }`}>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm sm:text-base font-semibold ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>
-                        Engagement rate (per impression)
-                      </p>
-      </div>
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <p className={`text-base sm:text-lg font-bold ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>5.0%</p>
-                      <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
-                        ▼12.7%
-                      </span>
-                    </div>
-                  </div>
-                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
-                    isDark ? "bg-slate-900 border-slate-800" : "bg-gray-50 border-gray-200"
-                  }`}>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm sm:text-base font-semibold ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>
-                        Facebook engagement rate
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <p className={`text-base sm:text-lg font-bold ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>5.0%</p>
-                      <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
-                        ▼12.7%
-                      </span>
-        </div>
-      </div>
-                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
-                    isDark ? "bg-slate-900 border-slate-800" : "bg-gray-50 border-gray-200"
-                  }`}>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm sm:text-base font-semibold ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>
-                        Instagram engagement rate
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <p className={`text-base sm:text-lg font-bold ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>12.3%</p>
-                      <span className="text-xs sm:text-sm font-medium text-green-600 whitespace-nowrap">
-                        ▲3.5%
-                      </span>
-                    </div>
-                  </div>
-                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
-                    isDark ? "bg-slate-900 border-slate-800" : "bg-gray-50 border-gray-200"
-                  }`}>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm sm:text-base font-semibold ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>
-                        Linkedin engagement rate
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <p className={`text-base sm:text-lg font-bold ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>4.5%</p>
-                      <span className="text-xs sm:text-sm font-medium text-red-600 whitespace-nowrap">
-                        ▼9.7%
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                <FeatureComingSoon
+                  compact
+                  isDark={isDark}
+                  icon={BarChart3}
+                  title="Engagement metrics coming soon"
+                  description="Platform engagement rates require analytics integration — they are not available yet."
+                />
               </CardContent>
             </Card>
           </div>
@@ -988,34 +707,15 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <div className="space-y-3 sm:space-y-4">
-                  {topGeographies.map((geo, idx) => (
-                    <div key={idx} className="space-y-1.5 sm:space-y-2">
-                      <div className="flex items-center justify-between">
-                        <p className={`text-xs sm:text-sm font-medium truncate flex-1 min-w-0 pr-2 ${
-                          isDark ? "text-slate-200" : "text-gray-950"
-                        }`}>
-                          {geo.country}
-                        </p>
-                        <p className={`text-xs sm:text-sm font-bold whitespace-nowrap ${
-                          isDark ? "text-white" : "text-gray-950"
-                        }`}>
-                          {geo.rate}%
-                        </p>
-              </div>
-                      <div className={`w-full rounded-full h-1.5 sm:h-2 ${
-                        isDark ? "bg-slate-700" : "bg-gray-200"
-                      }`}>
-                        <div
-                          className="bg-teal-500 h-1.5 sm:h-2 rounded-full"
-                          style={{ width: `${geo.rate}%` }}
-                        ></div>
-              </div>
-                    </div>
-                  ))}
-            </div>
-          </CardContent>
-        </Card>
+                <FeatureComingSoon
+                  compact
+                  isDark={isDark}
+                  icon={MapPin}
+                  title="Geography data coming soon"
+                  description="Audience location insights will be available with platform analytics."
+                />
+              </CardContent>
+            </Card>
 
             {/* My Post Planner */}
             <Card className={`border rounded-xl transition-colors shadow-sm ${
@@ -1063,53 +763,13 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <div className="space-y-3 sm:space-y-4">
-                  {commentsData.map((comment, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg transition-colors ${
-                        isDark ? "hover:bg-slate-700" : "hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        isDark ? "bg-purple-800 text-purple-200" : "bg-blue-100 text-blue-700"
-                      }`}>
-                        <span className={`text-xs sm:text-sm font-semibold ${
-                          isDark ? "text-purple-200" : "text-blue-700"
-                        }`}>
-                          {comment.avatar}
-                        </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
-                          <p className={`text-xs sm:text-sm font-semibold ${
-                            isDark ? "text-white" : "text-gray-950"
-                          }`}>
-                            {comment.name}
-                          </p>
-                          <p className={`text-xs ${
-                            isDark ? "text-slate-400" : "text-gray-500"
-                          }`}>
-                            {comment.handle}
-                          </p>
-              </div>
-                        <p className={`text-xs mb-0.5 sm:mb-1 ${
-                          isDark ? "text-slate-300" : "text-gray-600"
-                        }`}>
-                          {comment.location}
-                        </p>
-                        <p className={`text-xs ${
-                          isDark ? "text-slate-500" : "text-gray-500"
-                        }`}>
-                          {comment.time}
-                        </p>
-                  </div>
-                      <MoreVertical className={`w-4 h-4 cursor-pointer flex-shrink-0 ${
-                        isDark ? "text-slate-500 hover:text-white" : "text-gray-400 hover:text-gray-600"
-                      }`} />
-                </div>
-                  ))}
-                </div>
+                <FeatureComingSoon
+                  compact
+                  isDark={isDark}
+                  icon={Bell}
+                  title="Social inbox coming soon"
+                  description="Comments and mentions from connected platforms will appear here."
+                />
               </CardContent>
             </Card>
               </div>

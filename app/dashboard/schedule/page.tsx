@@ -12,6 +12,7 @@ import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CalendarView } from "@/components/CalendarView";
 import { PostReminderModal } from "@/components/PostReminderModal";
+import { ClientSelector } from "@/components/ClientSelector";
 import {
   TwitterIcon,
   InstagramIcon,
@@ -27,6 +28,7 @@ import {
   PlayIcon,
   CheckCircleIcon,
   ClockIcon,
+  CopyIcon,
 } from "lucide-react";
 
 type ContentType = "twitter" | "instagram" | "linkedin" | "tiktok" | "youtube";
@@ -62,6 +64,11 @@ export default function DashboardSchedulePage() {
   const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
   const [reminderPost, setReminderPost] = useState<ScheduledPost | null>(null);
   const [showReminderModal, setShowReminderModal] = useState(false);
+  const [approvalLinkModal, setApprovalLinkModal] = useState<{
+    open: boolean;
+    link: string;
+  }>({ open: false, link: "" });
+  const [scheduleClientId, setScheduleClientId] = useState<number | null>(null);
   const [twitterConnected, setTwitterConnected] = useState(false);
   const [instagramConnected, setInstagramConnected] = useState(false);
 
@@ -129,6 +136,14 @@ export default function DashboardSchedulePage() {
       const content = params.get("content");
       const platform = params.get("platform");
       const reminderId = params.get("reminder");
+      const clientIdParam = params.get("clientId");
+
+      if (clientIdParam) {
+        const parsedClientId = parseInt(clientIdParam, 10);
+        if (!Number.isNaN(parsedClientId)) {
+          setScheduleClientId(parsedClientId);
+        }
+      }
       
       if (content) {
         setSelectedContent(decodeURIComponent(content));
@@ -240,6 +255,18 @@ export default function DashboardSchedulePage() {
     
     checkConnections();
   }, [userId]);
+
+  const handleCopyApprovalLink = useCallback(async (link: string) => {
+    try {
+      await navigator.clipboard.writeText(link);
+      showToast.success(
+        "Approval link copied",
+        "Share this with your client if the email is delayed or goes to spam"
+      );
+    } catch {
+      showToast.error("Copy failed", "Please select and copy the link manually");
+    }
+  }, []);
 
   const fetchScheduledPosts = useCallback(async () => {
     try {
@@ -438,6 +465,7 @@ export default function DashboardSchedulePage() {
             platform: selectedPlatform,
             scheduledFor: scheduledDateTime.toISOString(),
             userId: userId,
+            ...(scheduleClientId != null && { clientId: scheduleClientId }),
           };
 
       const response = await fetch("/api/schedule", {
@@ -448,16 +476,25 @@ export default function DashboardSchedulePage() {
       });
 
       if (response.ok) {
+        const data = await response.json();
         setShowScheduleModal(false);
         setEditingPost(null);
         setSelectedContent("");
         setScheduledDate("");
         setScheduledTime("");
         fetchScheduledPosts();
-        showToast.success(
-          editingPost ? "Post updated!" : "Post scheduled!",
-          `Your ${selectedPlatform} post is scheduled for ${formatDateTime(scheduledDateTime.toISOString())}`
-        );
+        if (data.approvalLink) {
+          setApprovalLinkModal({ open: true, link: data.approvalLink });
+          showToast.success(
+            editingPost ? "Post updated!" : "Post scheduled!",
+            "Your client will be emailed when possible. Copy the approval link as a backup."
+          );
+        } else {
+          showToast.success(
+            editingPost ? "Post updated!" : "Post scheduled!",
+            `Your ${selectedPlatform} post is scheduled for ${formatDateTime(scheduledDateTime.toISOString())}`
+          );
+        }
       } else {
         const error = await response.json();
         showToast.error("Failed to schedule", error.error || "Please try again");
@@ -485,6 +522,7 @@ export default function DashboardSchedulePage() {
     youtubePrivacy,
     youtubeConnected,
     actionsBlocked,
+    scheduleClientId,
   ]);
 
   const handleDeleteClick = useCallback((id: number) => {
@@ -1069,6 +1107,27 @@ export default function DashboardSchedulePage() {
                 </div>
               </div>
 
+              {selectedPlatform !== "youtube" && (
+                <div>
+                  <label className={`block text-xs font-semibold mb-2 ${
+                    isDark ? "text-slate-300" : "text-gray-700"
+                  }`}>
+                    Client
+                  </label>
+                  <ClientSelector
+                    userId={userId}
+                    selectedClientId={scheduleClientId}
+                    onClientChange={setScheduleClientId}
+                    autoSelectFirst={false}
+                  />
+                  <p className={`mt-1.5 text-xs ${
+                    isDark ? "text-slate-400" : "text-gray-500"
+                  }`}>
+                    Select a client to send the post for approval. Leave empty to schedule without approval.
+                  </p>
+                </div>
+              )}
+
               {/* YouTube Connection Warning */}
               {selectedPlatform === "youtube" && !youtubeConnected && (
                 <div className={`p-3 border rounded-xl transition-colors duration-300 ${
@@ -1443,6 +1502,56 @@ export default function DashboardSchedulePage() {
             cancelText="Cancel"
             variant="destructive"
           />
+        </div>
+      )}
+
+      {/* Approval link — manual fallback when client email is delayed or missing */}
+      {approvalLinkModal.open && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          onClick={() => setApprovalLinkModal({ open: false, link: "" })}
+        >
+          <Card
+            className={`w-full max-w-lg border rounded-xl ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardContent className="p-6 space-y-4">
+              <div>
+                <h3 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                  Client approval link
+                </h3>
+                <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                  We&apos;ve attempted to email your client. Copy this link if they need it manually —
+                  it opens their approval portal.
+                </p>
+              </div>
+              <div
+                className={`rounded-lg border px-3 py-2 text-xs break-all ${
+                  isDark ? "bg-slate-900 border-slate-600 text-slate-300" : "bg-gray-50 border-gray-200 text-gray-700"
+                }`}
+              >
+                {approvalLinkModal.link}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setApprovalLinkModal({ open: false, link: "" })}
+                  className={isDark ? "border-slate-600" : ""}
+                >
+                  Done
+                </Button>
+                <Button
+                  onClick={() => handleCopyApprovalLink(approvalLinkModal.link)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <CopyIcon className="w-4 h-4 mr-2" />
+                  Copy approval link
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 

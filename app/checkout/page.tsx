@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckIcon, ArrowLeftIcon, CreditCardIcon, ShieldIcon } from "lucide-react";
+import { ArrowLeftIcon, CreditCardIcon, ShieldIcon } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { showToast } from "@/lib/toast";
 import { Navbar } from "../components/Navbar";

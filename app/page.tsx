@@ -1,16 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Logo } from "@/components/Logo";
 import {
   TwitterIcon,
   InstagramIcon,
   LinkedinIcon,
   MusicIcon,
   CheckCircleIcon,
-  Wand2Icon,
   BotIcon,
   ArrowRightIcon,
   TrendingUpIcon,
@@ -169,10 +168,13 @@ export default function Home() {
                   <div className="mb-6 pb-4 border-b border-gray-200">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-6 h-6 flex items-center justify-center">
-                        <img 
-                          src="/images/Revvylogo/logo-icon.png" 
-                          alt="Revvy Logo" 
+                        <Image
+                          src="/images/Revvylogo/logo-icon.png"
+                          alt="Revvy Logo"
+                          width={24}
+                          height={24}
                           className="w-full h-full object-contain"
+                          priority
                         />
                       </div>
                       <span className="text-lg font-bold text-gray-900">Revvy</span>

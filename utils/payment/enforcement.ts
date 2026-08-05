@@ -1,8 +1,7 @@
 import { db } from "@/utils/db/dbConfig";
 import { Clients, Subscription } from "@/utils/db/schema";
-import { Users } from "@/utils/db/schema";
 import { eq, and } from "drizzle-orm";
-import { GetUserByClerkId, GetUserSubscription } from "@/utils/db/actions";
+import { GetUserByClerkId, GetUserSubscription, EnsureLocalSubscription } from "@/utils/db/actions";
 
 export type PaymentStatus = "paid" | "overdue" | "pending";
 
@@ -12,6 +11,14 @@ export interface PaymentCheckResult {
   daysOverdue?: number;
   message?: string;
   gracePeriodDaysRemaining?: number;
+}
+
+/** True once Stripe or Kora keys are set — until then, billing checks stay relaxed. */
+export function isPaymentProviderConfigured(): boolean {
+  return !!(
+    process.env.STRIPE_SECRET_KEY?.trim() ||
+    process.env.KORA_API_KEY?.trim()
+  );
 }
 
 /**
@@ -30,7 +37,17 @@ export async function checkAgencySubscription(
       };
     }
 
-    const subscription = await GetUserSubscription(user.id);
+    // No Stripe/Kora yet — allow usage and seed a local Pro subscription for limits/UI
+    if (!isPaymentProviderConfigured()) {
+      await EnsureLocalSubscription(user.id);
+      return { isBlocked: false, status: "paid" };
+    }
+
+    const subscription =
+      (await GetUserSubscription(user.id)) ??
+      (process.env.NODE_ENV === "development"
+        ? await EnsureLocalSubscription(user.id)
+        : null);
 
     if (!subscription || subscription.canceldate) {
       return {
@@ -42,6 +59,13 @@ export async function checkAgencySubscription(
 
     // Check if subscription is expired
     const now = new Date();
+    if (!subscription.enddate) {
+      return {
+        isBlocked: true,
+        status: "overdue",
+        message: "No active subscription",
+      };
+    }
     const endDate = new Date(subscription.enddate);
 
     if (endDate < now) {
@@ -167,6 +191,10 @@ export async function shouldBlockAction(
   action: "generate" | "schedule" | "approve",
   clientId?: number
 ): Promise<{ blocked: boolean; reason?: string }> {
+  if (!isPaymentProviderConfigured()) {
+    return { blocked: false };
+  }
+
   // First check agency subscription
   const agencyCheck = await checkAgencySubscription(clerkUserId);
   if (agencyCheck.isBlocked) {

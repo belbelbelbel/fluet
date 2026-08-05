@@ -51,12 +51,10 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
   
-  // If token is expired, redirect to sign-in to get fresh token (preserve full path + query)
+  // Expired/stale Clerk cookies cause refresh loops — wipe session instead of sign-in ping-pong
   if (hasExpiredToken && !pathname.startsWith("/sign-in") && !pathname.startsWith("/sign-up") && !pathname.startsWith("/clear-session")) {
-    const signInUrl = new URL("/sign-in", req.url);
-    const fullPath = pathname + (req.nextUrl.search || "");
-    signInUrl.searchParams.set("redirect_url", fullPath);
-    return NextResponse.redirect(signInUrl);
+    const clearUrl = new URL("/clear-session", req.url);
+    return NextResponse.redirect(clearUrl);
   }
 
   // If user is signed in and on sign-in/sign-up, redirect to their intended destination or dashboard

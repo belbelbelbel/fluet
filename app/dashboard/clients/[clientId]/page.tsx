@@ -20,11 +20,14 @@ import {
   Pencil,
   X,
   Loader2,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { showToast } from "@/lib/toast";
+import { FeatureComingSoon } from "@/components/FeatureComingSoon";
 
 interface Client {
   id: number;
@@ -41,7 +44,27 @@ interface ClientStats {
   postsLimit: number;
   pendingApprovals: number;
   scheduledPosts: number;
-  engagementRate: number;
+  engagementRate: number | null;
+  engagementMetricsAvailable: boolean;
+}
+
+interface PendingApproval {
+  id: number;
+  approvalToken: string;
+  status: string;
+  content: string;
+  platform: string;
+  scheduledFor: string | null;
+  approvalLink: string;
+}
+
+interface UpcomingPost {
+  id: number;
+  platform: string;
+  content: string;
+  scheduledFor: string;
+  posted: boolean | null;
+  approvalStatus: string | null;
 }
 
 export default function ClientDashboardPage() {
@@ -61,8 +84,11 @@ export default function ClientDashboardPage() {
     postsLimit: 12,
     pendingApprovals: 0,
     scheduledPosts: 0,
-    engagementRate: 0,
+    engagementRate: null,
+    engagementMetricsAvailable: false,
   });
+  const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
+  const [upcomingPosts, setUpcomingPosts] = useState<UpcomingPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -75,40 +101,37 @@ export default function ClientDashboardPage() {
       try {
         setLoading(true);
         
-        // Fetch client details
-        const clientResponse = await fetch(`/api/clients/${clientId}?userId=${userId}`, {
-          credentials: "include",
-        });
+        const [clientResponse, dashboardResponse] = await Promise.all([
+          fetch(`/api/clients/${clientId}?userId=${userId}`, { credentials: "include" }),
+          fetch(`/api/clients/${clientId}/dashboard?userId=${userId}`, { credentials: "include" }),
+        ]);
         
         if (clientResponse.ok) {
           const clientData = await clientResponse.json();
           setClient(clientData.client);
         } else {
-          // Only log errors, don't show unnecessary toasts
           const errorData = await clientResponse.json().catch(() => ({}));
           console.error("Failed to load client:", clientResponse.status, errorData);
-          // Only show error for actual authentication failures
           if (clientResponse.status === 401) {
             showToast.error(
               "Authentication required",
               "Please sign in to view this client."
             );
           }
-          // For other errors, just log and continue
         }
 
-        // TODO: Fetch client stats
-        // For now, use placeholder data
-        setStats({
-          postsThisMonth: 8,
-          postsLimit: 12,
-          pendingApprovals: 3,
-          scheduledPosts: 5,
-          engagementRate: 4.2,
-        });
+        if (dashboardResponse.ok) {
+          const dashboardData = await dashboardResponse.json();
+          if (dashboardData.stats) {
+            setStats(dashboardData.stats);
+          }
+          setPendingApprovals(Array.isArray(dashboardData.pendingApprovals) ? dashboardData.pendingApprovals : []);
+          setUpcomingPosts(Array.isArray(dashboardData.upcomingPosts) ? dashboardData.upcomingPosts : []);
+        } else {
+          console.error("Failed to load client dashboard:", dashboardResponse.status);
+        }
       } catch (error) {
         console.error("Failed to fetch client data:", error);
-        // Silent fail - don't show unnecessary toast
       } finally {
         setLoading(false);
       }
@@ -158,6 +181,25 @@ export default function ClientDashboardPage() {
     }
   };
 
+  const handleCopyApprovalLink = async (link: string) => {
+    try {
+      await navigator.clipboard.writeText(link);
+      showToast.success("Link copied", "Approval link copied to clipboard.");
+    } catch {
+      showToast.error("Copy failed", "Could not copy the link.");
+    }
+  };
+
+  const formatScheduledDate = (iso: string | null) => {
+    if (!iso) return "Not scheduled";
+    return new Date(iso).toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   if (loading) {
     return (
       <div className={`flex items-center justify-center min-h-[400px] transition-colors duration-300 ${
@@ -182,7 +224,7 @@ export default function ClientDashboardPage() {
       <div className={`text-center py-12 transition-colors duration-300 ${isDark ? "bg-slate-900" : "bg-white"}`}>
         <AlertCircle className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-slate-400" : "text-gray-400"}`} />
         <h2 className={`text-xl font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Client not found</h2>
-        <p className={`mb-6 ${isDark ? "text-slate-400" : "text-gray-600"}`}>The client you're looking for doesn't exist.</p>
+        <p className={`mb-6 ${isDark ? "text-slate-400" : "text-gray-600"}`}>The client you&apos;re looking for doesn&apos;t exist.</p>
         <Button 
           onClick={() => router.push("/dashboard")}
           className={isDark ? "bg-purple-600 hover:bg-purple-700 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"}
@@ -193,8 +235,10 @@ export default function ClientDashboardPage() {
     );
   }
 
-  const postsRemaining = stats.postsLimit - stats.postsThisMonth;
-  const postsPercentage = (stats.postsThisMonth / stats.postsLimit) * 100;
+  const postsRemaining = Math.max(stats.postsLimit - stats.postsThisMonth, 0);
+  const postsPercentage = stats.postsLimit > 0
+    ? (stats.postsThisMonth / stats.postsLimit) * 100
+    : 0;
 
   return (
     <div className={`space-y-6 transition-colors duration-300 ${isDark ? "bg-slate-900" : "bg-white"}`}>
@@ -208,7 +252,9 @@ export default function ClientDashboardPage() {
               width={48}
               height={48}
               className={`w-12 h-12 rounded-lg object-cover border ${isDark ? "border-slate-700" : "border-gray-200"}`}
-              unoptimized={client.logoUrl.startsWith('http')}
+              unoptimized={client.logoUrl.startsWith("http")}
+              priority
+              fetchPriority="high"
             />
           ) : (
             <div className={`w-12 h-12 rounded-lg flex items-center justify-center border ${isDark ? "bg-purple-900/50 border-slate-700" : "bg-purple-100 border-gray-200"}`}>
@@ -368,15 +414,28 @@ export default function ClientDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-baseline gap-2">
-              <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
-                {stats.engagementRate}%
-              </span>
-              <TrendingUp className={`w-4 h-4 ${isDark ? "text-green-400" : "text-green-600"}`} />
-            </div>
-            <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
-              Average across platforms
-            </p>
+            {stats.engagementMetricsAvailable && stats.engagementRate != null ? (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                    {stats.engagementRate}%
+                  </span>
+                  <TrendingUp className={`w-4 h-4 ${isDark ? "text-green-400" : "text-green-600"}`} />
+                </div>
+                <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                  Average across platforms
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>—</span>
+                </div>
+                <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                  Engagement metrics coming soon
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -458,19 +517,49 @@ export default function ClientDashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="text-center py-8">
-                <Calendar className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
-                <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Calendar View</h3>
-                <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-                  See all scheduled posts in a visual calendar format
-                </p>
-                <Button
-                  onClick={() => router.push(`/dashboard/clients/${clientId}/calendar`)}
-                  className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
-                >
-                  Open Calendar
-                </Button>
-              </div>
+              {upcomingPosts.length === 0 ? (
+                <div className="text-center py-8">
+                  <Calendar className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
+                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>No upcoming posts</h3>
+                  <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                    Schedule a post for this client to see it here.
+                  </p>
+                  <Button
+                    onClick={() => router.push(`/dashboard/schedule?clientId=${clientId}`)}
+                    className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Schedule Post
+                  </Button>
+                </div>
+              ) : (
+                <ul className={`divide-y ${isDark ? "divide-slate-700" : "divide-gray-200"}`}>
+                  {upcomingPosts.map((post) => (
+                    <li key={post.id} className="py-4 first:pt-0 last:pb-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded capitalize ${
+                          isDark ? "bg-slate-700 text-slate-300" : "bg-gray-100 text-gray-700"
+                        }`}>
+                          {post.platform}
+                        </span>
+                        {post.approvalStatus === "pending" && (
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            isDark ? "bg-amber-900/50 text-amber-400" : "bg-amber-100 text-amber-800"
+                          }`}>
+                            Awaiting approval
+                          </span>
+                        )}
+                        <span className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                          {formatScheduledDate(post.scheduledFor)}
+                        </span>
+                      </div>
+                      <p className={`text-sm line-clamp-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                        {post.content}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -480,16 +569,57 @@ export default function ClientDashboardPage() {
             <CardHeader>
               <CardTitle className={isDark ? "text-white" : "text-gray-950"}>Pending Approvals</CardTitle>
             </CardHeader>
-            <CardContent>
-              {stats.pendingApprovals === 0 ? (
+            <CardContent className="p-0">
+              {pendingApprovals.length === 0 ? (
                 <div className={`text-center py-12 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
                   <CheckCircle2 className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-slate-500" : "text-gray-300"}`} />
                   <p>No pending approvals</p>
+                  <p className={`text-xs mt-2 max-w-sm mx-auto ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                    Schedule a post with this client selected to send an approval request and email.
+                  </p>
                 </div>
               ) : (
-                <div className={`text-center py-12 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
-                  <p>Approval list coming soon</p>
-                </div>
+                <ul className={`divide-y ${isDark ? "divide-slate-700" : "divide-gray-200"}`}>
+                  {pendingApprovals.map((approval) => (
+                    <li
+                      key={approval.id}
+                      className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded capitalize ${
+                          isDark ? "bg-amber-900/50 text-amber-400" : "bg-amber-100 text-amber-800"
+                        }`}>
+                          {approval.platform}
+                        </span>
+                        <p className={`text-sm mt-2 line-clamp-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                          {approval.content}
+                        </p>
+                        <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                          Scheduled: {formatScheduledDate(approval.scheduledFor)}
+                        </p>
+                      </div>
+                      <div className="flex flex-shrink-0 gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleCopyApprovalLink(approval.approvalLink)}
+                          className={isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700" : ""}
+                        >
+                          <Copy className="w-4 h-4 mr-1" />
+                          Copy link
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => window.open(approval.approvalLink, "_blank")}
+                          className="bg-purple-600 hover:bg-purple-700 text-white"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Open portal
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               )}
             </CardContent>
           </Card>
@@ -554,19 +684,13 @@ export default function ClientDashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="text-center py-8">
-                <BarChart3 className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
-                <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Performance Insights</h3>
-                <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-                  Track engagement, top posts, and platform performance
-                </p>
-                <Button
-                  onClick={() => router.push(`/dashboard/clients/${clientId}/analytics`)}
-                  className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
-                >
-                  Open Analytics
-                </Button>
-              </div>
+              <FeatureComingSoon
+                compact
+                isDark={isDark}
+                icon={BarChart3}
+                title="Performance insights coming soon"
+                description="Post counts and scheduling are live. Engagement metrics will appear here when platform analytics are connected."
+              />
             </CardContent>
           </Card>
         </TabsContent>

@@ -46,15 +46,17 @@ export async function getClientCreditsStatus(
       };
     }
 
-    const percentageUsed = (credits.postsUsed / credits.postsPerMonth) * 100;
-    const remaining = credits.postsPerMonth - credits.postsUsed;
+    const postsUsed = credits.postsUsed ?? 0;
+    const postsPerMonth = credits.postsPerMonth ?? 0;
+    const percentageUsed = postsPerMonth > 0 ? (postsUsed / postsPerMonth) * 100 : 0;
+    const remaining = postsPerMonth - postsUsed;
     const isNearLimit = percentageUsed >= 80;
-    const isExceeded = credits.postsUsed >= credits.postsPerMonth;
+    const isExceeded = postsUsed >= postsPerMonth;
     const canGenerate = !isExceeded;
 
     return {
-      postsUsed: credits.postsUsed,
-      postsPerMonth: credits.postsPerMonth,
+      postsUsed,
+      postsPerMonth,
       percentageUsed,
       remaining,
       isNearLimit,
@@ -125,7 +127,7 @@ export async function incrementClientCredits(clientId: number): Promise<boolean>
     await db
       .update(ClientCredits)
       .set({
-        postsUsed: credits.postsUsed + 1,
+        postsUsed: (credits.postsUsed ?? 0) + 1,
         updatedAt: new Date(),
       })
       .where(eq(ClientCredits.clientId, clientId))

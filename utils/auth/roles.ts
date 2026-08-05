@@ -58,7 +58,7 @@ export async function getUserRoleData(clerkUserId: string): Promise<UserRoleData
 export async function setClerkRole(clerkUserId: string, role: UserRole): Promise<boolean> {
   try {
     const { clerkClient } = await import("@clerk/nextjs/server");
-    const client = clerkClient();
+    const client = await clerkClient();
     
     await client.users.updateUser(clerkUserId, {
       publicMetadata: {

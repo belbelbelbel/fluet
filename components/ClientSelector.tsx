@@ -30,9 +30,11 @@ interface ClientSelectorProps {
   userId?: string | null;
   selectedClientId?: number | null;
   onClientChange?: (clientId: number | null) => void;
+  /** When false, do not auto-pick the first client; show optional empty state */
+  autoSelectFirst?: boolean;
 }
 
-export function ClientSelector({ userId, selectedClientId, onClientChange }: ClientSelectorProps) {
+export function ClientSelector({ userId, selectedClientId, onClientChange, autoSelectFirst = true }: ClientSelectorProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const [clients, setClients] = useState<Client[]>([]);
@@ -90,11 +92,15 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
         const client = fetchedClients.find((c: Client) => norm(c.id) === currentId);
         if (client) {
           setSelectedClient(client);
-        } else if (fetchedClients.length > 0) {
+        } else if (fetchedClients.length > 0 && autoSelectFirst) {
           setSelectedClient(fetchedClients[0]);
+        } else {
+          setSelectedClient(null);
         }
-      } else if (fetchedClients.length > 0) {
+      } else if (fetchedClients.length > 0 && autoSelectFirst) {
         setSelectedClient(fetchedClients[0]);
+      } else {
+        setSelectedClient(null);
       }
     } catch (error) {
       console.error("Failed to fetch clients:", error);
@@ -107,7 +113,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
     } finally {
       setLoading(false);
     }
-  }, [userId, selectedClientId, onClientChange]);
+  }, [userId, selectedClientId, autoSelectFirst]);
 
   // Fetch when we have userId (from header); refetch when selectedClientId or userId changes
   useEffect(() => {
@@ -119,14 +125,14 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
     }
     retryRef.current = false;
     fetchClients();
-  }, [userId, selectedClientId]);
+  }, [userId, selectedClientId, fetchClients]);
 
   // When clients load and we have no selection, show first client (display only)
   useEffect(() => {
-    if (clients.length > 0 && !selectedClient) {
+    if (autoSelectFirst && clients.length > 0 && !selectedClient) {
       setSelectedClient(clients[0]);
     }
-  }, [clients, selectedClient]);
+  }, [clients, selectedClient, autoSelectFirst]);
 
   // Listen for client creation events to refresh the list
   useEffect(() => {
@@ -134,6 +140,14 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
     window.addEventListener("clientCreated", handleClientCreated);
     return () => window.removeEventListener("clientCreated", handleClientCreated);
   }, []);
+
+  const handleClearClient = () => {
+    setSelectedClient(null);
+    setOpen(false);
+    setSearchQuery("");
+    setStatusFilter("all");
+    onClientChange?.(null);
+  };
 
   const handleClientSelect = (client: Client) => {
     setSelectedClient(client);
@@ -268,7 +282,13 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
             }`} />
           )}
           <span className="truncate">
-            {selectedClient ? selectedClient.name : clients.length === 0 ? "No clients" : "Select client"}
+            {selectedClient
+              ? selectedClient.name
+              : clients.length === 0
+                ? "No clients"
+                : autoSelectFirst
+                  ? "Select client"
+                  : "Select client (optional)"}
           </span>
         </div>
         <ChevronDown className={cn(
@@ -364,6 +384,35 @@ export function ClientSelector({ userId, selectedClientId, onClientChange }: Cli
                 </div>
               ) : (
                 <div className="max-h-[360px] overflow-y-auto">
+                  {!autoSelectFirst && (
+                    <button
+                      type="button"
+                      onClick={handleClearClient}
+                      className={cn(
+                        "w-full px-3 py-2.5 rounded-lg text-left transition-all duration-200 focus:outline-none",
+                        isDark
+                          ? !selectedClient
+                            ? "bg-purple-900/50 hover:bg-purple-900/70"
+                            : "hover:bg-slate-700 focus:bg-slate-700"
+                          : !selectedClient
+                            ? "bg-purple-50 hover:bg-purple-100"
+                            : "hover:bg-gray-50 focus:bg-gray-50"
+                      )}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span className={`text-sm ${
+                          isDark ? "text-slate-300" : "text-gray-700"
+                        }`}>
+                          No client — skip approval
+                        </span>
+                        {!selectedClient && (
+                          <Check className={`w-4 h-4 flex-shrink-0 ml-2 ${
+                            isDark ? "text-purple-400" : "text-purple-600"
+                          }`} />
+                        )}
+                      </div>
+                    </button>
+                  )}
                   {filteredClients.length === 0 ? (
                     <div className={`px-3 py-8 text-center text-sm ${
                       isDark ? "text-slate-400" : "text-gray-500"

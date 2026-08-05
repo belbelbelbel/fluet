@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TaskDetailModal } from "@/components/TaskDetailModal";
 import { showToast } from "@/lib/toast";
@@ -164,7 +164,10 @@ export default function TasksPage() {
     return () => window.removeEventListener("focus", onFocus);
   }, [clientId, fetchTasks]);
 
-  const handleTaskSave = async (updatedTask: Task) => {
+  type TaskSavePayload = Pick<Task, "id" | "type" | "status"> &
+    Partial<Omit<Task, "id" | "type" | "status">>;
+
+  const handleTaskSave = async (updatedTask: TaskSavePayload) => {
     try {
       const response = await fetch(`/api/clients/${clientId}/tasks/${updatedTask.id}`, {
         method: "PUT",

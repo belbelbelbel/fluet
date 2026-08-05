@@ -6,6 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import {
   BookOpen,
   Image as ImageIcon,
@@ -681,9 +682,7 @@ function ContentIdeasPageInner() {
 export default function ContentIdeasPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
-        <p className="text-gray-500 dark:text-slate-400">Loading...</p>
-      </div>
+      <LoadingScreen variant="inline" message="Loading content ideas..." />
     }>
       <ContentIdeasPageInner />
     </Suspense>

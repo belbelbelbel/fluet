@@ -3,7 +3,7 @@
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Logo } from "@/components/Logo";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,8 +18,6 @@ import {
   LinkIcon,
   Cpu,
   Code,
-  Twitter,
-  Instagram,
   Calendar,
 } from "lucide-react";
 import { showToast } from "@/lib/toast";
@@ -329,7 +327,15 @@ export default function SettingsPage() {
       });
 
       if (response.ok) {
-        showToast.success("Settings saved", "Your preferences have been updated");
+        const result = await response.json();
+        if (result.persisted === false) {
+          showToast.info(
+            "Settings not saved yet",
+            "Your preferences weren't persisted — account-wide settings are coming soon. Theme and niche still work on this device."
+          );
+        } else {
+          showToast.success("Settings saved", "Your preferences have been updated");
+        }
       } else if (response.status === 401) {
         showToast.error("Authentication failed", "Please sign in again");
       } else {
@@ -345,39 +351,12 @@ export default function SettingsPage() {
   };
 
   if (loading || !userLoaded) {
-    const isDarkLoading = resolvedTheme === "dark";
     return (
-      <div className={`flex items-center justify-center min-h-screen transition-colors duration-300 ${
-        isDarkLoading ? "bg-slate-900" : "bg-white"
-      }`}>
-        <div className="text-center">
-          <div className="flex flex-col items-center justify-center mb-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className={`w-28 h-28 rounded-full animate-pulse ${
-                  isDarkLoading ? "bg-purple-500/20" : "bg-purple-100"
-                }`}></div>
-              </div>
-              <div className="relative w-20 h-20 flex items-center justify-center">
-                <Logo size="lg" variant="icon" />
-              </div>
-            </div>
-            <div className="flex space-x-2 justify-center mt-4">
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-            </div>
-          </div>
-          <h2 className={`text-xl font-bold mb-2 ${
-            isDarkLoading ? "text-white" : "text-gray-950"
-          }`}>
-            Loading Settings...
-          </h2>
-          <p className={isDarkLoading ? "text-slate-400" : "text-gray-600"}>
-            Please wait while we load your settings
-          </p>
-        </div>
-      </div>
+      <LoadingScreen
+        variant="inline"
+        message="Loading settings..."
+        subtitle="Please wait while we load your settings"
+      />
     );
   }
 
@@ -1221,14 +1200,25 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Save Button - Bottom Right */}
-      <div className={`flex justify-end pt-6 border-t ${
+      {/* Save notice + button */}
+      <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t ${
         isDark ? "border-gray-800" : "border-gray-200"
       }`}>
+        <p className={`text-sm max-w-xl ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+          <span className={`font-medium ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+            Settings are not yet saved to your account — coming soon.
+          </span>{" "}
+          Theme and niche selections work on this device. Connected accounts (Google, YouTube) are managed separately.
+        </p>
         <Button
           onClick={saveSettings}
           disabled={saving}
-          className="bg-purple-600 hover:bg-purple-700 text-white rounded-md px-6 py-2 text-sm font-medium"
+          variant="outline"
+          className={`rounded-md px-6 py-2 text-sm font-medium shrink-0 ${
+            isDark
+              ? "border-slate-600 text-slate-300 hover:bg-slate-800"
+              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+          }`}
         >
           {saving ? (
             <>

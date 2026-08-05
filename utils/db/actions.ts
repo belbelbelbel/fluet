@@ -281,6 +281,53 @@ export const GetUserSubscription = async (userId: number) => {
     }
 };
 
+/** While Stripe/Kora are not configured, seed a local Pro subscription so limits/UI work. */
+export const EnsureLocalSubscription = async (userId: number) => {
+    if (isPaymentProviderConfigured()) {
+        return null;
+    }
+
+    const existing = await GetUserSubscription(userId);
+    if (existing) {
+        return existing;
+    }
+
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setFullYear(endDate.getFullYear() + 1);
+
+    try {
+        const [subscription] = await db
+            .insert(Subscription)
+            .values({
+                stripesubscripionId: `local_${userId}_${Date.now()}`,
+                userid: userId,
+                plan: "pro",
+                startdate: startDate,
+                enddate: endDate,
+                canceldate: false,
+            })
+            .returning()
+            .execute();
+
+        console.log(`[EnsureLocalSubscription] Created local Pro subscription for user ${userId}`);
+        return subscription;
+    } catch (error) {
+        console.error("[EnsureLocalSubscription] Error:", error);
+        return null;
+    }
+};
+
+function isPaymentProviderConfigured(): boolean {
+    return !!(
+        process.env.STRIPE_SECRET_KEY?.trim() ||
+        process.env.KORA_API_KEY?.trim()
+    );
+}
+
+/** @deprecated Use EnsureLocalSubscription */
+export const EnsureDevSubscription = EnsureLocalSubscription;
+
 export const GetUserUsageCount = async (userId: number) => {
     try {
         const startOfMonth = new Date();
@@ -792,7 +839,9 @@ export const CreateClient = async (data: {
                 email: data.email,
                 status: data.status || "active",
                 paymentStatus: data.paymentStatus || "paid",
-                paymentDueDate: data.paymentDueDate,
+                paymentDueDate: data.paymentDueDate
+                    ? data.paymentDueDate.toISOString().slice(0, 10)
+                    : undefined,
                 updatedAt: new Date(),
             })
             .returning()
@@ -815,7 +864,11 @@ export const CreateClient = async (data: {
                     revisionsPerPost: 3,
                     rushRequests: 2,
                     rushUsed: 0,
-                    resetDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+                    resetDate: (() => {
+                        const d = new Date();
+                        d.setMonth(d.getMonth() + 1);
+                        return d.toISOString().slice(0, 10);
+                    })(),
                     updatedAt: new Date(),
                 })
                 .execute();
@@ -914,10 +967,19 @@ export const UpdateClient = async (
     }
 ) => {
     try {
+        const { paymentDueDate, ...clientFields } = data;
         const [updated] = await db
             .update(Clients)
             .set({
-                ...data,
+                ...clientFields,
+                ...(paymentDueDate !== undefined && {
+                    paymentDueDate:
+                        paymentDueDate === null
+                            ? null
+                            : paymentDueDate instanceof Date
+                              ? paymentDueDate.toISOString().slice(0, 10)
+                              : paymentDueDate,
+                }),
                 updatedAt: new Date(),
             })
             .where(

@@ -3,7 +3,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, SaveGeneratedContent, CreateOrUpdateUser, GetClientBrandVoice } from "@/utils/db/actions";
 import { checkUsageLimit } from "@/utils/subscription/limits";
-import { shouldBlockAction } from "@/utils/payment/enforcement";
+import { shouldBlockAction, isPaymentProviderConfigured } from "@/utils/payment/enforcement";
 import { checkCostAlert } from "@/utils/economic/cost-alert";
 import { getAIGenerator } from "@/utils/ai/optimized-generator";
 
@@ -177,8 +177,10 @@ export async function POST(req: Request) {
     // ============================================
     // PROFESSIONAL SUBSCRIPTION ENFORCEMENT
     // ============================================
-    // In development, BYPASS_USAGE_LIMIT=true skips quota checks for easier testing
-    const bypassLimit = process.env.NODE_ENV === "development" && process.env.BYPASS_USAGE_LIMIT === "true";
+    // Skip quota checks in dev (explicit flag) or while Stripe/Kora are not wired up yet
+    const bypassLimit =
+      !isPaymentProviderConfigured() ||
+      (process.env.NODE_ENV === "development" && process.env.BYPASS_USAGE_LIMIT === "true");
     if (!bypassLimit && !usageStatus.canGenerate) {
       const isFreeTier = usageStatus.planName === "Free";
       const message = usageStatus.isInGracePeriod

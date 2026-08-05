@@ -113,13 +113,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       "price_1PyFKGBibz3ZDixDAaJ3HO74": "basic",
       "price_1PyFN0Bibz3ZDixDqm9eYL8W": "pro",
     };
-    function normalizePlanName(raw: string | undefined): string {
+    const normalizePlanName = (raw: string | undefined): string => {
       if (!raw) return "basic";
       const lower = raw.toLowerCase();
       if (lower.includes("enterprise")) return "enterprise";
       if (lower.includes("business") || lower.includes("pro")) return "pro";
       return "basic";
-    }
+    };
 
     let planName = normalizePlanName(session.metadata?.planName);
     let subscriptionId: string | null = null;

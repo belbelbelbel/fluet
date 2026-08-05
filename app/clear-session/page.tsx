@@ -74,7 +74,7 @@ export default function ClearSessionPage() {
         </p>
         {cleared && (
           <p className='text-sm text-gray-500 dark:text-gray-500'>
-            If you're not redirected automatically, <a href="/sign-in" className='text-purple-600 hover:text-purple-700 underline'>click here</a>
+            If you&apos;re not redirected automatically, <a href="/sign-in" className='text-purple-600 hover:text-purple-700 underline'>click here</a>
           </p>
         )}
       </div>

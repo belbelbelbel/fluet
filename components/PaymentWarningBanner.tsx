@@ -19,7 +19,6 @@ export function PaymentWarningBanner({
   status,
   message,
   daysRemaining,
-  clientName,
   onDismiss,
 }: PaymentWarningBannerProps) {
   const router = useRouter();

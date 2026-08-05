@@ -8,9 +8,9 @@ import {
     GetClientById,
     GetUserByClerkId,
 } from "@/utils/db/actions";
-import { ScheduledPosts, ContentAnalytics } from "@/utils/db/schema";
+import { ScheduledPosts } from "@/utils/db/schema";
 import { db } from "@/utils/db/dbConfig";
-import { eq, and, gte, desc, sql } from "drizzle-orm";
+import { eq, and, gte } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +48,6 @@ export async function GET(
             );
         }
 
-        // Verify client belongs to agency
         const client = await GetClientById(clientId, user.id);
         if (!client) {
             return NextResponse.json(
@@ -60,7 +59,6 @@ export async function GET(
         const { searchParams } = new URL(req.url);
         const range = searchParams.get("range") || "30d";
 
-        // Calculate date range
         const now = new Date();
         let startDate = new Date();
         if (range === "7d") {
@@ -70,10 +68,9 @@ export async function GET(
         } else if (range === "90d") {
             startDate.setDate(now.getDate() - 90);
         } else {
-            startDate = new Date(0); // All time
+            startDate = new Date(0);
         }
 
-        // Get scheduled posts for this client
         const posts = await db
             .select()
             .from(ScheduledPosts)
@@ -85,46 +82,55 @@ export async function GET(
             )
             .execute();
 
-        // Get analytics data (mock for now - would need real analytics data)
-        // In production, this would come from ContentAnalytics table
         const totalPosts = posts.length;
         const postedPosts = posts.filter((p) => p.posted);
-        
-        // Mock analytics data - in production, fetch from ContentAnalytics
+
+        const postsThisMonth = posts.filter((p) => {
+            const postDate = new Date(p.createdAt);
+            return postDate.getMonth() === now.getMonth() &&
+                   postDate.getFullYear() === now.getFullYear();
+        }).length;
+
+        const lastMonth = new Date(now);
+        lastMonth.setMonth(now.getMonth() - 1);
+        const postsLastMonth = posts.filter((p) => {
+            const postDate = new Date(p.createdAt);
+            return postDate.getMonth() === lastMonth.getMonth() &&
+                   postDate.getFullYear() === lastMonth.getFullYear();
+        }).length;
+
+        const platformCounts = posts.reduce<Record<string, number>>((acc, post) => {
+            const key = post.platform || "unknown";
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+        }, {});
+
+        const topPlatform =
+            Object.entries(platformCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
         const analytics = {
             totalPosts,
-            totalEngagement: postedPosts.length * 150, // Mock
-            averageEngagementRate: 4.2, // Mock
-            topPlatform: "instagram", // Mock
-            postsThisMonth: posts.filter((p) => {
-                const postDate = new Date(p.createdAt);
-                return postDate.getMonth() === now.getMonth() &&
-                       postDate.getFullYear() === now.getFullYear();
-            }).length,
-            postsLastMonth: posts.filter((p) => {
-                const postDate = new Date(p.createdAt);
-                const lastMonth = new Date(now);
-                lastMonth.setMonth(now.getMonth() - 1);
-                return postDate.getMonth() === lastMonth.getMonth() &&
-                       postDate.getFullYear() === lastMonth.getFullYear();
-            }).length,
-            engagementGrowth: 12.5, // Mock
-            topPerformingPost: postedPosts.length > 0 ? {
-                id: postedPosts[0].id,
-                platform: postedPosts[0].platform,
-                content: postedPosts[0].content.substring(0, 100),
-                engagementRate: 6.8,
-            } : null,
-            platformBreakdown: [
-                { platform: "instagram", posts: 5, engagement: 750, engagementRate: 5.2 },
-                { platform: "twitter", posts: 3, engagement: 320, engagementRate: 3.8 },
-                { platform: "linkedin", posts: 2, engagement: 180, engagementRate: 4.5 },
-            ],
-            monthlyTrend: [
-                { month: "Jan", posts: 8, engagement: 1200 },
-                { month: "Feb", posts: 12, engagement: 1800 },
-                { month: "Mar", posts: 15, engagement: 2400 },
-            ],
+            postedPosts: postedPosts.length,
+            postsThisMonth,
+            postsLastMonth,
+            topPlatform,
+            engagementMetricsAvailable: false,
+            totalEngagement: null as number | null,
+            averageEngagementRate: null as number | null,
+            engagementGrowth: null as number | null,
+            topPerformingPost: null as {
+                id: number;
+                platform: string;
+                content: string;
+                engagementRate: number;
+            } | null,
+            platformBreakdown: Object.entries(platformCounts).map(([platform, postCount]) => ({
+                platform,
+                posts: postCount,
+                engagement: null as number | null,
+                engagementRate: null as number | null,
+            })),
+            monthlyTrend: [] as Array<{ month: string; posts: number; engagement: number | null }>,
         };
 
         return NextResponse.json({

@@ -4,6 +4,7 @@ import { GetUserByClerkId, CreateScheduledPost, GetUserScheduledPosts, DeleteSch
 import { shouldBlockAction } from "@/utils/payment/enforcement";
 import { CreatePostApproval } from "@/utils/db/actions";
 import { generateApprovalToken } from "@/utils/approvals/token";
+import { sendNotificationEmail } from "@/lib/email/send-notification";
 
 export const dynamic = "force-dynamic";
 
@@ -144,26 +145,21 @@ export async function POST(req: Request) {
           const client = await GetClientById(parseInt(clientId), user.id);
           const recipientEmail = (client?.email && client.email.trim()) ? client.email.trim() : (user.email || null);
           if (recipientEmail) {
-            await fetch(`${appUrl}/api/notifications/email`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
+            const emailResult = await sendNotificationEmail({
+              type: "approval_requested",
+              recipientEmail,
+              data: {
+                clientName: client?.name || "Client",
+                platform,
+                scheduledFor: scheduledDate.toISOString(),
+                content,
+                approvalLink,
+                expiresAt: expiresAt.toISOString(),
               },
-              body: JSON.stringify({
-                type: "approval_requested",
-                recipientEmail,
-                data: {
-                  clientName: client?.name || "Client",
-                  platform: platform,
-                  scheduledFor: scheduledDate.toISOString(),
-                  content: content,
-                  approvalLink: approvalLink,
-                  expiresAt: expiresAt.toISOString(),
-                },
-              }),
-            }).catch((err) => {
-              console.error("Failed to send approval email:", err);
             });
+            if (!emailResult.sent) {
+              console.error("Failed to send approval email:", emailResult.error);
+            }
           }
         } catch (emailError) {
           console.error("Error sending approval email:", emailError);

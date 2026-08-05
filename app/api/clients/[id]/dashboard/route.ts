@@ -1,0 +1,112 @@
+/**
+ * Agency client dashboard — real stats, approvals, and upcoming posts
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import {
+  GetClientById,
+  GetClientCredits,
+  GetPendingApprovalsForClient,
+  GetScheduledPostsByClientId,
+  GetUserByClerkId,
+} from "@/utils/db/actions";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } | Promise<{ id: string }> }
+) {
+  try {
+    const resolvedParams = await Promise.resolve(params);
+    const searchParams = req.nextUrl.searchParams;
+    const queryUserId = searchParams.get("userId");
+
+    const authResult = await auth();
+    let clerkUserId: string | null = authResult?.userId || queryUserId || null;
+
+    if (!clerkUserId) {
+      try {
+        const user = await currentUser();
+        clerkUserId = user?.id ?? null;
+      } catch {
+        // ignore
+      }
+    }
+
+    if (!clerkUserId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await GetUserByClerkId(clerkUserId);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const clientId = parseInt(resolvedParams.id, 10);
+    if (Number.isNaN(clientId)) {
+      return NextResponse.json({ error: "Invalid client ID" }, { status: 400 });
+    }
+
+    const client = await GetClientById(clientId, user.id);
+    if (!client) {
+      return NextResponse.json({ error: "Client not found" }, { status: 404 });
+    }
+
+    const [posts, approvals, credits] = await Promise.all([
+      GetScheduledPostsByClientId(clientId),
+      GetPendingApprovalsForClient(clientId),
+      GetClientCredits(clientId),
+    ]);
+
+    const now = new Date();
+    const upcomingPosts = posts.filter(
+      (p) => !p.posted && p.scheduledFor && new Date(p.scheduledFor) > now
+    );
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    const pendingApprovals = approvals.map((a) => {
+      const post = posts.find((p) => p.id === a.scheduledPostId);
+      return {
+        id: a.id,
+        approvalToken: a.approvalToken,
+        status: a.status,
+        scheduledPostId: a.scheduledPostId,
+        content: post?.content ?? "",
+        platform: post?.platform ?? "",
+        scheduledFor: post?.scheduledFor ?? null,
+        approvalLink: `${appUrl}/client-portal/${a.approvalToken}`,
+        createdAt: a.createdAt,
+      };
+    });
+
+    return NextResponse.json({
+      success: true,
+      stats: {
+        postsThisMonth: credits?.postsUsed ?? 0,
+        postsLimit: credits?.postsPerMonth ?? 12,
+        pendingApprovals: pendingApprovals.length,
+        scheduledPosts: upcomingPosts.length,
+        engagementRate: null as number | null,
+        engagementMetricsAvailable: false,
+      },
+      pendingApprovals,
+      upcomingPosts: upcomingPosts.slice(0, 8).map((p) => ({
+        id: p.id,
+        platform: p.platform,
+        content: p.content,
+        scheduledFor: p.scheduledFor,
+        posted: p.posted,
+        approvalStatus: p.approvalStatus,
+      })),
+    });
+  } catch (error) {
+    console.error("[Client dashboard API] GET Error:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to fetch dashboard" },
+      { status: 500 }
+    );
+  }
+}

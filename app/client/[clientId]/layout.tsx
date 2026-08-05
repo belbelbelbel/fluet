@@ -13,7 +13,7 @@ export default async function ClientDashboardLayout({
   const clientId = parseInt(resolvedParams.clientId);
   
   // Verify client access
-  const { clerkUserId } = await requireClientAccess(clientId);
+  await requireClientAccess(clientId);
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900">

@@ -9,6 +9,8 @@ interface LogoProps {
   showText?: boolean;
   className?: string;
   variant?: "icon" | "full" | "square";
+  /** Preload above-the-fold logos (navbar, hero). Default true. */
+  priority?: boolean;
 }
 
 const sizeMap = {
@@ -19,11 +21,26 @@ const sizeMap = {
   "2xl": 96,
 };
 
-export function Logo({ 
-  size = "md", 
-  showText = false, 
+function getLogoSrc(variant: LogoProps["variant"], isDark: boolean) {
+  if (variant === "icon") {
+    return isDark
+      ? "/images/Revvylogo/logo-icon-dark-transparent.png"
+      : "/images/Revvylogo/logo-icon.png";
+  }
+  if (variant === "full") {
+    return isDark
+      ? "/images/Revvylogo/logo-dark-transparent.png"
+      : "/images/Revvylogo/logo-light-transparent.png";
+  }
+  return "/images/Revvylogo/logo-2-square.png";
+}
+
+export function Logo({
+  size = "md",
+  showText = false,
   className = "",
-  variant = "icon"
+  variant = "icon",
+  priority = true,
 }: LogoProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -32,46 +49,22 @@ export function Logo({
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    // Return a placeholder with the correct size to prevent layout shift
-    const logoSize = sizeMap[size];
-    return (
-      <div 
-        className={`flex items-center gap-2 ${className}`}
-        style={{ width: logoSize, height: logoSize }}
-      />
-    );
-  }
-
-  const isDark = resolvedTheme === "dark";
   const logoSize = sizeMap[size];
+  // SSR + first paint: light logo so Next/Image can preload immediately
+  const isDark = mounted && resolvedTheme === "dark";
+  const logoSrc = getLogoSrc(variant, isDark);
+  const effectiveSize =
+    isDark && variant === "full" ? Math.max(logoSize - 8, sizeMap.md) : logoSize;
 
-  let logoSrc = "/images/Revvylogo/logo-icon.png";
-  
-  if (variant === "icon") {
-    logoSrc = isDark 
-      ? "/images/Revvylogo/logo-icon-dark-transparent.png"
-      : "/images/Revvylogo/logo-icon.png";
-  } else if (variant === "full") {
-    logoSrc = isDark
-      ? "/images/Revvylogo/logo-dark-transparent.png"
-      : "/images/Revvylogo/logo-light-transparent.png";
-  } else if (variant === "square") {
-    logoSrc = "/images/Revvylogo/logo-2-square.png";
-  }
-
-  // Make dark mode logo smaller to match light mode visual size
-  const effectiveSize = isDark && variant === "full" ? Math.max(logoSize - 8, sizeMap.md) : logoSize;
-  
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div 
+      <div
         className="flex-shrink-0 flex items-center justify-center"
-        style={{ 
-          width: effectiveSize, 
+        style={{
+          width: effectiveSize,
           height: effectiveSize,
           maxWidth: effectiveSize,
-          maxHeight: effectiveSize
+          maxHeight: effectiveSize,
         }}
       >
         <Image
@@ -80,19 +73,22 @@ export function Logo({
           width={effectiveSize}
           height={effectiveSize}
           className="object-contain w-full h-full"
-          style={{ 
-            maxWidth: effectiveSize, 
+          style={{
+            maxWidth: effectiveSize,
             maxHeight: effectiveSize,
-            width: 'auto',
-            height: 'auto'
+            width: "auto",
+            height: "auto",
           }}
-          priority
+          priority={priority}
+          fetchPriority={priority ? "high" : "auto"}
         />
       </div>
       {showText && (
-        <span className={`text-lg font-bold ${
-          isDark ? "text-white" : "text-gray-950"
-        }`}>
+        <span
+          className={`text-lg font-bold ${
+            isDark ? "text-white" : "text-gray-950"
+          }`}
+        >
           Revvy
         </span>
       )}

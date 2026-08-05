@@ -146,7 +146,7 @@ export async function GET(req: NextRequest) {
                 },
                 { status: 500 }
             );
-        } catch (jsonError) {
+        } catch {
             // If even JSON.stringify fails, return minimal JSON
             return new NextResponse(
                 JSON.stringify({ error: "Internal server error" }),
@@ -194,7 +194,16 @@ export async function POST(req: NextRequest) {
         }
         
         // Parse request body once (can only be read once)
-        let body: any = {};
+        type ClientPostBody = {
+            userId?: string;
+            name?: string;
+            logoUrl?: string;
+            email?: string;
+            status?: string;
+            paymentStatus?: string;
+            paymentDueDate?: string;
+        };
+        let body: ClientPostBody = {};
         try {
             body = await req.json();
             // If we don't have userId from auth, try to get it from body

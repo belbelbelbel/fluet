@@ -81,7 +81,7 @@ export default function ClientsPage() {
   }, [userId]);
 
   // Filter, sort, and paginate clients
-  const { filteredAndSortedClients, totalPages, paginatedClients, totalFiltered } = useMemo(() => {
+  const { totalPages, paginatedClients, totalFiltered } = useMemo(() => {
     let list = clients;
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
@@ -113,7 +113,6 @@ export default function ClientsPage() {
     const start = (page - 1) * CLIENTS_PER_PAGE;
     const paginated = sorted.slice(start, start + CLIENTS_PER_PAGE);
     return {
-      filteredAndSortedClients: sorted,
       totalPages: pages,
       paginatedClients: paginated,
       totalFiltered: total,

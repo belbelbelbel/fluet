@@ -1,4 +1,4 @@
-import { varchar, pgTable, integer, serial, text, timestamp, boolean, jsonb, date, real } from 'drizzle-orm/pg-core'
+import { varchar, pgTable, integer, serial, text, timestamp, boolean, jsonb, date, real, type AnyPgColumn } from 'drizzle-orm/pg-core'
 
 export const Users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -7,7 +7,7 @@ export const Users = pgTable('users', {
   name: text('name'),
   points: integer('points').default(50),
   userType: varchar('user_type', { length: 50 }).default('agency'), // agency, team_member
-  agencyId: integer('agency_id').references(() => Users.id), // For team members
+  agencyId: integer('agency_id').references((): AnyPgColumn => Users.id), // For team members
   timestamp: timestamp('timestamp').defaultNow()
 })
 

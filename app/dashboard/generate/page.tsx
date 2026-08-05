@@ -9,8 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
 import { showToast } from "@/lib/toast";
+import { exportAsText, exportAsPDF } from "@/lib/export";
 import { contentTemplates, ContentTemplate } from "@/lib/templates";
 import { GENERATION_MODE_LABELS, type GenerationMode } from "@/utils/ai/prompt-builder";
+import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import {
   TwitterIcon,
   InstagramIcon,
@@ -24,6 +27,8 @@ import {
   Loader2Icon,
   X as XIcon,
   RefreshCwIcon,
+  DownloadIcon,
+  EyeIcon,
 } from "lucide-react";
 
 type ContentType = "twitter" | "instagram" | "linkedin" | "tiktok" | "youtube";
@@ -105,10 +110,20 @@ function DashboardGeneratePageInner() {
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
-  // const [loadingMessage, setLoadingMessage] = useState("");
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [showContentModal, setShowContentModal] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
-  // Removed loading messages - just use "Generating..." text
+  const loadingMessages = useMemo(
+    () => [
+      "Crafting your content…",
+      "Applying brand voice…",
+      "Polishing the copy…",
+      "Almost ready…",
+      "Finalizing your post…",
+    ],
+    []
+  );
 
   // Recent content - fetch from API
   const [recentContent, setRecentContent] = useState<RecentContent[]>([]);
@@ -259,7 +274,14 @@ function DashboardGeneratePageInner() {
     setError(null);
     setGeneratedContent("");
     setEditedContent("");
-    // setLoadingMessage("Generating..."); // Unused - commented out
+    setShowPreview(false);
+
+    let messageIndex = 0;
+    setLoadingMessage(loadingMessages[0]);
+    const messageInterval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % loadingMessages.length;
+      setLoadingMessage(loadingMessages[messageIndex]);
+    }, 2000);
 
     try {
       const response = await fetch("/api/generate", {
@@ -300,10 +322,11 @@ function DashboardGeneratePageInner() {
       setError("Failed to generate content. Please try again.");
       showToast.error("Error", "Failed to generate content. Please try again.");
     } finally {
+      clearInterval(messageInterval);
       setIsGenerating(false);
-      // setLoadingMessage(""); // Unused - commented out
+      setLoadingMessage("");
     }
-  }, [prompt, contentType, tone, style, length, generationMode, userId, fetchRecentContent, actionsBlocked, clientIdFromQuery]);
+  }, [prompt, contentType, tone, style, length, generationMode, userId, fetchRecentContent, actionsBlocked, clientIdFromQuery, loadingMessages]);
 
   const handleCopy = useCallback(async () => {
     if (generatedContent) {
@@ -346,8 +369,110 @@ function DashboardGeneratePageInner() {
       showToast.error("No content", "Generate content first");
       return;
     }
-    router.push(`/dashboard/schedule?content=${encodeURIComponent(generatedContent)}&platform=${contentType}`);
+    router.push(
+      `/dashboard/schedule?content=${encodeURIComponent(generatedContent)}&platform=${contentType}${
+        clientIdFromQuery ? `&clientId=${encodeURIComponent(clientIdFromQuery)}` : ""
+      }`
+    );
   }, [generatedContent, contentType, router]);
+
+  const handleRegenerate = useCallback(() => {
+    setShowPreview(false);
+    setIsEditing(false);
+    handleGenerate();
+  }, [handleGenerate]);
+
+  const getContentTypeLabel = useCallback((type: ContentType) => {
+    switch (type) {
+      case "twitter":
+        return "Twitter Thread";
+      case "instagram":
+        return "Instagram Caption";
+      case "linkedin":
+        return "LinkedIn Post";
+      case "tiktok":
+        return "TikTok Content";
+      case "youtube":
+        return "YouTube Description";
+    }
+  }, []);
+
+  const handleExportText = useCallback(() => {
+    if (generatedContent) {
+      exportAsText(generatedContent, `${contentType}-content`);
+      showToast.success("Exported as text file", "Your content has been downloaded");
+    }
+  }, [generatedContent, contentType]);
+
+  const handleExportPDF = useCallback(async () => {
+    if (generatedContent) {
+      await exportAsPDF(generatedContent, getContentTypeLabel(contentType));
+      showToast.success("PDF ready to print", "Use your browser's print dialog to save as PDF");
+    }
+  }, [generatedContent, contentType, getContentTypeLabel]);
+
+  const previewStyles = useMemo<Record<ContentType, string>>(
+    () => ({
+      twitter: isDark
+        ? "bg-slate-100 text-slate-900 p-4 rounded-xl max-w-md mx-auto"
+        : "bg-white text-black p-4 rounded-xl max-w-md mx-auto border border-gray-200",
+      instagram: "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 text-white p-6 rounded-xl max-w-md mx-auto",
+      linkedin: isDark
+        ? "bg-slate-700 text-slate-100 p-6 rounded-xl max-w-2xl mx-auto border border-slate-600"
+        : "bg-blue-50 text-gray-900 p-6 rounded-xl max-w-2xl mx-auto border border-blue-100",
+      tiktok: "bg-black text-white p-4 rounded-xl max-w-sm mx-auto",
+      youtube: "bg-gradient-to-br from-red-600 to-red-800 text-white p-6 rounded-xl max-w-lg mx-auto",
+    }),
+    [isDark]
+  );
+
+  const renderPreview = useMemo(() => {
+    if (!generatedContent) return null;
+    return (
+      <div className={`${previewStyles[contentType]} shadow-lg`}>
+        <div className="text-sm opacity-80 mb-2 flex items-center gap-2">
+          {contentType === "youtube" && <PlayIcon className="w-4 h-4" />}
+          {getContentTypeLabel(contentType)} Preview
+        </div>
+        <div className="whitespace-pre-wrap text-sm leading-relaxed">{generatedContent}</div>
+      </div>
+    );
+  }, [generatedContent, contentType, previewStyles, getContentTypeLabel]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && !isGenerating && prompt.trim() && !actionsBlocked) {
+        e.preventDefault();
+        handleGenerate();
+      }
+      if (e.key === "Escape" && showContentModal) {
+        setShowContentModal(false);
+        setIsEditing(false);
+        setShowPreview(false);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "e" && generatedContent && !isEditing && showContentModal) {
+        e.preventDefault();
+        handleEdit();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "s" && isEditing) {
+        e.preventDefault();
+        handleSaveEdit();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    isGenerating,
+    prompt,
+    showContentModal,
+    generatedContent,
+    isEditing,
+    actionsBlocked,
+    handleGenerate,
+    handleEdit,
+    handleSaveEdit,
+  ]);
 
   const getPlatformLabel = (platform: ContentType): string => {
     switch (platform) {
@@ -536,7 +661,7 @@ function DashboardGeneratePageInner() {
                 {isGenerating ? (
                   <>
                     <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
-                    Generating...
+                    {loadingMessage || "Generating…"}
                   </>
                 ) : (
                   "Generate Content"
@@ -791,6 +916,29 @@ function DashboardGeneratePageInner() {
         </div>
       </div>
 
+      {/* Generation loading overlay */}
+      {isGenerating && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div
+            className={`rounded-2xl shadow-xl max-w-md w-full p-8 text-center border transition-colors duration-300 ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}
+          >
+            <Loader2Icon
+              className={`w-12 h-12 animate-spin mx-auto mb-4 ${
+                isDark ? "text-purple-400" : "text-purple-600"
+              }`}
+            />
+            <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-950"}`}>
+              {loadingMessage || "Generating…"}
+            </h3>
+            <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+              This usually takes a few seconds
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Generated Content Modal */}
       {showContentModal && generatedContent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowContentModal(false)}>
@@ -809,36 +957,50 @@ function DashboardGeneratePageInner() {
             {/* Modal Content - Scrollable */}
             <div className="flex-1 overflow-y-auto p-6">
               {isEditing ? (
-                <textarea
-                  value={editedContent}
-                  onChange={(e) => setEditedContent(e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                    isDark
-                      ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
-                  }`}
-                  rows={12}
-                />
-              ) : (
-                <div className={`border rounded-xl p-6 transition-colors duration-300 ${
-                  isDark
-                    ? "bg-slate-900/50 border-slate-700"
-                    : "bg-gray-50 border-gray-200"
-                }`}>
-                  <pre className={`whitespace-pre-wrap text-sm leading-relaxed ${
-                    isDark ? "text-slate-200" : "text-gray-900"
-                  }`}>
-                    {generatedContent}
-                  </pre>
+                <div className="space-y-3">
+                  <p
+                    className={`text-xs rounded-lg px-3 py-2 ${
+                      isDark ? "bg-purple-950/40 text-purple-300" : "bg-purple-50 text-purple-800"
+                    }`}
+                  >
+                    Press Ctrl/Cmd + S to save, Esc to cancel
+                  </p>
+                  <textarea
+                    value={editedContent}
+                    onChange={(e) => setEditedContent(e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                      isDark
+                        ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                        : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
+                    }`}
+                    rows={12}
+                  />
                 </div>
+              ) : (
+                <>
+                  {showPreview && (
+                    <div className="mb-4">{renderPreview}</div>
+                  )}
+                  <div className={`border rounded-xl p-6 transition-colors duration-300 ${
+                    isDark
+                      ? "bg-slate-900/50 border-slate-700"
+                      : "bg-gray-50 border-gray-200"
+                  }`}>
+                    <pre className={`whitespace-pre-wrap text-sm leading-relaxed ${
+                      isDark ? "text-slate-200" : "text-gray-900"
+                    }`}>
+                      {generatedContent}
+                    </pre>
+                  </div>
+                </>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className={`flex items-center justify-between p-6 border-t gap-3 transition-colors duration-300 ${
+            <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-6 border-t gap-3 transition-colors duration-300 ${
               isDark ? "border-slate-700" : "border-gray-200"
             }`}>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {!isEditing && (
                   <>
                     <Button
@@ -855,6 +1017,19 @@ function DashboardGeneratePageInner() {
                       {isCopied ? "Copied!" : "Copy"}
                     </Button>
                     <Button
+                      onClick={() => setShowPreview(!showPreview)}
+                      size="sm"
+                      variant="outline"
+                      className={`rounded-lg transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <EyeIcon className="w-4 h-4 mr-1" />
+                      {showPreview ? "Hide Preview" : "Preview"}
+                    </Button>
+                    <Button
                       onClick={handleEdit}
                       size="sm"
                       variant="outline"
@@ -868,6 +1043,46 @@ function DashboardGeneratePageInner() {
                       Edit
                     </Button>
                     <Button
+                      onClick={handleExportText}
+                      size="sm"
+                      variant="outline"
+                      className={`rounded-lg transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <DownloadIcon className="w-4 h-4 mr-1" />
+                      Export TXT
+                    </Button>
+                    <Button
+                      onClick={handleExportPDF}
+                      size="sm"
+                      variant="outline"
+                      className={`rounded-lg transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <FileTextIcon className="w-4 h-4 mr-1" />
+                      Export PDF
+                    </Button>
+                    <Button
+                      onClick={handleRegenerate}
+                      size="sm"
+                      variant="outline"
+                      disabled={isGenerating}
+                      className={`rounded-lg transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <RefreshCwIcon className="w-4 h-4 mr-1" />
+                      Regenerate
+                    </Button>
+                    <Button
                       onClick={handleSchedule}
                       size="sm"
                       className={`rounded-lg transition-all duration-200 ${
@@ -878,6 +1093,21 @@ function DashboardGeneratePageInner() {
                     >
                       <CalendarIcon className="w-4 h-4 mr-1" />
                       Schedule
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowContentModal(false);
+                        router.push("/dashboard/history");
+                      }}
+                      size="sm"
+                      variant="outline"
+                      className={`rounded-lg transition-all duration-200 ${
+                        isDark
+                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      History
                     </Button>
                   </>
                 )}
@@ -910,7 +1140,11 @@ function DashboardGeneratePageInner() {
                 )}
               </div>
               <Button
-                onClick={() => setShowContentModal(false)}
+                onClick={() => {
+                  setShowContentModal(false);
+                  setShowPreview(false);
+                  setIsEditing(false);
+                }}
                 variant="outline"
                 className={`rounded-lg transition-all duration-200 ${
                   isDark
@@ -924,6 +1158,7 @@ function DashboardGeneratePageInner() {
           </div>
         </div>
       )}
+      <KeyboardShortcuts />
     </div>
   );
 }
@@ -931,9 +1166,7 @@ function DashboardGeneratePageInner() {
 export default function DashboardGeneratePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
-        <p className="text-gray-500 dark:text-slate-400">Loading...</p>
-      </div>
+      <LoadingScreen variant="inline" message="Loading generator..." />
     }>
       <DashboardGeneratePageInner />
     </Suspense>

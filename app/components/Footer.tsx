@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Twitter, Instagram, Linkedin, Mail, PenTool } from "lucide-react";
+import { Twitter, Instagram, Linkedin, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 export function Footer() {
@@ -49,7 +49,7 @@ export function Footer() {
             {/* Brand Section - same logo and name as Navbar */}
             <div className="lg:col-span-2">
               <Link href="/" className="flex items-center space-x-2 mb-4">
-                <Logo size="lg" variant="icon" />
+                <Logo size="lg" variant="icon" priority />
                 <span className="text-xl font-bold text-gray-900">Revvy</span>
               </Link>
               <p className="text-sm text-gray-600 mb-6 max-w-sm">

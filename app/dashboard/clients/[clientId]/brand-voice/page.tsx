@@ -4,12 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, Loader2, Plus, X, AlertCircle } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
 import {
   PRIMARY_INDUSTRY_OPTIONS,
-  NICHE_OPTIONS,
   primaryIndustryToNiche,
-  type Niche,
   type PrimaryIndustry,
 } from "@/lib/content-ideas";
 

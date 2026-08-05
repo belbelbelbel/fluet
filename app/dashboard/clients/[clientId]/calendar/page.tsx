@@ -170,7 +170,7 @@ export default function CalendarPage() {
           }`}>Content Calendar</h1>
         </div>
         <Button
-          onClick={() => router.push(`/dashboard/clients/${clientId}/schedule`)}
+          onClick={() => router.push(`/dashboard/schedule?clientId=${clientId}`)}
           className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200 shadow-sm hover:shadow-md py-2.5 sm:py-2 text-sm sm:text-base"
         >
           Schedule New Post

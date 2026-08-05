@@ -170,7 +170,7 @@ export default function FeaturesPage() {
                 asChild
                 className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-base sm:text-lg"
               >
-                <Link href="/generate">Start Creating</Link>
+                <Link href="/dashboard/generate">Start Creating</Link>
               </Button>
               <Button
                 asChild

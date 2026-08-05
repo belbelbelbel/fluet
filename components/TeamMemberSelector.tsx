@@ -30,6 +30,7 @@ export function TeamMemberSelector({
 }: TeamMemberSelectorProps) {
   const [members, setMembers] = useState<TeamMember[]>(membersProp || []);
   const [loading, setLoading] = useState(!membersProp);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (membersProp) {

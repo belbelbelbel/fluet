@@ -19,7 +19,7 @@ export async function POST(
       if (body && typeof body === 'object' && body.userId) {
         bodyUserId = body.userId;
       }
-    } catch (error) {
+    } catch {
       // Body might be empty or invalid JSON, that's okay - we'll use other auth methods
       console.log("[Accept Invitation] Could not parse request body, using other auth methods");
     }

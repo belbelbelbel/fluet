@@ -17,12 +17,17 @@ export default function Error({
 
   useEffect(() => {
     // Check if error is from a browser extension
+    const err = error as Error & {
+      reqInfo?: { pathPrefix?: string; path?: string };
+      error?: string;
+      code?: number;
+    };
     const extensionError = 
-      (error as any)?.reqInfo?.pathPrefix === "/writing" ||
-      (error as any)?.reqInfo?.path === "/get_template_list" ||
+      err.reqInfo?.pathPrefix === "/writing" ||
+      err.reqInfo?.path === "/get_template_list" ||
       error?.message?.includes("permission error") ||
-      (error as any)?.error === "exceptions.UserAuthError" ||
-      (error as any)?.code === 403 ||
+      err.error === "exceptions.UserAuthError" ||
+      err.code === 403 ||
       (error?.stack && error.stack.includes("background.js"));
 
     if (extensionError) {

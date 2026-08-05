@@ -11,6 +11,8 @@ import {
 import { ScheduledPosts, Clients, Users } from "@/utils/db/schema";
 import { db } from "@/utils/db/dbConfig";
 import { eq } from "drizzle-orm";
+import { sendNotificationEmail } from "@/lib/email/send-notification";
+import type { NotificationType } from "@/lib/email/types";
 
 export const dynamic = "force-dynamic";
 
@@ -177,11 +179,12 @@ export async function POST(
 
             if (post && client) {
                 // Send notification to agency (not client)
-                const notificationType = action === "approve" 
-                    ? "approval_approved" 
-                    : action === "request_changes"
-                    ? "approval_changes_requested"
-                    : "approval_rejected";
+                const notificationType: NotificationType =
+                    action === "approve"
+                        ? "approval_approved"
+                        : action === "request_changes"
+                        ? "approval_changes_requested"
+                        : "approval_rejected";
 
                 // Get agency user email
                 const [agencyUser] = await db
@@ -199,26 +202,21 @@ export async function POST(
                     .execute();
 
                 if (agencyUser?.email) {
-                    await fetch(`${appUrl}/api/notifications/email`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
+                    const emailResult = await sendNotificationEmail({
+                        type: notificationType,
+                        recipientEmail: agencyUser.email,
+                        data: {
+                            clientName: client.name,
+                            platform: post.platform,
+                            scheduledFor: post.scheduledFor?.toISOString?.() ?? String(post.scheduledFor),
+                            content: post.content,
+                            comment: comment,
+                            editLink: `${appUrl}/dashboard/schedule`,
                         },
-                        body: JSON.stringify({
-                            type: notificationType,
-                            recipientEmail: agencyUser.email,
-                            data: {
-                                clientName: client.name,
-                                platform: post.platform,
-                                scheduledFor: post.scheduledFor,
-                                content: post.content,
-                                comment: comment,
-                                editLink: `${appUrl}/dashboard/schedule`,
-                            },
-                        }),
-                    }).catch((err) => {
-                        console.error("Failed to send email notification:", err);
                     });
+                    if (!emailResult.sent) {
+                        console.error("Failed to send email notification:", emailResult.error);
+                    }
                 }
             }
         } catch (emailError) {

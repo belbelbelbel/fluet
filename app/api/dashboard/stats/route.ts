@@ -50,8 +50,9 @@ export async function GET(req: Request) {
         scheduledPosts: 0,
         teamMembers: 1,
         thisWeekContent: 0,
-        engagementRate: 0,
-        topPlatform: "Twitter",
+        engagementRate: null,
+        engagementMetricsAvailable: false,
+        topPlatform: null,
       });
     }
 
@@ -62,8 +63,9 @@ export async function GET(req: Request) {
         scheduledPosts: 0,
         teamMembers: 1,
         thisWeekContent: 0,
-        engagementRate: 0,
-        topPlatform: "Twitter",
+        engagementRate: null,
+        engagementMetricsAvailable: false,
+        topPlatform: null,
       });
     }
 
@@ -118,16 +120,14 @@ export async function GET(req: Request) {
 
     const topPlatform = topPlatformResult?.platform || "Twitter";
 
-    // Mock engagement rate (replace with real analytics later)
-    const engagementRate = totalContent > 0 ? Math.floor(Math.random() * 10) + 5 : 0;
-
     const response = NextResponse.json({
       totalContent,
       scheduledPosts,
       teamMembers: 1, // Will be updated when team features are implemented
       thisWeekContent,
-      engagementRate,
-      topPlatform,
+      engagementRate: null,
+      engagementMetricsAvailable: false,
+      topPlatform: topPlatformResult?.platform ? topPlatform : null,
     });
     
     // Add caching headers
@@ -145,7 +145,7 @@ export async function GET(req: Request) {
         },
         { status: 500 }
       );
-    } catch (jsonError) {
+    } catch {
       // If even JSON.stringify fails, return minimal JSON
       return new NextResponse(
         JSON.stringify({ error: "Internal server error" }),

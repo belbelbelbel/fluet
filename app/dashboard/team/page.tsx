@@ -22,7 +22,15 @@ import {
 } from "lucide-react";
 import { showToast } from "@/lib/toast";
 import { DropdownMenu, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { FeatureComingSoon } from "@/components/FeatureComingSoon";
 
+const TEAM_INVITES_ENABLED = false;
+
+
+interface TeamInvitation {
+  id: number;
+  expiresAt?: string;
+}
 interface TeamMember {
   id: number;
   name: string;
@@ -104,6 +112,14 @@ export default function TeamPage() {
   };
 
   const handleInvite = async () => {
+    if (!TEAM_INVITES_ENABLED) {
+      showToast.info(
+        "Team invites coming soon",
+        "Collaborator invites and email notifications aren't live yet."
+      );
+      return;
+    }
+
     if (!inviteEmail.trim()) {
       showToast.error("Invalid email", "Please enter a valid email address");
       return;
@@ -118,11 +134,14 @@ export default function TeamPage() {
 
       if (response.ok) {
         await response.json();
-        showToast.success("Invitation sent", `Invitation sent to ${inviteEmail}`);
+        showToast.info(
+          "Invitation recorded",
+          "Team email delivery isn't live yet — the invite was saved but no email was sent."
+        );
         setInviteEmail("");
         setShowInviteModal(false);
         fetchTeamMembers();
-        fetchInvitations(); // Refresh invitations list
+        fetchInvitations();
       } else {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.error || "Failed to send invitation. Please try again.";
@@ -226,12 +245,27 @@ export default function TeamPage() {
         </div>
         <Button
           onClick={() => setShowInviteModal(true)}
-          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 hover:shadow-md text-white rounded-xl transition-all duration-200 shadow-sm"
+          disabled={!TEAM_INVITES_ENABLED}
+          title={!TEAM_INVITES_ENABLED ? "Team invites aren't available yet" : undefined}
+          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 hover:shadow-md text-white rounded-xl transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Invite Member
         </Button>
       </div>
+
+      <Card className={`border rounded-xl ${
+        isDark ? "bg-purple-950/30 border-purple-800/50" : "bg-purple-50 border-purple-200"
+      }`}>
+        <CardContent className="p-4 sm:p-5">
+          <p className={`text-sm font-medium mb-1 ${isDark ? "text-purple-200" : "text-purple-900"}`}>
+            Team management coming soon
+          </p>
+          <p className={`text-sm ${isDark ? "text-purple-300/80" : "text-purple-800"}`}>
+            You can see your account below. Inviting collaborators and managing roles isn&apos;t live yet — invite emails are not sent, and only your profile is shown for now.
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
@@ -313,8 +347,9 @@ export default function TeamPage() {
               </p>
               <Button
                 onClick={() => setShowInviteModal(true)}
+                disabled={!TEAM_INVITES_ENABLED}
                 variant="outline"
-                className={`rounded-xl transition-all duration-200 ${
+                className={`rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                   isDark
                     ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
                     : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"
@@ -438,7 +473,7 @@ export default function TeamPage() {
                         <p className={`text-sm ${
                           isDark ? "text-slate-400" : "text-gray-600"
                         }`}>
-                          You've been invited to join a team
+                          You&apos;ve been invited to join a team
                         </p>
                         <p className={`text-xs mt-1 ${
                           isDark ? "text-slate-500" : "text-gray-500"
@@ -469,7 +504,7 @@ export default function TeamPage() {
                             const errorData = await response.json().catch(() => ({}));
                             showToast.error("Failed to accept", errorData.error || "Please try again");
                           }
-                        } catch (error) {
+                        } catch {
                           showToast.error("Error", "Failed to accept invitation");
                         }
                       }}
@@ -496,7 +531,7 @@ export default function TeamPage() {
                             const errorData = await response.json().catch(() => ({}));
                             showToast.error("Failed to decline", errorData.error || "Please try again");
                           }
-                        } catch (error) {
+                        } catch {
                           showToast.error("Error", "Failed to decline invitation");
                         }
                       }}
@@ -530,6 +565,16 @@ export default function TeamPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {!TEAM_INVITES_ENABLED ? (
+                <FeatureComingSoon
+                  compact
+                  isDark={isDark}
+                  icon={UserPlus}
+                  title="Team invites coming soon"
+                  description="You'll be able to invite registered collaborators here once email delivery and multi-member teams are enabled."
+                />
+              ) : (
+              <>
               <div>
                 <label className={`text-sm font-semibold mb-2 block ${
                   isDark ? "text-slate-300" : "text-gray-700"
@@ -572,6 +617,8 @@ export default function TeamPage() {
                   Cancel
                 </Button>
               </div>
+              </>
+              )}
             </CardContent>
           </Card>
         </div>

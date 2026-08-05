@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Save, Calendar, User, FileText, Loader2, AlertCircle } from "lucide-react";
+import { X, Save, Calendar, FileText, Loader2 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,8 +15,11 @@ interface Task {
   description?: string;
   dueDate?: string;
   assignedTo?: number;
+  assignedBy?: number;
   assignedToName?: string;
   scheduledPostId?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface TaskDetailModalProps {

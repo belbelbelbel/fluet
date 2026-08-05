@@ -62,3 +62,6 @@ app/fonts/*.zip
 *.tmp
 *.temp
 *.log
+
+# env files
+.env

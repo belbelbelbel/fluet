@@ -29,23 +29,11 @@ console.log('   ✅ Publishable Key: Must start with "pk_test_" or "pk_live_"');
 console.log('   ✅ Secret Key: Must start with "sk_test_" or "sk_live_"');
 console.log('   ✅ Both keys should be 50+ characters long\n');
 
-console.log('3. Your Keys (from your message):');
-console.log('   📝 Publishable: pk_test_bG92aW5nLWhhZ2Zpc2gtMzEuY2xlcmsuYWNjb3VudHMuZGV2JA');
-console.log('      Length: ~60 chars ✅');
-console.log('      Format: pk_test_ ✅');
-console.log('      ⚠️  WARNING: Key might be truncated (ends with "JA")\n');
-
-console.log('   🔐 Secret: sk_test_PVseHHij0LfzKIWRcZFvzbZvHULqHlPoQ0tP9H7VUA');
-console.log('      Length: ~50 chars ✅');
-console.log('      Format: sk_test_ ✅\n');
-
-console.log('4. To Verify:');
+console.log('3. Verify keys in Clerk Dashboard:');
 console.log('   a) Go to https://dashboard.clerk.com');
-console.log('   b) Select your app (loving-hagfish-31)');
+console.log('   b) Select your application');
 console.log('   c) Go to "API Keys" section');
 console.log('   d) Compare the FULL keys with your .env.local\n');
-
-console.log('5. Common Issues:');
 console.log('   ❌ Key truncated → Copy the FULL key from Clerk dashboard');
 console.log('   ❌ Wrong environment → Make sure you\'re using test keys for dev');
 console.log('   ❌ Missing quotes → Keys should NOT have quotes in .env.local\n');

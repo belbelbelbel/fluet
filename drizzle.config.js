@@ -1,25 +1,21 @@
-// Load environment variables from .env.local
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { config } from "dotenv";
+import { resolve } from "path";
 
-let databaseUrl = "postgresql://fluet_owner:O0mzILeGUb3x@ep-bold-sun-a52lj3ws.us-east-2.aws.neon.tech/fluet?sslmode=require";
+config({ path: resolve(process.cwd(), ".env") });
+config({ path: resolve(process.cwd(), ".env.local"), override: true });
 
-try {
-  const envFile = readFileSync(resolve(process.cwd(), '.env.local'), 'utf8');
-  const match = envFile.match(/DATABASE_URL=(.+)/);
-  if (match && match[1]) {
-    databaseUrl = match[1].trim().replace(/^["']|["']$/g, ''); // Remove quotes if present
-  }
-} catch (error) {
-  console.warn('Could not read .env.local, using default DATABASE_URL');
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is required — set it in .env or .env.local");
 }
 
 export default {
-    dialect: "postgresql",
-    schema: "./utils/db/schema.ts",
-    out: './drizzle',
+  dialect: "postgresql",
+  schema: "./utils/db/schema.ts",
+  out: "./drizzle",
 
-    dbCredentials: {
-        url: databaseUrl,
-    }
-}
+  dbCredentials: {
+    url: databaseUrl,
+  },
+};

@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
         autoSave: true,
         notifications: true,
         theme: "light",
+        persisted: false,
       });
     }
 
@@ -49,6 +50,7 @@ export async function GET(req: NextRequest) {
       autoSave: true,
       notifications: true,
       theme: "dark",
+      persisted: false,
     });
   } catch (error) {
     console.error("Error fetching settings:", error);
@@ -86,12 +88,13 @@ export async function POST(req: NextRequest) {
     }
 
     // TODO: Save to database when settings table is created
-    // For now, just return success
-    console.log("Settings to save:", settings);
+    // For now, acknowledge the request but do not claim persistence
+    console.log("Settings to save (not persisted):", settings);
 
     return NextResponse.json({
       success: true,
-      message: "Settings saved successfully",
+      persisted: false,
+      message: "Settings received but not yet saved to your account — persistence coming soon",
     });
   } catch (error) {
     console.error("Error saving settings:", error);

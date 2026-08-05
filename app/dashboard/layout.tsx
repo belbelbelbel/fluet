@@ -3,7 +3,7 @@
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { RouteTransition } from "@/components/RouteTransition";
-import { Logo } from "@/components/Logo";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -49,27 +49,10 @@ export default function DashboardLayout({
   // Trust middleware - if user got here, they're authenticated (middleware checked server-side)
   if (!isLoaded) {
     return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}>
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="flex flex-col items-center justify-center mb-8">
-            <div className="w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center mb-4">
-              <Logo size="2xl" variant="square" />
-            </div>
-          </div>
-          <h2 className={`text-2xl font-bold mb-2 ${
-            isDark ? "text-white" : "text-gray-900"
-          }`}>
-            Loading Revvy...
-          </h2>
-          <p className={`mb-6 ${
-            isDark ? "text-slate-400" : "text-gray-600"
-          }`}>
-            Please wait while we load your dashboard...
-          </p>
-        </div>
-      </div>
+      <LoadingScreen
+        message="Loading Revvy..."
+        subtitle="Please wait while we load your dashboard..."
+      />
     );
   }
 

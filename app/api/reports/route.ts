@@ -58,7 +58,6 @@ export async function GET(req: NextRequest) {
     }
 
     const reports = await GetClientReportsForAgency(agencyId, clientId ?? null);
-    const clientIds = [...new Set(reports.map((r) => r.clientId))];
     const clients = await GetClientsByAgency(agencyId);
     const clientMap = new Map(clients.map((c) => [c.id, c]));
 

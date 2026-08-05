@@ -96,7 +96,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Invitation sent successfully",
+      emailSent: false,
+      message: "Invitation recorded — email delivery is not yet enabled",
       invitation: {
         id: invitation.id,
         email,

@@ -371,7 +371,7 @@ export default function ReportsPage() {
               isDark ? "text-slate-400" : "text-gray-600"
             }`}
           >
-            Reports provide exportable summaries of your client's performance.
+            Reports provide exportable summaries of your client&apos;s performance.
             Generate monthly reports to share with clients, track progress, and
             analyze trends over time.
           </p>

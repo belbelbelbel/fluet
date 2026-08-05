@@ -11,6 +11,7 @@ import {
 import { Tasks, Users } from "@/utils/db/schema";
 import { db } from "@/utils/db/dbConfig";
 import { eq, and } from "drizzle-orm";
+import { sendNotificationEmail } from "@/lib/email/send-notification";
 
 export const dynamic = "force-dynamic";
 
@@ -134,26 +135,21 @@ export async function PUT(
                 const client = await GetClientById(clientId, user.id);
 
                 if (assignedUser?.email && client) {
-                    await fetch(`${appUrl}/api/notifications/email`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
+                    const emailResult = await sendNotificationEmail({
+                        type: "task_assigned",
+                        recipientEmail: assignedUser.email,
+                        data: {
+                            clientName: client.name,
+                            taskType: type,
+                            assignedToName: assignedUser.name || assignedUser.email,
+                            description: description,
+                            dueDate: dueDate ? new Date(dueDate).toLocaleString() : undefined,
+                            taskLink: `${appUrl}/dashboard/clients/${clientId}/tasks`,
                         },
-                        body: JSON.stringify({
-                            type: "task_assigned",
-                            recipientEmail: assignedUser.email,
-                            data: {
-                                clientName: client.name,
-                                taskType: type,
-                                assignedToName: assignedUser.name || assignedUser.email,
-                                description: description,
-                                dueDate: dueDate ? new Date(dueDate).toLocaleString() : undefined,
-                                taskLink: `${appUrl}/dashboard/clients/${clientId}/tasks`,
-                            },
-                        }),
-                    }).catch((err) => {
-                        console.error("Failed to send task assignment email:", err);
                     });
+                    if (!emailResult.sent) {
+                        console.error("Failed to send task assignment email:", emailResult.error);
+                    }
                 }
             } catch (emailError) {
                 console.error("Error sending task assignment email:", emailError);
