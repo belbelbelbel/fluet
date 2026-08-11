@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useEffect } from "react";
+import Link from "next/link";
 
+/**
+ * Inline styles only — must render even when UI chunks or ThemeContext fail.
+ */
 export default function Error({
   error,
   reset,
@@ -11,88 +13,102 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
-  const [isExtensionError, setIsExtensionError] = useState(false);
-
   useEffect(() => {
-    // Check if error is from a browser extension
-    const err = error as Error & {
-      reqInfo?: { pathPrefix?: string; path?: string };
-      error?: string;
-      code?: number;
-    };
-    const extensionError = 
-      err.reqInfo?.pathPrefix === "/writing" ||
-      err.reqInfo?.path === "/get_template_list" ||
-      error?.message?.includes("permission error") ||
-      err.error === "exceptions.UserAuthError" ||
-      err.code === 403 ||
-      (error?.stack && error.stack.includes("background.js"));
-
-    if (extensionError) {
-      // If it's an extension error, just reset and continue
-      console.warn("[Error Boundary] Ignoring browser extension error, resetting...");
-      setIsExtensionError(true);
-      // Auto-reset after a short delay
-      setTimeout(() => {
-        reset();
-      }, 100);
-      return;
-    }
-
     console.error("Application error:", error);
-  }, [error, reset]);
-
-  // Don't show error UI for extension errors (they'll be auto-reset)
-  if (isExtensionError) {
-    return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${isDark ? "bg-slate-900" : "bg-white"}`}>
-        <div className="text-center">
-          <div className={`w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4`}></div>
-          <p className={`${isDark ? "text-slate-400" : "text-gray-600"}`}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  }, [error]);
 
   return (
-    <div className={`min-h-screen flex items-center justify-center px-4 transition-colors duration-300 ${isDark ? "bg-slate-900" : "bg-white"}`}>
-      <div className="max-w-md w-full text-center">
-        <h2 className={`text-2xl font-bold mb-4 ${isDark ? "text-red-400" : "text-red-600"}`}>
-          Something went wrong!
-        </h2>
-        <p className={`mb-6 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
-          {error.message || "An unexpected error occurred"}
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1.5rem",
+        background: "#ffffff",
+        fontFamily:
+          "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      }}
+    >
+      <div style={{ maxWidth: "28rem", width: "100%", textAlign: "center" }}>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "#6b7280",
+            marginBottom: "0.5rem",
+          }}
+        >
+          Something went wrong
         </p>
-        <div className="space-y-4">
-          <Button
+        <h1
+          style={{
+            fontSize: "1.5rem",
+            fontWeight: 500,
+            color: "#030712",
+            marginBottom: "0.75rem",
+          }}
+        >
+          We couldn&apos;t load this page
+        </h1>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "#6b7280",
+            marginBottom: "1.5rem",
+            lineHeight: 1.6,
+          }}
+        >
+          {error.message ||
+            "An unexpected error occurred. Try again or return to your dashboard."}
+        </p>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.75rem",
+            alignItems: "center",
+          }}
+        >
+          <button
+            type="button"
             onClick={reset}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded transition-colors"
+            style={{
+              height: "2.5rem",
+              padding: "0 1rem",
+              borderRadius: "0.375rem",
+              border: "none",
+              background: "#0f172a",
+              color: "#fff",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              cursor: "pointer",
+              minWidth: "10rem",
+            }}
           >
             Try again
-          </Button>
-          <div>
-            <a
-              href="/"
-              className={`${isDark ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"} underline transition-colors`}
-            >
-              Go back home
-            </a>
-          </div>
+          </button>
+          <Link
+            href="/dashboard"
+            style={{
+              display: "inline-flex",
+              height: "2.5rem",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0 1rem",
+              borderRadius: "0.375rem",
+              border: "0.5px solid #d1d5db",
+              background: "#fff",
+              color: "#030712",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              textDecoration: "none",
+              minWidth: "10rem",
+            }}
+          >
+            Go to dashboard
+          </Link>
         </div>
-        {process.env.NODE_ENV === "development" && (
-          <details className="mt-6 text-left">
-            <summary className={`cursor-pointer mb-2 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-              Error Details (Development Only)
-            </summary>
-            <pre className={`p-4 rounded text-xs overflow-auto ${isDark ? "bg-slate-800 text-slate-300" : "bg-gray-100 text-gray-800"}`}>
-              {error.stack}
-            </pre>
-          </details>
-        )}
       </div>
     </div>
   );
 }
-

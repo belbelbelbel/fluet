@@ -13,6 +13,7 @@ import {
   Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ClientAvatar } from "@/components/ClientAvatar";
 import { cn } from "@/lib/utils";
 
 interface Client {
@@ -270,16 +271,16 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
         )}
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          {selectedClient?.logoUrl ? (
-            <img
-              src={selectedClient.logoUrl}
-              alt={selectedClient.name}
-              className="w-5 h-5 rounded object-cover flex-shrink-0"
+          {selectedClient ? (
+            <ClientAvatar
+              name={selectedClient.name}
+              logoUrl={selectedClient.logoUrl}
+              size="sm"
             />
           ) : (
-            <Building2 className={`w-5 h-5 flex-shrink-0 ${
-              isDark ? "text-slate-400" : "text-gray-400"
-            }`} />
+            <Building2 className={`w-4 h-4 flex-shrink-0 ${
+              isDark ? "text-slate-500" : "text-gray-400"
+            }`} strokeWidth={1.75} />
           )}
           <span className="truncate">
             {selectedClient
@@ -304,10 +305,10 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
             className="fixed inset-0 z-40"
             onClick={() => setOpen(false)}
           />
-          <div className={`absolute z-50 mt-2 w-[320px] rounded-lg border shadow-lg ${
+          <div className={`absolute z-50 mt-2 w-[320px] rounded-lg border border-gray-200 dark:border-slate-600 ${
             isDark 
-              ? "bg-slate-800 border-slate-700 shadow-xl" 
-              : "bg-white border-gray-200"
+              ? "bg-slate-800" 
+              : "bg-white"
           }`}>
             <div className="p-2">
               <div className="flex items-center justify-between px-2 py-1.5">
@@ -332,7 +333,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.stopPropagation()}
-                      className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-slate-600 ${
                         isDark
                           ? "bg-slate-900 border-slate-600 text-white placeholder-slate-500"
                           : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"
@@ -349,7 +350,9 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                         className={cn(
                           "shrink-0 px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
                           statusFilter === f
-                            ? "bg-purple-600 text-white"
+                            ? isDark
+                              ? "bg-white text-gray-950"
+                              : "bg-gray-950 text-white"
                             : isDark
                               ? "bg-slate-700 text-slate-400 hover:bg-slate-600"
                               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -376,7 +379,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                   <Button
                     onClick={handleCreateClient}
                     size="sm"
-                    className="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
+                    className="w-full bg-gray-950 hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-100 dark:text-gray-950 text-white transition-all duration-200"
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Create First Client
@@ -392,10 +395,10 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                         "w-full px-3 py-2.5 rounded-lg text-left transition-all duration-200 focus:outline-none",
                         isDark
                           ? !selectedClient
-                            ? "bg-purple-900/50 hover:bg-purple-900/70"
+                            ? "bg-slate-700/80 hover:bg-slate-700"
                             : "hover:bg-slate-700 focus:bg-slate-700"
                           : !selectedClient
-                            ? "bg-purple-50 hover:bg-purple-100"
+                            ? "bg-gray-100 hover:bg-gray-100"
                             : "hover:bg-gray-50 focus:bg-gray-50"
                       )}
                     >
@@ -407,7 +410,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                         </span>
                         {!selectedClient && (
                           <Check className={`w-4 h-4 flex-shrink-0 ml-2 ${
-                            isDark ? "text-purple-400" : "text-purple-600"
+                            isDark ? "text-slate-300" : "text-gray-700"
                           }`} />
                         )}
                       </div>
@@ -428,30 +431,20 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                         "w-full px-3 py-2.5 rounded-lg text-left transition-all duration-200 focus:outline-none",
                         isDark
                           ? selectedClient?.id === client.id
-                            ? "bg-purple-900/50 hover:bg-purple-900/70"
+                            ? "bg-slate-700/80 hover:bg-slate-700"
                             : "hover:bg-slate-700 focus:bg-slate-700"
                           : selectedClient?.id === client.id
-                            ? "bg-purple-50 hover:bg-purple-100"
+                            ? "bg-gray-100 hover:bg-gray-100"
                             : "hover:bg-gray-50 focus:bg-gray-50"
                       )}
                     >
                       <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          {client.logoUrl ? (
-                            <img
-                              src={client.logoUrl}
-                              alt={client.name}
-                              className="w-6 h-6 rounded object-cover flex-shrink-0"
-                            />
-                          ) : (
-                            <div className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ${
-                              isDark ? "bg-purple-900/50" : "bg-purple-100"
-                            }`}>
-                              <Building2 className={`w-4 h-4 ${
-                                isDark ? "text-purple-400" : "text-purple-600"
-                              }`} />
-                            </div>
-                          )}
+                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                          <ClientAvatar
+                            name={client.name}
+                            logoUrl={client.logoUrl}
+                            size="sm"
+                          />
                           <div className="flex-1 min-w-0">
                             <p className={`text-sm font-medium truncate ${
                               isDark ? "text-slate-200" : "text-gray-900"
@@ -465,7 +458,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                         </div>
                         {selectedClient?.id === client.id && (
                           <Check className={`w-4 h-4 flex-shrink-0 ml-2 ${
-                            isDark ? "text-purple-400" : "text-purple-600"
+                            isDark ? "text-slate-300" : "text-gray-700"
                           }`} />
                         )}
                       </div>
@@ -478,8 +471,8 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                     onClick={handleCreateClient}
                     className={`w-full px-3 py-2.5 rounded-lg text-left transition-all duration-200 focus:outline-none ${
                       isDark
-                        ? "hover:bg-slate-700 focus:bg-slate-700 text-purple-400 hover:text-purple-300"
-                        : "hover:bg-gray-50 focus:bg-gray-50 text-purple-600 hover:text-purple-700"
+                        ? "hover:bg-slate-700 focus:bg-slate-700 text-slate-300 hover:text-white"
+                        : "hover:bg-gray-50 focus:bg-gray-50 text-gray-700 hover:text-gray-900"
                     }`}
                   >
                     <div className="flex items-center gap-2">

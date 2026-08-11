@@ -158,7 +158,7 @@ export default function NewTaskPage() {
                         formData.type === taskType.value
                           ? isDark
                             ? "border-purple-500 bg-purple-900/50 text-purple-300"
-                            : "border-purple-600 bg-purple-50 text-purple-900"
+                            : "border-primary bg-muted text-purple-900"
                           : isDark
                             ? "border-slate-700 bg-slate-700/50 text-slate-300 hover:border-slate-600 hover:bg-slate-700"
                             : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
@@ -182,7 +182,7 @@ export default function NewTaskPage() {
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${isDark ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500" : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"}`}
+                  className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${isDark ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500" : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"}`}
                   rows={4}
                   placeholder="Describe what needs to be done..."
                 />
@@ -201,7 +201,7 @@ export default function NewTaskPage() {
                     id="assignedTo"
                     value={formData.assignedTo}
                     onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-                    className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${isDark ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500" : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"}`}
+                    className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${isDark ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500" : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"}`}
                   >
                     <option value="">Unassigned</option>
                     {teamMembers.map((member) => (
@@ -227,7 +227,7 @@ export default function NewTaskPage() {
                     id="dueDate"
                     value={formData.dueDate}
                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                    className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${isDark ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500" : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"}`}
+                    className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${isDark ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500" : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"}`}
                   />
                 </div>
               </div>
@@ -245,7 +245,7 @@ export default function NewTaskPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 sm:flex-none bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200 shadow-sm hover:shadow-md py-2.5 sm:py-2"
+                  className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground transition-all duration-200 shadow-sm hover:shadow-md py-2.5 sm:py-2"
                 >
                   {loading ? (
                     <>

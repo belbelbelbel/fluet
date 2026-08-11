@@ -188,7 +188,7 @@ export default function OnboardingPage() {
             <CardContent className="pt-8 pb-8 px-8">
               <div className="flex justify-center mb-6">
                 <div className="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center">
-                  <Sparkles className="w-7 h-7 text-purple-600" />
+                  <Sparkles className="w-7 h-7 text-foreground" />
                 </div>
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-1">Content niche for {clientName || "your client"}</h2>

@@ -6,11 +6,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   GetUserByClerkId,
-  GetClientById,
-  GetClientsByAgency,
   CreateClientReport,
   GetClientReportsForAgency,
 } from "@/utils/db/actions";
+import {
+  resolveAgencyContext,
+  getAccessibleClients,
+  requireClientAccess,
+  canAccessAllClients,
+} from "@/lib/team-access";
 
 export const dynamic = "force-dynamic";
 
@@ -42,12 +46,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await GetUserByClerkId(clerkUserId);
-    if (!user) {
+    const ctx = await resolveAgencyContext(clerkUserId);
+    if (!ctx) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const agencyId = user.id;
     const clientIdParam = req.nextUrl.searchParams.get("clientId");
     const clientId =
       clientIdParam !== null && clientIdParam !== ""
@@ -57,21 +60,34 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Invalid clientId" }, { status: 400 });
     }
 
-    const reports = await GetClientReportsForAgency(agencyId, clientId ?? null);
-    const clients = await GetClientsByAgency(agencyId);
-    const clientMap = new Map(clients.map((c) => [c.id, c]));
+    if (clientId != null) {
+      const access = await requireClientAccess(clerkUserId, clientId);
+      if (!access.ok) {
+        return NextResponse.json({ error: access.error }, { status: access.status });
+      }
+    }
 
-    const list = reports.map((r) => ({
-      id: r.id,
-      clientId: r.clientId,
-      clientName: clientMap.get(r.clientId)?.name ?? `Client #${r.clientId}`,
-      periodStart: r.periodStart,
-      periodEnd: r.periodEnd,
-      reportData: r.reportData,
-      pdfUrl: r.pdfUrl ?? undefined,
-      sentToClient: r.sentToClient ?? false,
-      createdAt: r.createdAt,
-    }));
+    const accessible = await getAccessibleClients(ctx);
+    const allowedIds = new Set(accessible.map((c) => c.id));
+    const reports = await GetClientReportsForAgency(
+      ctx.agencyId,
+      clientId ?? null
+    );
+    const clientMap = new Map(accessible.map((c) => [c.id, c]));
+
+    const list = reports
+      .filter((r) => canAccessAllClients(ctx.role) || allowedIds.has(r.clientId))
+      .map((r) => ({
+        id: r.id,
+        clientId: r.clientId,
+        clientName: clientMap.get(r.clientId)?.name ?? `Client #${r.clientId}`,
+        periodStart: r.periodStart,
+        periodEnd: r.periodEnd,
+        reportData: r.reportData,
+        pdfUrl: r.pdfUrl ?? undefined,
+        sentToClient: r.sentToClient ?? false,
+        createdAt: r.createdAt,
+      }));
 
     return NextResponse.json({ reports: list });
   } catch (error) {
@@ -111,9 +127,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const client = await GetClientById(clientId, user.id);
-    if (!client) {
-      return NextResponse.json({ error: "Client not found" }, { status: 404 });
+    const access = await requireClientAccess(clerkUserId, clientId);
+    if (!access.ok) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
     const now = new Date();
@@ -132,11 +148,16 @@ export async function POST(req: NextRequest) {
       if (!isNaN(parsed.getTime())) periodStart = parsed;
     }
 
-    const report = await CreateClientReport(user.id, clientId, periodStart, periodEnd);
+    const report = await CreateClientReport(
+      access.ctx.agencyId,
+      clientId,
+      periodStart,
+      periodEnd
+    );
     const reportPayload = {
       id: report.id,
       clientId: report.clientId,
-      clientName: client.name,
+      clientName: access.client.name,
       periodStart: report.periodStart,
       periodEnd: report.periodEnd,
       reportData: report.reportData,

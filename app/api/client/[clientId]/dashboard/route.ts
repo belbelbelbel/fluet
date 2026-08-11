@@ -51,7 +51,10 @@ export async function GET(
     }
 
     const [clientRow] = await db
-      .select({ name: Clients.name })
+      .select({
+        name: Clients.name,
+        portalPreferences: Clients.portalPreferences,
+      })
       .from(Clients)
       .where(eq(Clients.id, clientId))
       .limit(1)
@@ -63,13 +66,26 @@ export async function GET(
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
     const postsThisMonth = posts.filter(
       (p) => p.scheduledFor && new Date(p.scheduledFor) >= startOfMonth
     ).length;
-    const publishedThisMonth = posts.filter(
-      (p) => p.posted && p.postedAt && new Date(p.postedAt) >= startOfMonth
+    const published = posts.filter((p) => p.posted);
+    const publishedThisMonth = published.filter(
+      (p) => p.postedAt && new Date(p.postedAt) >= startOfMonth
     ).length;
-    const engagementRate = publishedThisMonth > 0 ? 0 : 0;
+    const upcoming = posts.filter(
+      (p) => !p.posted && p.scheduledFor && new Date(p.scheduledFor) > now
+    );
+
+    const platformMap = new Map<string, number>();
+    for (const p of posts) {
+      const key = (p.platform || "other").toLowerCase();
+      platformMap.set(key, (platformMap.get(key) || 0) + 1);
+    }
+    const platformBreakdown = Array.from(platformMap.entries())
+      .map(([platform, count]) => ({ platform, count }))
+      .sort((a, b) => b.count - a.count);
 
     const pendingApprovalsWithPosts = approvals.map((a) => {
       const post = posts.find((p) => p.id === a.scheduledPostId);
@@ -89,8 +105,15 @@ export async function GET(
       stats: {
         postsThisMonth,
         pendingApprovals: pendingApprovalsWithPosts.length,
-        engagementRate,
+        publishedThisMonth,
+        upcomingCount: upcoming.length,
+        // Honest: no social engagement yet — surface publish rate instead
+        publishRate:
+          postsThisMonth > 0
+            ? Math.round((publishedThisMonth / postsThisMonth) * 100)
+            : 0,
       },
+      platformBreakdown,
       posts: posts.map((p) => ({
         id: p.id,
         platform: p.platform,
@@ -101,6 +124,12 @@ export async function GET(
         approvalStatus: p.approvalStatus,
       })),
       pendingApprovals: pendingApprovalsWithPosts,
+      preferences: {
+        emailApprovals: true,
+        emailReminders: true,
+        notes: "",
+        ...((clientRow?.portalPreferences as Record<string, unknown>) || {}),
+      },
     });
   } catch (error) {
     console.error("[Client dashboard API]", error);

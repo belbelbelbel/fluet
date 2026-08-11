@@ -1,9 +1,12 @@
 export type NotificationType =
+  | "approval_verification_code"
   | "approval_requested"
   | "approval_approved"
   | "approval_changes_requested"
   | "approval_rejected"
-  | "task_assigned";
+  | "task_assigned"
+  | "clients_assigned"
+  | "team_invitation";
 
 export interface NotificationEmailData {
   clientName?: string;
@@ -19,6 +22,18 @@ export interface NotificationEmailData {
   description?: string;
   dueDate?: string;
   taskLink?: string;
+  /** Team invite */
+  inviterName?: string;
+  inviteLink?: string;
+  role?: string;
+  /** Approval identity verification */
+  code?: string;
+  codeTtlMinutes?: number;
+  /** Verified email of whoever made the decision — proves it was the client */
+  decidedByEmail?: string;
+  /** Client assignment */
+  clientNames?: string[];
+  dashboardLink?: string;
 }
 
 export interface SendNotificationResult {

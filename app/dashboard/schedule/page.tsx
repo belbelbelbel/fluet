@@ -10,6 +10,22 @@ import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
 import { showToast } from "@/lib/toast";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { CalendarView } from "@/components/CalendarView";
 import { PostReminderModal } from "@/components/PostReminderModal";
 import { ClientSelector } from "@/components/ClientSelector";
@@ -17,15 +33,14 @@ import {
   TwitterIcon,
   InstagramIcon,
   LinkedinIcon,
-  MusicIcon,
+  Music2Icon,
   CalendarIcon,
   TrashIcon,
   EditIcon,
   PlusIcon,
-  XIcon,
   Loader2Icon,
   BriefcaseIcon,
-  PlayIcon,
+  YoutubeIcon,
   CheckCircleIcon,
   ClockIcon,
   CopyIcon,
@@ -101,6 +116,17 @@ export default function DashboardSchedulePage() {
     [alertBanners]
   );
 
+  const resetScheduleModalState = useCallback(() => {
+    setShowScheduleModal(false);
+    setEditingPost(null);
+    setYoutubeVideoTitle("");
+    setYoutubeDescription("");
+    setYoutubeContentType("rain_sounds");
+    setYoutubeDuration(30);
+    setYoutubeQuality("high");
+    setYoutubePrivacy("public");
+  }, []);
+
   useEffect(() => {
     if (!userId) return;
     const loadAlerts = async () => {
@@ -167,21 +193,21 @@ export default function DashboardSchedulePage() {
     }
   }, [scheduledPosts]);
 
+  // Brand tint carries the platform, matching the palette in components/PostRow.tsx.
+  // These sit on white/slate surfaces, so the icon must never be white.
+  const PLATFORM_ICONS: Record<string, { Icon: typeof TwitterIcon; fg: string }> = {
+    twitter: { Icon: TwitterIcon, fg: "text-slate-500" },
+    instagram: { Icon: InstagramIcon, fg: "text-fuchsia-500" },
+    linkedin: { Icon: LinkedinIcon, fg: "text-sky-500" },
+    tiktok: { Icon: Music2Icon, fg: "text-cyan-500" },
+    youtube: { Icon: YoutubeIcon, fg: "text-red-500" },
+  };
+
   const getPlatformIcon = (platform: string) => {
-    switch (platform) {
-      case "twitter":
-        return <TwitterIcon className="w-4 h-4 text-white" />;
-      case "instagram":
-        return <InstagramIcon className="w-4 h-4 text-white" />;
-      case "linkedin":
-        return <LinkedinIcon className="w-4 h-4 text-white" />;
-      case "tiktok":
-        return <MusicIcon className="w-4 h-4 text-white" />;
-      case "youtube":
-        return <PlayIcon className="w-4 h-4 text-white" />;
-      default:
-        return null;
-    }
+    const meta = PLATFORM_ICONS[(platform || "").toLowerCase()];
+    if (!meta) return null;
+    const { Icon, fg } = meta;
+    return <Icon className={`w-4 h-4 shrink-0 ${fg}`} />;
   };
 
   // Get platform posting status (auto-post vs reminder)
@@ -485,10 +511,19 @@ export default function DashboardSchedulePage() {
         fetchScheduledPosts();
         if (data.approvalLink) {
           setApprovalLinkModal({ open: true, link: data.approvalLink });
-          showToast.success(
-            editingPost ? "Post updated!" : "Post scheduled!",
-            "Your client will be emailed when possible. Copy the approval link as a backup."
-          );
+          // Say plainly whether the client was actually emailed — "when
+          // possible" left it ambiguous whether anything was sent.
+          if (data.approvalEmailWarning) {
+            showToast.warning(
+              editingPost ? "Post updated — not sent" : "Post scheduled — not sent",
+              data.approvalEmailWarning
+            );
+          } else {
+            showToast.success(
+              editingPost ? "Post updated!" : "Post scheduled!",
+              "Approval request emailed to your client."
+            );
+          }
         } else {
           showToast.success(
             editingPost ? "Post updated!" : "Post scheduled!",
@@ -528,6 +563,29 @@ export default function DashboardSchedulePage() {
   const handleDeleteClick = useCallback((id: number) => {
     setDeleteConfirm({ open: true, id });
   }, []);
+
+  const handleMarkPosted = useCallback(
+    async (id: number) => {
+      try {
+        const response = await fetch("/api/schedule", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ id, posted: true, userId }),
+        });
+        if (response.ok) {
+          showToast.success("Marked as posted", "Post moved to published history");
+          fetchScheduledPosts();
+        } else {
+          const err = await response.json().catch(() => ({}));
+          showToast.error("Couldn’t update", err.error || "Try again");
+        }
+      } catch {
+        showToast.error("Error", "Failed to mark as posted");
+      }
+    },
+    [userId, fetchScheduledPosts]
+  );
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteConfirm.id) return;
@@ -670,7 +728,7 @@ export default function DashboardSchedulePage() {
             setShowScheduleModal(true);
           }}
           disabled={actionsBlocked}
-          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground rounded-xl transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           New Post
@@ -785,7 +843,7 @@ export default function DashboardSchedulePage() {
               onClick={() => setShowScheduleModal(true)}
               className={`rounded-xl transition-all duration-200 ${
                 isDark
-                  ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                  ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
                   : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
               }`}
             >
@@ -961,7 +1019,7 @@ export default function DashboardSchedulePage() {
                           }`}>
                           {post.platform}
                         </span>
-                        {post.posted && (
+                        {post.posted ? (
                             <span className={`px-2 py-0.5 text-xs rounded-lg border transition-colors duration-300 ${
                               isDark
                                 ? "bg-green-950/50 text-green-400 border-green-800"
@@ -969,13 +1027,32 @@ export default function DashboardSchedulePage() {
                             }`}>
                             Posted
                           </span>
+                        ) : (
+                          <span className={`px-2 py-0.5 text-xs rounded-lg border ${
+                            isDark
+                              ? "bg-amber-950/40 text-amber-300 border-amber-800"
+                              : "bg-amber-50 text-amber-800 border-amber-200"
+                          }`}>
+                            Due
+                          </span>
                         )}
                       </div>
-                      <span className={`text-xs ${
-                        isDark ? "text-slate-400" : "text-gray-600"
-                      }`}>
-                        {formatDateTime(post.scheduledFor)}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {!post.posted ? (
+                          <Button
+                            size="sm"
+                            onClick={() => handleMarkPosted(post.id)}
+                            className="h-8 rounded-lg text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                          >
+                            Mark posted
+                          </Button>
+                        ) : null}
+                        <span className={`text-xs ${
+                          isDark ? "text-slate-400" : "text-gray-600"
+                        }`}>
+                          {formatDateTime(post.scheduledFor)}
+                        </span>
+                      </div>
                     </div>
                       {post.platform === "youtube" ? (
                         <p className={`text-xs leading-relaxed ${
@@ -1016,7 +1093,7 @@ export default function DashboardSchedulePage() {
                 onClick={() => setShowScheduleModal(true)}
                 className={`rounded-xl transition-all duration-200 ${
                   isDark
-                    ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                    ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
                     : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
                 }`}
               >
@@ -1029,56 +1106,21 @@ export default function DashboardSchedulePage() {
       )}
 
       {/* Schedule Modal */}
-      {showScheduleModal && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 sm:p-6"
-          onClick={() => {
-            setShowScheduleModal(false);
-            setEditingPost(null);
-            // Reset YouTube state
-            setYoutubeVideoTitle("");
-            setYoutubeDescription("");
-            setYoutubeContentType("rain_sounds");
-            setYoutubeDuration(30);
-            setYoutubeQuality("high");
-            setYoutubePrivacy("public");
-          }}
-        >
-          <div
-            className={`border rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl mx-4 transition-colors duration-300 ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={`p-4 sm:p-6 border-b flex items-center justify-between transition-colors duration-300 ${
-              isDark ? "border-slate-700" : "border-gray-200"
-            }`}>
-              <h2 className={`text-base sm:text-lg font-semibold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>
-                {editingPost ? "Edit Post" : "Schedule Post"}
-              </h2>
-              <button
-                onClick={() => {
-                  setShowScheduleModal(false);
-                  setEditingPost(null);
-                  // Reset YouTube state
-                  setYoutubeVideoTitle("");
-                  setYoutubeDescription("");
-                  setYoutubeContentType("rain_sounds");
-                  setYoutubeDuration(30);
-                  setYoutubeQuality("high");
-                  setYoutubePrivacy("public");
-                }}
-                className={`transition-all duration-200 p-1.5 rounded-xl ${
-                  isDark
-                    ? "text-slate-400 hover:text-white hover:bg-slate-700"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                }`}
-              >
-                <XIcon className="w-4 h-4" />
-              </button>
-            </div>
+      <Dialog
+        open={showScheduleModal}
+        onOpenChange={(open) => {
+          if (!open) resetScheduleModalState();
+          else setShowScheduleModal(true);
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] p-0 gap-0 overflow-hidden flex flex-col sm:max-w-2xl">
+          <DialogHeader className={`p-4 sm:p-6 border-b shrink-0 ${
+            isDark ? "border-slate-700" : "border-gray-200"
+          }`}>
+            <DialogTitle>
+              {editingPost ? "Edit Post" : "Schedule Post"}
+            </DialogTitle>
+          </DialogHeader>
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
               <div>
@@ -1155,7 +1197,7 @@ export default function DashboardSchedulePage() {
                       value={youtubeVideoTitle}
                       onChange={(e) => setYoutubeVideoTitle(e.target.value)}
                       placeholder="Enter video title..."
-                      className={`w-full px-4 py-3 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                      className={`w-full px-4 py-3 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
                         isDark
                           ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
                           : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
@@ -1171,7 +1213,7 @@ export default function DashboardSchedulePage() {
                       value={youtubeDescription}
                       onChange={(e) => setYoutubeDescription(e.target.value)}
                       placeholder="Enter video description (optional)..."
-                      className={`w-full px-4 py-3 border rounded-xl resize-none text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                      className={`w-full px-4 py-3 border rounded-xl resize-none text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
                         isDark
                           ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
                           : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
@@ -1182,23 +1224,25 @@ export default function DashboardSchedulePage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className={`block text-xs font-semibold mb-2 ${
-                        isDark ? "text-slate-300" : "text-gray-700"
-                      }`}>Content Type</label>
-                      <select
+                      <Label className="text-xs mb-2 block">Content Type</Label>
+                      <Select
                         value={youtubeContentType}
-                        onChange={(e) => setYoutubeContentType(e.target.value as "rain_sounds" | "sleep_sounds" | "ambient_sounds" | "white_noise")}
-                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                          isDark
-                            ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
-                            : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
-                        }`}
+                        onValueChange={(value) =>
+                          setYoutubeContentType(
+                            value as "rain_sounds" | "sleep_sounds" | "ambient_sounds" | "white_noise"
+                          )
+                        }
                       >
-                        <option value="rain_sounds">Rain Sounds</option>
-                        <option value="sleep_sounds">Sleep Sounds</option>
-                        <option value="ambient_sounds">Ambient Sounds</option>
-                        <option value="white_noise">White Noise</option>
-                      </select>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="rain_sounds">Rain Sounds</SelectItem>
+                          <SelectItem value="sleep_sounds">Sleep Sounds</SelectItem>
+                          <SelectItem value="ambient_sounds">Ambient Sounds</SelectItem>
+                          <SelectItem value="white_noise">White Noise</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
@@ -1211,7 +1255,7 @@ export default function DashboardSchedulePage() {
                         onChange={(e) => setYoutubeDuration(parseInt(e.target.value) || 30)}
                         min={1}
                         max={480}
-                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
                           isDark
                             ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
                             : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
@@ -1222,41 +1266,41 @@ export default function DashboardSchedulePage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className={`block text-xs font-semibold mb-2 ${
-                        isDark ? "text-slate-300" : "text-gray-700"
-                      }`}>Quality</label>
-                      <select
+                      <Label className="text-xs mb-2 block">Quality</Label>
+                      <Select
                         value={youtubeQuality}
-                        onChange={(e) => setYoutubeQuality(e.target.value as "high" | "medium" | "low")}
-                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                          isDark
-                            ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
-                            : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
-                        }`}
+                        onValueChange={(value) =>
+                          setYoutubeQuality(value as "high" | "medium" | "low")
+                        }
                       >
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                      </select>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
-                      <label className={`block text-xs font-semibold mb-2 ${
-                        isDark ? "text-slate-300" : "text-gray-700"
-                      }`}>Privacy</label>
-                      <select
+                      <Label className="text-xs mb-2 block">Privacy</Label>
+                      <Select
                         value={youtubePrivacy}
-                        onChange={(e) => setYoutubePrivacy(e.target.value as "public" | "unlisted" | "private")}
-                        className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                          isDark
-                            ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
-                            : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
-                        }`}
+                        onValueChange={(value) =>
+                          setYoutubePrivacy(value as "public" | "unlisted" | "private")
+                        }
                       >
-                        <option value="public">Public</option>
-                        <option value="unlisted">Unlisted</option>
-                        <option value="private">Private</option>
-                      </select>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="public">Public</SelectItem>
+                          <SelectItem value="unlisted">Unlisted</SelectItem>
+                          <SelectItem value="private">Private</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </>
@@ -1271,7 +1315,7 @@ export default function DashboardSchedulePage() {
                   value={selectedContent}
                   onChange={(e) => setSelectedContent(e.target.value)}
                   placeholder="Paste or type your content here..."
-                      className={`w-full px-4 py-3 border rounded-xl resize-none text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                      className={`w-full px-4 py-3 border rounded-xl resize-none text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
                         isDark
                           ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
                           : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
@@ -1297,7 +1341,7 @@ export default function DashboardSchedulePage() {
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     min={getTodayDate()}
-                    className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                    className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
                       isDark
                         ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
                         : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
@@ -1334,7 +1378,7 @@ export default function DashboardSchedulePage() {
                       }
                       return getMinTimeForToday();
                     })() : undefined}
-                    className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                    className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
                       isDark
                         ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
                         : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
@@ -1356,13 +1400,13 @@ export default function DashboardSchedulePage() {
               <div className={`px-4 sm:px-6 pb-4 border-t transition-colors duration-300 ${
                 isDark
                   ? "border-slate-700 bg-purple-950/30"
-                  : "border-gray-200 bg-purple-50/50"
+                  : "border-gray-200 bg-muted/50"
               }`}>
                 <div className="space-y-3 pt-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Loader2Icon className={`w-4 h-4 animate-spin ${
-                        isDark ? "text-purple-400" : "text-purple-600"
+                        isDark ? "text-purple-400" : "text-foreground"
                       }`} />
                       <span className={`text-sm font-semibold ${
                         isDark ? "text-white" : "text-gray-900"
@@ -1407,7 +1451,7 @@ export default function DashboardSchedulePage() {
                           fetchScheduledPosts();
                         }}
                         size="sm"
-                        className="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl transition-all duration-200"
+                        className="w-full bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground rounded-xl transition-all duration-200"
                       >
                         Done
                       </Button>
@@ -1421,24 +1465,10 @@ export default function DashboardSchedulePage() {
               isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"
             }`}>
               <Button
-                onClick={() => {
-                  setShowScheduleModal(false);
-                  setEditingPost(null);
-                  // Reset YouTube state
-                  setYoutubeVideoTitle("");
-                  setYoutubeDescription("");
-                  setYoutubeContentType("rain_sounds");
-                  setYoutubeDuration(30);
-                  setYoutubeQuality("high");
-                  setYoutubePrivacy("public");
-                }}
+                onClick={resetScheduleModalState}
                 size="sm"
                 variant="outline"
-                className={`w-full sm:w-auto rounded-xl transition-all duration-200 ${
-                  isDark
-                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100"
-                }`}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
@@ -1456,7 +1486,7 @@ export default function DashboardSchedulePage() {
                 size="sm"
                 className={`w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed px-4 rounded-xl transition-all duration-200 ${
                   isDark
-                    ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                    ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
                     : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
                 }`}
               >
@@ -1470,9 +1500,8 @@ export default function DashboardSchedulePage() {
                 )}
               </Button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Post Reminder Modal */}
       <PostReminderModal
@@ -1481,6 +1510,7 @@ export default function DashboardSchedulePage() {
           setShowReminderModal(false);
           setReminderPost(null);
         }}
+        onMarkedPosted={fetchScheduledPosts}
         post={reminderPost ? {
           id: reminderPost.id,
           platform: reminderPost.platform,
@@ -1490,70 +1520,52 @@ export default function DashboardSchedulePage() {
       />
 
       {/* Delete Confirmation Dialog */}
-      {deleteConfirm.open && (
-        <div className="fixed inset-0 z-[100]">
-          <ConfirmDialog
-            open={deleteConfirm.open}
-            onClose={() => setDeleteConfirm({ open: false, id: null })}
-            onConfirm={handleDeleteConfirm}
-            title="Delete Scheduled Post"
-            description="Are you sure you want to delete this scheduled post? This action cannot be undone."
-            confirmText="Delete"
-            cancelText="Cancel"
-            variant="destructive"
-          />
-        </div>
-      )}
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, id: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Scheduled Post"
+        description="Are you sure you want to delete this scheduled post? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
 
       {/* Approval link — manual fallback when client email is delayed or missing */}
-      {approvalLinkModal.open && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-          onClick={() => setApprovalLinkModal({ open: false, link: "" })}
-        >
-          <Card
-            className={`w-full max-w-lg border rounded-xl ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CardContent className="p-6 space-y-4">
-              <div>
-                <h3 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
-                  Client approval link
-                </h3>
-                <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-                  We&apos;ve attempted to email your client. Copy this link if they need it manually —
-                  it opens their approval portal.
-                </p>
-              </div>
-              <div
-                className={`rounded-lg border px-3 py-2 text-xs break-all ${
-                  isDark ? "bg-slate-900 border-slate-600 text-slate-300" : "bg-gray-50 border-gray-200 text-gray-700"
-                }`}
-              >
-                {approvalLinkModal.link}
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
-                <Button
-                  variant="outline"
-                  onClick={() => setApprovalLinkModal({ open: false, link: "" })}
-                  className={isDark ? "border-slate-600" : ""}
-                >
-                  Done
-                </Button>
-                <Button
-                  onClick={() => handleCopyApprovalLink(approvalLinkModal.link)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  <CopyIcon className="w-4 h-4 mr-2" />
-                  Copy approval link
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <Dialog
+        open={approvalLinkModal.open}
+        onOpenChange={(open) =>
+          !open && setApprovalLinkModal({ open: false, link: "" })
+        }
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Client approval link</DialogTitle>
+            <DialogDescription className="leading-relaxed">
+              We&apos;ve attempted to email your client. Copy this link if they
+              need it manually — it opens their approval portal.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 px-3 py-2 text-xs break-all text-gray-700 dark:text-slate-300">
+            {approvalLinkModal.link}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setApprovalLinkModal({ open: false, link: "" })}
+            >
+              Done
+            </Button>
+            <Button
+              onClick={() => handleCopyApprovalLink(approvalLinkModal.link)}
+              className="bg-gray-950 hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-100 dark:text-gray-950 text-white"
+            >
+              <CopyIcon className="w-4 h-4 mr-2" />
+              Copy approval link
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <KeyboardShortcuts />
     </div>

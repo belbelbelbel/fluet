@@ -9,19 +9,20 @@ import {
   SignedIn,
   useAuth,
 } from "@clerk/nextjs";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Logo } from "@/components/Logo";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Menu, X } from "lucide-react";
 
-export function Navbar() {
+interface NavbarProps {
+  /** Kept for callers; marketing nav is always light. */
+  forceLight?: boolean;
+}
+
+export function Navbar(_props: NavbarProps = {}) {
   const { userId } = useAuth();
   const pathname = usePathname();
-  const { resolvedTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  
-  const isDark = resolvedTheme === "dark";
 
   const handleScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 10);
@@ -31,25 +32,31 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
-  
+
   const toggleMenu = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
   }, []);
 
   // Keep dependency array empty so hook count/order never changes (avoids "more hooks" error with Router).
-  const navItems = useMemo(() => [
-    { name: "Home", href: "/", isAnchor: false },
-    { name: "Features", href: "#features", isAnchor: true },
-    { name: "Pricing", href: "#pricing", isAnchor: true },
-    { name: "FAQ", href: "#faq", isAnchor: true },
-  ], []);
+  const navItems = useMemo(
+    () => [
+      { name: "Home", href: "/", isAnchor: false },
+      { name: "Features", href: "#features", isAnchor: true },
+      { name: "Pricing", href: "#pricing", isAnchor: true },
+      { name: "FAQ", href: "#faq", isAnchor: true },
+    ],
+    []
+  );
 
-  const isActive = useCallback((path: string) => {
-    if (path === "/") {
-      return pathname === "/";
-    }
-    return pathname.startsWith(path);
-  }, [pathname]);
+  const isActive = useCallback(
+    (path: string) => {
+      if (path === "/") {
+        return pathname === "/";
+      }
+      return pathname.startsWith(path);
+    },
+    [pathname]
+  );
 
   // Close menu when route changes
   useEffect(() => {
@@ -60,11 +67,7 @@ export function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b backdrop-blur-sm ${
-          isDark
-            ? isScrolled
-              ? "bg-gray-950/90 border-gray-800 shadow-lg"
-              : "bg-gray-950/95 border-gray-800/50"
-            : isScrolled
+          isScrolled
             ? "bg-white/80 border-gray-200 shadow-sm"
             : "bg-white/95 border-gray-200/50"
         }`}
@@ -74,12 +77,8 @@ export function Navbar() {
             {/* Logo - Left - Matching Dashboard */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
-                  <Logo size="lg" variant="icon" priority />
-                <span className={`text-lg font-bold ${
-                  isDark ? "text-white" : "text-gray-950"
-                }`}>
-                  Revvy
-                </span>
+                <Logo size="lg" variant="icon" priority forceLight />
+                <span className="text-lg font-bold text-gray-950">Revvy</span>
               </Link>
             </div>
 
@@ -87,15 +86,17 @@ export function Navbar() {
             <div className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
               {navItems.map((item) => {
                 const isPricingOnHome = item.name === "Pricing" && pathname === "/";
-                const href = item.name === "Pricing" && pathname !== "/" ? "/pricing" : item.href;
-                const useAnchor = item.name === "Pricing" ? isPricingOnHome : item.isAnchor;
+                const href =
+                  item.name === "Pricing" && pathname !== "/" ? "/pricing" : item.href;
+                const useAnchor =
+                  item.name === "Pricing" ? isPricingOnHome : item.isAnchor;
                 const active = useAnchor ? false : isActive(href);
                 const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
                   if (useAnchor) {
                     e.preventDefault();
                     const element = document.querySelector(item.href);
                     if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
                     }
                   }
                 };
@@ -105,12 +106,10 @@ export function Navbar() {
                     href={href}
                     onClick={handleClick}
                     className={`${
-                      active 
-                      ? isDark ? "text-white font-semibold" : "text-gray-900 font-semibold"
-                      : isDark ? "text-gray-400" : "text-gray-600"
-                    } ${
-                      isDark ? "hover:text-white" : "hover:text-gray-900"
-                    } transition-colors text-sm font-medium cursor-pointer`}
+                      active
+                        ? "text-gray-900 font-semibold"
+                        : "text-gray-600"
+                    } hover:text-gray-900 transition-colors text-sm font-medium cursor-pointer`}
                   >
                     {item.name}
                   </Link>
@@ -121,9 +120,7 @@ export function Navbar() {
             {/* User Actions - Right */}
             <div className="flex items-center space-x-4">
               <button
-                className={`md:hidden ${
-                  isDark ? "text-white" : "text-gray-900"
-                } focus:outline-none`}
+                className="md:hidden text-gray-900 focus:outline-none"
                 onClick={toggleMenu}
                 aria-label="Toggle menu"
               >
@@ -137,11 +134,7 @@ export function Navbar() {
               <div className="hidden md:flex items-center space-x-4">
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <button className={`${
-                      isDark 
-                        ? "text-gray-300 hover:text-white bg-gray-900 border-gray-800"
-                        : "text-gray-700 hover:text-gray-900 bg-white border-gray-200"
-                    } transition-colors text-sm font-medium px-4 py-2 rounded-lg`}>
+                    <button className="text-gray-700 hover:text-gray-900 bg-white border border-gray-200 transition-colors text-sm font-medium px-4 py-2 rounded-lg">
                       Log in
                     </button>
                   </SignInButton>
@@ -156,11 +149,9 @@ export function Navbar() {
                     href="/dashboard"
                     className={`${
                       isActive("/dashboard")
-                        ? isDark ? "text-white font-semibold" : "text-gray-900 font-semibold"
-                        : isDark ? "text-gray-400" : "text-gray-600"
-                    } ${
-                      isDark ? "hover:text-white" : "hover:text-gray-900"
-                    } transition-colors text-sm font-medium mr-2`}
+                        ? "text-gray-900 font-semibold"
+                        : "text-gray-600"
+                    } hover:text-gray-900 transition-colors text-sm font-medium mr-2`}
                   >
                     Dashboard
                   </Link>
@@ -171,7 +162,8 @@ export function Navbar() {
                         card: "bg-white shadow-lg border border-gray-200",
                         modalContent: "bg-white",
                         formButtonPrimary: "bg-gray-950 hover:bg-gray-900 text-white",
-                        formButtonSecondary: "bg-white hover:bg-gray-50 text-gray-950 border border-gray-200",
+                        formButtonSecondary:
+                          "bg-white hover:bg-gray-50 text-gray-950 border border-gray-200",
                       },
                       variables: {
                         colorBackground: "#ffffff",
@@ -194,16 +186,14 @@ export function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-40 sm:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 sm:hidden"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] ${
-          isDark ? "bg-gray-950 border-gray-800" : "bg-white border-gray-200"
-        } border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out sm:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white border-gray-200 border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out sm:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -211,18 +201,12 @@ export function Navbar() {
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-2">
-              <Logo size="lg" variant="icon" priority />
-              <span className={`text-lg font-bold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Revvy</span>
+              <Logo size="lg" variant="icon" priority forceLight />
+              <span className="text-lg font-bold text-gray-900">Revvy</span>
             </div>
             <button
               onClick={() => setIsMenuOpen(false)}
-              className={`${
-                isDark 
-                  ? "text-gray-400 hover:text-white hover:bg-gray-800"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              } transition-colors p-2 rounded-lg`}
+              className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors p-2 rounded-lg"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -238,8 +222,10 @@ export function Navbar() {
               </p>
               {navItems.map((item) => {
                 const isPricingOnHome = item.name === "Pricing" && pathname === "/";
-                const href = item.name === "Pricing" && pathname !== "/" ? "/pricing" : item.href;
-                const useAnchor = item.name === "Pricing" ? isPricingOnHome : item.isAnchor;
+                const href =
+                  item.name === "Pricing" && pathname !== "/" ? "/pricing" : item.href;
+                const useAnchor =
+                  item.name === "Pricing" ? isPricingOnHome : item.isAnchor;
                 const active = useAnchor ? false : isActive(href);
                 const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
                   setIsMenuOpen(false);
@@ -248,7 +234,7 @@ export function Navbar() {
                     setTimeout(() => {
                       const element = document.querySelector(item.href);
                       if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        element.scrollIntoView({ behavior: "smooth", block: "start" });
                       }
                     }, 100);
                   }
@@ -319,7 +305,8 @@ export function Navbar() {
                         card: "bg-white shadow-lg border border-gray-200",
                         modalContent: "bg-white",
                         formButtonPrimary: "bg-gray-950 hover:bg-gray-900 text-white",
-                        formButtonSecondary: "bg-white hover:bg-gray-50 text-gray-950 border border-gray-200",
+                        formButtonSecondary:
+                          "bg-white hover:bg-gray-50 text-gray-950 border border-gray-200",
                       },
                       variables: {
                         colorBackground: "#ffffff",

@@ -104,14 +104,14 @@ export function TeamMemberSelector({
                   className={cn(
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                     !selectedMemberId
-                      ? "bg-purple-50 text-purple-700 font-medium"
+                      ? "bg-muted text-foreground font-medium"
                       : "text-gray-700 hover:bg-gray-50"
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <span>Unassigned</span>
                     {!selectedMemberId && (
-                      <Check className="w-4 h-4 text-purple-600" />
+                      <Check className="w-4 h-4 text-foreground" />
                     )}
                   </div>
                 </button>
@@ -126,7 +126,7 @@ export function TeamMemberSelector({
                   className={cn(
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                     selectedMemberId === member.id
-                      ? "bg-purple-50 text-purple-700 font-medium"
+                      ? "bg-muted text-foreground font-medium"
                       : "text-gray-700 hover:bg-gray-50"
                   )}
                 >
@@ -141,7 +141,7 @@ export function TeamMemberSelector({
                       )}
                     </div>
                     {selectedMemberId === member.id && (
-                      <Check className="w-4 h-4 text-purple-600" />
+                      <Check className="w-4 h-4 text-foreground" />
                     )}
                   </div>
                 </button>

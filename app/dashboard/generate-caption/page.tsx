@@ -209,7 +209,7 @@ function GenerateCaptionPageInner() {
             }`}>
               Generate Caption
               {clientName && (
-                <span className="text-purple-600 dark:text-purple-400 font-semibold ml-2">
+                <span className="text-foreground dark:text-purple-400 font-semibold ml-2">
                   for {clientName}
                 </span>
               )}
@@ -240,7 +240,7 @@ function GenerateCaptionPageInner() {
                     </h2>
                   </div>
                   <div className={`border-l-4 pl-3 sm:pl-4 py-2 ${
-                    isDark ? "border-purple-500" : "border-purple-600"
+                    isDark ? "border-purple-500" : "border-primary"
                   }`}>
                     <p className={`text-xs sm:text-sm mb-1 ${
                       isDark ? "text-slate-400" : "text-gray-500"
@@ -268,31 +268,31 @@ function GenerateCaptionPageInner() {
                     key={tone}
                     onClick={() => setSelectedTone(tone)}
                     disabled={isGenerating}
-                    className={`relative p-4 sm:p-5 rounded-xl border-2 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`relative p-4 sm:p-5 rounded-xl border transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed ${
                       selectedTone === tone
                         ? isDark
                           ? "border-purple-500 bg-purple-900/50"
-                          : "border-purple-600 bg-purple-50"
+                          : "border-primary bg-muted"
                         : isDark
                         ? "border-slate-700 bg-slate-800 hover:border-purple-500 hover:bg-purple-900/30"
-                        : "border-gray-200 bg-white hover:border-purple-200 hover:bg-purple-50/30"
+                        : "border-gray-200 bg-white hover:border-purple-200 hover:bg-muted/30"
                     }`}
                   >
                     {selectedTone === tone && (
                       <div className={`absolute top-3 right-3 w-2 h-2 rounded-full ${
-                        isDark ? "bg-purple-400" : "bg-purple-600"
+                        isDark ? "bg-purple-400" : "bg-primary"
                       }`} />
                     )}
                     <div className={`font-bold text-base mb-2 capitalize ${
                       selectedTone === tone 
-                        ? isDark ? "text-purple-300" : "text-purple-700"
+                        ? isDark ? "text-purple-300" : "text-foreground"
                         : isDark ? "text-white" : "text-gray-950"
                     }`}>
                       {tone}
                     </div>
                     <div className={`text-xs leading-relaxed ${
                       selectedTone === tone 
-                        ? isDark ? "text-purple-400" : "text-purple-600"
+                        ? isDark ? "text-purple-400" : "text-foreground"
                         : isDark ? "text-slate-400" : "text-gray-600"
                     }`}>
                       {tone === "mild" && "Professional with local phrases"}
@@ -310,10 +310,10 @@ function GenerateCaptionPageInner() {
                 <Button
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className={`w-full text-white rounded-xl py-3 sm:py-4 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md ${
+                  className={`w-full rounded-xl py-3 sm:py-4 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md ${
                     isDark
-                      ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800"
-                      : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950"
+                      ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
+                      : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
                   }`}
                 >
                   {isGenerating ? (
@@ -420,7 +420,7 @@ function GenerateCaptionPageInner() {
                             onClick={handleSave}
                             disabled={isSaving || !generatedCaption}
                             size="sm"
-                            className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-lg px-4 py-1.5 text-xs font-medium disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                            className="bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground rounded-lg px-4 py-1.5 text-xs font-medium disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
                           >
                             <Save className="w-3 h-3 mr-1.5" />
                             {isSaving ? "Saving..." : "Save"}

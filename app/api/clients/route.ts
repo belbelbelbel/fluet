@@ -7,10 +7,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { 
     CreateClient, 
-    GetClientsByAgency, 
     GetUserByClerkId,
     CreateOrUpdateUser
 } from "@/utils/db/actions";
+import {
+    resolveAgencyContext,
+    getAccessibleClients,
+    canAccessAllClients,
+} from "@/lib/team-access";
 
 export const dynamic = "force-dynamic";
 
@@ -123,12 +127,18 @@ export async function GET(req: NextRequest) {
             console.log(`[Clients API GET] ✅ User found: ${user.id}`);
         }
 
-        // Get all clients for this agency
-        const clients = await GetClientsByAgency(user.id);
+        // Owners/admins/managers see all agency clients; others see assignments only
+        const ctx = await resolveAgencyContext(clerkUserId);
+        const clients = ctx
+            ? await getAccessibleClients(ctx)
+            : [];
 
         const response = NextResponse.json({
             success: true,
             clients,
+            access: ctx
+                ? { role: ctx.role, canManageAll: canAccessAllClients(ctx.role) }
+                : null,
         });
         
         // Add caching headers
@@ -303,9 +313,17 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Create client
+        // Create client (owners / admins / managers)
         try {
-            console.log(`[Clients API POST] Creating client for agency ${user.id} with name: ${name.trim()}`);
+            const ctx = await resolveAgencyContext(clerkUserId!);
+            if (!ctx || !canAccessAllClients(ctx.role)) {
+                return NextResponse.json(
+                    { error: "You don't have permission to create clients" },
+                    { status: 403 }
+                );
+            }
+
+            console.log(`[Clients API POST] Creating client for agency ${ctx.agencyId} with name: ${name.trim()}`);
             
             // Validate user has an ID
             if (!user || !user.id) {
@@ -320,7 +338,7 @@ export async function POST(req: NextRequest) {
             }
             
             const client = await CreateClient({
-                agencyId: user.id,
+                agencyId: ctx.agencyId,
                 name: name.trim(),
                 logoUrl: logoUrl?.trim() || undefined,
                 email: email?.trim() || undefined,

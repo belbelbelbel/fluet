@@ -19,6 +19,7 @@ import {
   Cpu,
   Code,
   Calendar,
+  CreditCard,
 } from "lucide-react";
 import { showToast } from "@/lib/toast";
 import { Niche } from "@/lib/content-ideas";
@@ -31,8 +32,9 @@ import {
   Briefcase,
   Store,
 } from "lucide-react";
+import Link from "next/link";
 
-type AIModel = "gpt-4o-mini" | "gpt-4" | "claude-3-haiku" | "claude-3-sonnet" | "gemini-pro";
+type AIModel = "deepseek-v4-flash" | "deepseek-v4-pro";
 
 const niches = [
   {
@@ -93,59 +95,26 @@ interface AIModelInfo {
 
 const aiModels: AIModelInfo[] = [
   {
-    id: "gpt-4o-mini",
-    name: "GPT-4o Mini",
-    provider: "OpenAI",
-    description: "Fast and efficient, perfect for quick content generation",
+    id: "deepseek-v4-flash",
+    name: "DeepSeek V4 Flash",
+    provider: "DeepSeek",
+    description: "Best default — fast + cheap for tweets, captions, and ideas",
     speed: "fast",
     quality: "high",
     cost: "low",
     icon: <Bot className="w-4 h-4" />,
-    color: "text-green-600",
+    color: "text-teal-600",
   },
   {
-    id: "gpt-4",
-    name: "GPT-4",
-    provider: "OpenAI",
-    description: "Most advanced model with superior quality and creativity",
+    id: "deepseek-v4-pro",
+    name: "DeepSeek V4 Pro",
+    provider: "DeepSeek",
+    description: "Higher quality for brand strategy, research, and long LinkedIn",
     speed: "medium",
     quality: "high",
-    cost: "high",
+    cost: "medium",
     icon: <Brain className="w-4 h-4" />,
-    color: "text-blue-600",
-  },
-  {
-    id: "claude-3-haiku",
-    name: "Claude 3 Haiku",
-    provider: "Anthropic",
-    description: "Lightning-fast responses with good quality",
-    speed: "fast",
-    quality: "medium",
-    cost: "low",
-    icon: <Cpu className="w-4 h-4" />,
-    color: "text-purple-600",
-  },
-  {
-    id: "claude-3-sonnet",
-    name: "Claude 3 Sonnet",
-    provider: "Anthropic",
-    description: "Balanced performance with excellent reasoning",
-    speed: "medium",
-    quality: "high",
-    cost: "medium",
-    icon: <Bot className="w-4 h-4" />,
-    color: "text-indigo-600",
-  },
-  {
-    id: "gemini-pro",
-    name: "Gemini Pro",
-    provider: "Google",
-    description: "Great for diverse content types and multilingual support",
-    speed: "fast",
-    quality: "high",
-    cost: "medium",
-    icon: <Code className="w-4 h-4" />,
-    color: "text-orange-600",
+    color: "text-sky-600",
   },
 ];
 
@@ -169,7 +138,7 @@ export default function SettingsPage() {
   const { user, isLoaded: userLoaded } = useUser();
   const { theme: currentTheme, setTheme: setCurrentTheme, resolvedTheme } = useTheme();
   const [settings, setSettings] = useState<UserSettings>({
-    defaultAIModel: "gpt-4o-mini",
+    defaultAIModel: "deepseek-v4-flash",
     emailApprovals: true,
     emailTasks: true,
     defaultRequiresApproval: true,
@@ -184,8 +153,44 @@ export default function SettingsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [publishBusy, setPublishBusy] = useState<"check" | "run" | null>(null);
+  const [publishReport, setPublishReport] = useState<{
+    canAutoPostTwitter: boolean;
+    tip: string;
+    dueCount: number;
+    readyCount: number;
+    checks: { id: string; ok: boolean; label: string }[];
+    duePosts: {
+      id: number;
+      platform: string;
+      ready: boolean;
+      reason: string;
+      preview: string;
+    }[];
+    lastRun?: {
+      successful: number;
+      failed: number;
+      skipped: number;
+      actions: { id: number; platform: string; result: string }[];
+    };
+  } | null>(null);
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
   const modelDropdownRef = useRef<HTMLDivElement>(null);
+  const [usage, setUsage] = useState<{
+    usageCount: number;
+    limit: number;
+    remainingQuota: number;
+    usagePercentage: number;
+    daysUntilReset: number;
+    plan: string;
+    isAtLimit: boolean;
+    isNearLimit: boolean;
+    hasActiveSubscription: boolean;
+  } | null>(null);
+  const [agencyStats, setAgencyStats] = useState({
+    clients: 0,
+    team: 0,
+  });
 
   const checkYouTubeConnection = async () => {
     try {
@@ -267,9 +272,40 @@ export default function SettingsPage() {
     }
   };
 
+  const fetchBillingAndStats = async () => {
+    if (!userId) return;
+    try {
+      const [usageRes, clientsRes, teamRes] = await Promise.all([
+        fetch("/api/usage", { credentials: "include" }),
+        fetch(`/api/clients?userId=${userId}`, { credentials: "include" }),
+        fetch(`/api/team?userId=${userId}`, { credentials: "include" }),
+      ]);
+      if (usageRes.ok) {
+        setUsage(await usageRes.json());
+      }
+      if (clientsRes.ok) {
+        const data = await clientsRes.json();
+        setAgencyStats((s) => ({
+          ...s,
+          clients: (data.clients || []).length,
+        }));
+      }
+      if (teamRes.ok) {
+        const data = await teamRes.json();
+        setAgencyStats((s) => ({
+          ...s,
+          team: (data.members || []).length,
+        }));
+      }
+    } catch {
+      /* ignore */
+    }
+  };
+
   useEffect(() => {
     if (userId) {
       fetchSettings();
+      fetchBillingAndStats();
       checkYouTubeConnection();
       checkTwitterConnection();
       checkInstagramConnection();
@@ -283,7 +319,17 @@ export default function SettingsPage() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("youtube") === "connected") {
       checkYouTubeConnection();
-      // Clean up URL
+      showToast.success("YouTube connected", "Ready for video uploads");
+      window.history.replaceState({}, "", "/dashboard/settings");
+    }
+    if (urlParams.get("twitter") === "connected") {
+      checkTwitterConnection();
+      showToast.success("Twitter connected", "Scheduled tweets can auto-publish");
+      window.history.replaceState({}, "", "/dashboard/settings");
+    }
+    if (urlParams.get("instagram") === "connected") {
+      checkInstagramConnection();
+      showToast.success("Instagram connected", "Image posts can auto-publish");
       window.history.replaceState({}, "", "/dashboard/settings");
     }
     if (urlParams.get("success") === "google_calendar_connected") {
@@ -330,11 +376,11 @@ export default function SettingsPage() {
         const result = await response.json();
         if (result.persisted === false) {
           showToast.info(
-            "Settings not saved yet",
-            "Your preferences weren't persisted — account-wide settings are coming soon. Theme and niche still work on this device."
+            "Saved on this device",
+            "Account sync wasn’t available — try again in a moment."
           );
         } else {
-          showToast.success("Settings saved", "Your preferences have been updated");
+          showToast.success("Settings saved", "Your preferences are saved to your account");
         }
       } else if (response.status === 401) {
         showToast.error("Authentication failed", "Please sign in again");
@@ -387,7 +433,7 @@ export default function SettingsPage() {
             <TabsTrigger value="agency" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
                 ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
               <Bot className="w-4 h-4 mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Agency Profile</span>
@@ -396,7 +442,7 @@ export default function SettingsPage() {
             <TabsTrigger value="integrations" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
                 ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
               <LinkIcon className="w-4 h-4 mr-2 flex-shrink-0" />
               Integrations
@@ -404,7 +450,7 @@ export default function SettingsPage() {
             <TabsTrigger value="team" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
                 ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
               <Check className="w-4 h-4 mr-2 flex-shrink-0" />
               Team
@@ -412,7 +458,7 @@ export default function SettingsPage() {
             <TabsTrigger value="notifications" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
                 ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
               <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
               <span className="hidden md:inline">Notifications</span>
@@ -421,7 +467,7 @@ export default function SettingsPage() {
             <TabsTrigger value="ai" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
                 ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
               <Brain className="w-4 h-4 mr-2 flex-shrink-0" />
               AI
@@ -429,10 +475,18 @@ export default function SettingsPage() {
             <TabsTrigger value="workflow" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
               isDark
                 ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-purple-700 data-[state=active]:border-purple-600 data-[state=active]:bg-purple-50 data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
             }`}>
               <Cpu className="w-4 h-4 mr-2 flex-shrink-0" />
               Workflow
+            </TabsTrigger>
+            <TabsTrigger value="billing" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
+              isDark
+                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
+                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+            }`}>
+              <CreditCard className="w-4 h-4 mr-2 flex-shrink-0" />
+              Billing
             </TabsTrigger>
           </TabsList>
         </div>
@@ -503,13 +557,13 @@ export default function SettingsPage() {
                   <div className={`p-4 rounded-lg border ${
                     isDark
                       ? "bg-purple-950/50 border-purple-900"
-                      : "bg-purple-50 border-purple-200"
+                      : "bg-muted border-purple-200"
                   }`}>
                     <div className={`text-2xl font-bold mb-1 ${
                       isDark ? "text-purple-300" : "text-purple-900"
-                    }`}>0</div>
+                    }`}>{agencyStats.clients}</div>
                     <div className={`text-sm ${
-                      isDark ? "text-purple-400" : "text-purple-700"
+                      isDark ? "text-purple-400" : "text-foreground"
                     }`}>Active Clients</div>
                   </div>
                   <div className={`p-4 rounded-lg border ${
@@ -519,7 +573,7 @@ export default function SettingsPage() {
                   }`}>
                     <div className={`text-2xl font-bold mb-1 ${
                       isDark ? "text-blue-300" : "text-blue-900"
-                    }`}>0</div>
+                    }`}>{agencyStats.team}</div>
                     <div className={`text-sm ${
                       isDark ? "text-blue-400" : "text-blue-700"
                     }`}>Team Members</div>
@@ -531,13 +585,91 @@ export default function SettingsPage() {
                   }`}>
                     <div className={`text-2xl font-bold mb-1 ${
                       isDark ? "text-green-300" : "text-green-900"
-                    }`}>0</div>
+                    }`}>{usage?.usageCount ?? 0}</div>
                     <div className={`text-sm ${
                       isDark ? "text-green-400" : "text-green-700"
-                    }`}>Posts This Month</div>
+                    }`}>Generations this month</div>
                   </div>
                 </div>
               </div>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="billing" className="space-y-6">
+          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
+            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                Plan & usage
+              </CardTitle>
+              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+                See what’s included this month and upgrade when you need more.
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>Current plan</p>
+                  <p className={`text-xl font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                    {usage?.plan || "Free"}
+                  </p>
+                </div>
+                <Button asChild className="rounded-xl">
+                  <Link href="/checkout?plan=pro">
+                    {usage?.hasActiveSubscription ? "Change plan" : "Upgrade"}
+                  </Link>
+                </Button>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className={isDark ? "text-slate-300" : "text-gray-700"}>
+                    Generations used
+                  </span>
+                  <span className={isDark ? "text-slate-400" : "text-gray-500"}>
+                    {usage
+                      ? `${usage.usageCount} / ${
+                          usage.limit === Infinity || !Number.isFinite(usage.limit)
+                            ? "∞"
+                            : usage.limit
+                        }`
+                      : "—"}
+                  </span>
+                </div>
+                <div
+                  className={`h-2 rounded-full overflow-hidden ${
+                    isDark ? "bg-slate-700" : "bg-gray-100"
+                  }`}
+                >
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      usage?.isAtLimit
+                        ? "bg-red-500"
+                        : usage?.isNearLimit
+                          ? "bg-amber-500"
+                          : "bg-primary"
+                    }`}
+                    style={{
+                      width: `${Math.min(100, usage?.usagePercentage ?? 0)}%`,
+                    }}
+                  />
+                </div>
+                <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                  {usage
+                    ? usage.limit === Infinity || !Number.isFinite(usage.limit)
+                      ? "Unlimited on your plan."
+                      : `${usage.remainingQuota} left · resets in ${usage.daysUntilReset} day${
+                          usage.daysUntilReset === 1 ? "" : "s"
+                        }`
+                    : "Loading usage…"}
+                </p>
+              </div>
+
+              {usage?.isAtLimit ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+                  You’ve hit this month’s limit. Upgrade to keep generating.
+                </div>
+              ) : null}
             </div>
           </Card>
         </TabsContent>
@@ -552,6 +684,180 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-6">
+              {/* Prove publish loop */}
+              <div
+                className={`rounded-xl border p-4 ${
+                  isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-3">
+                  <div>
+                    <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                      Publish readiness
+                    </h3>
+                    <p className={`text-sm mt-0.5 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                      Prove Twitter/Instagram auto-post without waiting on cron
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                    <Button
+                      variant="outline"
+                      disabled={!!publishBusy}
+                      onClick={async () => {
+                        try {
+                          setPublishBusy("check");
+                          const res = await fetch("/api/publish/readiness", {
+                            credentials: "include",
+                          });
+                          const data = await res.json();
+                          if (!res.ok) throw new Error(data.error || "Check failed");
+                          setPublishReport({
+                            canAutoPostTwitter: !!data.canAutoPostTwitter,
+                            tip: data.tip || "",
+                            dueCount: data.dueCount ?? 0,
+                            readyCount: data.readyCount ?? 0,
+                            checks: data.checks || [],
+                            duePosts: data.duePosts || [],
+                            lastRun: publishReport?.lastRun,
+                          });
+                          showToast.success(
+                            data.canAutoPostTwitter ? "Twitter ready" : "Not ready yet",
+                            data.tip || "See checklist below"
+                          );
+                        } catch (e) {
+                          showToast.error(
+                            "Check failed",
+                            e instanceof Error ? e.message : "Try again"
+                          );
+                        } finally {
+                          setPublishBusy(null);
+                        }
+                      }}
+                    >
+                      {publishBusy === "check" ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : null}
+                      Check readiness
+                    </Button>
+                    <Button
+                      disabled={!!publishBusy}
+                      className="bg-sky-600 hover:bg-sky-700 text-white"
+                      onClick={async () => {
+                        try {
+                          setPublishBusy("run");
+                          const res = await fetch("/api/publish/run-due", {
+                            method: "POST",
+                            credentials: "include",
+                          });
+                          const data = await res.json();
+                          if (!res.ok) throw new Error(data.error || "Run failed");
+                          setPublishReport((prev) => ({
+                            canAutoPostTwitter: prev?.canAutoPostTwitter ?? false,
+                            tip: prev?.tip || data.message || "",
+                            dueCount: prev?.dueCount ?? 0,
+                            readyCount: prev?.readyCount ?? 0,
+                            checks: prev?.checks || [],
+                            duePosts: prev?.duePosts || [],
+                            lastRun: {
+                              successful: data.successful ?? 0,
+                              failed: data.failed ?? 0,
+                              skipped: data.skipped ?? 0,
+                              actions: data.actions || [],
+                            },
+                          }));
+                          showToast.success(
+                            "Run finished",
+                            `${data.successful ?? 0} posted · ${data.failed ?? 0} failed · ${data.skipped ?? 0} skipped`
+                          );
+                        } catch (e) {
+                          showToast.error(
+                            "Run failed",
+                            e instanceof Error ? e.message : "Try again"
+                          );
+                        } finally {
+                          setPublishBusy(null);
+                        }
+                      }}
+                    >
+                      {publishBusy === "run" ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <PlayIcon className="w-4 h-4 mr-2" />
+                      )}
+                      Run due posts now
+                    </Button>
+                  </div>
+                </div>
+
+                {publishReport ? (
+                  <div
+                    className={`rounded-xl border p-4 space-y-3 text-sm ${
+                      isDark ? "bg-slate-900/60 border-slate-700" : "bg-white border-gray-200"
+                    }`}
+                  >
+                    <p className={isDark ? "text-slate-300" : "text-gray-700"}>
+                      {publishReport.canAutoPostTwitter
+                        ? "Twitter token looks good."
+                        : "Twitter not ready for auto-post yet."}{" "}
+                      <span className={isDark ? "text-slate-400" : "text-gray-500"}>
+                        {publishReport.readyCount}/{publishReport.dueCount} due posts ready
+                      </span>
+                    </p>
+                    <ul className="space-y-1">
+                      {publishReport.checks.map((c) => (
+                        <li
+                          key={c.id}
+                          className={
+                            c.ok
+                              ? isDark
+                                ? "text-emerald-300"
+                                : "text-emerald-700"
+                              : isDark
+                                ? "text-amber-200"
+                                : "text-amber-800"
+                          }
+                        >
+                          {c.ok ? "✓" : "○"} {c.label}
+                        </li>
+                      ))}
+                    </ul>
+                    {publishReport.duePosts.length > 0 ? (
+                      <ul className={`space-y-2 pt-1 border-t ${isDark ? "border-slate-700" : "border-gray-100"}`}>
+                        {publishReport.duePosts.slice(0, 8).map((p) => (
+                          <li key={p.id} className={isDark ? "text-slate-300" : "text-gray-700"}>
+                            <span className="font-medium capitalize">#{p.id} {p.platform}</span>
+                            {" — "}
+                            {p.ready ? "ready" : p.reason}
+                            <span className={`block text-xs truncate ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                              {p.preview}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className={`text-xs ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                        {publishReport.tip}
+                      </p>
+                    )}
+                    {publishReport.lastRun ? (
+                      <div className={`pt-2 border-t ${isDark ? "border-slate-700" : "border-gray-100"}`}>
+                        <p className={`text-xs font-medium mb-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                          Last run: {publishReport.lastRun.successful} posted ·{" "}
+                          {publishReport.lastRun.failed} failed · {publishReport.lastRun.skipped} skipped
+                        </p>
+                        <ul className="space-y-1 text-xs">
+                          {publishReport.lastRun.actions.slice(0, 10).map((a) => (
+                            <li key={`${a.id}-${a.result}`} className={isDark ? "text-slate-400" : "text-gray-600"}>
+                              #{a.id} {a.platform}: {a.result}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+
               {/* YouTube Integration */}
               <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
                 <div className="flex items-center gap-3 mb-4">
@@ -641,6 +947,223 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Twitter */}
+              <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">
+                    X
+                  </div>
+                  <div>
+                    <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                      Twitter / X
+                    </h3>
+                    <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                      Auto-post scheduled tweets when connected
+                    </p>
+                  </div>
+                </div>
+                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
+                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+                }`}>
+                  <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                    {settings.twitterConnected
+                      ? "✅ Connected — scheduled tweets can auto-publish"
+                      : "Not connected — connect to enable auto-posting"}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    {settings.twitterConnected ? (
+                      <Button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch("/api/twitter/disconnect", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              credentials: "include",
+                              body: JSON.stringify({ userId }),
+                            });
+                            if (response.ok) {
+                              setSettings((prev) => ({ ...prev, twitterConnected: false }));
+                              showToast.success("Twitter disconnected", "Auto-posting disabled");
+                            } else {
+                              const data = await response.json();
+                              throw new Error(data.error || "Failed to disconnect");
+                            }
+                          } catch (error: unknown) {
+                            showToast.error(
+                              "Disconnect failed",
+                              error instanceof Error ? error.message : "Try again"
+                            );
+                          }
+                        }}
+                        className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
+                      >
+                        Disconnect
+                      </Button>
+                    ) : null}
+                    <Button
+                      onClick={() => {
+                        window.location.href = "/api/twitter/auth";
+                      }}
+                      className={`w-full sm:w-auto ${
+                        settings.twitterConnected
+                          ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                          : "bg-sky-500 hover:bg-sky-600 text-white"
+                      }`}
+                    >
+                      {settings.twitterConnected ? "Reconnect" : "Connect Twitter"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Instagram */}
+              <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center flex-shrink-0 text-white font-bold text-xs">
+                    IG
+                  </div>
+                  <div>
+                    <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                      Instagram
+                    </h3>
+                    <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                      Auto-publish image posts when a public image URL is set
+                    </p>
+                  </div>
+                </div>
+                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
+                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+                }`}>
+                  <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                    {settings.instagramConnected
+                      ? "✅ Connected — image posts can auto-publish"
+                      : "Not connected — connect a Business/Creator account"}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    {settings.instagramConnected ? (
+                      <Button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch("/api/instagram/disconnect", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              credentials: "include",
+                              body: JSON.stringify({ userId }),
+                            });
+                            if (response.ok) {
+                              setSettings((prev) => ({ ...prev, instagramConnected: false }));
+                              showToast.success("Instagram disconnected", "Auto-posting disabled");
+                            } else {
+                              const data = await response.json();
+                              throw new Error(data.error || "Failed to disconnect");
+                            }
+                          } catch (error: unknown) {
+                            showToast.error(
+                              "Disconnect failed",
+                              error instanceof Error ? error.message : "Try again"
+                            );
+                          }
+                        }}
+                        className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
+                      >
+                        Disconnect
+                      </Button>
+                    ) : null}
+                    <Button
+                      onClick={() => {
+                        window.location.href = "/api/instagram/auth";
+                      }}
+                      className={`w-full sm:w-auto ${
+                        settings.instagramConnected
+                          ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                          : "bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-90 text-white"
+                      }`}
+                    >
+                      {settings.instagramConnected ? "Reconnect" : "Connect Instagram"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Google Calendar */}
+              <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    isDark ? "bg-blue-900" : "bg-blue-100"
+                  }`}>
+                    <Calendar className={`w-5 h-5 ${isDark ? "text-blue-300" : "text-blue-700"}`} />
+                  </div>
+                  <div>
+                    <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                      Google Calendar
+                    </h3>
+                    <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                      Calendar reminders for LinkedIn / TikTok manual posts
+                    </p>
+                  </div>
+                </div>
+                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
+                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+                }`}>
+                  <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                    {settings.googleCalendarConnected
+                      ? "✅ Connected — due posts can create calendar events"
+                      : "Not connected — optional reminders for manual platforms"}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    {settings.googleCalendarConnected ? (
+                      <Button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch("/api/google-calendar/disconnect", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              credentials: "include",
+                              body: JSON.stringify({ userId }),
+                            });
+                            if (response.ok) {
+                              setSettings((prev) => ({
+                                ...prev,
+                                googleCalendarConnected: false,
+                              }));
+                              showToast.success(
+                                "Google Calendar disconnected",
+                                "Calendar reminders disabled"
+                              );
+                            } else {
+                              const data = await response.json();
+                              throw new Error(data.error || "Failed to disconnect");
+                            }
+                          } catch (error: unknown) {
+                            showToast.error(
+                              "Disconnect failed",
+                              error instanceof Error ? error.message : "Try again"
+                            );
+                          }
+                        }}
+                        className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white"
+                      >
+                        Disconnect
+                      </Button>
+                    ) : null}
+                    <Button
+                      onClick={() => {
+                        window.location.href = "/api/google-calendar/auth";
+                      }}
+                      className={`w-full sm:w-auto ${
+                        settings.googleCalendarConnected
+                          ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                      }`}
+                    >
+                      {settings.googleCalendarConnected
+                        ? "Reconnect"
+                        : "Connect Google Calendar"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           </Card>
         </TabsContent>
@@ -658,7 +1181,7 @@ export default function SettingsPage() {
         </div>
                 <Button
                   onClick={() => window.location.href = "/dashboard/team"}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   Manage Team
                 </Button>
@@ -674,7 +1197,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={() => window.location.href = "/dashboard/team"}
                   variant="outline"
-                  className={isDark ? "border-slate-600 text-purple-300 hover:bg-slate-700" : "border-purple-200 text-purple-700 hover:bg-purple-50"}
+                  className={isDark ? "border-slate-600 text-purple-300 hover:bg-slate-700" : "border-purple-200 text-foreground hover:bg-muted"}
                 >
                   Go to Team Page
                 </Button>
@@ -705,7 +1228,7 @@ export default function SettingsPage() {
                     setSettings({ ...settings, defaultRequiresApproval: !settings.defaultRequiresApproval })
                   }
                   className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                    settings.defaultRequiresApproval !== false ? "bg-purple-600" : "bg-gray-300"
+                    settings.defaultRequiresApproval !== false ? "bg-primary" : "bg-gray-300"
                   }`}
                   aria-label="Toggle default approval"
                 >
@@ -752,7 +1275,7 @@ export default function SettingsPage() {
                       }}
                       className={`p-4 rounded-xl border text-center transition-all ${
                         currentTheme === theme
-                          ? isDark ? "border-purple-500 bg-purple-900/40" : "border-purple-600 bg-purple-50"
+                          ? isDark ? "border-purple-500 bg-purple-900/40" : "border-primary bg-muted"
                           : isDark ? "border-slate-700 bg-slate-800 hover:border-slate-600" : "border-gray-200 bg-white hover:border-gray-300"
                       }`}
                     >
@@ -780,7 +1303,7 @@ export default function SettingsPage() {
                 </div>
                 <Button
                   onClick={() => window.location.href = "/dashboard/team"}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   Manage Team
                 </Button>
@@ -796,7 +1319,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={() => window.location.href = "/dashboard/team"}
                   variant="outline"
-                  className={isDark ? "border-slate-600 text-purple-300 hover:bg-slate-700" : "border-purple-200 text-purple-700 hover:bg-purple-50"}
+                  className={isDark ? "border-slate-600 text-purple-300 hover:bg-slate-700" : "border-purple-200 text-foreground hover:bg-muted"}
                 >
                   Go to Team Page
                 </Button>
@@ -827,7 +1350,7 @@ export default function SettingsPage() {
                     setSettings({ ...settings, emailApprovals: !settings.emailApprovals })
                   }
                   className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                    settings.emailApprovals !== false ? "bg-purple-600" : "bg-gray-300"
+                    settings.emailApprovals !== false ? "bg-primary" : "bg-gray-300"
                   }`}
                   aria-label="Toggle approval notifications"
                 >
@@ -856,7 +1379,7 @@ export default function SettingsPage() {
                     setSettings({ ...settings, emailTasks: !settings.emailTasks })
                   }
                   className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                    settings.emailTasks !== false ? "bg-purple-600" : "bg-gray-300"
+                    settings.emailTasks !== false ? "bg-primary" : "bg-gray-300"
                   }`}
                   aria-label="Toggle task notifications"
                 >
@@ -885,7 +1408,7 @@ export default function SettingsPage() {
                     setSettings({ ...settings, notifications: !settings.notifications })
                   }
                   className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                    settings.notifications ? "bg-purple-600" : "bg-gray-300"
+                    settings.notifications ? "bg-primary" : "bg-gray-300"
                   }`}
                   aria-label="Toggle general notifications"
                 >
@@ -919,7 +1442,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-md text-left focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm ${isDark ? "bg-slate-700 border-slate-600 hover:border-slate-500" : "bg-white border-gray-300 hover:border-gray-400"}`}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-md text-left focus:outline-none focus:ring-1 focus-visible:ring-ring focus-visible:border-ring transition-colors text-sm ${isDark ? "bg-slate-700 border-slate-600 hover:border-slate-500" : "bg-white border-gray-300 hover:border-gray-400"}`}
                   >
                     <div className="flex items-center gap-2.5 flex-1 min-w-0">
                       {(() => {
@@ -1045,16 +1568,16 @@ export default function SettingsPage() {
                       className={`relative p-4 rounded-xl border transition-all text-left ${
                         isSelected
                           ? isDark
-                            ? "border-purple-600 bg-purple-950/50 text-purple-200"
-                            : "border-purple-600 bg-purple-50 text-purple-900"
+                            ? "border-primary bg-purple-950/50 text-purple-200"
+                            : "border-primary bg-muted text-purple-900"
                           : isDark
                           ? "border-slate-600 bg-slate-700 hover:border-slate-500"
                           : "border-gray-200 bg-white hover:border-gray-300"
                       }`}
                     >
                       {isSelected && (
-                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
+                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                          <Check className="w-3 h-3 text-primary-foreground" />
                         </div>
                       )}
                       
@@ -1066,22 +1589,19 @@ export default function SettingsPage() {
                         }`}>
                           <Icon className={`w-5 h-5 ${
                             isSelected
-                              ? isDark ? "text-purple-400" : "text-purple-600"
+                              ? isDark ? "text-purple-400" : "text-foreground"
                               : isDark ? "text-gray-400" : "text-gray-600"
                           }`} />
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xl">{niche.emoji}</span>
-                            <h3 className={`font-semibold text-sm ${
-                              isSelected
-                                ? isDark ? "text-purple-200" : "text-purple-900"
-                                : isDark ? "text-white" : "text-gray-950"
-                            }`}>
-                              {niche.name}
-                            </h3>
-                          </div>
+                          <h3 className={`font-semibold text-sm ${
+                            isSelected
+                              ? isDark ? "text-slate-100" : "text-gray-950"
+                              : isDark ? "text-white" : "text-gray-950"
+                          }`}>
+                            {niche.name}
+                          </h3>
                         </div>
                       </div>
                 </button>
@@ -1123,7 +1643,7 @@ export default function SettingsPage() {
                     setSettings({ ...settings, autoSave: !settings.autoSave })
                   }
                   className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                    settings.autoSave ? "bg-purple-600" : "bg-gray-300"
+                    settings.autoSave ? "bg-primary" : "bg-gray-300"
                   }`}
                   aria-label="Toggle auto-save"
                 >
@@ -1179,8 +1699,8 @@ export default function SettingsPage() {
                       className={`p-4 rounded-xl border text-center transition-all ${
                         currentTheme === theme
                           ? isDark
-                            ? "border-purple-600 bg-purple-950/50"
-                            : "border-purple-600 bg-purple-50"
+                            ? "border-primary bg-purple-950/50"
+                            : "border-primary bg-muted"
                           : isDark
                           ? "border-slate-600 bg-slate-700 hover:border-slate-500"
                           : "border-gray-200 bg-white hover:border-gray-300"
@@ -1206,9 +1726,9 @@ export default function SettingsPage() {
       }`}>
         <p className={`text-sm max-w-xl ${isDark ? "text-slate-400" : "text-gray-600"}`}>
           <span className={`font-medium ${isDark ? "text-slate-300" : "text-gray-700"}`}>
-            Settings are not yet saved to your account — coming soon.
+            Preferences save to your account.
           </span>{" "}
-          Theme and niche selections work on this device. Connected accounts (Google, YouTube) are managed separately.
+          Connected accounts (Google, YouTube) are managed separately in Integrations.
         </p>
         <Button
           onClick={saveSettings}

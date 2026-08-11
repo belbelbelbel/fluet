@@ -1,10 +1,26 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { GetUserByClerkId, CreateScheduledPost, GetUserScheduledPosts, DeleteScheduledPost, UpdateScheduledPost } from "@/utils/db/actions";
+import {
+  GetUserByClerkId,
+  CreateScheduledPost,
+  GetAccessibleScheduledPosts,
+  DeleteScheduledPost,
+  UpdateScheduledPost,
+  CreatePostApproval,
+  MarkScheduledPostAsPosted,
+  CreateNotification,
+} from "@/utils/db/actions";
 import { shouldBlockAction } from "@/utils/payment/enforcement";
-import { CreatePostApproval } from "@/utils/db/actions";
-import { generateApprovalToken } from "@/utils/approvals/token";
+import {
+  generateApprovalToken,
+  computeApprovalExpiry,
+} from "@/utils/approvals/token";
 import { sendNotificationEmail } from "@/lib/email/send-notification";
+import {
+  resolveAgencyContext,
+  getAccessibleClients,
+  requireClientAccess,
+} from "@/lib/team-access";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +54,12 @@ export async function GET(req: Request) {
       return NextResponse.json([]);
     }
 
-    const scheduledPosts = await GetUserScheduledPosts(user.id);
+    const ctx = await resolveAgencyContext(clerkUserId);
+    const clients = ctx ? await getAccessibleClients(ctx) : [];
+    const scheduledPosts = await GetAccessibleScheduledPosts(
+      user.id,
+      clients.map((c) => c.id)
+    );
     return NextResponse.json(scheduledPosts);
   } catch (error) {
     console.error("Error fetching scheduled posts:", error);
@@ -85,9 +106,19 @@ export async function POST(req: Request) {
     }
 
     // Payment enforcement: block schedule if agency subscription or client payment is overdue
-    const parsedClientId = clientId ? parseInt(String(clientId), 10) : undefined;
-    const validClientIdForBlock = parsedClientId != null && !Number.isNaN(parsedClientId) ? parsedClientId : undefined;
-    const blockCheck = await shouldBlockAction(clerkUserId, "schedule", validClientIdForBlock);
+    const parsedClientId =
+      clientId != null && clientId !== ""
+        ? parseInt(String(clientId), 10)
+        : null;
+    const scheduleClientId =
+      parsedClientId != null && !Number.isNaN(parsedClientId)
+        ? parsedClientId
+        : null;
+    const blockCheck = await shouldBlockAction(
+      clerkUserId,
+      "schedule",
+      scheduleClientId ?? undefined
+    );
     if (blockCheck.blocked) {
       return NextResponse.json(
         { error: blockCheck.reason || "Action blocked. Resolve payment or subscription to continue." },
@@ -110,6 +141,22 @@ export async function POST(req: Request) {
         { status: 404 }
       );
     }
+
+    let accessClient: { name: string; email: string | null } | null = null;
+    if (scheduleClientId != null) {
+      const access = await requireClientAccess(clerkUserId, scheduleClientId);
+      if (!access.ok) {
+        return NextResponse.json(
+          { error: access.error },
+          { status: access.status }
+        );
+      }
+      accessClient = {
+        name: access.client.name,
+        email: access.client.email ?? null,
+      };
+    }
+
     // Create scheduled post
     const scheduledPost = await CreateScheduledPost(
       user.id,
@@ -117,39 +164,41 @@ export async function POST(req: Request) {
       platform,
       content,
       scheduledDate,
-      clientId ? parseInt(clientId) : null,
+      scheduleClientId,
       requiresApproval !== false // Default to true if clientId exists
     );
 
     // If clientId provided and requires approval, create approval record
-    if (clientId && scheduledPost.requiresApproval) {
+    if (scheduleClientId != null && scheduledPost.requiresApproval) {
       try {
         const approvalToken = generateApprovalToken();
-        const expiresAt = new Date(scheduledDate);
-        expiresAt.setDate(expiresAt.getDate() - 1); // Expire 1 day before scheduled time
+        const expiresAt = computeApprovalExpiry(scheduledDate);
 
         await CreatePostApproval({
           scheduledPostId: scheduledPost.id,
-          clientId: parseInt(clientId),
+          clientId: scheduleClientId,
           approvalToken,
           expiresAt,
         });
 
         // Return approval link in response
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const approvalLink = `${appUrl}/client-portal/${approvalToken}`;
+        const { getEmailAppUrl } = await import("@/lib/email/send-notification");
+        const approvalLink = `${getEmailAppUrl()}/client-portal/${approvalToken}`;
 
-        // Send email notification: prefer client email so they get the approval link
-        try {
-          const { GetClientById } = await import("@/utils/db/actions");
-          const client = await GetClientById(parseInt(clientId), user.id);
-          const recipientEmail = (client?.email && client.email.trim()) ? client.email.trim() : (user.email || null);
-          if (recipientEmail) {
+        // The approval link goes to the client and only the client. It used to
+        // fall back to the agency's own inbox, which both looks like the client
+        // was asked when they weren't, and is useless now that a decision
+        // requires proving control of the client's address.
+        const clientEmail = accessClient?.email?.trim() || null;
+        let approvalEmailSent = false;
+
+        if (clientEmail) {
+          try {
             const emailResult = await sendNotificationEmail({
               type: "approval_requested",
-              recipientEmail,
+              recipientEmail: clientEmail,
               data: {
-                clientName: client?.name || "Client",
+                clientName: accessClient?.name || "Client",
                 platform,
                 scheduledFor: scheduledDate.toISOString(),
                 content,
@@ -157,19 +206,26 @@ export async function POST(req: Request) {
                 expiresAt: expiresAt.toISOString(),
               },
             });
+            approvalEmailSent = emailResult.sent;
             if (!emailResult.sent) {
               console.error("Failed to send approval email:", emailResult.error);
             }
+          } catch (emailError) {
+            console.error("Error sending approval email:", emailError);
+            // Don't fail the post creation if email fails
           }
-        } catch (emailError) {
-          console.error("Error sending approval email:", emailError);
-          // Don't fail the post creation if email fails
         }
 
         return NextResponse.json({
           ...scheduledPost,
           approvalLink,
           approvalToken,
+          approvalEmailSent,
+          approvalEmailWarning: clientEmail
+            ? approvalEmailSent
+              ? null
+              : `Couldn't email ${clientEmail}. Share the link manually.`
+            : "This client has no email on file, so no approval request was sent. Add one and we'll deliver it automatically.",
         });
       } catch (approvalError) {
         console.error("Error creating approval:", approvalError);
@@ -192,7 +248,7 @@ export async function PUT(req: Request) {
   try {
     // Parse body first to get client userId (same pattern as generate API)
     const body = await req.json();
-    const { id, content, scheduledFor, platform, userId: clientUserId } = body;
+    const { id, content, scheduledFor, platform, posted, userId: clientUserId } = body;
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
@@ -229,6 +285,39 @@ export async function PUT(req: Request) {
         { status: 404 }
       );
     }
+
+    // Verify the post is in this user's accessible set (owner or assigned clients)
+    const ctx = await resolveAgencyContext(clerkUserId);
+    const clients = ctx ? await getAccessibleClients(ctx) : [];
+    const accessible = await GetAccessibleScheduledPosts(
+      user.id,
+      clients.map((c) => c.id)
+    );
+    const owned = accessible.find((p) => p.id === Number(id));
+    if (!owned) {
+      return NextResponse.json(
+        { error: "Post not found or access denied" },
+        { status: 404 }
+      );
+    }
+
+    // Mark as posted (manual publish loop)
+    if (posted === true) {
+      const marked = await MarkScheduledPostAsPosted(Number(id));
+      try {
+        await CreateNotification(
+          user.id,
+          "post_published",
+          "Post marked as published",
+          `Your ${owned.platform} post was marked as posted.`,
+          "/dashboard/schedule"
+        );
+      } catch {
+        /* non-fatal */
+      }
+      return NextResponse.json(marked);
+    }
+
     const updates: Partial<{ content: string; scheduledFor: Date; platform: string }> = {};
     if (content) updates.content = content;
     if (scheduledFor) {
@@ -243,7 +332,7 @@ export async function PUT(req: Request) {
     }
     if (platform) updates.platform = platform;
 
-    const updatedPost = await UpdateScheduledPost(id, user.id, updates);
+    const updatedPost = await UpdateScheduledPost(id, owned.userId, updates);
     return NextResponse.json(updatedPost);
   } catch (error) {
     console.error("Error updating scheduled post:", error);

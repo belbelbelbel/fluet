@@ -1,24 +1,20 @@
 "use client";
 
+import { Suspense } from "react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { RouteTransition } from "@/components/RouteTransition";
 import { LoadingScreen } from "@/components/LoadingScreen";
-import { useUser } from "@clerk/nextjs";
+import { DashboardAuthGate } from "@/components/DashboardAuthGate";
 import { useEffect, useState } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoaded } = useUser();
-  const { resolvedTheme } = useTheme();
   const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isMobile, setIsMobile] = useState(false);
-  
-  const isDark = resolvedTheme === "dark";
 
   // Handle responsive sidebar
   useEffect(() => {
@@ -45,37 +41,30 @@ export default function DashboardLayout({
     };
   }, []);
 
-  // Show loading ONLY while Clerk is loading
-  // Trust middleware - if user got here, they're authenticated (middleware checked server-side)
-  if (!isLoaded) {
-    return (
-      <LoadingScreen
-        message="Loading Revvy..."
-        subtitle="Please wait while we load your dashboard..."
-      />
-    );
-  }
-
-  // Render dashboard - middleware already verified auth server-side
-  // Don't check isSignedIn here - it causes race conditions
-  // If middleware allowed access, user IS authenticated
+  // Keep dashboard shell visible; only gate page content while Clerk loads
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
+    <div className="min-h-screen bg-background transition-colors duration-300">
       <RouteTransition />
       <DashboardSidebar onWidthChange={(width) => setSidebarWidth(width)} />
-      <main 
-        className={`transition-all duration-200 min-h-screen transition-colors ${
-          isDark ? "bg-slate-900" : "bg-white"
-        }`}
+      <main
+        className="min-h-screen bg-background transition-all duration-200"
         style={{ 
           marginLeft: isMobile ? '0' : `${sidebarWidth}px`,
         }}
       >
         <DashboardHeader />
         <div className="h-full w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-0 overflow-x-hidden">
-          {children}
+          <Suspense
+            fallback={
+              <LoadingScreen
+                variant="inline"
+                message="Loading Revvy..."
+                subtitle="Please wait..."
+              />
+            }
+          >
+            <DashboardAuthGate>{children}</DashboardAuthGate>
+          </Suspense>
         </div>
       </main>
     </div>

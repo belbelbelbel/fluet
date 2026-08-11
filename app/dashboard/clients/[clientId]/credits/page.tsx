@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CreditCard, TrendingUp, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft, CreditCard, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 interface Credits {
   postsPerMonth: number;
@@ -51,11 +52,7 @@ export default function CreditsPage() {
   }, [clientId]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className={`w-8 h-8 animate-spin ${isDark ? "text-purple-400" : "text-purple-600"}`} />
-      </div>
-    );
+    return <LoadingScreen variant="inline" message="Loading credits..." />;
   }
 
   if (!credits) {
@@ -98,7 +95,7 @@ export default function CreditsPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className={`text-lg font-semibold flex items-center gap-2 ${isDark ? "text-white" : "text-gray-900"}`}>
-                <CreditCard className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+                <CreditCard className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-foreground"}`} />
                 Monthly Posts
               </CardTitle>
               <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
@@ -136,7 +133,7 @@ export default function CreditsPage() {
                       ? "bg-red-500"
                       : isNearLimit
                       ? "bg-yellow-500"
-                      : "bg-purple-600"
+                      : "bg-primary"
                   }`}
                   style={{ width: `${Math.min(postsPercentage, 100)}%` }}
                 />
@@ -238,7 +235,7 @@ export default function CreditsPage() {
         </Button>
         {isAtLimit && (
           <Button
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
             onClick={() => {
               // TODO: Open upgrade modal or contact client
               alert("Contact client to upgrade plan");

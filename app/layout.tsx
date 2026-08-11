@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { Fraunces } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs"
-import { dark } from '@clerk/themes'
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeToaster } from "@/components/ThemeToaster";
 import { GlobalErrorHandler } from "@/components/GlobalErrorHandler";
@@ -24,12 +24,50 @@ const nunito = localFont({
   display: "swap",
 });
 
+/**
+ * Landing-page type system. Scoped to marketing pages via `.landing` in
+ * globals.css so the dashboard keeps Nunito untouched.
+ *
+ * Fraunces carries the editorial voice; Geist does the UI work; Geist Mono
+ * labels the technical detail. Fraunces is variable across 100–900, so headings
+ * can sit at 600–700 with real presence — Instrument Serif only shipped a 400
+ * and read too thin at display sizes.
+ */
+// No `weight` here on purpose: naming weights requests static instances, and
+// `axes` is only valid on the variable font. Omitting it loads the full 100–900
+// range, which is what lets the headings sit at 600.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["SOFT", "WONK", "opsz"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const geist = localFont({
+  src: "./fonts/GeistVF.woff",
+  weight: "100 900",
+  variable: "--font-geist",
+  display: "swap",
+});
+
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  weight: "100 900",
+  variable: "--font-geist-mono",
+  display: "swap",
+});
+
+const SITE_TITLE = "Revvy — Client approvals, without the chasing";
+const SITE_DESCRIPTION =
+  "Revvy gives your agency one link where clients review, approve, and schedule — so nothing goes out unapproved. Built for agencies managing 3–10 clients.";
+
 export const metadata: Metadata = {
-  title: "Revvy - Social Media Management for Nigerian Agencies",
-  description: "Manage multiple clients, generate AI content, schedule posts, and track performance. Built for Nigerian social media managers and agencies.",
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "Revvy — Social Media Management for Nigerian Agencies",
-    description: "Manage multiple clients, generate AI content, schedule posts, and track performance. Built for Nigerian social media managers and agencies.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     url: process.env.NEXT_PUBLIC_APP_URL || "https://revvy.vercel.app",
     siteName: "Revvy",
     images: [
@@ -45,8 +83,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Revvy - Social Media Management for Nigerian Agencies",
-    description: "Manage multiple clients, generate AI content, schedule posts, and track performance. Built for Nigerian social media managers and agencies.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: ["/images/Revvylogo/logo-1-primary.png"], // Your logo for Twitter cards
   },
   icons: {
@@ -62,6 +100,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,14 +109,19 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
-      appearance={{
-        baseTheme: dark
-      }}
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
       afterSignOutUrl="/"
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/dashboard"
+      allowedRedirectOrigins={[appUrl, "http://localhost:3000", "http://127.0.0.1:3000"]}
     >
-      <html lang="en" suppressHydrationWarning className={nunito.variable}>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        className={`${nunito.variable} ${fraunces.variable} ${geist.variable} ${geistMono.variable}`}
+      >
         <head>
           <link
             rel="preload"

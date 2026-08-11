@@ -81,10 +81,10 @@ function OAuthCallbackContent() {
       setStatus("success");
       setMessage(`${platformName} connected successfully!`);
       
-      // Redirect to settings or dashboard after 2 seconds
+      // Redirect to settings with platform flag so UI can toast + refresh status
       setTimeout(() => {
-        router.push("/dashboard/settings");
-      }, 2000);
+        router.push(`/dashboard/settings?${platform}=connected`);
+      }, 1500);
     } catch (error: unknown) {
       console.error("Token exchange error:", error);
       setStatus("error");

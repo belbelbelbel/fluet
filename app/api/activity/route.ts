@@ -5,6 +5,7 @@ import { PostApprovals, ScheduledPosts, Clients, Tasks, ClientCredits } from "@/
 import { eq, desc, and, inArray } from "drizzle-orm";
 import { GetUserByClerkId } from "@/utils/db/actions";
 import type { ActivityItem } from "@/components/ActivityFeed";
+import { resolveAgencyContext, getAccessibleClients } from "@/lib/team-access";
 
 export const dynamic = "force-dynamic";
 
@@ -31,22 +32,17 @@ export async function GET(req: NextRequest) {
 
     const activities: ActivityItem[] = [];
 
-    // Agency's client IDs for filtering
-    const agencyClients = await db
-      .select({ id: Clients.id, name: Clients.name, createdAt: Clients.createdAt })
-      .from(Clients)
-      .where(eq(Clients.agencyId, user.id))
-      .execute();
-    const agencyClientIds = agencyClients.map((c) => c.id);
+    const ctx = await resolveAgencyContext(clerkUserId);
+    const accessibleClients = ctx ? await getAccessibleClients(ctx) : [];
+    const agencyClientIds = accessibleClients.map((c) => c.id);
 
     // Client created events – show when the agency added a client (most recent first)
-    const recentClientsForActivity = await db
-      .select({ id: Clients.id, name: Clients.name, createdAt: Clients.createdAt })
-      .from(Clients)
-      .where(eq(Clients.agencyId, user.id))
-      .orderBy(desc(Clients.createdAt))
-      .limit(10)
-      .execute();
+    const recentClientsForActivity = [...accessibleClients]
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      )
+      .slice(0, 10);
 
     for (const client of recentClientsForActivity) {
       if (client.createdAt) {

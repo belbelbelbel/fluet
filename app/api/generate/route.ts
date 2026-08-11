@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GetUserByClerkId, SaveGeneratedContent, CreateOrUpdateUser, GetClientBrandVoice } from "@/utils/db/actions";
+import { requireClientAccess } from "@/lib/team-access";
 import { checkUsageLimit } from "@/utils/subscription/limits";
 import { shouldBlockAction, isPaymentProviderConfigured } from "@/utils/payment/enforcement";
 import { checkCostAlert } from "@/utils/economic/cost-alert";
@@ -174,6 +175,17 @@ export async function POST(req: Request) {
       );
     }
 
+    // Team members may only generate for assigned clients
+    if (validClientId != null) {
+      const access = await requireClientAccess(clerkUserId, validClientId);
+      if (!access.ok) {
+        return NextResponse.json(
+          { error: access.error },
+          { status: access.status }
+        );
+      }
+    }
+
     // ============================================
     // PROFESSIONAL SUBSCRIPTION ENFORCEMENT
     // ============================================
@@ -229,12 +241,20 @@ export async function POST(req: Request) {
             brandDescription: bv.brandDescription,
             targetAudience: bv.targetAudience,
             tone: bv.tone,
-            industry: bv.industry,
+            industry:
+              bv.industry ||
+              bv.nicheDescription ||
+              bv.primaryIndustry ||
+              null,
             slangLevel: bv.slangLevel,
             dos: Array.isArray(bv.dos) ? bv.dos : null,
             donts: Array.isArray(bv.donts) ? bv.donts : null,
-            examplePosts: Array.isArray(bv.examplePosts) ? bv.examplePosts : null,
-            preferredHashtags: Array.isArray(bv.preferredHashtags) ? bv.preferredHashtags : null,
+            examplePosts: Array.isArray(bv.examplePosts)
+              ? bv.examplePosts
+              : null,
+            preferredHashtags: Array.isArray(bv.preferredHashtags)
+              ? bv.preferredHashtags
+              : null,
             bannedWords: Array.isArray(bv.bannedWords) ? bv.bannedWords : null,
           };
         }
@@ -246,6 +266,15 @@ export async function POST(req: Request) {
     const validModes = ["standard", "viral_hook", "client_voice", "carousel", "cta", "authority", "strategy", "trend_adaptation", "content_repurpose", "audience_research"];
     const mode = generationMode && validModes.includes(generationMode) ? generationMode : "standard";
 
+    let modelId: string | null = null;
+    try {
+      const { GetUserSettings } = await import("@/utils/db/actions");
+      const userSettings = await GetUserSettings(user.id);
+      modelId = userSettings?.defaultAIModel ?? null;
+    } catch {
+      /* use resolver defaults */
+    }
+
     const generationResult = await aiGenerator.generate(prompt, {
       contentType,
       tone: tone || "professional",
@@ -254,6 +283,7 @@ export async function POST(req: Request) {
       usePremium: usageStatus.planName === "Enterprise",
       generationMode: mode,
       brandVoice,
+      modelId,
     });
     
     const generatedContent = generationResult.content;

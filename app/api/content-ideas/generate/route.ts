@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { generateContentIdeasForNiche } from "@/utils/ai/idea-generator";
 import {
-  GetClientById,
   GetUserByClerkId,
   GetClientBrandVoice,
   GetIdeasFromCache,
@@ -16,6 +15,7 @@ import {
 } from "@/utils/db/actions";
 import { normalizeNicheString } from "@/lib/content-ideas";
 import { getIdeaRefreshLimitForClient } from "@/utils/subscription/limits";
+import { requireClientAccess } from "@/lib/team-access";
 
 export const dynamic = "force-dynamic";
 
@@ -43,9 +43,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const client = await GetClientById(validClientId, user.id);
-    if (!client) {
-      return NextResponse.json({ error: "Client not found" }, { status: 404 });
+    const access = await requireClientAccess(clerkUserId, validClientId);
+    if (!access.ok) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
     const brandVoice = await GetClientBrandVoice(validClientId);
@@ -140,9 +140,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "clientId required" }, { status: 400 });
     }
 
-    const client = await GetClientById(clientId, user.id);
-    if (!client) {
-      return NextResponse.json({ error: "Client not found" }, { status: 404 });
+    const access = await requireClientAccess(clerkUserId, clientId);
+    if (!access.ok) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
     const brandVoice = await GetClientBrandVoice(clientId);

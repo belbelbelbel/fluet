@@ -35,7 +35,7 @@ export function FeatureComingSoon({
       >
         <Icon
           className={`${compact ? "w-6 h-6" : "w-8 h-8 sm:w-10 sm:h-10"} ${
-            isDark ? "text-purple-400" : "text-purple-600"
+            isDark ? "text-purple-400" : "text-foreground"
           }`}
         />
       </div>

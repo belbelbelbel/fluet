@@ -4,13 +4,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import {
-    GetClientById,
-    GetUserByClerkId,
-} from "@/utils/db/actions";
+import { GetUserByClerkId } from "@/utils/db/actions";
 import { Tasks, Users } from "@/utils/db/schema";
 import { db } from "@/utils/db/dbConfig";
 import { eq, desc } from "drizzle-orm";
+import { resolveAgencyContext, assertClientAccess } from "@/lib/team-access";
+import {
+    sendNotificationEmail,
+    getEmailAppUrl,
+} from "@/lib/email/send-notification";
 
 export const dynamic = "force-dynamic";
 
@@ -52,11 +54,14 @@ export async function GET(
             );
         }
 
-        // Verify client belongs to agency
-        const client = await GetClientById(clientId, user.id);
+        const ctx = await resolveAgencyContext(clerkUserId);
+        if (!ctx) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+        const client = await assertClientAccess(ctx, clientId);
         if (!client) {
             return NextResponse.json(
-                { error: "Client not found" },
+                { error: "Client not found or access denied" },
                 { status: 404 }
             );
         }
@@ -171,11 +176,14 @@ export async function POST(
             );
         }
 
-        // Verify client belongs to agency
-        const client = await GetClientById(clientId, user.id);
+        const ctx = await resolveAgencyContext(clerkUserId);
+        if (!ctx) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+        const client = await assertClientAccess(ctx, clientId);
         if (!client) {
             return NextResponse.json(
-                { error: "Client not found" },
+                { error: "Client not found or access denied" },
                 { status: 404 }
             );
         }
@@ -206,6 +214,45 @@ export async function POST(
             })
             .returning()
             .execute();
+
+        // Assigning on creation is just as much an assignment as reassigning
+        // later — notify the assignee either way.
+        if (task?.assignedTo) {
+            try {
+                const [assignee] = await db
+                    .select({ email: Users.email, name: Users.name })
+                    .from(Users)
+                    .where(eq(Users.id, task.assignedTo))
+                    .limit(1)
+                    .execute();
+
+                if (assignee?.email) {
+                    const emailResult = await sendNotificationEmail({
+                        type: "task_assigned",
+                        recipientEmail: assignee.email,
+                        data: {
+                            clientName: client.name,
+                            taskType: type,
+                            assignedToName: assignee.name || assignee.email,
+                            description,
+                            dueDate: dueDate
+                                ? new Date(dueDate).toLocaleString()
+                                : undefined,
+                            taskLink: `${getEmailAppUrl()}/dashboard/clients/${clientId}/tasks`,
+                        },
+                    });
+                    if (!emailResult.sent) {
+                        console.error(
+                            "[Tasks API] Failed to send assignment email:",
+                            emailResult.error
+                        );
+                    }
+                }
+            } catch (emailError) {
+                // Never fail task creation because email failed
+                console.error("[Tasks API] Assignment email error:", emailError);
+            }
+        }
 
         return NextResponse.json({
             success: true,

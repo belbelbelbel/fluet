@@ -6,6 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FeatureComingSoon } from "@/components/FeatureComingSoon";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import {
   ArrowLeft,
   TrendingUp,
@@ -23,9 +24,23 @@ interface AnalyticsData {
   postsLastMonth: number;
   topPlatform: string | null;
   engagementMetricsAvailable: boolean;
+  totalViews?: number;
+  totalLikes?: number;
+  totalShares?: number;
+  totalComments?: number;
+  totalEngagement: number | null;
+  averageEngagementRate: number | null;
+  topPerformingPost: {
+    id: number;
+    platform: string;
+    content: string;
+    engagementRate: number;
+  } | null;
   platformBreakdown: Array<{
     platform: string;
     posts: number;
+    engagement: number | null;
+    engagementRate: number | null;
   }>;
 }
 
@@ -66,11 +81,7 @@ export default function AnalyticsPage() {
   }, [clientId, timeRange]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className={`w-8 h-8 animate-spin ${isDark ? "text-purple-400" : "text-purple-600"}`} />
-      </div>
-    );
+    return <LoadingScreen variant="inline" message="Loading analytics..." />;
   }
 
   if (!analytics) {
@@ -97,7 +108,7 @@ export default function AnalyticsPage() {
               Client Analytics
             </h1>
             <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-              Post activity is tracked — engagement metrics coming soon
+              Scheduled activity plus synced Twitter/Instagram engagement
             </p>
           </div>
         </div>
@@ -109,7 +120,7 @@ export default function AnalyticsPage() {
               size="sm"
               onClick={() => setTimeRange(range)}
               className={
-                timeRange === range ? "bg-purple-600 hover:bg-purple-700 text-white" : ""
+                timeRange === range ? "bg-primary hover:bg-primary/90 text-primary-foreground" : ""
               }
             >
               {range === "7d" ? "7 Days" : range === "30d" ? "30 Days" : range === "90d" ? "90 Days" : "All Time"}
@@ -174,7 +185,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <FileText className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+              <FileText className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-foreground"}`} />
               <span className={`text-2xl font-bold capitalize ${isDark ? "text-white" : "text-gray-900"}`}>
                 {analytics.topPlatform ?? "—"}
               </span>
@@ -192,10 +203,25 @@ export default function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <span className={`text-2xl font-bold ${isDark ? "text-slate-500" : "text-gray-400"}`}>—</span>
-            <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
-              Coming soon
-            </p>
+            {analytics.engagementMetricsAvailable ? (
+              <>
+                <span className={`text-2xl font-bold tabular-nums ${isDark ? "text-white" : "text-gray-900"}`}>
+                  {(analytics.totalEngagement ?? 0).toLocaleString()}
+                </span>
+                <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                  {analytics.averageEngagementRate != null
+                    ? `${analytics.averageEngagementRate}% avg rate`
+                    : "Likes + shares + comments"}
+                </p>
+              </>
+            ) : (
+              <>
+                <span className={`text-2xl font-bold ${isDark ? "text-slate-500" : "text-gray-400"}`}>—</span>
+                <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                  Syncs after Twitter/IG auto-post
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -210,12 +236,18 @@ export default function AnalyticsPage() {
           <CardContent className="pt-6">
             <div className="space-y-4">
               {analytics.platformBreakdown.map((platform) => (
-                <div key={platform.platform} className="flex items-center justify-between">
+                <div key={platform.platform} className="flex items-center justify-between gap-3">
                   <span className={`text-sm font-medium capitalize ${isDark ? "text-white" : "text-gray-900"}`}>
                     {platform.platform}
                   </span>
-                  <span className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                  <span className={`text-sm text-right ${isDark ? "text-slate-400" : "text-gray-600"}`}>
                     {platform.posts} posts
+                    {platform.engagement != null
+                      ? ` · ${platform.engagement.toLocaleString()} eng.`
+                      : ""}
+                    {platform.engagementRate != null
+                      ? ` · ${platform.engagementRate}%`
+                      : ""}
                   </span>
                 </div>
               ))}
@@ -231,12 +263,49 @@ export default function AnalyticsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          <FeatureComingSoon
-            isDark={isDark}
-            icon={BarChart3}
-            title="Real-time analytics coming soon"
-            description="Engagement rates, top-performing posts, and monthly trend charts will appear here once platform analytics are connected."
-          />
+          {analytics.engagementMetricsAvailable ? (
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: "Views", value: analytics.totalViews ?? 0 },
+                  { label: "Likes", value: analytics.totalLikes ?? 0 },
+                  { label: "Shares", value: analytics.totalShares ?? 0 },
+                  { label: "Comments", value: analytics.totalComments ?? 0 },
+                ].map((m) => (
+                  <div
+                    key={m.label}
+                    className={`rounded-lg p-3 ${isDark ? "bg-slate-700/50" : "bg-gray-50"}`}
+                  >
+                    <p className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>{m.label}</p>
+                    <p className={`text-lg font-semibold tabular-nums ${isDark ? "text-white" : "text-gray-950"}`}>
+                      {m.value.toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              {analytics.topPerformingPost && (
+                <div
+                  className={`rounded-lg p-4 ${isDark ? "bg-slate-700/40" : "bg-gray-50"}`}
+                >
+                  <p className={`text-xs font-medium uppercase tracking-wide mb-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                    Top performing · {analytics.topPerformingPost.platform} ·{" "}
+                    {analytics.topPerformingPost.engagementRate}%
+                  </p>
+                  <p className={`text-sm ${isDark ? "text-slate-200" : "text-gray-800"}`}>
+                    {analytics.topPerformingPost.content}
+                    {analytics.topPerformingPost.content.length >= 160 ? "…" : ""}
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <FeatureComingSoon
+              isDark={isDark}
+              icon={BarChart3}
+              title="No engagement synced yet"
+              description="Connect Twitter or Instagram, auto-post for this client, then metrics appear here on each cron run."
+            />
+          )}
         </CardContent>
       </Card>
     </div>

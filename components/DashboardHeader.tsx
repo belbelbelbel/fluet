@@ -15,60 +15,37 @@ export function DashboardHeader() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
-  // Extract client ID from pathname if on client-specific page
   const pathClientId = pathname.match(/\/dashboard\/clients\/(\d+)/)?.[1];
   const currentClientId = pathClientId ? parseInt(pathClientId) : null;
 
   const toggleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-    } else if (theme === "dark") {
-      setTheme("light");
-    } else {
-      // If system, toggle to opposite of current resolved theme
-      setTheme(isDark ? "light" : "dark");
-    }
+    if (theme === "light") setTheme("dark");
+    else if (theme === "dark") setTheme("light");
+    else setTheme(isDark ? "light" : "dark");
   };
 
   return (
-    <div className={`sticky top-0 z-30 border-b transition-colors duration-300 ${
-      isDark ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"
-    }`}>
-      <div className="px-4 sm:px-6 lg:px-8 py-4 pr-14 sm:pr-6 lg:pr-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <ClientSelector
-              userId={userId}
-              selectedClientId={currentClientId || selectedClientId}
-              onClientChange={(clientId) => {
-                setSelectedClientId(clientId);
-                if (clientId && currentClientId !== clientId) {
-                  window.location.href = `/dashboard/clients/${clientId}`;
-                }
-              }}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className={`transition-colors ${
-                isDark 
-                  ? "text-gray-400 hover:text-white hover:bg-neutral-900" 
-                  : "text-gray-600 hover:text-gray-950 hover:bg-gray-100"
-              }`}
-              aria-label="Toggle theme"
-              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {isDark ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-        </div>
+    <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8 pr-14 sm:pr-6 lg:pr-8">
+        <ClientSelector
+          userId={userId}
+          selectedClientId={currentClientId || selectedClientId}
+          onClientChange={(clientId) => {
+            setSelectedClientId(clientId);
+            if (clientId && currentClientId !== clientId) {
+              window.location.href = `/dashboard/clients/${clientId}`;
+            }
+          }}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
       </div>
     </div>
   );

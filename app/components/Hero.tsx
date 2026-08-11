@@ -5,34 +5,29 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import { useTheme } from "@/contexts/ThemeContext";
+import { authPath } from "@/lib/auth-redirect";
 
 export function Hero() {
-  const { isSignedIn } = useUser();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const { isSignedIn, isLoaded } = useUser();
+
+  const getStartedHref =
+    isLoaded && isSignedIn
+      ? "/dashboard/generate"
+      : authPath("sign-in", "/dashboard/generate");
 
   return (
     <section
-      className={`relative overflow-hidden transition-colors duration-300 ${
-        isDark
-          ? "bg-slate-950"
-          : "bg-gradient-to-b from-white via-purple-50/30 to-white"
-      }`}
+      className="relative overflow-hidden bg-gradient-to-b from-white via-purple-50/30 to-white"
       aria-labelledby="hero-heading"
     >
       {/* Subtle background gradient orbs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
-          className={`absolute -top-1/2 -right-1/4 w-[800px] h-[800px] rounded-full blur-3xl opacity-30 ${
-            isDark ? "bg-purple-600/20" : "bg-purple-400/20"
-          }`}
+          className="absolute -top-1/2 -right-1/4 w-[800px] h-[800px] rounded-full blur-3xl opacity-30 bg-purple-400/20"
           aria-hidden
         />
         <div
-          className={`absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full blur-3xl opacity-20 ${
-            isDark ? "bg-purple-700/15" : "bg-purple-300/20"
-          }`}
+          className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full blur-3xl opacity-20 bg-purple-300/20"
           aria-hidden
         />
       </div>
@@ -47,25 +42,17 @@ export function Hero() {
           {/* Main Headline - Fluid typography */}
           <h1
             id="hero-heading"
-            className={`font-bold leading-[1.1] tracking-tight max-w-5xl
+            className="font-bold leading-[1.1] tracking-tight max-w-5xl
               text-[2.25rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl
-              ${isDark ? "text-white" : "text-gray-950"}`}
+              text-gray-950"
           >
             Built for{" "}
             <span className="relative inline-block">
-              <span
-                className={`bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 bg-clip-text text-transparent font-extrabold drop-shadow-sm ${
-                  isDark ? "from-purple-400 via-purple-500 to-purple-600" : ""
-                }`}
-              >
+              <span className="bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 bg-clip-text text-transparent font-extrabold drop-shadow-sm">
                 Nigerian
               </span>
               <span
-                className={`absolute inset-0 blur-xl -z-10 ${
-                  isDark
-                    ? "bg-purple-500/25"
-                    : "bg-gradient-to-r from-purple-600/20 via-purple-700/20 to-purple-800/20"
-                }`}
+                className="absolute inset-0 blur-xl -z-10 bg-gradient-to-r from-purple-600/20 via-purple-700/20 to-purple-800/20"
                 aria-hidden
               />
             </span>{" "}
@@ -74,9 +61,9 @@ export function Hero() {
 
           {/* Subheading - Responsive */}
           <p
-            className={`leading-relaxed max-w-3xl font-normal
+            className="leading-relaxed max-w-3xl font-normal
               text-base sm:text-lg md:text-xl lg:text-2xl
-              ${isDark ? "text-slate-400" : "text-gray-600"}`}
+              text-gray-600"
           >
             Manage, generate and schedule content for all your client accounts in
             one place. Perfect for agencies managing multiple pages.
@@ -88,14 +75,10 @@ export function Hero() {
               <input
                 type="email"
                 placeholder="Enter your email address"
-                className={`flex-1 min-w-0 w-full px-4 py-3.5 sm:px-5 sm:py-4 rounded-xl sm:rounded-2xl border text-base
+                className="flex-1 min-w-0 w-full px-4 py-3.5 sm:px-5 sm:py-4 rounded-xl sm:rounded-2xl border text-base
                   focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
                   transition-colors duration-200
-                  ${
-                    isDark
-                      ? "bg-slate-800/80 border-slate-700 text-white placeholder-slate-500 hover:border-slate-600"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-gray-400 shadow-sm"
-                  }`}
+                  bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-gray-400 shadow-sm"
                 aria-label="Email address"
               />
               <Button
@@ -106,7 +89,7 @@ export function Hero() {
                   shadow-lg hover:shadow-xl shadow-purple-500/25
                   transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
               >
-                <Link href={isSignedIn ? "/dashboard/generate" : "/sign-up"}>
+                <Link href={getStartedHref}>
                   Get Started
                   <ArrowRightIcon className="w-5 h-5 shrink-0" aria-hidden />
                 </Link>
@@ -120,19 +103,10 @@ export function Hero() {
           <div className="relative w-full max-w-6xl">
             {/* Decorative border/glow */}
             <div
-              className={`absolute -inset-1 sm:-inset-2 rounded-2xl sm:rounded-3xl -z-10 blur-xl opacity-40 ${
-                isDark ? "bg-purple-500/20" : "bg-purple-400/30"
-              }`}
+              className="absolute -inset-1 sm:-inset-2 rounded-2xl sm:rounded-3xl -z-10 blur-xl opacity-40 bg-purple-400/30"
               aria-hidden
             />
-            <div
-              className={`relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden
-                shadow-2xl ring-1 ${
-                  isDark
-                    ? "bg-slate-800/50 ring-slate-700/50"
-                    : "bg-gray-100 ring-gray-200/50"
-                }`}
-            >
+            <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl ring-1 bg-gray-100 ring-gray-200/50">
               <Image
                 src="/images/fluetdashboardimg.png"
                 alt="Fluet Dashboard - Manage social media for multiple clients"

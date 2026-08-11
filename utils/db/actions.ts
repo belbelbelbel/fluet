@@ -1,5 +1,5 @@
 import { db } from "./dbConfig"
-import { eq, sql, desc, and, gte, lte, or } from "drizzle-orm"
+import { eq, sql, desc, and, gte, lte, or, inArray } from "drizzle-orm"
 import { 
     GeneratedContent, 
     Users, 
@@ -14,12 +14,16 @@ import {
     PostApprovals,
     Tasks,
     AgencyTeamMembers,
+    ClientAssignments,
     ClientReports,
     TeamInvitations,
     IdeasCache,
     ClientIdeaRefreshes,
+    UserSettings,
+    ContentAnalytics,
 } from "./schema"
 import { sendWelcomeEmail } from "./mailtrap"
+import { computeApprovalExpiry } from "@/utils/approvals/token"
 
 export const CreateOrUpdateUser = async (stripecustomerId: string, email: string, name: string) => {
     try {
@@ -30,6 +34,8 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
                 email: Users.email,
                 name: Users.name,
                 points: Users.points,
+                userType: Users.userType,
+                agencyId: Users.agencyId,
                 timestamp: Users.timestamp,
             })
             .from(Users)
@@ -47,6 +53,8 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
                     email: Users.email,
                     name: Users.name,
                     points: Users.points,
+                    userType: Users.userType,
+                    agencyId: Users.agencyId,
                     timestamp: Users.timestamp,
                 })
                 .execute();
@@ -67,6 +75,8 @@ export const CreateOrUpdateUser = async (stripecustomerId: string, email: string
                     email: Users.email,
                     name: Users.name,
                     points: Users.points,
+                    userType: Users.userType,
+                    agencyId: Users.agencyId,
                     timestamp: Users.timestamp,
                 })
                 .execute();
@@ -114,6 +124,8 @@ export const GetUserByClerkId = async (clerkUserId: string) => {
                 email: Users.email,
                 name: Users.name,
                 points: Users.points,
+                userType: Users.userType,
+                agencyId: Users.agencyId,
                 timestamp: Users.timestamp,
             })
             .from(Users)
@@ -436,6 +448,33 @@ export const GetUserScheduledPosts = async (userId: number) => {
     }
 };
 
+/** Scheduled posts for a user OR any of the given client IDs (team access). */
+export const GetAccessibleScheduledPosts = async (
+    userId: number,
+    clientIds: number[]
+) => {
+    try {
+        if (clientIds.length === 0) {
+            return GetUserScheduledPosts(userId);
+        }
+        const posts = await db
+            .select()
+            .from(ScheduledPosts)
+            .where(
+                or(
+                    eq(ScheduledPosts.userId, userId),
+                    inArray(ScheduledPosts.clientId, clientIds)
+                )
+            )
+            .orderBy(desc(ScheduledPosts.scheduledFor))
+            .execute();
+        return posts;
+    } catch (error) {
+        console.error(`[GetAccessibleScheduledPosts] Error:`, error);
+        throw new Error("Failed to get scheduled posts");
+    }
+};
+
 export const DeleteScheduledPost = async (postId: number, userId: number) => {
     try {
         await db
@@ -682,13 +721,19 @@ export const GetPendingScheduledPosts = async () => {
 /**
  * Mark a scheduled post as posted
  */
-export const MarkScheduledPostAsPosted = async (postId: number) => {
+export const MarkScheduledPostAsPosted = async (
+    postId: number,
+    externalPostId?: string | null
+) => {
     try {
         const [updated] = await db
             .update(ScheduledPosts)
             .set({
                 posted: true,
                 postedAt: new Date(),
+                ...(externalPostId
+                    ? { externalPostId: String(externalPostId) }
+                    : {}),
             })
             .where(eq(ScheduledPosts.id, postId))
             .returning()
@@ -699,6 +744,114 @@ export const MarkScheduledPostAsPosted = async (postId: number) => {
         throw new Error("Failed to mark post as posted");
     }
 };
+
+/** Upsert engagement row for a scheduled/external post (Twitter sync, etc.) */
+export const UpsertContentAnalyticsForPost = async (data: {
+    userId: number;
+    platform: string;
+    scheduledPostId?: number | null;
+    contentId?: number | null;
+    externalPostId?: string | null;
+    views: number;
+    likes: number;
+    shares: number;
+    comments: number;
+}) => {
+    try {
+        const engagements = data.likes + data.shares + data.comments;
+        const engagementRate =
+            data.views > 0
+                ? Math.round((engagements / data.views) * 100)
+                : 0;
+
+        let existing: { id: number } | undefined;
+        if (data.scheduledPostId) {
+            const [row] = await db
+                .select({ id: ContentAnalytics.id })
+                .from(ContentAnalytics)
+                .where(eq(ContentAnalytics.scheduledPostId, data.scheduledPostId))
+                .limit(1)
+                .execute();
+            existing = row;
+        } else if (data.externalPostId) {
+            const [row] = await db
+                .select({ id: ContentAnalytics.id })
+                .from(ContentAnalytics)
+                .where(
+                    and(
+                        eq(ContentAnalytics.userId, data.userId),
+                        eq(ContentAnalytics.externalPostId, data.externalPostId)
+                    )
+                )
+                .limit(1)
+                .execute();
+            existing = row;
+        }
+
+        const payload = {
+            contentId: data.contentId ?? null,
+            scheduledPostId: data.scheduledPostId ?? null,
+            externalPostId: data.externalPostId ?? null,
+            userId: data.userId,
+            platform: data.platform,
+            views: data.views,
+            likes: data.likes,
+            shares: data.shares,
+            comments: data.comments,
+            engagementRate,
+            lastUpdated: new Date(),
+        };
+
+        if (existing) {
+            const [updated] = await db
+                .update(ContentAnalytics)
+                .set(payload)
+                .where(eq(ContentAnalytics.id, existing.id))
+                .returning()
+                .execute();
+            return updated;
+        }
+
+        const [created] = await db
+            .insert(ContentAnalytics)
+            .values({ ...payload, createdAt: new Date() })
+            .returning()
+            .execute();
+        return created;
+    } catch (error) {
+        console.error(`[UpsertContentAnalyticsForPost] Error:`, error);
+        return null;
+    }
+};
+
+/** Recent posted rows with an external id (for metrics sync). */
+export const GetPostedWithExternalIds = async (
+    platform: string,
+    limit = 25
+) => {
+    try {
+        return await db
+            .select()
+            .from(ScheduledPosts)
+            .where(
+                and(
+                    eq(ScheduledPosts.posted, true),
+                    eq(ScheduledPosts.platform, platform),
+                    sql`${ScheduledPosts.externalPostId} IS NOT NULL`
+                )
+            )
+            .orderBy(desc(ScheduledPosts.postedAt))
+            .limit(limit)
+            .execute();
+    } catch (error) {
+        console.error(`[GetPostedWithExternalIds] Error (${platform}):`, error);
+        return [];
+    }
+};
+
+/** @deprecated Use GetPostedWithExternalIds("twitter") */
+export const GetPostedTwitterWithExternalIds = async (limit = 25) =>
+    GetPostedWithExternalIds("twitter", limit);
 
 // Notification Actions
 
@@ -1467,16 +1620,20 @@ export const CreatePostApproval = async (data: {
     scheduledPostId: number;
     clientId: number;
     approvalToken: string;
-    expiresAt: Date;
+    expiresAt?: Date | null;
 }) => {
     try {
+        // Never persist an expiry that is already past (or too close) — that
+        // would hand the client a link that is dead the moment it is sent.
+        const expiresAt = computeApprovalExpiry(data.expiresAt);
+
         const [approval] = await db
             .insert(PostApprovals)
             .values({
                 scheduledPostId: data.scheduledPostId,
                 clientId: data.clientId,
                 approvalToken: data.approvalToken,
-                expiresAt: data.expiresAt,
+                expiresAt,
                 status: "pending",
                 updatedAt: new Date(),
             })
@@ -1508,12 +1665,37 @@ export const GetApprovalByToken = async (token: string) => {
 };
 
 /**
+ * Push an approval's expiry forward.
+ *
+ * Used to self-heal links that expired while the post was still sitting
+ * unpublished and undecided — the exact case the link exists to resolve.
+ */
+export const ExtendApprovalExpiry = async (
+    approvalId: number,
+    expiresAt: Date
+) => {
+    try {
+        const [updated] = await db
+            .update(PostApprovals)
+            .set({ expiresAt, updatedAt: new Date() })
+            .where(eq(PostApprovals.id, approvalId))
+            .returning()
+            .execute();
+        return updated;
+    } catch (error) {
+        console.error(`[ExtendApprovalExpiry] Error encountered:`, error);
+        throw new Error("Failed to extend approval expiry");
+    }
+};
+
+/**
  * Update approval status
  */
 export const UpdateApprovalStatus = async (
     approvalId: number,
     status: string,
-    clientComment?: string
+    clientComment?: string,
+    approvedByEmail?: string
 ) => {
     try {
         const [updated] = await db
@@ -1521,6 +1703,7 @@ export const UpdateApprovalStatus = async (
             .set({
                 status,
                 clientComment,
+                approvedByEmail,
                 approvedAt: status === "approved" ? new Date() : undefined,
                 updatedAt: new Date(),
             })
@@ -1582,7 +1765,8 @@ export const GetPendingApprovalsForClient = async (clientId: number) => {
 export const CreateTeamInvitation = async (
     invitedBy: number,
     email: string,
-    role: string = "member"
+    role: string = "member",
+    clientIds: number[] = []
 ) => {
     try {
         // Generate a unique token for the invitation
@@ -1599,6 +1783,7 @@ export const CreateTeamInvitation = async (
                 email: email.toLowerCase().trim(),
                 token,
                 role,
+                clientIds: clientIds.filter((id) => Number.isFinite(id)),
                 status: "pending",
                 expiresAt,
             })
@@ -1645,5 +1830,345 @@ export const GetTeamInvitationsByInviter = async (invitedBy: number) => {
     } catch (error) {
         console.error(`[GetTeamInvitationsByInviter] Error encountered:`, error);
         throw new Error("Failed to get team invitations");
+    }
+};
+
+export const GetTeamInvitationByToken = async (token: string) => {
+    try {
+        const [invitation] = await db
+            .select()
+            .from(TeamInvitations)
+            .where(eq(TeamInvitations.token, token))
+            .limit(1)
+            .execute();
+        return invitation || null;
+    } catch (error) {
+        console.error(`[GetTeamInvitationByToken] Error encountered:`, error);
+        throw new Error("Failed to get team invitation");
+    }
+};
+
+/** Active (and pending) members for an agency owner, joined with user profile. */
+export const GetAgencyTeamMembers = async (agencyId: number) => {
+    try {
+        const rows = await db
+            .select({
+                membershipId: AgencyTeamMembers.id,
+                userId: AgencyTeamMembers.userId,
+                role: AgencyTeamMembers.role,
+                status: AgencyTeamMembers.status,
+                joinedAt: AgencyTeamMembers.joinedAt,
+                invitedAt: AgencyTeamMembers.invitedAt,
+                permissions: AgencyTeamMembers.permissions,
+                name: Users.name,
+                email: Users.email,
+            })
+            .from(AgencyTeamMembers)
+            .innerJoin(Users, eq(AgencyTeamMembers.userId, Users.id))
+            .where(
+                and(
+                    eq(AgencyTeamMembers.agencyId, agencyId),
+                    or(
+                        eq(AgencyTeamMembers.status, "active"),
+                        eq(AgencyTeamMembers.status, "pending")
+                    )
+                )
+            )
+            .orderBy(desc(AgencyTeamMembers.joinedAt))
+            .execute();
+        return rows;
+    } catch (error) {
+        console.error(`[GetAgencyTeamMembers] Error encountered:`, error);
+        throw new Error("Failed to get agency team members");
+    }
+};
+
+export const RemoveAgencyTeamMember = async (
+    agencyId: number,
+    membershipId: number
+) => {
+    try {
+        const [updated] = await db
+            .update(AgencyTeamMembers)
+            .set({ status: "inactive" })
+            .where(
+                and(
+                    eq(AgencyTeamMembers.id, membershipId),
+                    eq(AgencyTeamMembers.agencyId, agencyId)
+                )
+            )
+            .returning()
+            .execute();
+
+        if (updated) {
+            await db
+                .delete(ClientAssignments)
+                .where(
+                    and(
+                        eq(ClientAssignments.userId, updated.userId),
+                        eq(ClientAssignments.agencyId, agencyId)
+                    )
+                )
+                .execute();
+        }
+
+        return updated || null;
+    } catch (error) {
+        console.error(`[RemoveAgencyTeamMember] Error encountered:`, error);
+        throw new Error("Failed to remove team member");
+    }
+};
+
+export const UpdateAgencyTeamMemberRole = async (
+    agencyId: number,
+    membershipId: number,
+    role: string
+) => {
+    try {
+        const [updated] = await db
+            .update(AgencyTeamMembers)
+            .set({ role })
+            .where(
+                and(
+                    eq(AgencyTeamMembers.id, membershipId),
+                    eq(AgencyTeamMembers.agencyId, agencyId)
+                )
+            )
+            .returning()
+            .execute();
+        return updated || null;
+    } catch (error) {
+        console.error(`[UpdateAgencyTeamMemberRole] Error:`, error);
+        throw new Error("Failed to update role");
+    }
+};
+
+/** Replace client assignments for a team member under an agency. */
+export const SetClientAssignments = async (
+    agencyId: number,
+    userId: number,
+    clientIds: number[]
+) => {
+    try {
+        const uniqueIds = Array.from(
+            new Set(clientIds.filter((id) => Number.isFinite(id)))
+        );
+
+        // Only allow clients owned by this agency
+        let allowedIds = uniqueIds;
+        if (uniqueIds.length > 0) {
+            const owned = await db
+                .select({ id: Clients.id })
+                .from(Clients)
+                .where(
+                    and(eq(Clients.agencyId, agencyId), inArray(Clients.id, uniqueIds))
+                )
+                .execute();
+            allowedIds = owned.map((c) => c.id);
+        }
+
+        await db
+            .delete(ClientAssignments)
+            .where(
+                and(
+                    eq(ClientAssignments.userId, userId),
+                    eq(ClientAssignments.agencyId, agencyId)
+                )
+            )
+            .execute();
+
+        if (allowedIds.length > 0) {
+            await db
+                .insert(ClientAssignments)
+                .values(
+                    allowedIds.map((clientId) => ({
+                        clientId,
+                        userId,
+                        agencyId,
+                    }))
+                )
+                .execute();
+        }
+
+        // Mirror on membership permissions for quick reads
+        await db
+            .update(AgencyTeamMembers)
+            .set({ permissions: { clientIds: allowedIds } })
+            .where(
+                and(
+                    eq(AgencyTeamMembers.userId, userId),
+                    eq(AgencyTeamMembers.agencyId, agencyId)
+                )
+            )
+            .execute();
+
+        return allowedIds;
+    } catch (error) {
+        console.error(`[SetClientAssignments] Error:`, error);
+        throw new Error("Failed to set client assignments");
+    }
+};
+
+export const GetClientAssignmentsForAgency = async (agencyId: number) => {
+    try {
+        const rows = await db
+            .select({
+                id: ClientAssignments.id,
+                userId: ClientAssignments.userId,
+                clientId: ClientAssignments.clientId,
+                clientName: Clients.name,
+            })
+            .from(ClientAssignments)
+            .innerJoin(Clients, eq(ClientAssignments.clientId, Clients.id))
+            .where(eq(ClientAssignments.agencyId, agencyId))
+            .execute();
+        return rows;
+    } catch (error) {
+        console.error(`[GetClientAssignmentsForAgency] Error:`, error);
+        throw new Error("Failed to get client assignments");
+    }
+};
+
+/** Client IDs assigned to a team member under an agency. */
+export const GetAssignedClientIds = async (userId: number, agencyId: number) => {
+    try {
+        const rows = await db
+            .select({ clientId: ClientAssignments.clientId })
+            .from(ClientAssignments)
+            .where(
+                and(
+                    eq(ClientAssignments.userId, userId),
+                    eq(ClientAssignments.agencyId, agencyId)
+                )
+            )
+            .execute();
+        return rows.map((r) => r.clientId);
+    } catch (error) {
+        console.error(`[GetAssignedClientIds] Error:`, error);
+        return [];
+    }
+};
+
+/** Active team membership for a user (any agency). */
+export const GetActiveTeamMembership = async (userId: number) => {
+    try {
+        const [row] = await db
+            .select({
+                id: AgencyTeamMembers.id,
+                agencyId: AgencyTeamMembers.agencyId,
+                role: AgencyTeamMembers.role,
+                status: AgencyTeamMembers.status,
+                permissions: AgencyTeamMembers.permissions,
+            })
+            .from(AgencyTeamMembers)
+            .where(
+                and(
+                    eq(AgencyTeamMembers.userId, userId),
+                    eq(AgencyTeamMembers.status, "active")
+                )
+            )
+            .limit(1)
+            .execute();
+        return row || null;
+    } catch (error) {
+        console.error(`[GetActiveTeamMembership] Error:`, error);
+        return null;
+    }
+};
+
+const DEFAULT_USER_SETTINGS = {
+    defaultAIModel: "deepseek-v4-flash",
+    autoSave: true,
+    notifications: true,
+    theme: "system",
+    niche: null as string | null,
+    emailApprovals: true,
+    emailTasks: true,
+    defaultRequiresApproval: true,
+};
+
+export const GetUserSettings = async (userId: number) => {
+    try {
+        const [row] = await db
+            .select()
+            .from(UserSettings)
+            .where(eq(UserSettings.userId, userId))
+            .limit(1)
+            .execute();
+        if (!row) {
+            return { ...DEFAULT_USER_SETTINGS, persisted: false as const };
+        }
+        return {
+            defaultAIModel: row.defaultAIModel || DEFAULT_USER_SETTINGS.defaultAIModel,
+            autoSave: row.autoSave ?? true,
+            notifications: row.notifications ?? true,
+            theme: row.theme || "system",
+            niche: row.niche,
+            emailApprovals: row.emailApprovals ?? true,
+            emailTasks: row.emailTasks ?? true,
+            defaultRequiresApproval: row.defaultRequiresApproval ?? true,
+            persisted: true as const,
+        };
+    } catch (error) {
+        console.error(`[GetUserSettings] Error:`, error);
+        return { ...DEFAULT_USER_SETTINGS, persisted: false as const };
+    }
+};
+
+export type UserSettingsInput = {
+    defaultAIModel?: string;
+    autoSave?: boolean;
+    notifications?: boolean;
+    theme?: string;
+    niche?: string | null;
+    emailApprovals?: boolean;
+    emailTasks?: boolean;
+    defaultRequiresApproval?: boolean;
+};
+
+export const UpsertUserSettings = async (
+    userId: number,
+    settings: UserSettingsInput
+) => {
+    try {
+        const [existing] = await db
+            .select({ id: UserSettings.id })
+            .from(UserSettings)
+            .where(eq(UserSettings.userId, userId))
+            .limit(1)
+            .execute();
+
+        const payload = {
+            defaultAIModel:
+                settings.defaultAIModel ?? DEFAULT_USER_SETTINGS.defaultAIModel,
+            autoSave: settings.autoSave ?? true,
+            notifications: settings.notifications ?? true,
+            theme: settings.theme ?? "system",
+            niche: settings.niche ?? null,
+            emailApprovals: settings.emailApprovals ?? true,
+            emailTasks: settings.emailTasks ?? true,
+            defaultRequiresApproval: settings.defaultRequiresApproval ?? true,
+            updatedAt: new Date(),
+        };
+
+        if (existing) {
+            const [updated] = await db
+                .update(UserSettings)
+                .set(payload)
+                .where(eq(UserSettings.userId, userId))
+                .returning()
+                .execute();
+            return updated;
+        }
+
+        const [created] = await db
+            .insert(UserSettings)
+            .values({ userId, ...payload })
+            .returning()
+            .execute();
+        return created;
+    } catch (error) {
+        console.error(`[UpsertUserSettings] Error:`, error);
+        throw new Error("Failed to save settings");
     }
 };

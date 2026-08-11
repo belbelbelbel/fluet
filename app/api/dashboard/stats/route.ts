@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { GetUserByClerkId } from "@/utils/db/actions";
 import { db } from "@/utils/db/dbConfig";
-import { GeneratedContent, ScheduledPosts } from "@/utils/db/schema";
-import { eq, and, gte, sql, count } from "drizzle-orm";
+import { ContentAnalytics, GeneratedContent, ScheduledPosts } from "@/utils/db/schema";
+import { eq, and, gte, sql, count, sum } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60; // Cache for 60 seconds
@@ -120,13 +120,38 @@ export async function GET(req: Request) {
 
     const topPlatform = topPlatformResult?.platform || "Twitter";
 
+    const [engagement] = await db
+      .select({
+        views: sum(ContentAnalytics.views),
+        likes: sum(ContentAnalytics.likes),
+        shares: sum(ContentAnalytics.shares),
+        comments: sum(ContentAnalytics.comments),
+      })
+      .from(ContentAnalytics)
+      .where(eq(ContentAnalytics.userId, user.id));
+
+    const totalViews = Number(engagement?.views || 0);
+    const totalLikes = Number(engagement?.likes || 0);
+    const totalShares = Number(engagement?.shares || 0);
+    const totalComments = Number(engagement?.comments || 0);
+    const hasEngagement =
+      totalViews + totalLikes + totalShares + totalComments > 0;
+    const engagementRate =
+      hasEngagement && totalViews > 0
+        ? Math.round(
+            ((totalLikes + totalShares + totalComments) / totalViews) * 100 * 10
+          ) / 10
+        : null;
+
     const response = NextResponse.json({
       totalContent,
       scheduledPosts,
       teamMembers: 1, // Will be updated when team features are implemented
       thisWeekContent,
-      engagementRate: null,
-      engagementMetricsAvailable: false,
+      engagementRate,
+      engagementMetricsAvailable: hasEngagement,
+      totalViews: hasEngagement ? totalViews : 0,
+      totalLikes: hasEngagement ? totalLikes : 0,
       topPlatform: topPlatformResult?.platform ? topPlatform : null,
     });
     

@@ -7,6 +7,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
 import { showToast } from "@/lib/toast";
 import { exportAsText, exportAsPDF } from "@/lib/export";
@@ -569,7 +571,7 @@ function DashboardGeneratePageInner() {
           <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${isDark ? "text-white" : "text-gray-950"}`}>
             Generate Content
             {clientName && (
-              <span className="text-purple-600 dark:text-purple-400 font-semibold ml-2">for {clientName}</span>
+              <span className="text-foreground dark:text-purple-400 font-semibold ml-2">for {clientName}</span>
             )}
           </h1>
           <p className={`${isDark ? "text-slate-400" : "text-gray-600"} flex flex-wrap items-center gap-x-2 gap-y-1`}>
@@ -578,11 +580,18 @@ function DashboardGeneratePageInner() {
               <>
                 <span className={isDark ? "text-slate-500" : "text-gray-400"}>·</span>
                 {brandVoice ? (
-                  <span className={isDark ? "text-green-400" : "text-green-600"}>Using brand voice</span>
+                  <span className={isDark ? "text-teal-300" : "text-teal-700"}>
+                    Brand voice on
+                    {brandVoice.brandDescription
+                      ? ` · ${brandVoice.brandDescription.slice(0, 48)}${
+                          brandVoice.brandDescription.length > 48 ? "…" : ""
+                        }`
+                      : ""}
+                  </span>
                 ) : (
                   <Link
                     href={`/dashboard/clients/${clientIdFromQuery}/brand-voice`}
-                    className="text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300"
+                    className="text-foreground hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300"
                   >
                     Add brand voice
                   </Link>
@@ -608,14 +617,14 @@ function DashboardGeneratePageInner() {
                       <button
                         key={type}
                         onClick={() => setContentType(type)}
-                        className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200 ${
+                        className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-[0.5px] transition-all duration-200 ${
                           contentType === type
                             ? isDark
-                              ? "border-purple-500 bg-purple-900/50 text-purple-300"
-                              : "border-purple-600 bg-purple-50 text-purple-900"
+                              ? "border-foreground/40 bg-accent text-foreground"
+                              : "border-foreground/30 bg-muted text-foreground"
                             : isDark
-                            ? "border-slate-700 bg-slate-700/50 text-slate-300 hover:border-slate-600 hover:bg-slate-700"
-                            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                            ? "border-border bg-muted/30 text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                            : "border-border bg-background text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                         }`}
                       >
                         {getContentTypeIcon(type)}
@@ -629,18 +638,11 @@ function DashboardGeneratePageInner() {
               {/* Prompt Input */}
               <Card className={`border rounded-xl transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
                 <CardContent className="p-4 sm:p-6">
-                  <label className={`block text-sm font-semibold mb-3 ${isDark ? "text-white" : "text-gray-950"}`}>
-                    What do you want to create?
-                  </label>
-                  <textarea
+                  <Label className="mb-3 block">What do you want to create?</Label>
+                  <Textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Describe what you want to post about... (e.g., 'A post about launching our new product')"
-                    className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-                      isDark
-                        ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
-                        : "bg-white border-gray-200 text-gray-950 placeholder-gray-400 hover:border-gray-300"
-                    }`}
                     rows={4}
                   />
                   <div className={`mt-2 text-xs text-right ${
@@ -656,7 +658,7 @@ function DashboardGeneratePageInner() {
                 <Button
                   onClick={handleGenerate}
                   disabled={isGenerating || !prompt.trim() || actionsBlocked}
-                  className="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl py-4 sm:py-6 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="w-full py-4 sm:py-6 text-base font-medium"
                 >
                 {isGenerating ? (
                   <>
@@ -703,7 +705,7 @@ function DashboardGeneratePageInner() {
                           </p>
                           <Link
                             href={`/dashboard/clients/${clientIdFromQuery}/brand-voice`}
-                            className="text-xs text-purple-600 hover:text-purple-500 dark:text-purple-400"
+                            className="text-xs text-foreground hover:text-purple-500 dark:text-purple-400"
                           >
                             {brandVoice ? "Edit brand voice" : "Add brand voice"}
                           </Link>
@@ -771,7 +773,7 @@ function DashboardGeneratePageInner() {
                             <button
                               key={t}
                               onClick={() => setTone(t)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${tone === t ? "bg-purple-600 text-white" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${tone === t ? "bg-primary text-primary-foreground" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                             >
                               {t}
                             </button>
@@ -787,7 +789,7 @@ function DashboardGeneratePageInner() {
                             <button
                               key={s}
                               onClick={() => setStyle(s)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${style === s ? "bg-purple-600 text-white" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${style === s ? "bg-primary text-primary-foreground" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                             >
                               {s}
                             </button>
@@ -804,7 +806,7 @@ function DashboardGeneratePageInner() {
                               key={l}
                               onClick={() => setLength(l)}
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                                length === l ? "bg-purple-600 text-white" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                length === l ? "bg-primary text-primary-foreground" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                               }`}
                             >
                               {l}
@@ -926,7 +928,7 @@ function DashboardGeneratePageInner() {
           >
             <Loader2Icon
               className={`w-12 h-12 animate-spin mx-auto mb-4 ${
-                isDark ? "text-purple-400" : "text-purple-600"
+                isDark ? "text-purple-400" : "text-foreground"
               }`}
             />
             <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-950"}`}>
@@ -960,7 +962,7 @@ function DashboardGeneratePageInner() {
                 <div className="space-y-3">
                   <p
                     className={`text-xs rounded-lg px-3 py-2 ${
-                      isDark ? "bg-purple-950/40 text-purple-300" : "bg-purple-50 text-purple-800"
+                      isDark ? "bg-purple-950/40 text-purple-300" : "bg-muted text-purple-800"
                     }`}
                   >
                     Press Ctrl/Cmd + S to save, Esc to cancel
@@ -968,7 +970,7 @@ function DashboardGeneratePageInner() {
                   <textarea
                     value={editedContent}
                     onChange={(e) => setEditedContent(e.target.value)}
-                    className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                    className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
                       isDark
                         ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400"
                         : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
@@ -1087,7 +1089,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       className={`rounded-lg transition-all duration-200 ${
                         isDark
-                          ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                          ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
                           : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
                       }`}
                     >
@@ -1118,7 +1120,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       className={`rounded-lg transition-all duration-200 ${
                         isDark
-                          ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                          ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
                           : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
                       }`}
                     >

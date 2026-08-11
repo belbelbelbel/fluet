@@ -27,7 +27,10 @@ interface AnalyticsData {
     scheduledPosts: number;
     thisWeekContent: number;
     topPlatform: string | null;
+    tasksOpen?: number;
   };
+  contentVolume: { date: string; generated: number; scheduled: number }[];
+  activityPlatformStats: { platform: string; posts: number }[];
   engagementMetricsAvailable: boolean;
   totalViews: number;
   totalLikes: number;
@@ -48,7 +51,10 @@ const defaultData: AnalyticsData = {
     scheduledPosts: 0,
     thisWeekContent: 0,
     topPlatform: null,
+    tasksOpen: 0,
   },
+  contentVolume: [],
+  activityPlatformStats: [],
   engagementMetricsAvailable: false,
   totalViews: 0,
   totalLikes: 0,
@@ -157,7 +163,7 @@ export default function AnalyticsPage() {
             isDark ? "text-white" : "text-gray-950"
           }`}>Analytics Dashboard</h1>
           <p className={isDark ? "text-slate-400" : "text-gray-600"}>
-            Your content activity is tracked now — engagement metrics from social platforms are coming soon
+            Live activity from your workspace — social engagement connects next
           </p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
@@ -167,10 +173,10 @@ export default function AnalyticsPage() {
               onClick={() => setTimeRange(range)}
               className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 timeRange === range
-                  ? "bg-purple-600 text-white shadow-md"
+                  ? "bg-primary text-primary-foreground shadow-md"
                   : isDark
-                  ? "bg-slate-800 border-2 border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
-                  : "bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+                  ? "bg-slate-800 border-[0.5px] border-slate-700 text-slate-300 hover:bg-slate-700"
+                  : "bg-white border-[0.5px] border-border text-gray-700 hover:bg-accent/50"
               }`}
             >
               {range === "7d" ? "7 Days" : range === "30d" ? "30 Days" : "90 Days"}
@@ -288,8 +294,8 @@ export default function AnalyticsPage() {
           <FeatureComingSoon
             isDark={isDark}
             icon={BarChart3}
-            title="Real-time analytics coming soon"
-            description="Views, likes, shares, and engagement rates will appear here once social platform analytics are connected. Your post counts above reflect real activity in Revvy."
+            title="No engagement synced yet"
+            description="Connect Twitter in Settings and let scheduled posts auto-publish. Tweet metrics sync into analytics on each cron run."
           />
         )}
       </div>
@@ -312,7 +318,7 @@ export default function AnalyticsPage() {
                 {data.platformStats.map((platform, index) => (
                   <div
                     key={index}
-                    className={`flex items-center justify-between p-4 sm:p-6 rounded-xl border-2 ${
+                    className={`flex items-center justify-between p-4 sm:p-6 rounded-xl border ${
                       isDark
                         ? "bg-slate-700/50 border-slate-700"
                         : "bg-gray-50 border-gray-200"
@@ -346,47 +352,210 @@ export default function AnalyticsPage() {
         </div>
       )}
 
+      {/* Activity by platform (real scheduled posts) */}
+      {data.activityPlatformStats.length > 0 && (
+        <div>
+          <h2 className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-950"}`}>
+            Scheduled by platform
+          </h2>
+          <Card
+            className={`border-2 rounded-xl transition-colors duration-300 ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}
+          >
+            <CardContent className="pt-6 space-y-3">
+              {data.activityPlatformStats.map((platform) => {
+                const max = Math.max(
+                  ...data.activityPlatformStats.map((p) => p.posts),
+                  1
+                );
+                return (
+                  <div key={platform.platform} className="space-y-1.5">
+                    <div className="flex items-center justify-between text-sm">
+                      <span
+                        className={`capitalize font-medium flex items-center gap-2 ${
+                          isDark ? "text-slate-200" : "text-gray-800"
+                        }`}
+                      >
+                        {getPlatformIcon(platform.platform)}
+                        {platform.platform}
+                      </span>
+                      <span className={isDark ? "text-slate-400" : "text-gray-500"}>
+                        {platform.posts}
+                      </span>
+                    </div>
+                    <div
+                      className={`h-2 rounded-full overflow-hidden ${
+                        isDark ? "bg-slate-700" : "bg-gray-100"
+                      }`}
+                    >
+                      <div
+                        className="h-full rounded-full bg-primary transition-all duration-500"
+                        style={{ width: `${(platform.posts / max) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <div>
         <h2 className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-950"}`}>
           Performance Trends
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className={`border-2 rounded-xl ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+          <Card
+            className={`border-2 rounded-xl ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}
+          >
             <CardHeader className="pb-4">
-              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>Content Volume</CardTitle>
+              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+                Content volume
+              </CardTitle>
               <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
-                Posts created over time
+                Generated vs scheduled in this range
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <FeatureComingSoon
-                compact
-                isDark={isDark}
-                icon={Calendar}
-                title="Chart coming soon"
-                description="Visual content volume trends will be available here."
-              />
+              {loading ? (
+                <div
+                  className={`h-40 rounded-xl animate-pulse ${
+                    isDark ? "bg-slate-700" : "bg-gray-100"
+                  }`}
+                />
+              ) : (
+                <VolumeChart series={data.contentVolume} isDark={isDark} />
+              )}
             </CardContent>
           </Card>
 
-          <Card className={`border-2 rounded-xl ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+          <Card
+            className={`border-2 rounded-xl ${
+              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            }`}
+          >
             <CardHeader className="pb-4">
-              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>Engagement Trends</CardTitle>
+              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+                Engagement trends
+              </CardTitle>
               <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
-                Engagement rate over time
+                From connected social analytics
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <FeatureComingSoon
-                compact
-                isDark={isDark}
-                icon={BarChart3}
-                title="Real-time analytics coming soon"
-                description="Engagement trend charts require platform analytics integration."
-              />
+              {data.engagementMetricsAvailable ? (
+                <div className="space-y-4 py-2">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                        Views
+                      </p>
+                      <p className={`text-2xl font-bold tabular-nums ${isDark ? "text-white" : "text-gray-950"}`}>
+                        {data.totalViews.toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                        Engagement rate
+                      </p>
+                      <p className={`text-2xl font-bold tabular-nums ${isDark ? "text-white" : "text-gray-950"}`}>
+                        {data.engagementRate != null ? `${data.engagementRate}%` : "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <p className={`text-xs ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                    Synced from Twitter after auto-post (cron). More platforms next.
+                  </p>
+                </div>
+              ) : (
+                <FeatureComingSoon
+                  compact
+                  isDark={isDark}
+                  icon={BarChart3}
+                  title="Twitter engagement sync ready"
+                  description="Connect Twitter, auto-post scheduled tweets, then metrics appear here on each cron run."
+                />
+              )}
             </CardContent>
           </Card>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function VolumeChart({
+  series,
+  isDark,
+}: {
+  series: { date: string; generated: number; scheduled: number }[];
+  isDark: boolean;
+}) {
+  if (!series.length) {
+    return (
+      <p className={`text-sm py-10 text-center ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+        No activity in this range yet.
+      </p>
+    );
+  }
+
+  // Sample bars for readability on long ranges
+  const step = series.length > 30 ? Math.ceil(series.length / 24) : 1;
+  const bars = series.filter((_, i) => i % step === 0 || i === series.length - 1);
+  const max = Math.max(...bars.map((b) => b.generated + b.scheduled), 1);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-end gap-1 h-40">
+        {bars.map((day) => {
+          const total = day.generated + day.scheduled;
+          const h = Math.max(4, Math.round((total / max) * 100));
+          const genShare = total ? (day.generated / total) * 100 : 0;
+          return (
+            <div
+              key={day.date}
+              className="flex-1 min-w-0 flex flex-col justify-end group relative"
+              title={`${day.date}: ${day.generated} generated, ${day.scheduled} scheduled`}
+            >
+              <div
+                className="w-full rounded-t-sm overflow-hidden flex flex-col justify-end"
+                style={{ height: `${h}%` }}
+              >
+                <div
+                  className="w-full bg-primary/80"
+                  style={{ height: `${genShare}%`, minHeight: day.generated ? 2 : 0 }}
+                />
+                <div
+                  className={`w-full ${isDark ? "bg-slate-500" : "bg-gray-400"}`}
+                  style={{
+                    height: `${100 - genShare}%`,
+                    minHeight: day.scheduled ? 2 : 0,
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex items-center gap-4 text-xs">
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-sm bg-primary/80" />
+          <span className={isDark ? "text-slate-400" : "text-gray-500"}>Generated</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span
+            className={`w-2.5 h-2.5 rounded-sm ${isDark ? "bg-slate-500" : "bg-gray-400"}`}
+          />
+          <span className={isDark ? "text-slate-400" : "text-gray-500"}>Scheduled</span>
+        </span>
+        <span className={`ml-auto ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+          <Calendar className="w-3 h-3 inline mr-1" />
+          {series[0]?.date?.slice(5)} → {series[series.length - 1]?.date?.slice(5)}
+        </span>
       </div>
     </div>
   );

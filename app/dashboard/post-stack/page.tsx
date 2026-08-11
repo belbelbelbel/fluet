@@ -107,7 +107,7 @@ export default function PostStackPage() {
       }`}>
         <div className="text-center">
           <Clock className={`w-8 h-8 animate-pulse mx-auto mb-4 ${
-            isDark ? "text-purple-400" : "text-purple-600"
+            isDark ? "text-purple-400" : "text-foreground"
           }`} />
           <p className={isDark ? "text-slate-300" : "text-gray-600"}>Loading your stack...</p>
         </div>
@@ -135,7 +135,7 @@ export default function PostStackPage() {
             </div>
             <Button
               onClick={() => router.push("/dashboard/content-ideas")}
-              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-lg sm:rounded-xl flex items-center justify-center gap-2 text-sm px-4 transition-all duration-200 shadow-sm hover:shadow-md"
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground rounded-lg sm:rounded-xl flex items-center justify-center gap-2 text-sm px-4 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <Plus className="w-4 h-4" />
               Add More
@@ -160,10 +160,10 @@ export default function PostStackPage() {
                     {/* Topic Header */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                        isDark ? "bg-purple-500/20" : "bg-purple-100"
+                        isDark ? "bg-muted0/20" : "bg-purple-100"
                       }`}>
                         <FormatIcon className={`w-5 h-5 ${
-                          isDark ? "text-purple-400" : "text-purple-600"
+                          isDark ? "text-purple-400" : "text-foreground"
                         }`} />
                       </div>
                       <h3 className={`text-lg font-semibold flex-1 ${
@@ -234,7 +234,7 @@ export default function PostStackPage() {
                         onClick={() => handleSchedule(item)}
                         className={`flex-1 rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md ${
                           isDark
-                            ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                            ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
                             : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
                         }`}
                       >
@@ -291,7 +291,7 @@ export default function PostStackPage() {
               </p>
               <Button
                 onClick={() => router.push("/dashboard/content-ideas")}
-                className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-lg sm:rounded-xl text-sm px-4 sm:px-6 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground rounded-lg sm:rounded-xl text-sm px-4 sm:px-6 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Browse Content Ideas

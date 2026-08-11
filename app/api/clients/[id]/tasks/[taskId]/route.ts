@@ -4,14 +4,16 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import {
-    GetClientById,
-    GetUserByClerkId,
-} from "@/utils/db/actions";
+import { GetUserByClerkId } from "@/utils/db/actions";
 import { Tasks, Users } from "@/utils/db/schema";
 import { db } from "@/utils/db/dbConfig";
 import { eq, and } from "drizzle-orm";
 import { sendNotificationEmail } from "@/lib/email/send-notification";
+import {
+    resolveAgencyContext,
+    assertClientAccess,
+    canAssignTasks,
+} from "@/lib/team-access";
 
 export const dynamic = "force-dynamic";
 
@@ -63,16 +65,31 @@ export async function PUT(
             );
         }
 
-        // Verify client belongs to agency
-        const client = await GetClientById(clientId, user.id);
+        const ctx = await resolveAgencyContext(clerkUserId);
+        if (!ctx) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+        const client = await assertClientAccess(ctx, clientId);
         if (!client) {
             return NextResponse.json(
-                { error: "Client not found" },
+                { error: "Client not found or access denied" },
                 { status: 404 }
             );
         }
 
         const { type, status, description, assignedTo, dueDate } = body;
+
+        // Only managers+ can reassign tasks to others
+        if (
+            assignedTo != null &&
+            parseInt(String(assignedTo)) !== user.id &&
+            !canAssignTasks(ctx.role)
+        ) {
+            return NextResponse.json(
+                { error: "You don't have permission to assign tasks to others" },
+                { status: 403 }
+            );
+        }
 
         // Get current task to check if assignment changed
         const [currentTask] = await db
@@ -130,9 +147,6 @@ export async function PUT(
                     .where(eq(Users.id, isNowAssigned))
                     .limit(1)
                     .execute();
-
-                // Get client info
-                const client = await GetClientById(clientId, user.id);
 
                 if (assignedUser?.email && client) {
                     const emailResult = await sendNotificationEmail({

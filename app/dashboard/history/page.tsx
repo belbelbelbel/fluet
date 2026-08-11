@@ -226,7 +226,7 @@ export default function DashboardHistoryPage() {
             onClick={() => setFilter("all")}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               filter === "all"
-                ? "bg-purple-600 text-white"
+                ? "bg-primary text-primary-foreground"
                 : isDark
                 ? "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
                 : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -240,7 +240,7 @@ export default function DashboardHistoryPage() {
               onClick={() => setFilter(type)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                 filter === type
-                  ? "bg-purple-600 text-white"
+                  ? "bg-primary text-primary-foreground"
                   : isDark
                   ? "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -303,7 +303,7 @@ export default function DashboardHistoryPage() {
           {userId && (
             <Button
               onClick={() => router.push("/dashboard/generate")}
-              className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+              className="bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Generate Content
             </Button>
@@ -580,7 +580,7 @@ export default function DashboardHistoryPage() {
                 size="sm"
                 className={`transition-all duration-200 ${
                   isDark
-                    ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white"
+                    ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
                     : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white"
                 }`}
               >
@@ -605,20 +605,16 @@ export default function DashboardHistoryPage() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      {deleteConfirm.open && (
-        <div className="fixed inset-0 z-[100]">
-          <ConfirmDialog
-            open={deleteConfirm.open}
-            onClose={() => setDeleteConfirm({ open: false, id: null })}
-            onConfirm={handleDeleteConfirm}
-            title="Delete Content"
-            description="Are you sure you want to delete this content? This action cannot be undone."
-            confirmText="Delete"
-            cancelText="Cancel"
-            variant="destructive"
-          />
-        </div>
-      )}
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, id: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Content"
+        description="Are you sure you want to delete this content? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
 
       <KeyboardShortcuts />
     </div>

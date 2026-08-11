@@ -3,10 +3,11 @@
  * Uses strategic frameworks (educational, BTS, testimonial, etc.) for diverse, high-quality ideas
  */
 
-import OpenAI from "openai";
 import type { ContentIdea, Niche, HookStyle, Format, ContentStrategy } from "@/lib/content-ideas";
+import { DEEPSEEK_MODELS, getChatClient } from "./client";
 
-const MODEL = "gpt-4o-mini";
+/** Flash is best for batch idea JSON — fast + cheap */
+const MODEL = DEEPSEEK_MODELS.flash;
 
 const HOOK_STYLES: HookStyle[] = ["story", "question", "shock", "value", "tip"];
 const FORMATS: Format[] = ["text_only", "text_image", "carousel", "video"];
@@ -59,17 +60,14 @@ export interface GenerateIdeasResult {
 export async function generateContentIdeasForNiche(
   nicheDescription: string
 ): Promise<GenerateIdeasResult> {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is not configured");
-  }
+  const client = getChatClient();
 
   const userPrompt = USER_PROMPT_TEMPLATE.replace(
     "{niche}",
     nicheDescription.trim() || "small business in Nigeria"
   );
 
-  const completion = await openai.chat.completions.create({
+  const completion = await client.chat.completions.create({
     model: MODEL,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
@@ -77,9 +75,17 @@ export async function generateContentIdeasForNiche(
     ],
     temperature: 0.8,
     max_tokens: 4000,
+    // DeepSeek V4: disable thinking so JSON lands in content, not only reasoning
+    ...({ thinking: { type: "disabled" } } as object),
   });
 
-  const content = completion.choices[0]?.message?.content;
+  const message = completion.choices[0]?.message as
+    | { content?: string | null; reasoning_content?: string | null }
+    | undefined;
+  const content =
+    (message?.content && String(message.content).trim()) ||
+    (message?.reasoning_content && String(message.reasoning_content).trim()) ||
+    "";
   if (!content) {
     throw new Error("No content generated from AI");
   }

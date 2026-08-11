@@ -71,6 +71,8 @@ export const Clients = pgTable("clients", {
   activatedAt: timestamp("activated_at"),
   lastLoginAt: timestamp("last_login_at"),
   deactivatedAt: timestamp("deactivated_at"),
+  /** Client portal prefs: { emailApprovals, emailReminders, notes } */
+  portalPreferences: jsonb("portal_preferences"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -88,6 +90,8 @@ export const ScheduledPosts = pgTable("scheduled_posts", {
   scheduledFor: timestamp("scheduled_for").notNull(),
   posted: boolean("posted").default(false),
   postedAt: timestamp("posted_at"),
+  /** Platform-native id (e.g. Twitter tweet id) for metrics sync */
+  externalPostId: varchar("external_post_id", { length: 255 }),
   approvalStatus: varchar("approval_status", { length: 50 }).default('pending'), // pending, approved, changes_requested, rejected
   requiresApproval: boolean("requires_approval").default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -95,9 +99,11 @@ export const ScheduledPosts = pgTable("scheduled_posts", {
 
 export const ContentAnalytics = pgTable("content_analytics", {
   id: serial("id").primaryKey(),
-  contentId: integer("content_id")
-    .references(() => GeneratedContent.id)
-    .notNull(),
+  contentId: integer("content_id").references(() => GeneratedContent.id),
+  scheduledPostId: integer("scheduled_post_id").references(() => ScheduledPosts.id, {
+    onDelete: "cascade",
+  }),
+  externalPostId: varchar("external_post_id", { length: 255 }),
   userId: integer("user_id")
     .references(() => Users.id)
     .notNull(),
@@ -118,10 +124,27 @@ export const TeamInvitations = pgTable("team_invitations", {
     .notNull(),
   email: text("email").notNull(),
   token: text("token").notNull().unique(), // Unique token for invitation link
-  role: varchar("role", { length: 50 }).default("member"), // owner, admin, member
+  role: varchar("role", { length: 50 }).default("member"), // admin, manager, designer, copywriter, member
+  /** Client IDs this invitee should access after accepting */
+  clientIds: jsonb("client_ids").$type<number[]>().default([]),
   status: varchar("status", { length: 50 }).default("pending"), // pending, accepted, rejected, expired
   expiresAt: timestamp("expires_at"), // Invitation expiration (e.g., 7 days)
   acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/** Which clients a team member can work on */
+export const ClientAssignments = pgTable("client_assignments", {
+  id: serial("id").primaryKey(),
+  clientId: integer("client_id")
+    .references(() => Clients.id, { onDelete: "cascade" })
+    .notNull(),
+  userId: integer("user_id")
+    .references(() => Users.id, { onDelete: "cascade" })
+    .notNull(),
+  agencyId: integer("agency_id")
+    .references(() => Users.id, { onDelete: "cascade" })
+    .notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -215,8 +238,34 @@ export const PostApprovals = pgTable("post_approvals", {
   clientComment: text("client_comment"),
   expiresAt: timestamp("expires_at"),
   approvedAt: timestamp("approved_at"),
+  // Verified email of whoever made the decision — audit trail
+  approvedByEmail: varchar("approved_by_email", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
+ * Email-ownership challenges for the public approval portal.
+ *
+ * The portal link is a bearer token, so possession alone can't prove the
+ * approver is the client — a forwarded email would let anyone decide. A code
+ * sent to the client's address on file closes that gap.
+ */
+export const ApprovalVerifications = pgTable("approval_verifications", {
+  id: serial("id").primaryKey(),
+  approvalId: integer("approval_id")
+    .references(() => PostApprovals.id, { onDelete: "cascade" })
+    .notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  // sha256 of the code — never store the code itself
+  codeHash: varchar("code_hash", { length: 128 }).notNull(),
+  attempts: integer("attempts").default(0).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  consumedAt: timestamp("consumed_at"),
+  // Issued once the code checks out; carried in an httpOnly cookie
+  sessionToken: varchar("session_token", { length: 255 }),
+  sessionExpiresAt: timestamp("session_expires_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const Tasks = pgTable("tasks", {
@@ -316,4 +365,23 @@ export const ClientIdeaRefreshes = pgTable("client_idea_refreshes", {
     .notNull(),
   refreshedAt: timestamp("refreshed_at").defaultNow().notNull(),
   nicheString: varchar("niche_string", { length: 255 }),
+});
+
+/** Agency / user account preferences (theme, AI, notifications, workflow) */
+export const UserSettings = pgTable("user_settings", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => Users.id, { onDelete: "cascade" })
+    .notNull()
+    .unique(),
+  defaultAIModel: varchar("default_ai_model", { length: 50 }).default("deepseek-v4-flash"),
+  autoSave: boolean("auto_save").default(true),
+  notifications: boolean("notifications").default(true),
+  theme: varchar("theme", { length: 20 }).default("system"), // light | dark | system
+  niche: varchar("niche", { length: 100 }),
+  emailApprovals: boolean("email_approvals").default(true),
+  emailTasks: boolean("email_tasks").default(true),
+  defaultRequiresApproval: boolean("default_requires_approval").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

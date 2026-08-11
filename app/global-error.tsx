@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Root fallback — no imports from app components. Renders when layout itself crashes.
+ */
 export default function GlobalError({
   error,
   reset,
@@ -8,36 +11,98 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <html>
-      <body>
-        <div className="min-h-screen bg-black text-gray-100 flex items-center justify-center px-4">
-          <div className="max-w-md w-full text-center">
-            <h2 className="text-2xl font-bold mb-4 text-red-400">
-              Application Error
-            </h2>
-            <p className="text-gray-300 mb-6">
-              {error.message || "A critical error occurred"}
+    <html lang="en">
+      <body
+        style={{
+          margin: 0,
+          fontFamily:
+            "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          background: "#f9fafb",
+          color: "#030712",
+        }}
+      >
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.5rem",
+          }}
+        >
+          <div style={{ maxWidth: "28rem", width: "100%", textAlign: "center" }}>
+            <p style={{ fontSize: "0.875rem", color: "#6b7280", marginBottom: "0.5rem" }}>
+              Application error
             </p>
-            <button
-              onClick={reset}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+            <h1
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 500,
+                marginBottom: "0.75rem",
+              }}
             >
-              Try again
-            </button>
-            {process.env.NODE_ENV === "development" && (
-              <details className="mt-6 text-left">
-                <summary className="cursor-pointer text-gray-400 mb-2">
-                  Error Details
-                </summary>
-                <pre className="bg-gray-900 p-4 rounded text-xs overflow-auto text-gray-300">
-                  {error.stack}
-                </pre>
-              </details>
-            )}
+              Revvy hit a snag
+            </h1>
+            <p
+              style={{
+                fontSize: "0.875rem",
+                color: "#6b7280",
+                marginBottom: "1.5rem",
+                lineHeight: 1.6,
+              }}
+            >
+              {error.message || "A critical error occurred. Please try again."}
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem",
+                alignItems: "center",
+              }}
+            >
+              <button
+                type="button"
+                onClick={reset}
+                style={{
+                  height: "2.5rem",
+                  padding: "0 1rem",
+                  borderRadius: "0.375rem",
+                  border: "none",
+                  background: "#0f172a",
+                  color: "#fff",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  minWidth: "10rem",
+                }}
+              >
+                Try again
+              </button>
+              <a
+                href="/"
+                style={{
+                  display: "inline-flex",
+                  height: "2.5rem",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 1rem",
+                  borderRadius: "0.375rem",
+                  border: "0.5px solid #d1d5db",
+                  background: "#fff",
+                  color: "#030712",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  minWidth: "10rem",
+                }}
+              >
+                Back home
+              </a>
+            </div>
           </div>
         </div>
       </body>
     </html>
   );
 }
-

@@ -154,7 +154,7 @@ export default function ReportsPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-purple-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 text-foreground animate-spin mx-auto mb-4" />
           <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
             Loading reports...
           </p>
@@ -206,7 +206,7 @@ export default function ReportsPage() {
           </select>
           <Button
             onClick={handleGenerateReport}
-            className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white py-2.5 sm:py-2 min-h-[44px] touch-manipulation"
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground py-2.5 sm:py-2 min-h-[44px] touch-manipulation"
             disabled={!selectedClientId || generating}
           >
             {generating ? (
@@ -251,7 +251,7 @@ export default function ReportsPage() {
               </p>
               <Button
                 onClick={handleGenerateReport}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 disabled={!selectedClientId}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -361,7 +361,7 @@ export default function ReportsPage() {
               isDark ? "text-white" : "text-gray-900"
             }`}
           >
-            <AlertCircle className="w-5 h-5 text-purple-600" />
+            <AlertCircle className="w-5 h-5 text-foreground" />
             About Reports
           </CardTitle>
         </CardHeader>

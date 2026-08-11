@@ -12,19 +12,18 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+/** Marketing home stays light — dark mode is for the app shell only. */
+function isLandingPath(pathname?: string | null): boolean {
+  if (typeof window === "undefined") return false;
+  const path = pathname ?? window.location.pathname;
+  return path === "/" || path === "";
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("system");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
-  // Initialize theme from localStorage or system preference
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("app-theme") as Theme | null;
-    const initialTheme = savedTheme || "system";
-    setThemeState(initialTheme);
-    applyTheme(initialTheme);
-  }, []);
-
-  // Apply theme changes
+  // Apply theme changes (landing path never gets .dark on <html>)
   const applyTheme = (newTheme: Theme) => {
     let resolved: "light" | "dark" = "light";
 
@@ -37,17 +36,50 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     setResolvedTheme(resolved);
 
-    // Apply to document
     const root = document.documentElement;
-    if (resolved === "dark") {
+    if (resolved === "dark" && !isLandingPath()) {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
 
-    // Save to localStorage
     localStorage.setItem("app-theme", newTheme);
   };
+
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("app-theme") as Theme | null;
+    const initialTheme = savedTheme || "system";
+    setThemeState(initialTheme);
+    applyTheme(initialTheme);
+  }, []);
+
+  // Re-apply when leaving/entering landing (Next client navigations)
+  useEffect(() => {
+    const reapply = () => applyTheme(theme);
+    window.addEventListener("popstate", reapply);
+    // Next.js App Router fires this on client navigations
+    window.addEventListener("next-route-change", reapply as EventListener);
+
+    const { pushState, replaceState } = window.history;
+    window.history.pushState = function (...args) {
+      const result = pushState.apply(this, args);
+      reapply();
+      return result;
+    };
+    window.history.replaceState = function (...args) {
+      const result = replaceState.apply(this, args);
+      reapply();
+      return result;
+    };
+
+    return () => {
+      window.removeEventListener("popstate", reapply);
+      window.removeEventListener("next-route-change", reapply as EventListener);
+      window.history.pushState = pushState;
+      window.history.replaceState = replaceState;
+    };
+  }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);

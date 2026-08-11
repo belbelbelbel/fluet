@@ -4,13 +4,10 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import {
-    GetClientById,
-    GetUserByClerkId,
-} from "@/utils/db/actions";
 import { ScheduledPosts } from "@/utils/db/schema";
 import { db } from "@/utils/db/dbConfig";
 import { eq, and, desc } from "drizzle-orm";
+import { requireClientAccess } from "@/lib/team-access";
 
 export const dynamic = "force-dynamic";
 
@@ -32,14 +29,6 @@ export async function GET(
             );
         }
 
-        const user = await GetUserByClerkId(clerkUserId);
-        if (!user) {
-            return NextResponse.json(
-                { error: "User not found" },
-                { status: 404 }
-            );
-        }
-
         const clientId = parseInt(params.id);
         if (isNaN(clientId)) {
             return NextResponse.json(
@@ -48,12 +37,11 @@ export async function GET(
             );
         }
 
-        // Verify client belongs to agency
-        const client = await GetClientById(clientId, user.id);
-        if (!client) {
+        const access = await requireClientAccess(clerkUserId, clientId);
+        if (!access.ok) {
             return NextResponse.json(
-                { error: "Client not found" },
-                { status: 404 }
+                { error: access.error },
+                { status: access.status }
             );
         }
 

@@ -1,14 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { XIcon, CopyIcon, CheckIcon, ExternalLinkIcon } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { CopyIcon, CheckIcon, ExternalLinkIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { showToast } from "@/lib/toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface PostReminderModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onMarkedPosted?: () => void;
   post: {
     id: number;
     platform: string;
@@ -17,10 +25,14 @@ interface PostReminderModalProps {
   } | null;
 }
 
-export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalProps) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+export function PostReminderModal({
+  isOpen,
+  onClose,
+  onMarkedPosted,
+  post,
+}: PostReminderModalProps) {
   const [copied, setCopied] = useState(false);
+  const [marking, setMarking] = useState(false);
 
   useEffect(() => {
     if (copied) {
@@ -29,7 +41,7 @@ export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalPr
     }
   }, [copied]);
 
-  if (!isOpen || !post) return null;
+  if (!post) return null;
 
   const handleCopy = async () => {
     try {
@@ -38,6 +50,32 @@ export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalPr
       showToast.success("Copied!", "Content copied to clipboard");
     } catch {
       showToast.error("Failed to copy", "Please try again");
+    }
+  };
+
+  const handleMarkPosted = async () => {
+    try {
+      setMarking(true);
+      const response = await fetch("/api/schedule", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: post.id, posted: true }),
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to update");
+      }
+      showToast.success("Marked as posted", "This post moved to your history");
+      onMarkedPosted?.();
+      onClose();
+    } catch (e) {
+      showToast.error(
+        "Couldn’t mark posted",
+        e instanceof Error ? e.message : "Try again"
+      );
+    } finally {
+      setMarking(false);
     }
   };
 
@@ -75,105 +113,93 @@ export function PostReminderModal({ isOpen, onClose, post }: PostReminderModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className={`relative w-full max-w-2xl mx-4 rounded-2xl shadow-xl border ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
-        {/* Header */}
-        <div className={`flex items-center justify-between p-6 border-b ${isDark ? "border-slate-700" : "border-gray-200"}`}>
-          <div>
-            <h2 className={`text-2xl font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
-              Time to Post on {getPlatformName(post.platform)}
-            </h2>
-            <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-              Scheduled for {formatDate(post.scheduledFor)}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className={`p-2 rounded-lg transition-colors ${isDark ? "hover:bg-slate-700" : "hover:bg-gray-100"}`}
-          >
-            <XIcon className={`w-5 h-5 ${isDark ? "text-slate-400" : "text-gray-600"}`} />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl gap-0 p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-4 border-b border-gray-200 dark:border-slate-600">
+          <DialogTitle className="text-lg">
+            Time to post on {getPlatformName(post.platform)}
+          </DialogTitle>
+          <DialogDescription>
+            Scheduled for {formatDate(post.scheduledFor)}
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Content */}
-        <div className="p-6">
-          <div className="mb-6">
-            <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
-              Your Content (Ready to Copy)
+        <div className="p-6 space-y-5">
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-slate-300">
+              Your content
             </label>
             <div className="relative">
               <textarea
                 readOnly
                 value={post.content}
-                className={`w-full h-32 p-4 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                  isDark ? "border-slate-600 bg-slate-700 text-white placeholder-slate-500" : "border-gray-300 bg-gray-50 text-gray-900"
-                }`}
+                className="w-full h-32 p-4 border border-gray-200 dark:border-slate-600 rounded-lg resize-none bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:outline-none"
               />
               <button
+                type="button"
                 onClick={handleCopy}
-                className={`absolute top-3 right-3 p-2 border rounded-lg transition-colors ${isDark ? "bg-slate-700 border-slate-600 hover:bg-slate-600" : "bg-white border-gray-300 hover:bg-gray-50"}`}
+                className="absolute top-3 right-3 p-2 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 title="Copy to clipboard"
               >
                 {copied ? (
-                  <CheckIcon className={`w-4 h-4 ${isDark ? "text-green-400" : "text-green-600"}`} />
+                  <CheckIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 ) : (
-                  <CopyIcon className={`w-4 h-4 ${isDark ? "text-slate-400" : "text-gray-600"}`} />
+                  <CopyIcon className="w-4 h-4 text-gray-500 dark:text-slate-400" />
                 )}
               </button>
             </div>
           </div>
 
-          {/* Instructions */}
-          <div className={`rounded-lg p-4 mb-6 border ${isDark ? "bg-purple-900/30 border-purple-800" : "bg-purple-50 border-purple-200"}`}>
-            <h3 className={`text-sm font-semibold mb-2 ${isDark ? "text-purple-300" : "text-purple-900"}`}>
-              How to Post:
+          <div className="rounded-lg p-4 border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/50">
+            <h3 className="text-sm font-medium mb-2 text-gray-900 dark:text-slate-200">
+              How to post
             </h3>
-            <ol className={`text-sm space-y-1 list-decimal list-inside ${isDark ? "text-purple-200" : "text-purple-800"}`}>
-              <li>Click &quot;Copy&quot; to copy your content</li>
-              <li>Click &quot;Open {getPlatformName(post.platform)}&quot; to go to the platform</li>
-              <li>Paste your content and post</li>
+            <ol className="text-sm space-y-1 list-decimal list-inside text-gray-600 dark:text-slate-400">
+              <li>Copy your content above</li>
+              <li>Open {getPlatformName(post.platform)} in a new tab</li>
+              <li>Paste and publish</li>
               <li>Come back and mark as posted</li>
             </ol>
           </div>
+        </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={handleCopy}
-              variant="outline"
-              className="flex-1"
-            >
+        <DialogFooter className="p-6 pt-4 border-t border-gray-200 dark:border-slate-600 flex-col sm:flex-col gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <Button onClick={handleCopy} variant="outline" className="flex-1 rounded-xl">
               {copied ? (
                 <>
                   <CheckIcon className="w-4 h-4 mr-2" />
-                  Copied!
+                  Copied
                 </>
               ) : (
                 <>
                   <CopyIcon className="w-4 h-4 mr-2" />
-                  Copy Content
+                  Copy content
                 </>
               )}
             </Button>
             <Button
-              onClick={() => {
-                window.open(getPlatformUrl(post.platform), "_blank");
-              }}
-              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={() => window.open(getPlatformUrl(post.platform), "_blank")}
+              className="flex-1 rounded-xl bg-gray-950 hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-100 dark:text-gray-950 text-white"
             >
               <ExternalLinkIcon className="w-4 h-4 mr-2" />
               Open {getPlatformName(post.platform)}
             </Button>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className={`px-6 py-4 border-t rounded-b-2xl ${isDark ? "bg-slate-800/80 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
-          <p className={`text-xs text-center ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-            Tip: Connect your {getPlatformName(post.platform)} account in Settings to enable auto-posting
-          </p>
-        </div>
-      </div>
-    </div>
+          <Button
+            onClick={handleMarkPosted}
+            disabled={marking}
+            className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+          >
+            {marking ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <CheckIcon className="w-4 h-4 mr-2" />
+            )}
+            Mark as posted
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

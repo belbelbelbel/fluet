@@ -1,15 +1,19 @@
-import { SignUp } from '@clerk/nextjs'
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { normalizeRedirectPath } from "@/lib/auth-redirect";
+import { SignUpClient } from "./SignUpClient";
 
-export default function signUpPage() {
-    return (
-        <div className='flex justify-center pt-20 min-h-screen items-center bg-black'>
-            <SignUp
-                appearance={{
-                    elements: {
-                        formButtonPrimary: 'bg-blue-500 hover:bg-blue-600 normal-case text-sm'
-                    }
-                }}
-            />
-        </div>
-    )
+type SignUpPageProps = {
+  searchParams: { redirect_url?: string };
+};
+
+export default async function SignUpPage({ searchParams }: SignUpPageProps) {
+  const { userId } = await auth();
+  const redirectUrl = normalizeRedirectPath(searchParams.redirect_url);
+
+  if (userId) {
+    redirect(redirectUrl);
+  }
+
+  return <SignUpClient />;
 }

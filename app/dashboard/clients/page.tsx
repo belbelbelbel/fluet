@@ -3,20 +3,28 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ClientAvatar } from "@/components/ClientAvatar";
 import {
-  Building2,
   Plus,
   AlertCircle,
   Clock,
   CheckCircle2,
-  Loader2,
   Search,
   ChevronLeft,
   ChevronRight,
+  Users,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { LoadingScreen } from "@/components/LoadingScreen";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Client {
   id: number;
@@ -128,13 +136,13 @@ export default function ClientsPage() {
     if (client.paymentStatus === "overdue") {
       return (
         <span
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border ${
             isDark
-              ? "bg-red-950/50 text-red-400"
-              : "bg-red-100 text-red-700"
+              ? "border-red-900/50 text-red-400 bg-red-950/20"
+              : "border-red-200 text-red-700 bg-red-50/50"
           }`}
         >
-          <AlertCircle className="w-3 h-3" />
+          <AlertCircle className="w-3 h-3" strokeWidth={2} />
           Payment Due
         </span>
       );
@@ -142,26 +150,26 @@ export default function ClientsPage() {
     if (client.status === "paused" || client.status === "inactive") {
       return (
         <span
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border ${
             isDark
-              ? "bg-yellow-950/50 text-yellow-400"
-              : "bg-yellow-100 text-yellow-700"
+              ? "border-amber-900/50 text-amber-400 bg-amber-950/20"
+              : "border-amber-200 text-amber-700 bg-amber-50/50"
           }`}
         >
-          <Clock className="w-3 h-3" />
+          <Clock className="w-3 h-3" strokeWidth={2} />
           {client.status === "paused" ? "Paused" : "Inactive"}
         </span>
       );
     }
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border ${
           isDark
-            ? "bg-green-950/50 text-green-400"
-            : "bg-green-100 text-green-700"
+            ? "border-emerald-900/50 text-emerald-400 bg-emerald-950/20"
+            : "border-emerald-200 text-emerald-700 bg-emerald-50/50"
         }`}
       >
-        <CheckCircle2 className="w-3 h-3" />
+        <CheckCircle2 className="w-3 h-3" strokeWidth={2} />
         Active
       </span>
     );
@@ -169,14 +177,11 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 text-purple-600 animate-spin mx-auto mb-4" />
-          <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-            Loading clients...
-          </p>
-        </div>
-      </div>
+      <LoadingScreen
+        variant="inline"
+        message="Loading clients..."
+        subtitle="Fetching your accounts"
+      />
     );
   }
 
@@ -186,7 +191,7 @@ export default function ClientsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1
-            className={`text-3xl font-bold ${
+            className={`text-2xl font-medium ${
               isDark ? "text-white" : "text-gray-900"
             }`}
           >
@@ -202,7 +207,11 @@ export default function ClientsPage() {
         </div>
         <Button
           onClick={() => router.push("/dashboard/clients/new")}
-          className="bg-purple-600 hover:bg-purple-700 text-white shrink-0"
+          className={`shrink-0 ${
+            isDark
+              ? "bg-white hover:bg-gray-100 text-gray-950"
+              : "bg-gray-950 hover:bg-gray-900 text-white"
+          }`}
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Client
@@ -212,7 +221,7 @@ export default function ClientsPage() {
       {/* Search, filters, sort */}
       {clients.length > 0 && (
         <div className={`rounded-xl border p-4 ${
-          isDark ? "bg-slate-800/50 border-slate-700" : "bg-white border-gray-200"
+          isDark ? "bg-slate-800/50 border-slate-600" : "bg-white border-gray-200"
         }`}>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
@@ -224,7 +233,7 @@ export default function ClientsPage() {
                 placeholder="Search by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-slate-600 ${
                   isDark
                     ? "bg-slate-900 border-slate-600 text-white placeholder-slate-500"
                     : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"
@@ -241,9 +250,11 @@ export default function ClientsPage() {
                     onClick={() => setStatusFilter(f)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       statusFilter === f
-                        ? "bg-purple-600 text-white"
+                        ? isDark
+                          ? "bg-white text-gray-950"
+                          : "bg-gray-950 text-white"
                         : isDark
-                          ? "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                          ? "bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200"
                           : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                   >
@@ -251,19 +262,21 @@ export default function ClientsPage() {
                   </button>
                 ))}
               </div>
-              <select
+              <Select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as "recent" | "name" | "payment")}
-                className={`px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                  isDark
-                    ? "bg-slate-800 border-slate-600 text-white"
-                    : "bg-white border-gray-200 text-gray-900"
-                }`}
+                onValueChange={(value) =>
+                  setSortBy(value as "recent" | "name" | "payment")
+                }
               >
-                <option value="recent">Recently added</option>
-                <option value="name">Name A–Z</option>
-                <option value="payment">Payment status</option>
-              </select>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Recently added</SelectItem>
+                  <SelectItem value="name">Name A–Z</SelectItem>
+                  <SelectItem value="payment">Payment status</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           {(searchQuery || statusFilter !== "all") && (
@@ -281,19 +294,24 @@ export default function ClientsPage() {
         <Card
           className={`${
             isDark
-              ? "bg-slate-800 border-slate-700"
+              ? "bg-slate-800 border-slate-600"
               : "bg-white border-gray-200"
           }`}
         >
           <CardContent className="pt-12 pb-12">
             <div className="text-center">
-              <Building2
-                className={`w-16 h-16 mx-auto mb-4 ${
-                  isDark ? "text-slate-600" : "text-gray-400"
-                }`}
-              />
+              <div className={`w-14 h-14 mx-auto mb-4 rounded-xl border flex items-center justify-center ${
+                isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"
+              }`}>
+                <Users
+                  className={`w-6 h-6 ${
+                    isDark ? "text-slate-500" : "text-gray-400"
+                  }`}
+                  strokeWidth={1.75}
+                />
+              </div>
               <h2
-                className={`text-xl font-semibold mb-2 ${
+                className={`text-lg font-medium mb-2 ${
                   isDark ? "text-white" : "text-gray-900"
                 }`}
               >
@@ -308,7 +326,11 @@ export default function ClientsPage() {
               </p>
               <Button
                 onClick={() => router.push("/dashboard/clients/new")}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className={
+                  isDark
+                    ? "bg-white hover:bg-gray-100 text-gray-950"
+                    : "bg-gray-950 hover:bg-gray-900 text-white"
+                }
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Client
@@ -345,57 +367,59 @@ export default function ClientsPage() {
         </Card>
       ) : (
         <>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {paginatedClients.map((client) => (
             <Card
               key={client.id}
-              className={`cursor-pointer transition-all hover:shadow-lg ${
+              className={`cursor-pointer transition-colors ${
                 isDark
-                  ? "bg-slate-800 border-slate-700 hover:border-purple-600"
-                  : "bg-white border-gray-200 hover:border-purple-300"
+                  ? "hover:border-slate-600"
+                  : "hover:border-gray-300"
               }`}
               onClick={() => router.push(`/dashboard/clients/${client.id}`)}
             >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    {client.logoUrl ? (
-                      <img
-                        src={client.logoUrl}
-                        alt={client.name}
-                        className="w-12 h-12 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-lg bg-purple-600 flex items-center justify-center">
-                        <Building2 className="w-6 h-6 text-white" />
-                      </div>
-                    )}
-                    <div>
-                      <CardTitle
-                        className={`text-lg ${
-                          isDark ? "text-white" : "text-gray-900"
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <ClientAvatar
+                    name={client.name}
+                    logoUrl={client.logoUrl}
+                    size="md"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`text-sm font-medium truncate ${
+                        isDark ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {client.name}
+                    </p>
+                    {client.email ? (
+                      <p
+                        className={`text-xs mt-0.5 truncate ${
+                          isDark ? "text-slate-400" : "text-gray-500"
                         }`}
                       >
-                        {client.name}
-                      </CardTitle>
-                      {client.email && (
-                        <p
-                          className={`text-xs mt-1 ${
-                            isDark ? "text-slate-400" : "text-gray-500"
-                          }`}
-                        >
-                          {client.email}
-                        </p>
-                      )}
-                    </div>
+                        {client.email}
+                      </p>
+                    ) : (
+                      <p
+                        className={`text-xs mt-0.5 ${
+                          isDark ? "text-slate-500" : "text-gray-400"
+                        }`}
+                      >
+                        No email
+                      </p>
+                    )}
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
+                <div
+                  className={`flex items-center justify-between mt-3 pt-3 border-t ${
+                    isDark ? "border-slate-600" : "border-gray-200"
+                  }`}
+                >
                   {getStatusBadge(client)}
                   <span
-                    className={`text-xs ${
+                    className={`text-xs tabular-nums ${
                       isDark ? "text-slate-500" : "text-gray-400"
                     }`}
                   >

@@ -16,6 +16,14 @@ import {
   ArrowRight,
   Lightbulb,
   Calendar,
+  UtensilsCrossed,
+  Shirt,
+  Briefcase,
+  ShoppingCart,
+  Dumbbell,
+  Home,
+  Palette,
+  Rocket,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -24,6 +32,7 @@ import {
   Niche,
   HookStyle,
   Format,
+  PrimaryIndustry,
   NICHE_OPTIONS,
   PRIMARY_INDUSTRY_OPTIONS,
   primaryIndustryToNiche,
@@ -33,6 +42,18 @@ import {
   isSupportedNiche,
 } from "@/lib/content-ideas";
 import { showToast } from "@/lib/toast";
+
+const INDUSTRY_ICONS: Record<PrimaryIndustry, LucideIcon> = {
+  food_beverage: UtensilsCrossed,
+  fashion_beauty: Shirt,
+  coaching_consulting: Briefcase,
+  retail_ecommerce: ShoppingCart,
+  health_fitness: Dumbbell,
+  real_estate: Home,
+  creative_services: Palette,
+  tech_startups: Rocket,
+  other: Lightbulb,
+};
 
 const hookStyleLabels: Record<HookStyle, string> = {
   story: "Story",
@@ -346,21 +367,34 @@ function ContentIdeasPageInner() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
             {PRIMARY_INDUSTRY_OPTIONS.map((opt) => {
               const isCustom = customIndustries.includes(opt.id);
+              const Icon = INDUSTRY_ICONS[opt.id] || Lightbulb;
               return (
                 <button
                   key={opt.id}
+                  type="button"
                   onClick={() => {
-                    if (isCustom) return;
+                    if (isCustom) {
+                      // Focus custom niche: scroll / hint — keep typing box below
+                      const el = document.getElementById("custom-niche-input");
+                      el?.focus();
+                      return;
+                    }
                     const mapped = primaryIndustryToNiche(opt.id);
                     handleSelectNiche(mapped === "custom" ? "custom" : (mapped as Niche), undefined);
                   }}
-                  className={`flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+                  className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
                     isDark
-                      ? "border-slate-700 bg-slate-800 hover:border-purple-500 hover:bg-slate-700/50"
-                      : "border-gray-200 bg-white hover:border-purple-500 hover:bg-purple-50/50"
+                      ? "border-slate-700 bg-slate-800 hover:border-slate-500 hover:bg-slate-700/50"
+                      : "border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50"
                   }`}
                 >
-                  <span className="text-2xl">{opt.emoji}</span>
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                      isDark ? "bg-slate-700 text-slate-100" : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" strokeWidth={1.75} />
+                  </span>
                   <span className={`font-medium ${isDark ? "text-white" : "text-gray-950"}`}>
                     {opt.name}
                   </span>
@@ -374,6 +408,7 @@ function ContentIdeasPageInner() {
             </p>
             <div className="flex gap-2">
               <input
+                id="custom-niche-input"
                 type="text"
                 value={customNicheInput}
                 onChange={(e) => setCustomNicheInput(e.target.value)}
@@ -385,7 +420,7 @@ function ContentIdeasPageInner() {
               <Button
                 onClick={() => customNicheInput.trim() && handleSelectNiche("custom", customNicheInput.trim())}
                 disabled={!customNicheInput.trim()}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Use This
               </Button>
@@ -410,7 +445,7 @@ function ContentIdeasPageInner() {
           }`}>
             Daily Content Ideas
             {clientName && (
-              <span className="text-purple-600 dark:text-purple-400 font-semibold ml-2">
+              <span className="text-foreground dark:text-purple-400 font-semibold ml-2">
                 for {clientName}
               </span>
             )}
@@ -482,10 +517,10 @@ function ContentIdeasPageInner() {
                   {/* Topic Header */}
                   <div className="flex items-start sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isDark ? "bg-purple-500/20" : "bg-purple-100"
+                      isDark ? "bg-muted0/20" : "bg-purple-100"
                     }`}>
                       <Lightbulb className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                        isDark ? "text-purple-400" : "text-purple-600"
+                        isDark ? "text-purple-400" : "text-foreground"
                       }`} />
                     </div>
                     <h3 className={`text-base sm:text-lg font-semibold flex-1 leading-tight ${
@@ -526,7 +561,7 @@ function ContentIdeasPageInner() {
                       <Badge className={`${
                         isDark 
                           ? "bg-purple-900/50 text-purple-300 border-purple-700" 
-                          : "bg-purple-50 text-purple-700 border-purple-200"
+                          : "bg-muted text-foreground border-purple-200"
                       }`}>
                         {CONTENT_STRATEGIES.find((s) => s.id === idea.strategy)?.name ?? idea.strategy}
                       </Badge>
@@ -561,10 +596,10 @@ function ContentIdeasPageInner() {
                   }`}>
                     <Button
                       onClick={() => handleGenerateCaption(idea)}
-                      className={`flex-1 text-white rounded-xl py-2.5 sm:py-2 text-sm transition-all duration-200 shadow-sm hover:shadow-md ${
+                      className={`flex-1 rounded-xl py-2.5 sm:py-2 text-sm transition-all duration-200 shadow-sm hover:shadow-md ${
                         isDark
-                          ? "bg-purple-600 hover:bg-purple-700 active:bg-purple-800"
-                          : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950"
+                          ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
+                          : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
                       }`}
                     >
                       Generate Caption
@@ -592,7 +627,7 @@ function ContentIdeasPageInner() {
           }`}>
             <CardContent className="p-12 text-center">
               <Lightbulb className={`w-12 h-12 mx-auto mb-4 ${
-                isDark ? "text-purple-400" : "text-purple-600"
+                isDark ? "text-purple-400" : "text-foreground"
               }`} />
               <h3 className={`text-lg font-semibold mb-2 ${
                 isDark ? "text-white" : "text-gray-950"
@@ -614,8 +649,8 @@ function ContentIdeasPageInner() {
                 disabled={generatingIdeas || !!(refreshLimits && !refreshLimits.canRefresh)}
                 className={`rounded-xl transition-all duration-200 ${
                   isDark
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "bg-purple-600 hover:bg-purple-700 text-white"
+                    ? "bg-primary hover:bg-primary/90 text-primary-foreground"
+                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
                 }`}
               >
                 {generatingIdeas ? (

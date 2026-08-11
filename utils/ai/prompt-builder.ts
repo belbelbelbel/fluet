@@ -1,22 +1,25 @@
 /**
  * Prompt Builder – Maps generation modes to specialized AI instructions
- *
- * Generation modes align with professional content strategies (strategy, viral hook,
- * client voice, carousel, CTA, authority-building, etc.). Each mode augments the
- * system prompt and user prompt so the model produces higher-quality, on-brand content.
+ * Brand voice is injected into the SYSTEM prompt (persona) for DeepSeek fidelity.
  */
 
+import {
+  buildBrandVoiceSystemBlock,
+  brandVoiceIsActive,
+  resolveEffectiveTone,
+} from "./brand-voice";
+
 export type GenerationMode =
-  | "standard"           // Default: platform-optimized content
-  | "viral_hook"         // Scroll-stopping hooks (curiosity, authority, pain points)
-  | "client_voice"       // Match brand tone, personality, emotional positioning
-  | "carousel"           // Instagram carousel: hook slide, value slides, CTA
-  | "cta"                // High-converting calls-to-action
-  | "authority"          // Thought-leader content, credibility over virality
-  | "strategy"           // 30-day content strategy, pillars, post ideas
-  | "trend_adaptation"   // Adapt trending topics to niche
-  | "content_repurpose"  // Long-form → multi-platform posts
-  | "audience_research"; // Act as target audience, psychological triggers
+  | "standard"
+  | "viral_hook"
+  | "client_voice"
+  | "carousel"
+  | "cta"
+  | "authority"
+  | "strategy"
+  | "trend_adaptation"
+  | "content_repurpose"
+  | "audience_research";
 
 /** Brand voice context from ClientBrandVoice (used when generating for a client) */
 export interface BrandVoiceContext {
@@ -47,58 +50,66 @@ export interface PromptBuildOutput {
   userPrompt: string;
 }
 
-/** Base system prompt – minimal, platform-focused */
-const BASE_SYSTEM =
-  "Expert social media creator. Generate platform-optimized content. Output PLAIN TEXT only - no markdown, asterisks, formatting, or emojis. Ready to copy-paste.";
+const BASE_SYSTEM = `You are a senior social media copywriter for agencies.
+Output PLAIN TEXT only — no markdown, no asterisks, no bullet markers, no emojis unless the brand voice explicitly allows them.
+Write copy ready to paste into the platform.
+Never sound like generic AI marketing. Prefer concrete language, specificity, and a human ear.`;
 
-/** Mode-specific system augmentations – injected before BASE_SYSTEM when mode != standard */
 const MODE_SYSTEM_AUGMENT: Record<Exclude<GenerationMode, "standard">, string> = {
   viral_hook:
-    "You specialize in scroll-stopping hooks. Use curiosity gaps, authority positioning, emotional pain points, bold claims, and pattern interrupts. Avoid clichés and generic phrases. Optimize for short attention spans and the first 3 seconds.",
+    "Specialize in scroll-stopping hooks: curiosity gaps, authority, pain points, pattern interrupts. First line must earn the next second. Avoid clichés.",
 
   client_voice:
-    "You match the brand's exact voice. Analyze tone, personality, emotional positioning, and communication style. Write captions that sound natural, human, and emotionally engaging. Reinforce brand identity consistently.",
+    "Brand voice is the product. Prioritize voice match over virality. If a line is clever but off-brand, cut it. Sound like a real person from this brand.",
 
   carousel:
-    "You create high-engagement Instagram carousels. Structure: strong curiosity-driven hook slide, clear value slides, logical flow, save-worthy final CTA. Optimize for readability, swipe momentum, and audience retention.",
+    "Instagram carousel structure: curiosity hook slide → clear value slides → save-worthy CTA. Scannable lines. Logical swipe flow.",
 
   cta:
-    "You generate high-converting calls-to-action. Include a mix of soft engagement CTAs, authority-building prompts, community-driven questions, and subtle conversion-focused CTAs. Avoid generic phrases. Optimize for interaction.",
+    "High-converting CTAs: soft engagement, authority prompts, community questions, light conversion. Specific actions — never 'click here' emptiness.",
 
   authority:
-    "You create thought-leader content. Focus on contrarian perspectives, experience-based insights, industry observations, and value-driven storytelling. Prioritize credibility, trust, and long-term brand authority over quick virality.",
+    "Thought-leader content: contrarian insight, experience, industry observation. Credibility over hype. Specific claims over slogans.",
 
   strategy:
-    "You act as a senior social media strategist. Create clearly defined content pillars, post ideas per pillar, recommended formats, posting frequency, and success KPIs. Align with growth and conversion, not just engagement.",
+    "Senior strategist mode: pillars, post ideas, formats, frequency, KPIs. Practical and conversion-aware.",
 
   trend_adaptation:
-    "You adapt trending topics to a niche. Maintain relevance, originality, and credibility while leveraging the trend's momentum. Include post concepts and caption angles that feel organic and on-brand.",
+    "Adapt trends to the niche without cringe. Keep originality and brand credibility.",
 
   content_repurpose:
-    "You repurpose long-form content (blog, podcast, video, article) into high-quality social media posts. Adapt tone, structure, hook style, caption length, and CTAs to each platform's best practices.",
+    "Turn long-form into platform-native posts. Adapt hook, length, and CTA per channel.",
 
   audience_research:
-    "You act as the ideal target audience. Identify fears, desires, objections, frustrations, goals, and language patterns. Suggest content ideas that directly address and resonate with these psychological triggers.",
+    "Speak as the ideal customer: fears, desires, objections, language. Then suggest content that hits those triggers.",
 };
 
-/** Platform-specific user prompt templates – format user input per platform */
 const PLATFORM_TEMPLATES: Record<
   string,
   (prompt: string, tone: string, style: string, length: string) => string
 > = {
   twitter: (p, t, s, l) =>
-    `Twitter thread: "${p}". Format: numbered (1/, 2/, 3/). Tone: ${t}. Style: ${s}. Length: ${l}. Include hashtags. NO EMOJIS. Plain text only, no markdown.`,
+    `Write an X/Twitter post (or short thread if needed) about: "${p}".
+Requirements: Tone=${t}. Style=${s}. Length=${l}.
+Hook in the first line. Number threads as 1/ 2/ 3/ only if multiple tweets.
+Include 1–3 relevant hashtags at the end. Plain text only.`,
   instagram: (p, t, s, l) =>
-    `Instagram caption: "${p}". Engaging, visual. Tone: ${t}. Style: ${s}. Length: ${l}. Include hashtags. NO EMOJIS. Plain text only.`,
+    `Write an Instagram caption about: "${p}".
+Requirements: Tone=${t}. Style=${s}. Length=${l}.
+Strong first line. Scannable body. Hashtags at the end. Plain text only.`,
   linkedin: (p, t, s, l) =>
-    `LinkedIn post: "${p}". Professional, valuable. Tone: ${t}. Style: ${s}. Length: ${l}. Clear structure. NO EMOJIS. Plain text only.`,
+    `Write a LinkedIn post about: "${p}".
+Requirements: Tone=${t}. Style=${s}. Length=${l}.
+Lead with insight. Short paragraphs. Soft CTA. Plain text only.`,
   tiktok: (p, t, s, l) =>
-    `TikTok content: "${p}". Script: Hook (0-3s), Body (3-15s), CTA (15-30s). Caption + hashtags. Tone: ${t}. NO EMOJIS. Plain text only.`,
+    `Write a TikTok script + caption about: "${p}".
+Structure: Hook (0-3s), Body (3-15s), CTA (15-30s), then caption + hashtags.
+Tone=${t}. Style=${s}. Length=${l}. Plain text only.`,
   youtube: (p, t, s, l) =>
-    `YouTube video description: "${p}". SEO-optimized, engaging. Tone: ${t}. Style: ${s}. Length: ${l}. Include keywords, timestamps if applicable, call-to-action. NO EMOJIS. Plain text only.`,
+    `Write a YouTube description about: "${p}".
+SEO-aware, engaging, clear CTA. Tone=${t}. Style=${s}. Length=${l}. Plain text only.`,
 };
 
-/** Mode-specific user prompt wrappers – some modes need different framing */
 function wrapUserPromptForMode(
   mode: GenerationMode,
   platformPrompt: string,
@@ -106,78 +117,73 @@ function wrapUserPromptForMode(
 ): string {
   switch (mode) {
     case "viral_hook":
-      return `Generate 20 high-impact, scroll-stopping hooks for Instagram and TikTok in this niche: ${userPrompt}. ${platformPrompt}`;
+      return `Generate 12 high-impact hooks for this topic/niche: ${userPrompt}.\n${platformPrompt}`;
     case "cta":
-      return `Generate 10 high-converting calls-to-action for social media content. Topic/niche: ${userPrompt}. ${platformPrompt}`;
+      return `Generate 8 high-converting CTAs for: ${userPrompt}.\n${platformPrompt}`;
     case "carousel":
-      return `Create a high-engagement Instagram carousel on this topic: ${userPrompt}. ${platformPrompt}`;
+      return `Create a high-engagement Instagram carousel on: ${userPrompt}.\n${platformPrompt}`;
     case "authority":
-      return `Create thought-leader style content that positions as an expert. Topic: ${userPrompt}. ${platformPrompt}`;
+      return `Create thought-leader content on: ${userPrompt}.\n${platformPrompt}`;
     case "trend_adaptation":
-      return `Take this trending topic and adapt it to my niche in 5 creative ways: ${userPrompt}. Include post concepts and caption angles. ${platformPrompt}`;
+      return `Adapt this trend/topic to the brand niche in 5 angles: ${userPrompt}.\n${platformPrompt}`;
     case "content_repurpose":
-      return `Repurpose this long-form content into 10 high-quality social media posts for Instagram, LinkedIn, and TikTok: ${userPrompt}. ${platformPrompt}`;
+      return `Repurpose into platform-ready posts: ${userPrompt}.\n${platformPrompt}`;
     case "audience_research":
-      return `Act as my ideal target audience for: ${userPrompt}. Identify fears, desires, objections, goals, language patterns. Then suggest content ideas that resonate. ${platformPrompt}`;
+      return `Audience research then content ideas for: ${userPrompt}.\n${platformPrompt}`;
     case "strategy":
-      return `Create a 30-day content strategy. Brand/niche: ${userPrompt}. Include content pillars, post ideas per pillar, formats (Reels, carousels, static), posting frequency, success KPIs. ${platformPrompt}`;
+      return `30-day content strategy for: ${userPrompt}. Pillars, ideas, formats, frequency, KPIs.\n${platformPrompt}`;
+    case "client_voice":
+      return `Write this entirely in the brand voice profile (system). Topic: ${userPrompt}.\n${platformPrompt}`;
     default:
       return platformPrompt;
   }
 }
 
-/** Build brand voice context block for prompt injection */
-function buildBrandVoiceBlock(bv: BrandVoiceContext): string {
-  const parts: string[] = [];
-  if (bv.brandDescription?.trim())
-    parts.push(`Brand description: ${bv.brandDescription.trim()}`);
-  if (bv.targetAudience?.trim())
-    parts.push(`Target audience: ${bv.targetAudience.trim()}`);
-  if (bv.industry?.trim()) parts.push(`Industry: ${bv.industry.trim()}`);
-  if (bv.tone?.trim()) parts.push(`Tone: ${bv.tone.trim()}`);
-  if (bv.slangLevel?.trim() && bv.slangLevel !== "none")
-    parts.push(`Slang level: ${bv.slangLevel.trim()}`);
-  if (Array.isArray(bv.dos) && bv.dos.length > 0)
-    parts.push(`Do: ${bv.dos.join(", ")}`);
-  if (Array.isArray(bv.donts) && bv.donts.length > 0)
-    parts.push(`Avoid: ${bv.donts.join(", ")}`);
-  if (Array.isArray(bv.examplePosts) && bv.examplePosts.length > 0)
-    parts.push(`Example posts (match this voice): ${bv.examplePosts.slice(0, 3).join(" | ")}`);
-  if (Array.isArray(bv.preferredHashtags) && bv.preferredHashtags.length > 0)
-    parts.push(`Preferred hashtags: ${bv.preferredHashtags.join(", ")}`);
-  if (Array.isArray(bv.bannedWords) && bv.bannedWords.length > 0)
-    parts.push(`Never use these words: ${bv.bannedWords.join(", ")}`);
-  if (parts.length === 0) return "";
-  return `\n\nBrand voice context (strictly follow):\n${parts.join("\n")}`;
-}
-
 /**
  * Build system and user prompts for AI content generation.
- * Combines generation mode, platform, brand voice, and user input.
  */
 export function buildPrompt(input: PromptBuildInput): PromptBuildOutput {
-  const { mode, userPrompt, platform, tone, style, length, brandVoice } = input;
+  const { mode, userPrompt, platform, style, length, brandVoice } = input;
 
-  // System prompt: mode augmentation (if any) + base
-  const modeAugment = mode === "standard" ? "" : MODE_SYSTEM_AUGMENT[mode];
-  const systemPrompt =
-    modeAugment.trim().length > 0
-      ? `${modeAugment}\n\n${BASE_SYSTEM}`
-      : BASE_SYSTEM;
+  const effectiveTone = resolveEffectiveTone(input.tone, brandVoice);
+  const voiceActive = brandVoiceIsActive(brandVoice);
 
-  // User prompt: platform template + mode wrapper + brand voice
+  // When a client has brand voice, treat every generation as voice-aware
+  const effectiveMode: GenerationMode =
+    voiceActive && mode === "standard" ? "client_voice" : mode;
+
+  const modeAugment =
+    effectiveMode === "standard" ? "" : MODE_SYSTEM_AUGMENT[effectiveMode];
+
+  const brandSystem = buildBrandVoiceSystemBlock(brandVoice, platform);
+
+  const systemParts = [
+    modeAugment.trim(),
+    BASE_SYSTEM,
+    brandSystem,
+    voiceActive
+      ? "If brand voice conflicts with a generic trend/format request, brand voice wins."
+      : "",
+  ].filter(Boolean);
+
+  const systemPrompt = systemParts.join("\n\n");
+
   const template =
     PLATFORM_TEMPLATES[platform] ?? PLATFORM_TEMPLATES.instagram;
-  const platformPrompt = template(userPrompt, tone, style, length);
-  let finalUserPrompt = wrapUserPromptForMode(mode, platformPrompt, userPrompt);
+  const platformPrompt = template(userPrompt, effectiveTone, style, length);
+  let finalUserPrompt = wrapUserPromptForMode(
+    effectiveMode,
+    platformPrompt,
+    userPrompt
+  );
 
-  const brandBlock = brandVoice ? buildBrandVoiceBlock(brandVoice) : "";
-  if (brandBlock) finalUserPrompt += brandBlock;
+  if (voiceActive) {
+    finalUserPrompt += `\n\nReminder: stay inside the brand voice rules from the system message. Match example posts if provided.`;
+  }
 
   return { systemPrompt, userPrompt: finalUserPrompt };
 }
 
-/** Human-readable labels for generation modes (for UI) */
 export const GENERATION_MODE_LABELS: Record<GenerationMode, string> = {
   standard: "Standard",
   viral_hook: "Viral Hooks",

@@ -11,6 +11,10 @@ interface LogoProps {
   variant?: "icon" | "full" | "square";
   /** Preload above-the-fold logos (navbar, hero). Default true. */
   priority?: boolean;
+  /** Always use the light logo asset (marketing/landing). */
+  forceLight?: boolean;
+  /** Always use the dark-surface logo asset (white mark on dark UIs). */
+  forceDark?: boolean;
 }
 
 const sizeMap = {
@@ -23,9 +27,11 @@ const sizeMap = {
 
 function getLogoSrc(variant: LogoProps["variant"], isDark: boolean) {
   if (variant === "icon") {
+    // The light variant must be the transparent asset — logo-icon.png is baked
+    // onto solid white and shows as a white box on any tinted surface.
     return isDark
       ? "/images/Revvylogo/logo-icon-dark-transparent.png"
-      : "/images/Revvylogo/logo-icon.png";
+      : "/images/Revvylogo/logo-icon-light-transparent.png";
   }
   if (variant === "full") {
     return isDark
@@ -41,6 +47,8 @@ export function Logo({
   className = "",
   variant = "icon",
   priority = true,
+  forceLight = false,
+  forceDark = false,
 }: LogoProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -51,7 +59,9 @@ export function Logo({
 
   const logoSize = sizeMap[size];
   // SSR + first paint: light logo so Next/Image can preload immediately
-  const isDark = mounted && resolvedTheme === "dark";
+  const isDark = forceDark
+    ? true
+    : !forceLight && mounted && resolvedTheme === "dark";
   const logoSrc = getLogoSrc(variant, isDark);
   const effectiveSize =
     isDark && variant === "full" ? Math.max(logoSize - 8, sizeMap.md) : logoSize;

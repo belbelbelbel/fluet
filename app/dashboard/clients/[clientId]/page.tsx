@@ -24,10 +24,12 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PostRow, type PostStatus } from "@/components/PostRow";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { showToast } from "@/lib/toast";
 import { FeatureComingSoon } from "@/components/FeatureComingSoon";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 interface Client {
   id: number;
@@ -190,32 +192,13 @@ export default function ClientDashboardPage() {
     }
   };
 
-  const formatScheduledDate = (iso: string | null) => {
-    if (!iso) return "Not scheduled";
-    return new Date(iso).toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   if (loading) {
     return (
-      <div className={`flex items-center justify-center min-h-[400px] transition-colors duration-300 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}>
-        <div className="text-center flex flex-col items-center">
-          <div className="w-28 h-28 flex items-center justify-center animate-pulse">
-            <Building2 className={`w-28 h-28 ${
-              isDark ? "text-slate-500" : "text-gray-300"
-            }`} />
-          </div>
-          <p className={`mt-4 text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
-            Loading client data...
-          </p>
-        </div>
-      </div>
+      <LoadingScreen
+        variant="inline"
+        message="Loading client..."
+        subtitle="Fetching client data"
+      />
     );
   }
 
@@ -227,7 +210,7 @@ export default function ClientDashboardPage() {
         <p className={`mb-6 ${isDark ? "text-slate-400" : "text-gray-600"}`}>The client you&apos;re looking for doesn&apos;t exist.</p>
         <Button 
           onClick={() => router.push("/dashboard")}
-          className={isDark ? "bg-purple-600 hover:bg-purple-700 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           Back to Dashboard
         </Button>
@@ -258,7 +241,7 @@ export default function ClientDashboardPage() {
             />
           ) : (
             <div className={`w-12 h-12 rounded-lg flex items-center justify-center border ${isDark ? "bg-purple-900/50 border-slate-700" : "bg-purple-100 border-gray-200"}`}>
-              <Building2 className={`w-6 h-6 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+              <Building2 className={`w-6 h-6 ${isDark ? "text-purple-400" : "text-foreground"}`} />
             </div>
           )}
           <div>
@@ -304,21 +287,21 @@ export default function ClientDashboardPage() {
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/brand-voice`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"}`}
+            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900"}`}
           >
             Brand Voice
           </Button>
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/credits`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"}`}
+            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900"}`}
           >
             Credits
           </Button>
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/tasks`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"}`}
+            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900"}`}
           >
             Tasks
           </Button>
@@ -326,7 +309,7 @@ export default function ClientDashboardPage() {
             variant="outline"
             onClick={() => router.push(`/dashboard/content-ideas?clientId=${clientId}`)}
             className={`transition-all duration-200 ${
-              isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900"
+              isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900"
             }`}
           >
             <Lightbulb className="w-4 h-4 mr-2" />
@@ -334,7 +317,7 @@ export default function ClientDashboardPage() {
           </Button>
           <Button
             onClick={() => router.push(`/dashboard/clients/${clientId}/generate`)}
-            className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200 shadow-sm hover:shadow-md"
+            className="bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground transition-all duration-200 shadow-sm hover:shadow-md"
           >
             <Plus className="w-4 h-4 mr-2" />
             Generate Content
@@ -360,7 +343,7 @@ export default function ClientDashboardPage() {
             <div className="mt-2">
               <div className={`w-full rounded-full h-2 ${isDark ? "bg-slate-700" : "bg-gray-200"}`}>
                 <div
-                  className="bg-purple-600 h-2 rounded-full transition-all"
+                  className="bg-primary h-2 rounded-full transition-all"
                   style={{ width: `${Math.min(postsPercentage, 100)}%` }}
                 />
               </div>
@@ -467,7 +450,7 @@ export default function ClientDashboardPage() {
             <CheckCircle2 className="w-4 h-4 mr-2" />
             Approvals
             {stats.pendingApprovals > 0 && (
-              <span className="ml-2 px-1.5 py-0.5 rounded-full bg-purple-600 text-white text-xs">
+              <span className="ml-2 px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-xs">
                 {stats.pendingApprovals}
               </span>
             )}
@@ -498,67 +481,67 @@ export default function ClientDashboardPage() {
 
         <TabsContent value="calendar" className="space-y-4">
           <Card className={`border transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
-            <CardHeader className={`border-b ${isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"}`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Content Calendar</CardTitle>
-                  <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-                    Visual overview of scheduled posts and approvals
-                  </p>
-                </div>
-                <Button
-                  onClick={() => router.push(`/dashboard/clients/${clientId}/calendar`)}
-                  size="sm"
-                  className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  View Full Calendar
-                </Button>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 gap-4 pb-4">
+              <div className="min-w-0">
+                <CardTitle className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  Upcoming
+                </CardTitle>
+                <p className={`text-sm mt-0.5 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                  {upcomingPosts.length > 0
+                    ? `Next ${upcomingPosts.length} post${upcomingPosts.length !== 1 ? "s" : ""} in the queue`
+                    : "Nothing scheduled yet"}
+                </p>
               </div>
+              <Button
+                onClick={() => router.push(`/dashboard/clients/${clientId}/calendar`)}
+                size="sm"
+                variant="outline"
+                className={`shrink-0 ${isDark ? "border-slate-600 text-slate-200 hover:bg-slate-700" : ""}`}
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Full calendar
+              </Button>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-0 pb-3">
               {upcomingPosts.length === 0 ? (
-                <div className="text-center py-8">
-                  <Calendar className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
-                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>No upcoming posts</h3>
-                  <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-                    Schedule a post for this client to see it here.
+                <div className="text-center py-10">
+                  <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${
+                    isDark ? "bg-slate-700/60 text-slate-400" : "bg-slate-100 text-slate-400"
+                  }`}>
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                    Nothing scheduled
+                  </h3>
+                  <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                    Queue a post and it&apos;ll show up here.
                   </p>
                   <Button
                     onClick={() => router.push(`/dashboard/schedule?clientId=${clientId}`)}
-                    className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
+                    size="sm"
+                    className="mt-4"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Schedule Post
+                    Schedule a post
                   </Button>
                 </div>
               ) : (
-                <ul className={`divide-y ${isDark ? "divide-slate-700" : "divide-gray-200"}`}>
+                <div className="-mx-1">
                   {upcomingPosts.map((post) => (
-                    <li key={post.id} className="py-4 first:pt-0 last:pb-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded capitalize ${
-                          isDark ? "bg-slate-700 text-slate-300" : "bg-gray-100 text-gray-700"
-                        }`}>
-                          {post.platform}
-                        </span>
-                        {post.approvalStatus === "pending" && (
-                          <span className={`text-xs px-2 py-0.5 rounded ${
-                            isDark ? "bg-amber-900/50 text-amber-400" : "bg-amber-100 text-amber-800"
-                          }`}>
-                            Awaiting approval
-                          </span>
-                        )}
-                        <span className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>
-                          {formatScheduledDate(post.scheduledFor)}
-                        </span>
-                      </div>
-                      <p className={`text-sm line-clamp-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
-                        {post.content}
-                      </p>
-                    </li>
+                    <PostRow
+                      key={post.id}
+                      platform={post.platform}
+                      content={post.content}
+                      scheduledFor={post.scheduledFor}
+                      status={
+                        post.approvalStatus === "pending"
+                          ? "pending"
+                          : (post.approvalStatus as PostStatus | null) || "scheduled"
+                      }
+                      onClick={() => router.push(`/dashboard/clients/${clientId}/calendar`)}
+                    />
                   ))}
-                </ul>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -566,60 +549,71 @@ export default function ClientDashboardPage() {
 
         <TabsContent value="approvals" className="space-y-4">
           <Card className={`border transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
-            <CardHeader>
-              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>Pending Approvals</CardTitle>
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-2.5">
+                <CardTitle className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                  Waiting on the client
+                </CardTitle>
+                {pendingApprovals.length > 0 && (
+                  <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400/15 px-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                    {pendingApprovals.length}
+                  </span>
+                )}
+              </div>
+              <p className={`text-sm mt-0.5 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                Only {client?.email || "the client's email on file"} can sign these off.
+              </p>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="pt-0 pb-3">
               {pendingApprovals.length === 0 ? (
-                <div className={`text-center py-12 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
-                  <CheckCircle2 className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-slate-500" : "text-gray-300"}`} />
-                  <p>No pending approvals</p>
-                  <p className={`text-xs mt-2 max-w-sm mx-auto ${isDark ? "text-slate-500" : "text-gray-400"}`}>
-                    Schedule a post with this client selected to send an approval request and email.
+                <div className="text-center py-10">
+                  <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${
+                    isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-500"
+                  }`}>
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                    All clear
+                  </h3>
+                  <p className={`mt-1 text-sm max-w-xs mx-auto ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                    Schedule a post for this client to send an approval request.
                   </p>
                 </div>
               ) : (
-                <ul className={`divide-y ${isDark ? "divide-slate-700" : "divide-gray-200"}`}>
+                <div className="-mx-1">
                   {pendingApprovals.map((approval) => (
-                    <li
+                    <PostRow
                       key={approval.id}
-                      className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded capitalize ${
-                          isDark ? "bg-amber-900/50 text-amber-400" : "bg-amber-100 text-amber-800"
-                        }`}>
-                          {approval.platform}
-                        </span>
-                        <p className={`text-sm mt-2 line-clamp-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
-                          {approval.content}
-                        </p>
-                        <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
-                          Scheduled: {formatScheduledDate(approval.scheduledFor)}
-                        </p>
-                      </div>
-                      <div className="flex flex-shrink-0 gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleCopyApprovalLink(approval.approvalLink)}
-                          className={isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700" : ""}
-                        >
-                          <Copy className="w-4 h-4 mr-1" />
-                          Copy link
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => window.open(approval.approvalLink, "_blank")}
-                          className="bg-purple-600 hover:bg-purple-700 text-white"
-                        >
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Open portal
-                        </Button>
-                      </div>
-                    </li>
+                      platform={approval.platform}
+                      content={approval.content}
+                      scheduledFor={approval.scheduledFor}
+                      status="pending"
+                      actions={
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            title="Copy approval link"
+                            onClick={() => handleCopyApprovalLink(approval.approvalLink)}
+                            className={isDark ? "text-slate-300 hover:bg-slate-700" : "text-slate-600"}
+                          >
+                            <Copy className="w-4 h-4 sm:mr-1.5" />
+                            <span className="hidden sm:inline">Copy</span>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(approval.approvalLink, "_blank")}
+                            className={isDark ? "border-slate-600 text-slate-200 hover:bg-slate-700" : ""}
+                          >
+                            <ExternalLink className="w-4 h-4 sm:mr-1.5" />
+                            <span className="hidden sm:inline">Preview</span>
+                          </Button>
+                        </>
+                      }
+                    />
                   ))}
-                </ul>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -638,7 +632,7 @@ export default function ClientDashboardPage() {
                 <Button
                   onClick={() => router.push(`/dashboard/clients/${clientId}/tasks`)}
                   size="sm"
-                  className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
+                  className="bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground transition-all duration-200"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   View All Tasks
@@ -654,7 +648,7 @@ export default function ClientDashboardPage() {
                 </p>
                 <Button
                   onClick={() => router.push(`/dashboard/clients/${clientId}/tasks`)}
-                  className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
+                  className="bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground transition-all duration-200"
                 >
                   Go to Tasks
                 </Button>
@@ -676,7 +670,7 @@ export default function ClientDashboardPage() {
                 <Button
                   onClick={() => router.push(`/dashboard/clients/${clientId}/analytics`)}
                   size="sm"
-                  className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200"
+                  className="bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground transition-all duration-200"
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
                   View Full Analytics
@@ -725,7 +719,7 @@ export default function ClientDashboardPage() {
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   placeholder="Client name"
                 />
               </div>
@@ -737,7 +731,7 @@ export default function ClientDashboardPage() {
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   placeholder="client@example.com"
                 />
                 <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
@@ -752,7 +746,7 @@ export default function ClientDashboardPage() {
                   type="url"
                   value={editForm.logoUrl}
                   onChange={(e) => setEditForm({ ...editForm, logoUrl: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   placeholder="https://example.com/logo.png"
                 />
               </div>
@@ -768,7 +762,7 @@ export default function ClientDashboardPage() {
                 <Button
                   onClick={handleEditSave}
                   disabled={editSaving || !editForm.name.trim()}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   {editSaving ? (
                     <>

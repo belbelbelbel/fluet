@@ -1,29 +1,29 @@
 "use client";
 
 import { useAuth, useUser } from "@clerk/nextjs";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ClientAvatar } from "@/components/ClientAvatar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import {
   TrendingUp,
   Bell,
   Search,
-  MapPin,
   Plus,
   Building2,
   ChevronRight,
-  Users,
-  AlertCircle,
-  FileCheck,
-  CreditCard,
-  BarChart3,
+  Eye,
+  Heart,
+  Share2,
 } from "lucide-react";
 import { ActivityFeed } from "@/components/ActivityFeed";
-import { AlertBanner, type AlertBannerItem } from "@/components/AlertBanner";
-import { FeatureComingSoon } from "@/components/FeatureComingSoon";
+import { type AlertBannerItem } from "@/components/AlertBanner";
+import { AttentionToast, type AttentionItem } from "@/components/AttentionToast";
 
 interface DashboardStats {
   totalContent: number;
@@ -32,6 +32,18 @@ interface DashboardStats {
   thisWeekContent: number;
   engagementRate: number | null;
   topPlatform: string | null;
+}
+
+interface OverviewData {
+  contentVolume: { date: string; generated: number; scheduled: number }[];
+  activityPlatformStats: { platform: string; posts: number }[];
+  engagementMetricsAvailable: boolean;
+  totalViews: number;
+  totalLikes: number;
+  totalShares: number;
+  totalComments: number;
+  engagementRate: number | null;
+  platformStats: { platform: string; posts: number; views: number; engagement: number }[];
 }
 
 export default function DashboardPage() {
@@ -57,6 +69,18 @@ export default function DashboardPage() {
     overduePayments: { clientId: number; clientName: string }[];
     creditsWarnings: { clientId: number; clientName: string; percentage: number }[];
   } | null>(null);
+  const [overview, setOverview] = useState<OverviewData>({
+    contentVolume: [],
+    activityPlatformStats: [],
+    engagementMetricsAvailable: false,
+    totalViews: 0,
+    totalLikes: 0,
+    totalShares: 0,
+    totalComments: 0,
+    engagementRate: null,
+    platformStats: [],
+  });
+  const [overviewRange, setOverviewRange] = useState<"7d" | "30d" | "90d">("30d");
 
   // Load clients on mount; redirect to onboarding if none
   useEffect(() => {
@@ -170,6 +194,41 @@ export default function DashboardPage() {
     loadNeedsAttention();
   }, [userId]);
 
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    const loadOverview = async () => {
+      try {
+        const res = await fetch(`/api/analytics?range=${overviewRange}`, {
+          credentials: "include",
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        setOverview({
+          contentVolume: data.contentVolume || [],
+          activityPlatformStats: data.activityPlatformStats || [],
+          engagementMetricsAvailable: !!data.engagementMetricsAvailable,
+          totalViews: data.totalViews ?? 0,
+          totalLikes: data.totalLikes ?? 0,
+          totalShares: data.totalShares ?? 0,
+          totalComments: data.totalComments ?? 0,
+          engagementRate: data.engagementRate ?? null,
+          platformStats: data.platformStats || [],
+        });
+        if (data.engagementRate != null) {
+          setStats((prev) => ({ ...prev, engagementRate: data.engagementRate }));
+        }
+      } catch {
+        /* keep previous overview */
+      }
+    };
+    loadOverview();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, overviewRange]);
+
   // Fetch activity to show payment/credits banners (overdue = red block, credits 80% = yellow, 100% = red)
   useEffect(() => {
     if (!userId) return;
@@ -233,6 +292,66 @@ export default function DashboardPage() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
+  // Everything that used to sit above the KPI row — payment/credit banners and
+  // the "Needs attention" panel — folded into one docked toast so the page
+  // itself opens on the numbers.
+  const attentionItems: AttentionItem[] = useMemo(() => {
+    const out: AttentionItem[] = [];
+
+    for (const b of alertBanners) {
+      out.push({
+        id: `banner-${b.id}`,
+        severity:
+          b.variant === "payment_overdue" || b.variant === "credits_exceeded"
+            ? "critical"
+            : "warning",
+        group:
+          b.variant === "payment_overdue" ? "Payment overdue" : "Credits",
+        label: b.clientName || b.message,
+        href: b.link,
+      });
+    }
+
+    for (const a of needsAttention?.pendingApprovals ?? []) {
+      out.push({
+        id: `approval-${a.clientId}`,
+        severity: "info",
+        group: "Awaiting approval",
+        label: a.clientName,
+        meta: `${a.count} post${a.count !== 1 ? "s" : ""}`,
+        href: "/dashboard/schedule",
+      });
+    }
+
+    for (const p of needsAttention?.overduePayments ?? []) {
+      if (out.some((i) => i.group === "Payment overdue" && i.label === p.clientName)) continue;
+      out.push({
+        id: `overdue-${p.clientId}`,
+        severity: "critical",
+        group: "Payment overdue",
+        label: p.clientName,
+        href: `/dashboard/clients/${p.clientId}`,
+      });
+    }
+
+    for (const c of needsAttention?.creditsWarnings ?? []) {
+      out.push({
+        id: `credits-${c.clientId}`,
+        severity: "warning",
+        group: "Credits running low",
+        label: c.clientName,
+        meta: `${c.percentage}% used`,
+        href: `/dashboard/clients/${c.clientId}/credits`,
+      });
+    }
+
+    return out;
+  }, [alertBanners, needsAttention]);
+
+  const actionsBlocked = alertBanners.some(
+    (b) => b.variant === "payment_overdue" || b.variant === "credits_exceeded"
+  );
+
   // Show loading state
   if (loading || !authLoaded || !userLoaded) {
     return (
@@ -249,14 +368,14 @@ export default function DashboardPage() {
       isDark ? "bg-slate-900" : "bg-white"
     }`}>
       {/* Top Header */}
-      <div className={`sticky top-0 z-10 border-b px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300 ${
+      <div className={`sticky top-0 z-10 border-b border-gray-200 dark:border-slate-600 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300 ${
         isDark
-          ? "bg-slate-900 border-slate-700"
-          : "bg-white border-gray-200"
+          ? "bg-slate-900"
+          : "bg-white"
       }`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
-            <h1 className={`text-xl sm:text-2xl font-bold truncate ${
+            <h1 className={`text-xl sm:text-2xl font-medium truncate ${
               isDark ? "text-white" : "text-gray-950"
             }`}>
               Welcome, {userName}
@@ -278,14 +397,10 @@ export default function DashboardPage() {
               <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
                 isDark ? "text-gray-500" : "text-gray-400"
               }`} />
-              <input
+              <Input
                 type="text"
                 placeholder="Search..."
-                className={`pl-9 pr-8 py-2 w-full sm:w-48 lg:w-64 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
-                  isDark
-                    ? "bg-gray-900 border-gray-700 text-white placeholder-gray-500"
-                    : "border-gray-200"
-                }`}
+                className="pl-9 w-full sm:w-48 lg:w-64"
               />
               <span className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs hidden sm:inline ${
                 isDark ? "text-gray-500" : "text-gray-400"
@@ -297,155 +412,16 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Alerts live in the chrome, not the page flow — see AttentionToast */}
+      <AttentionToast items={attentionItems} blocked={actionsBlocked} />
+
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         <div className="w-full max-w-7xl space-y-4 sm:space-y-6">
-          {/* Payment / credits banners: overdue or exceeded = hard block */}
-          <AlertBanner
-            items={alertBanners}
-            blockActions={alertBanners.some(
-              (b) => b.variant === "payment_overdue" || b.variant === "credits_exceeded"
-            )}
-          />
-          {/* Needs Attention — triage panel when agency has items to act on */}
-          {needsAttention &&
-            (needsAttention.pendingApprovals.length > 0 ||
-              needsAttention.overduePayments.length > 0 ||
-              needsAttention.creditsWarnings.length > 0) && (
-              <Card className={`border rounded-xl transition-colors shadow-sm ${
-                isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-              }`}>
-                <CardHeader className="pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
-                  <CardTitle className={`text-base sm:text-lg font-semibold flex items-center gap-2 ${
-                    isDark ? "text-white" : "text-gray-950"
-                  }`}>
-                    <AlertCircle className={`w-5 h-5 ${isDark ? "text-amber-400" : "text-amber-600"}`} />
-                    Needs attention
-                  </CardTitle>
-                  <p className={`text-sm mt-1 ${
-                    isDark ? "text-slate-400" : "text-gray-600"
-                  }`}>
-                    Clients that need your action
-                  </p>
-                </CardHeader>
-                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                    {needsAttention.pendingApprovals.length > 0 && (
-                      <div className="flex-1 min-w-0">
-                        <div className={`flex items-center gap-2 mb-2 text-sm font-medium ${
-                          isDark ? "text-slate-300" : "text-gray-700"
-                        }`}>
-                          <FileCheck className="w-4 h-4 text-purple-500" />
-                          Awaiting approval
-                        </div>
-                        <div className="space-y-1.5">
-                          {needsAttention.pendingApprovals.slice(0, 3).map((item) => (
-                            <button
-                              key={item.clientId}
-                              onClick={() => router.push(`/dashboard/schedule`)}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
-                                isDark
-                                  ? "bg-slate-900/50 hover:bg-slate-700 border border-slate-700"
-                                  : "bg-purple-50/50 hover:bg-purple-50 border border-purple-100"
-                              }`}
-                            >
-                              <span className={`font-medium truncate text-sm ${
-                                isDark ? "text-slate-200" : "text-gray-900"
-                              }`}>
-                                {item.clientName}
-                              </span>
-                              <span className={`text-xs shrink-0 ${
-                                isDark ? "text-slate-500" : "text-gray-500"
-                              }`}>
-                                {item.count} post{item.count !== 1 ? "s" : ""}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {needsAttention.overduePayments.length > 0 && (
-                      <div className="flex-1 min-w-0">
-                        <div className={`flex items-center gap-2 mb-2 text-sm font-medium ${
-                          isDark ? "text-slate-300" : "text-gray-700"
-                        }`}>
-                          <CreditCard className="w-4 h-4 text-red-500" />
-                          Payment overdue
-                        </div>
-                        <div className="space-y-1.5">
-                          {needsAttention.overduePayments.slice(0, 3).map((item) => (
-                            <button
-                              key={item.clientId}
-                              onClick={() => router.push(`/dashboard/clients/${item.clientId}`)}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
-                                isDark
-                                  ? "bg-slate-900/50 hover:bg-slate-700 border border-slate-700"
-                                  : "bg-red-50/50 hover:bg-red-50 border border-red-100"
-                              }`}
-                            >
-                              <span className={`font-medium truncate text-sm ${
-                                isDark ? "text-slate-200" : "text-gray-900"
-                              }`}>
-                                {item.clientName}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {needsAttention.creditsWarnings.length > 0 && (
-                      <div className="flex-1 min-w-0">
-                        <div className={`flex items-center gap-2 mb-2 text-sm font-medium ${
-                          isDark ? "text-slate-300" : "text-gray-700"
-                        }`}>
-                          <AlertCircle className="w-4 h-4 text-amber-500" />
-                          Credits warning
-                        </div>
-                        <div className="space-y-1.5">
-                          {needsAttention.creditsWarnings.slice(0, 3).map((item) => (
-                            <button
-                              key={item.clientId}
-                              onClick={() => router.push(`/dashboard/clients/${item.clientId}/credits`)}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
-                                isDark
-                                  ? "bg-slate-900/50 hover:bg-slate-700 border border-slate-700"
-                                  : "bg-amber-50/50 hover:bg-amber-50 border border-amber-100"
-                              }`}
-                            >
-                              <span className={`font-medium truncate text-sm ${
-                                isDark ? "text-slate-200" : "text-gray-900"
-                              }`}>
-                                {item.clientName}
-                              </span>
-                              <span className={`text-xs shrink-0 ${
-                                isDark ? "text-amber-400" : "text-amber-700"
-                              }`}>
-                                {item.percentage}% used
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => router.push("/dashboard/clients")}
-                    className={`mt-4 ${
-                      isDark ? "text-slate-400 hover:text-white hover:bg-slate-700" : "text-gray-600 hover:text-gray-900"
-                    }`}
-                  >
-                    View all clients
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
           {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <Card className={`border rounded-xl transition-colors shadow-sm ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <Card className={`rounded-xl transition-colors ${
+            isDark ? "bg-slate-800" : "bg-white"
           }`}>
             <CardContent className="p-4 sm:p-6">
               <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
@@ -453,7 +429,7 @@ export default function DashboardPage() {
               }`}>
                 Total posts
               </div>
-              <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 ${
+              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 ${
                 isDark ? "text-white" : "text-gray-950"
               }`}>
                 {loading ? (
@@ -469,8 +445,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className={`border rounded-xl transition-colors shadow-sm ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          <Card className={`rounded-xl transition-colors ${
+            isDark ? "bg-slate-800" : "bg-white"
           }`}>
             <CardContent className="p-4 sm:p-6">
               <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
@@ -478,7 +454,7 @@ export default function DashboardPage() {
               }`}>
                 Scheduled posts
               </div>
-              <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 ${
+              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 ${
                 isDark ? "text-white" : "text-gray-950"
               }`}>
                 {loading ? (
@@ -493,8 +469,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className={`border rounded-xl sm:col-span-2 lg:col-span-1 transition-colors ${
-            isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"
+          <Card className={`rounded-xl sm:col-span-2 lg:col-span-1 transition-colors ${
+            isDark ? "bg-gray-900" : "bg-white"
           }`}>
             <CardContent className="p-4 sm:p-6">
               <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
@@ -502,7 +478,7 @@ export default function DashboardPage() {
               }`}>
                 Top platform
               </div>
-              <div className={`text-2xl sm:text-3xl font-bold mb-1.5 sm:mb-2 capitalize ${
+              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 capitalize ${
                 isDark ? "text-white" : "text-gray-950"
               }`}>
                 {loading ? (
@@ -520,14 +496,11 @@ export default function DashboardPage() {
 
         {/* Your clients — always visible; shows list or "No clients" */}
         {!loading && userId && (
-          <Card className={`border rounded-xl transition-colors shadow-sm ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          <Card className={`rounded-xl transition-colors ${
+            isDark ? "bg-slate-800" : "bg-white"
           }`}>
             <CardHeader className="pb-3 px-4 sm:px-6 pt-4 sm:pt-6 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className={`text-base sm:text-lg font-semibold flex items-center gap-2 ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
-                <Users className="w-5 h-5 text-purple-500" />
+              <CardTitle className="text-base sm:text-lg font-medium">
                 Your clients
               </CardTitle>
               <div className="flex items-center gap-2">
@@ -546,7 +519,6 @@ export default function DashboardPage() {
                 <Button
                   size="sm"
                   onClick={() => router.push("/dashboard/clients/new")}
-                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm"
                 >
                   <Plus className="w-3.5 h-3.5 mr-1.5" />
                   Add client
@@ -561,17 +533,11 @@ export default function DashboardPage() {
                       <button
                         key={client.id}
                         onClick={() => router.push(`/dashboard/clients/${client.id}`)}
-                        className={`flex items-center gap-2 px-4 py-3 rounded-lg border text-left min-w-0 transition-colors ${
-                          isDark
-                            ? "bg-slate-900/50 border-slate-700 hover:bg-slate-700 hover:border-slate-600"
-                            : "bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300"
+                        className={`flex items-center gap-2.5 px-3 py-2.5 rounded-md border border-border text-left min-w-0 transition-colors hover:bg-accent/50 ${
+                          isDark ? "bg-card" : "bg-card"
                         }`}
                       >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          isDark ? "bg-purple-900/50 text-purple-300" : "bg-purple-100 text-purple-700"
-                        }`}>
-                          <Building2 className="w-4 h-4" />
-                        </div>
+                        <ClientAvatar name={client.name} size="sm" />
                         <span className={`font-medium truncate text-sm ${
                           isDark ? "text-slate-200" : "text-gray-900"
                         }`}>
@@ -591,7 +557,7 @@ export default function DashboardPage() {
                       <button
                         type="button"
                         onClick={() => router.push("/dashboard/clients")}
-                        className="font-medium text-purple-600 hover:text-purple-700 underline"
+                        className="font-medium text-foreground hover:underline"
                       >
                         view all clients
                       </button>
@@ -599,8 +565,8 @@ export default function DashboardPage() {
                   )}
                 </>
               ) : (
-                <div className={`py-6 text-center rounded-lg border border-dashed ${
-                  isDark ? "border-slate-600 bg-slate-900/30" : "border-gray-200 bg-gray-50"
+                <div className={`py-6 text-center rounded-lg border border-dashed border-gray-200 dark:border-slate-600 ${
+                  isDark ? "bg-slate-900/30" : "bg-gray-50"
                 }`}>
                   <Building2 className={`w-10 h-10 mx-auto mb-2 ${
                     isDark ? "text-slate-500" : "text-gray-400"
@@ -629,100 +595,233 @@ export default function DashboardPage() {
           {/* Left Column - 2 spans */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* My Social Overview */}
-            <Card className={`border rounded-xl transition-colors shadow-sm ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            <Card className={`rounded-xl transition-colors ${
+              isDark ? "bg-slate-800" : "bg-white"
             }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
-                  <CardTitle className={`text-base sm:text-lg font-semibold ${
+                  <CardTitle className={`text-base sm:text-lg font-medium ${
                     isDark ? "text-white" : "text-gray-950"
                   }`}>
-                    My social overview
+                    Activity overview
                 </CardTitle>
                   <div className="flex items-center gap-2">
-                    <select className={`flex-1 sm:flex-none text-xs sm:text-sm border rounded-lg px-2 sm:px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                    <select
+                      value={overviewRange}
+                      onChange={(e) =>
+                        setOverviewRange(e.target.value as "7d" | "30d" | "90d")
+                      }
+                      className={`flex-1 sm:flex-none text-xs sm:text-sm border rounded-lg px-2 sm:px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring ${
                       isDark 
                         ? "bg-slate-700 border-slate-600 text-slate-200" 
                         : "bg-white border-gray-200 text-gray-700"
-                    }`}>
-                      <option>Jul 2024 - Dec 2024</option>
-                      <option>Jan 2024 - Jun 2024</option>
+                    }`}
+                    >
+                      <option value="7d">Last 7 days</option>
+                      <option value="30d">Last 30 days</option>
+                      <option value="90d">Last 90 days</option>
                     </select>
-                    <select className={`flex-1 sm:flex-none text-xs sm:text-sm border rounded-lg px-2 sm:px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                      isDark 
-                        ? "bg-slate-700 border-slate-600 text-slate-200" 
-                        : "bg-white border-gray-200 text-gray-700"
-                    }`}>
-                      <option>Engagement</option>
-                      <option>Reach</option>
-                      <option>Impressions</option>
-                    </select>
+                    <Link
+                      href="/dashboard/analytics"
+                      className={`text-xs font-medium whitespace-nowrap ${
+                        isDark ? "text-slate-300 hover:text-white" : "text-gray-600 hover:text-gray-950"
+                      }`}
+                    >
+                      Full analytics
+                    </Link>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <FeatureComingSoon
-                  isDark={isDark}
-                  icon={TrendingUp}
-                  title="Real-time analytics coming soon"
-                  description="Engagement charts and geography breakdowns will appear here once social platform analytics are connected."
-                />
+                <MiniVolumeChart series={overview.contentVolume} isDark={isDark} />
               </CardContent>
             </Card>
 
             {/* Engagement Rate Metrics */}
-            <Card className={`border rounded-xl transition-colors shadow-sm ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            <Card className={`rounded-xl transition-colors ${
+              isDark ? "bg-slate-800" : "bg-white"
             }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className={`text-base sm:text-lg font-semibold ${
+                <CardTitle className={`text-base sm:text-lg font-medium ${
                   isDark ? "text-white" : "text-gray-950"
                 }`}>
-                  Engagement rate metrics
+                  Engagement
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <FeatureComingSoon
-                  compact
-                  isDark={isDark}
-                  icon={BarChart3}
-                  title="Engagement metrics coming soon"
-                  description="Platform engagement rates require analytics integration — they are not available yet."
-                />
+                {overview.engagementMetricsAvailable ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {[
+                        { label: "Views", value: overview.totalViews, icon: Eye },
+                        { label: "Likes", value: overview.totalLikes, icon: Heart },
+                        { label: "Shares", value: overview.totalShares, icon: Share2 },
+                        {
+                          label: "Rate",
+                          value:
+                            overview.engagementRate != null
+                              ? `${overview.engagementRate}%`
+                              : "—",
+                          icon: TrendingUp,
+                        },
+                      ].map((item) => (
+                        <div
+                          key={item.label}
+                          className={`rounded-lg p-3 ${
+                            isDark ? "bg-slate-700/60" : "bg-gray-50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <item.icon
+                              className={`h-3.5 w-3.5 ${
+                                isDark ? "text-slate-400" : "text-gray-500"
+                              }`}
+                            />
+                            <span
+                              className={`text-xs ${
+                                isDark ? "text-slate-400" : "text-gray-500"
+                              }`}
+                            >
+                              {item.label}
+                            </span>
+                          </div>
+                          <p
+                            className={`text-lg font-semibold tabular-nums ${
+                              isDark ? "text-white" : "text-gray-950"
+                            }`}
+                          >
+                            {typeof item.value === "number"
+                              ? item.value.toLocaleString()
+                              : item.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    {overview.platformStats.length > 0 && (
+                      <div className="space-y-2">
+                        {overview.platformStats.map((p) => (
+                          <div
+                            key={p.platform}
+                            className="flex items-center justify-between text-sm"
+                          >
+                            <span
+                              className={`capitalize ${
+                                isDark ? "text-slate-300" : "text-gray-700"
+                              }`}
+                            >
+                              {p.platform}
+                            </span>
+                            <span
+                              className={isDark ? "text-slate-400" : "text-gray-500"}
+                            >
+                              {p.engagement}% · {p.views.toLocaleString()} views
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div
+                    className={`rounded-lg px-4 py-6 text-center ${
+                      isDark ? "bg-slate-700/40" : "bg-gray-50"
+                    }`}
+                  >
+                    <p
+                      className={`text-sm font-medium ${
+                        isDark ? "text-slate-200" : "text-gray-800"
+                      }`}
+                    >
+                      No engagement data yet
+                    </p>
+                    <p
+                      className={`text-xs mt-1.5 max-w-sm mx-auto ${
+                        isDark ? "text-slate-400" : "text-gray-500"
+                      }`}
+                    >
+                      Connect Twitter in Settings and auto-post — metrics sync on each cron run.
+                    </p>
+                    <Link
+                      href="/dashboard/settings"
+                      className="inline-block mt-3 text-xs font-medium text-primary hover:underline"
+                    >
+                      Open settings
+                    </Link>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
 
           {/* Right Column */}
           <div className="space-y-4 sm:space-y-6">
-            {/* Top Geographies */}
-            <Card className={`border rounded-xl transition-colors shadow-sm ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            {/* Platform mix */}
+            <Card className={`rounded-xl transition-colors ${
+              isDark ? "bg-slate-800" : "bg-white"
             }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className={`text-base sm:text-lg font-semibold ${
+                <CardTitle className={`text-base sm:text-lg font-medium ${
                   isDark ? "text-white" : "text-gray-950"
                 }`}>
-                  Top geographies
+                  Platforms
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <FeatureComingSoon
-                  compact
-                  isDark={isDark}
-                  icon={MapPin}
-                  title="Geography data coming soon"
-                  description="Audience location insights will be available with platform analytics."
-                />
+                {overview.activityPlatformStats.length > 0 ? (
+                  <div className="space-y-3">
+                    {(() => {
+                      const max = Math.max(
+                        ...overview.activityPlatformStats.map((p) => p.posts),
+                        1
+                      );
+                      return overview.activityPlatformStats.map((p) => (
+                        <div key={p.platform}>
+                          <div className="flex items-center justify-between text-sm mb-1">
+                            <span
+                              className={`capitalize ${
+                                isDark ? "text-slate-200" : "text-gray-800"
+                              }`}
+                            >
+                              {p.platform}
+                            </span>
+                            <span
+                              className={isDark ? "text-slate-400" : "text-gray-500"}
+                            >
+                              {p.posts} posts
+                            </span>
+                          </div>
+                          <div
+                            className={`h-1.5 rounded-full overflow-hidden ${
+                              isDark ? "bg-slate-700" : "bg-gray-100"
+                            }`}
+                          >
+                            <div
+                              className="h-full rounded-full bg-primary"
+                              style={{ width: `${Math.round((p.posts / max) * 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                ) : (
+                  <p
+                    className={`text-sm py-4 text-center ${
+                      isDark ? "text-slate-400" : "text-gray-500"
+                    }`}
+                  >
+                    Schedule posts to see platform mix.
+                  </p>
+                )}
               </CardContent>
             </Card>
 
             {/* My Post Planner */}
-            <Card className={`border rounded-xl transition-colors shadow-sm ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            <Card className={`rounded-xl transition-colors ${
+              isDark ? "bg-slate-800" : "bg-white"
             }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className={`text-base sm:text-lg font-semibold ${
+                <CardTitle className={`text-base sm:text-lg font-medium ${
                   isDark ? "text-white" : "text-gray-950"
                 }`}>
                   My post planner
@@ -735,14 +834,14 @@ export default function DashboardPage() {
                       key={idx}
                       className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg text-center min-w-[60px] sm:min-w-[70px] ${
                         date.isToday
-                          ? "bg-purple-600 text-white"
+                          ? "bg-primary text-primary-foreground"
                           : isDark
                           ? "bg-slate-700 text-slate-200 hover:bg-slate-600"
                           : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                       }`}
                     >
                       <div className="text-xs font-medium">{date.day}</div>
-                      <div className="text-sm font-semibold mt-1">
+                      <div className="text-sm font-medium mt-1">
                         {date.date}
                   </div>
                 </div>
@@ -751,30 +850,111 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Comments and Mentions */}
-            <Card className={`border rounded-xl transition-colors shadow-sm ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+            {/* Workspace inbox preview */}
+            <Card className={`rounded-xl transition-colors ${
+              isDark ? "bg-slate-800" : "bg-white"
             }`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className={`text-base sm:text-lg font-semibold ${
-                  isDark ? "text-white" : "text-gray-950"
-                }`}>
-                  Comments and mentions
-                </CardTitle>
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className={`text-base sm:text-lg font-medium ${
+                    isDark ? "text-white" : "text-gray-950"
+                  }`}>
+                    Inbox
+                  </CardTitle>
+                  <Link
+                    href="/dashboard/inbox"
+                    className={`text-xs font-medium ${
+                      isDark ? "text-slate-300 hover:text-white" : "text-gray-600 hover:text-gray-950"
+                    }`}
+                  >
+                    Open all
+                  </Link>
+                </div>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <FeatureComingSoon
-                  compact
-                  isDark={isDark}
-                  icon={Bell}
-                  title="Social inbox coming soon"
-                  description="Comments and mentions from connected platforms will appear here."
-                />
+                <ActivityFeed maxItems={5} autoRefresh={false} embedded />
+                <p className={`text-xs mt-3 ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                  Approvals & tasks now · social comments when platforms connect
+                </p>
               </CardContent>
             </Card>
               </div>
             </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function MiniVolumeChart({
+  series,
+  isDark,
+}: {
+  series: { date: string; generated: number; scheduled: number }[];
+  isDark: boolean;
+}) {
+  if (!series.length) {
+    return (
+      <p className={`text-sm py-10 text-center ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+        No activity in this range yet.
+      </p>
+    );
+  }
+
+  const step = series.length > 30 ? Math.ceil(series.length / 28) : 1;
+  const bars = series.filter((_, i) => i % step === 0 || i === series.length - 1);
+  const max = Math.max(...bars.map((b) => b.generated + b.scheduled), 1);
+  const totalGen = series.reduce((s, d) => s + d.generated, 0);
+  const totalSched = series.reduce((s, d) => s + d.scheduled, 0);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-end gap-0.5 h-36">
+        {bars.map((day) => {
+          const total = day.generated + day.scheduled;
+          const h = Math.max(4, Math.round((total / max) * 100));
+          const genShare = total ? (day.generated / total) * 100 : 0;
+          return (
+            <div
+              key={day.date}
+              className="flex-1 min-w-0 flex flex-col justify-end"
+              title={`${day.date}: ${day.generated} generated, ${day.scheduled} scheduled`}
+            >
+              <div
+                className="w-full rounded-t-sm overflow-hidden flex flex-col justify-end"
+                style={{ height: `${h}%` }}
+              >
+                <div
+                  className={isDark ? "bg-sky-400/90" : "bg-sky-500"}
+                  style={{ height: `${genShare}%`, minHeight: day.generated ? 2 : 0 }}
+                />
+                <div
+                  className={isDark ? "bg-emerald-400/80" : "bg-emerald-500/80"}
+                  style={{
+                    height: `${100 - genShare}%`,
+                    minHeight: day.scheduled ? 2 : 0,
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div
+        className={`flex flex-wrap gap-4 text-xs ${
+          isDark ? "text-slate-400" : "text-gray-500"
+        }`}
+      >
+        <span className="inline-flex items-center gap-1.5">
+          <span className={`h-2 w-2 rounded-sm ${isDark ? "bg-sky-400" : "bg-sky-500"}`} />
+          {totalGen} generated
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            className={`h-2 w-2 rounded-sm ${isDark ? "bg-emerald-400" : "bg-emerald-500"}`}
+          />
+          {totalSched} scheduled
+        </span>
       </div>
     </div>
   );

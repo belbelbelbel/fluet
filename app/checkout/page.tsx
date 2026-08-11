@@ -315,12 +315,19 @@ function CheckoutContent() {
                   >
                     Change plan
                   </button>
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <p className="text-xs text-gray-500">Add promotion code (coming soon)</p>
-                  </div>
-                  <div className="mt-6 flex items-center gap-2">
-                    <ShieldIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                    <span className="text-xs text-gray-500">Secure payment. Pay with Stripe or Kora on the right.</span>
+                  <div className="mt-6 space-y-3">
+                    <div className="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+                      <p className="text-xs font-medium text-gray-800">What happens next</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        You’ll finish checkout with Stripe or Kora. Your plan activates when payment succeeds.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ShieldIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      <span className="text-xs text-gray-500">
+                        Secure payment — card details never touch Revvy servers.
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -334,7 +341,7 @@ function CheckoutContent() {
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <button
                       onClick={() => setSelectedProvider("stripe")}
-                      className={`p-4 rounded-lg border-2 transition-all ${
+                      className={`p-4 rounded-lg border transition-all ${
                         selectedProvider === "stripe"
                           ? "border-purple-600 bg-purple-50"
                           : "border-gray-200 hover:border-gray-300 bg-white"
@@ -345,7 +352,7 @@ function CheckoutContent() {
                     </button>
                     <button
                       onClick={() => setSelectedProvider("kora")}
-                      className={`p-4 rounded-lg border-2 transition-all ${
+                      className={`p-4 rounded-lg border transition-all ${
                         selectedProvider === "kora"
                           ? "border-purple-600 bg-purple-50"
                           : "border-gray-200 hover:border-gray-300 bg-white"

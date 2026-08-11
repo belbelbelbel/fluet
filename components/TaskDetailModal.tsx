@@ -70,7 +70,7 @@ export function TaskDetailModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
         <Card className={`w-full max-w-2xl shadow-xl ${isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}`}>
           <CardContent className="flex items-center justify-center py-16">
-            <Loader2 className={`w-10 h-10 animate-spin ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+            <Loader2 className={`w-10 h-10 animate-spin ${isDark ? "text-purple-400" : "text-foreground"}`} />
             <span className={`ml-3 ${isDark ? "text-slate-400" : "text-gray-600"}`}>Loading task...</span>
           </CardContent>
         </Card>
@@ -129,7 +129,7 @@ export function TaskDetailModal({
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none ${
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${
                   errors.type ? "border-red-300" : isDark ? "border-slate-600 bg-slate-700 text-white" : "border-gray-300 bg-white"
                 }`}
               >
@@ -153,7 +153,7 @@ export function TaskDetailModal({
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none ${
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${
                   errors.status ? "border-red-300" : isDark ? "border-slate-600 bg-slate-700 text-white" : "border-gray-300 bg-white"
                 }`}
               >
@@ -177,7 +177,7 @@ export function TaskDetailModal({
                 value={formData.description || ""}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none resize-none ${isDark ? "border-slate-600 bg-slate-700 text-white placeholder-slate-500" : "border-gray-300 bg-white"}`}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none resize-none ${isDark ? "border-slate-600 bg-slate-700 text-white placeholder-slate-500" : "border-gray-300 bg-white"}`}
                 placeholder="Add task description..."
               />
             </div>
@@ -220,7 +220,7 @@ export function TaskDetailModal({
                       dueDate: e.target.value ? new Date(e.target.value).toISOString() : undefined,
                     })
                   }
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none ${isDark ? "border-slate-600 bg-slate-700 text-white" : "border-gray-300 bg-white"}`}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${isDark ? "border-slate-600 bg-slate-700 text-white" : "border-gray-300 bg-white"}`}
                 />
               </div>
             </div>
@@ -248,7 +248,7 @@ export function TaskDetailModal({
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             {saving ? (
               <>

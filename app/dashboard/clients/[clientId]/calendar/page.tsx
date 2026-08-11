@@ -12,9 +12,9 @@ import {
   Calendar as CalendarIcon,
   CheckCircle2,
   Clock,
-  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 interface ScheduledPost {
   id: number;
@@ -137,15 +137,7 @@ export default function CalendarPage() {
   };
 
   if (loading) {
-    return (
-      <div className={`flex items-center justify-center min-h-[400px] transition-colors duration-300 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}>
-        <Loader2 className={`w-8 h-8 animate-spin ${
-          isDark ? "text-purple-400" : "text-purple-600"
-        }`} />
-      </div>
-    );
+    return <LoadingScreen variant="inline" message="Loading calendar..." />;
   }
 
   return (
@@ -171,7 +163,7 @@ export default function CalendarPage() {
         </div>
         <Button
           onClick={() => router.push(`/dashboard/schedule?clientId=${clientId}`)}
-          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white transition-all duration-200 shadow-sm hover:shadow-md py-2.5 sm:py-2 text-sm sm:text-base"
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground transition-all duration-200 shadow-sm hover:shadow-md py-2.5 sm:py-2 text-sm sm:text-base"
         >
           Schedule New Post
         </Button>
@@ -188,7 +180,7 @@ export default function CalendarPage() {
               isDark ? "text-white" : "text-gray-900"
             }`}>
               <CalendarIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                isDark ? "text-purple-400" : "text-purple-600"
+                isDark ? "text-purple-400" : "text-foreground"
               }`} />
               {monthName}
             </CardTitle>
@@ -263,11 +255,11 @@ export default function CalendarPage() {
                         : "bg-white border-gray-200 hover:bg-gray-50 cursor-pointer"
                       : isDark
                         ? "bg-slate-900 border-slate-800"
-                        : "bg-gray-50 border-gray-100",
+                        : "bg-gray-50 border-gray-200",
                     isCurrentDay && isDark
-                      ? "border-purple-500 border-2 bg-purple-950/50"
+                      ? "border-primary border bg-purple-950/50"
                       : isCurrentDay
-                      ? "border-purple-500 border-2 bg-purple-50"
+                      ? "border-primary border bg-muted"
                       : ""
                   )}
                   onClick={() => {
@@ -284,7 +276,7 @@ export default function CalendarPage() {
                           isCurrentDay
                             ? isDark
                               ? "text-purple-400"
-                              : "text-purple-700"
+                              : "text-foreground"
                             : isDark
                             ? "text-slate-200"
                             : "text-gray-900"
@@ -308,7 +300,7 @@ export default function CalendarPage() {
                                   : "bg-yellow-100 text-yellow-700"
                                 : isDark
                                 ? "bg-purple-950/50 text-purple-400 border border-purple-800"
-                                : "bg-purple-100 text-purple-700"
+                                : "bg-purple-100 text-foreground"
                             )}
                             title={post.content}
                           >

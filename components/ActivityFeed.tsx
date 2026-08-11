@@ -37,11 +37,14 @@ export interface ActivityItem {
 interface ActivityFeedProps {
   maxItems?: number;
   autoRefresh?: boolean;
+  /** Skip outer card chrome when nested in another card */
+  embedded?: boolean;
 }
 
 export function ActivityFeed({
   maxItems = 20,
   autoRefresh = true,
+  embedded = false,
 }: ActivityFeedProps) {
   const { userId } = useAuth();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
@@ -98,7 +101,7 @@ export function ActivityFeed({
       case "task_assigned":
         return <UserPlus className="w-4 h-4 text-blue-600" />;
       case "post_published":
-        return <Calendar className="w-4 h-4 text-purple-600" />;
+        return <Calendar className="w-4 h-4 text-foreground" />;
       default:
         return null;
     }
@@ -123,14 +126,78 @@ export function ActivityFeed({
     return (
       <div
         className={cn(
-          "rounded-lg border p-4",
-          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          !embedded && "rounded-lg border p-4",
+          !embedded && (isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"),
+          embedded && "py-2"
         )}
       >
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Recent Activity</h3>
+        {!embedded && (
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            Recent Activity
+          </h3>
+        )}
         <p className="text-sm text-gray-500">Loading activity...</p>
       </div>
     );
+  }
+
+  const list =
+    activities.length === 0 ? (
+      <div className={cn(embedded ? "py-4" : "p-6", "text-center")}>
+        {error ? (
+          <p className="text-sm text-amber-600 dark:text-amber-400">{error}</p>
+        ) : (
+          <>
+            <Inbox
+              className={cn(
+                "w-10 h-10 mx-auto mb-3",
+                isDark ? "text-slate-500" : "text-gray-400"
+              )}
+            />
+            <p className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              No recent activity
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Add a client, create tasks, get approvals, or schedule posts to see
+              updates here.
+            </p>
+          </>
+        )}
+      </div>
+    ) : (
+      <div className="divide-y divide-gray-200 dark:divide-slate-700">
+        {activities.map((activity) => (
+          <div
+            key={activity.id}
+            className={cn(
+              "p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors",
+              activity.link && "cursor-pointer",
+              embedded && "px-0 first:pt-0 last:pb-0"
+            )}
+            onClick={() => {
+              if (activity.link) {
+                window.location.href = activity.link;
+              }
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5">{getActivityIcon(activity.type)}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-900 dark:text-white">
+                  {activity.message}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {formatTimestamp(activity.timestamp)}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+
+  if (embedded) {
+    return <div>{!isCollapsed && list}</div>;
   }
 
   return (
@@ -154,54 +221,7 @@ export function ActivityFeed({
         )}
       </div>
 
-      {!isCollapsed && (
-        activities.length === 0 ? (
-          <div className="p-6 text-center">
-            {error ? (
-              <p className="text-sm text-amber-600 dark:text-amber-400">{error}</p>
-            ) : (
-              <>
-                <Inbox className={cn("w-10 h-10 mx-auto mb-3", isDark ? "text-slate-500" : "text-gray-400")} />
-                <p className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  No recent activity
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Add a client, create tasks, get approvals, or schedule posts to see updates here.
-                </p>
-              </>
-            )}
-          </div>
-        ) : (
-        <div className="divide-y divide-gray-200 dark:divide-slate-700">
-          {activities.map((activity) => (
-            <div
-              key={activity.id}
-              className={cn(
-                "p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors",
-                activity.link && "cursor-pointer"
-              )}
-              onClick={() => {
-                if (activity.link) {
-                  window.location.href = activity.link;
-                }
-              }}
-            >
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5">{getActivityIcon(activity.type)}</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900 dark:text-white">
-                    {activity.message}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {formatTimestamp(activity.timestamp)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        )
-      )}
+      {!isCollapsed && list}
     </div>
   );
 }

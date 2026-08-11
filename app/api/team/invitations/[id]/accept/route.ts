@@ -3,7 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@/utils/db/dbConfig";
 import { TeamInvitations, AgencyTeamMembers } from "@/utils/db/schema";
 import { eq, and } from "drizzle-orm";
-import { GetUserByClerkId } from "@/utils/db/actions";
+import { GetUserByClerkId, SetClientAssignments } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -136,6 +136,7 @@ export async function POST(
         .set({
           status: "active",
           joinedAt: new Date(),
+          role: invitation.role || "member",
         })
         .where(
           and(
@@ -155,6 +156,17 @@ export async function POST(
       })
       .where(eq(TeamInvitations.id, invitationId))
       .execute();
+
+    const inviteClientIds = Array.isArray(invitation.clientIds)
+      ? (invitation.clientIds as number[])
+      : [];
+    if (inviteClientIds.length > 0) {
+      try {
+        await SetClientAssignments(invitation.invitedBy, user.id, inviteClientIds);
+      } catch (assignErr) {
+        console.warn("[Accept Invitation] Client assign failed:", assignErr);
+      }
+    }
 
     console.log(`[Accept Invitation] ✅ User ${user.id} accepted invitation ${invitationId}`);
 
