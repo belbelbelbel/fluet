@@ -127,7 +127,7 @@ function verifiedRow(email: string | undefined): string {
   if (!email) return "";
   return metaRow(
     "Verified as",
-    `${escapeHtml(email)} <span style="font-weight:400;color:#16a34a;">✓ email confirmed</span>`
+    `${escapeHtml(email)} <span style="font-weight:400;color:#16a34a;">(email confirmed)</span>`
   );
 }
 

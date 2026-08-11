@@ -336,12 +336,13 @@ export default function DashboardHistoryPage() {
                           {item.contentType}
                         </span>
                         {item.posted === true && (
-                          <span className={`px-2 py-1 text-xs rounded-full border transition-colors duration-300 ${
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors duration-300 ${
                             isDark
                               ? "bg-green-950/50 text-green-400 border-green-800"
                               : "bg-green-50 text-green-700 border-green-200"
                           }`}>
-                            ✓ Posted
+                            <CheckIcon className="h-3 w-3" />
+                            Posted
                           </span>
                         )}
                       </div>

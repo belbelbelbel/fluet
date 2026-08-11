@@ -12,6 +12,12 @@ import {
   Calendar as CalendarIcon,
   CheckCircle2,
   Clock,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube,
+  Music2,
+  Smartphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -122,17 +128,17 @@ export default function CalendarPage() {
   const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
       case "twitter":
-        return "🐦";
+        return Twitter;
       case "instagram":
-        return "📷";
+        return Instagram;
       case "linkedin":
-        return "💼";
+        return Linkedin;
       case "youtube":
-        return "▶️";
+        return Youtube;
       case "tiktok":
-        return "🎵";
+        return Music2;
       default:
-        return "📱";
+        return Smartphone;
     }
   };
 
@@ -304,7 +310,10 @@ export default function CalendarPage() {
                             )}
                             title={post.content}
                           >
-                            <span>{getPlatformIcon(post.platform)}</span>
+                            {(() => {
+                              const PlatformIcon = getPlatformIcon(post.platform);
+                              return <PlatformIcon className="w-3 h-3 shrink-0" />;
+                            })()}
                             <span className="truncate flex-1">
                               {post.platform}
                             </span>

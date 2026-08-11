@@ -42,7 +42,7 @@ export async function GET(req: Request) {
         return NextResponse.json([]);
       }
     } catch (userError) {
-      console.error(`[Content API] ❌ Error getting user:`, userError);
+      console.error(`[Content API] Error getting user:`, userError);
       if (userError instanceof Error) {
         console.error(`[Content API] Error message: ${userError.message}`);
         console.error(`[Content API] Error stack: ${userError.stack}`);
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
     try {
       content = await GetUserGeneratedContent(user.id, limit, validClientId);
     } catch (dbError) {
-      console.error("[Content API] ❌ Database error fetching content:", dbError);
+      console.error("[Content API] Database error fetching content:", dbError);
       if (dbError instanceof Error) {
         console.error("[Content API] Error message:", dbError.message);
         console.error("[Content API] Error stack:", dbError.stack);

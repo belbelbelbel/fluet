@@ -52,10 +52,10 @@ export async function getValidAccessToken(
     const newExpiresAt = new Date(Date.now() + newTokens.expires_in * 1000);
     await UpdateLinkedAccountToken(userId, "youtube", newTokens.access_token, newExpiresAt);
     
-    console.log(`[YouTube Upload] ✅ Token refreshed successfully`);
+    console.log(`[YouTube Upload] Token refreshed successfully`);
     return newTokens.access_token;
   } catch (error) {
-    console.error(`[YouTube Upload] ❌ Token refresh failed:`, error);
+    console.error(`[YouTube Upload] Token refresh failed:`, error);
     throw new Error(`Token refresh failed: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
@@ -93,8 +93,8 @@ export async function uploadVideoToYouTube(
   const stats = await fs.stat(videoPath);
   const fileSize = stats.size;
 
-  console.log(`[YouTube Upload] 📤 Uploading video: ${path.basename(videoPath)}`);
-  console.log(`[YouTube Upload] 📊 File size: ${(fileSize / 1024 / 1024).toFixed(2)} MB`);
+  console.log(`[YouTube Upload] Uploading video: ${path.basename(videoPath)}`);
+  console.log(`[YouTube Upload] File size: ${(fileSize / 1024 / 1024).toFixed(2)} MB`);
 
   // Read video file into buffer
   const videoFileBuffer = await fs.readFile(videoPath);
@@ -137,17 +137,17 @@ export async function uploadVideoToYouTube(
 
   // If unauthorized, try refreshing token and retry once
   if (initResponse.status === 401) {
-    console.log(`[YouTube Upload] ⚠️  Token expired or invalid, refreshing...`);
+    console.log(`[YouTube Upload]  Token expired or invalid, refreshing...`);
     try {
       // Force refresh by passing expired date
       validToken = await getValidAccessToken(userId, accessToken, refreshToken, new Date(0));
-      console.log(`[YouTube Upload] ✅ Token refreshed, retrying upload...`);
+      console.log(`[YouTube Upload] Token refreshed, retrying upload...`);
       initResponse = await attemptUpload(validToken);
       
       // If still unauthorized after refresh, it's likely a scope/permission issue
       if (initResponse.status === 401) {
         const errorText = await initResponse.text();
-        console.error(`[YouTube Upload] ❌ Still unauthorized after refresh. Error:`, errorText);
+        console.error(`[YouTube Upload] Still unauthorized after refresh. Error:`, errorText);
         throw new Error("YouTube upload permission denied. Your account may not have the required upload permissions. Please disconnect and reconnect your YouTube account in Settings, and make sure to grant all requested permissions.");
       }
     } catch (refreshError) {
@@ -156,7 +156,7 @@ export async function uploadVideoToYouTube(
         throw refreshError;
       }
       
-      console.error(`[YouTube Upload] ❌ Token refresh failed:`, refreshError);
+      console.error(`[YouTube Upload] Token refresh failed:`, refreshError);
       const errorText = await initResponse.text();
       let errorMessage = `Token refresh failed. Please disconnect and reconnect your YouTube account in Settings.`;
       
@@ -213,7 +213,7 @@ export async function uploadVideoToYouTube(
     throw new Error("No upload location received from YouTube API");
   }
 
-  console.log(`[YouTube Upload] ✅ Upload initialized, uploading file...`);
+  console.log(`[YouTube Upload] Upload initialized, uploading file...`);
 
   // Step 2: Upload video file (resumable upload)
   // For large files, YouTube supports chunked uploads, but for simplicity
@@ -230,7 +230,7 @@ export async function uploadVideoToYouTube(
 
   // If unauthorized during upload, refresh token and retry
   if (uploadResponse.status === 401) {
-    console.log(`[YouTube Upload] ⚠️  Token expired during upload, refreshing...`);
+    console.log(`[YouTube Upload]  Token expired during upload, refreshing...`);
     validToken = await getValidAccessToken(userId, accessToken, refreshToken, new Date(0));
     uploadResponse = await fetch(location, {
       method: "PUT",
@@ -270,9 +270,9 @@ export async function uploadVideoToYouTube(
     throw new Error("No video ID returned from YouTube API");
   }
 
-  console.log(`[YouTube Upload] ✅ Video uploaded successfully!`);
-  console.log(`[YouTube Upload] 🎬 Video ID: ${videoId}`);
-  console.log(`[YouTube Upload] 🔗 URL: https://www.youtube.com/watch?v=${videoId}`);
+  console.log(`[YouTube Upload] Video uploaded successfully!`);
+  console.log(`[YouTube Upload] Video ID: ${videoId}`);
+  console.log(`[YouTube Upload] URL: https://www.youtube.com/watch?v=${videoId}`);
 
   return {
     videoId,

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         defaultAIModel: "deepseek-v4-flash",
         autoSave: true,
         notifications: true,
-        theme: "system",
+        theme: "light",
         niche: null,
         emailApprovals: true,
         emailTasks: true,

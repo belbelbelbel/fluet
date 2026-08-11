@@ -50,7 +50,6 @@ export async function GET(
         { status: access.status }
       );
     }
-    const client = access.client;
 
     const [posts, approvals, credits] = await Promise.all([
       GetScheduledPostsByClientId(clientId),

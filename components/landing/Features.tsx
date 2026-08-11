@@ -50,7 +50,7 @@ export function Features() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-end">
         <div>
           <Reveal>
-            <SectionLabel>What's inside</SectionLabel>
+            <SectionLabel>What&apos;s inside</SectionLabel>
           </Reveal>
           <Reveal delay={60}>
             <h2 className="font-display mt-7 text-[clamp(2.1rem,4.6vw,3.25rem)] text-[rgb(var(--ink))]">

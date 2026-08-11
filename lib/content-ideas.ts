@@ -23,16 +23,16 @@ export type PrimaryIndustry =
   | "tech_startups"
   | "other";
 
-export const PRIMARY_INDUSTRY_OPTIONS: { id: PrimaryIndustry; name: string; emoji: string; mapsTo?: Niche[] }[] = [
-  { id: "food_beverage", name: "Food & Beverage", emoji: "🍲", mapsTo: ["home_food_vendor", "street_food_seller", "baker_cake_vendor"] },
-  { id: "fashion_beauty", name: "Fashion & Beauty", emoji: "💄", mapsTo: ["fashion_seller", "beauty_hair_vendor"] },
-  { id: "coaching_consulting", name: "Coaching & Consulting", emoji: "💼", mapsTo: ["business_coach"] },
-  { id: "retail_ecommerce", name: "Retail & E-commerce", emoji: "🛒", mapsTo: ["online_vendor"] },
-  { id: "health_fitness", name: "Health & Fitness", emoji: "💪", mapsTo: [] }, // custom → AI
-  { id: "real_estate", name: "Real Estate", emoji: "🏠", mapsTo: [] }, // custom → AI
-  { id: "creative_services", name: "Creative Services", emoji: "🎨", mapsTo: [] }, // custom → AI
-  { id: "tech_startups", name: "Tech & Startups", emoji: "🚀", mapsTo: [] }, // custom → AI
-  { id: "other", name: "Other (type your niche)", emoji: "✨", mapsTo: [] }, // custom → AI
+export const PRIMARY_INDUSTRY_OPTIONS: { id: PrimaryIndustry; name: string; mapsTo?: Niche[] }[] = [
+  { id: "food_beverage", name: "Food & Beverage", mapsTo: ["home_food_vendor", "street_food_seller", "baker_cake_vendor"] },
+  { id: "fashion_beauty", name: "Fashion & Beauty", mapsTo: ["fashion_seller", "beauty_hair_vendor"] },
+  { id: "coaching_consulting", name: "Coaching & Consulting", mapsTo: ["business_coach"] },
+  { id: "retail_ecommerce", name: "Retail & E-commerce", mapsTo: ["online_vendor"] },
+  { id: "health_fitness", name: "Health & Fitness", mapsTo: [] }, // custom → AI
+  { id: "real_estate", name: "Real Estate", mapsTo: [] }, // custom → AI
+  { id: "creative_services", name: "Creative Services", mapsTo: [] }, // custom → AI
+  { id: "tech_startups", name: "Tech & Startups", mapsTo: [] }, // custom → AI
+  { id: "other", name: "Other (type your niche)", mapsTo: [] }, // custom → AI
 ];
 
 /** Map primary industry to a single niche for supported industries, or "custom" for AI */
@@ -86,14 +86,14 @@ export function inferNicheFromIndustry(industry: string | null | undefined): Nic
 }
 
 /** Niche options for the content ideas picker */
-export const NICHE_OPTIONS: { id: Niche; name: string; emoji: string }[] = [
-  { id: "home_food_vendor", name: "Home Food Vendor", emoji: "🍲" },
-  { id: "street_food_seller", name: "Street Food Seller", emoji: "🍔" },
-  { id: "baker_cake_vendor", name: "Baker / Cake Vendor", emoji: "🎂" },
-  { id: "fashion_seller", name: "Fashion Seller", emoji: "👗" },
-  { id: "beauty_hair_vendor", name: "Beauty / Hair Vendor", emoji: "💇🏽" },
-  { id: "business_coach", name: "Business / Coach", emoji: "💼" },
-  { id: "online_vendor", name: "Online Vendor (IG Shop)", emoji: "📱" },
+export const NICHE_OPTIONS: { id: Niche; name: string }[] = [
+  { id: "home_food_vendor", name: "Home Food Vendor" },
+  { id: "street_food_seller", name: "Street Food Seller" },
+  { id: "baker_cake_vendor", name: "Baker / Cake Vendor" },
+  { id: "fashion_seller", name: "Fashion Seller" },
+  { id: "beauty_hair_vendor", name: "Beauty / Hair Vendor" },
+  { id: "business_coach", name: "Business / Coach" },
+  { id: "online_vendor", name: "Online Vendor (IG Shop)" },
 ];
 
 export type HookStyle = "story" | "question" | "shock" | "value" | "tip";

@@ -13,6 +13,10 @@ import {
   Calendar,
   User,
   FileText,
+  Palette,
+  PenLine,
+  ClipboardCheck,
+  CheckCircle2,
 } from "lucide-react";
 
 interface TeamMember {
@@ -111,10 +115,10 @@ export default function NewTaskPage() {
   };
 
   const taskTypes = [
-    { value: "design_image", label: "Design Image", icon: "🎨" },
-    { value: "write_caption", label: "Write Caption", icon: "✍️" },
-    { value: "review_copy", label: "Review Copy", icon: "📝" },
-    { value: "approve", label: "Approve", icon: "✅" },
+    { value: "design_image", label: "Design Image", icon: Palette },
+    { value: "write_caption", label: "Write Caption", icon: PenLine },
+    { value: "review_copy", label: "Review Copy", icon: ClipboardCheck },
+    { value: "approve", label: "Approve", icon: CheckCircle2 },
   ];
 
   return (
@@ -164,7 +168,7 @@ export default function NewTaskPage() {
                             : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                       }`}
                     >
-                      <span className="text-2xl">{taskType.icon}</span>
+                      <taskType.icon className="h-6 w-6" />
                       <span className="text-xs font-medium text-center">{taskType.label}</span>
                     </button>
                   ))}

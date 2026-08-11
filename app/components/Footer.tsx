@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Twitter, Instagram, Linkedin, Mail } from "lucide-react";
+import { Twitter, Instagram, Linkedin, Mail, Heart } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 export function Footer() {
@@ -152,7 +152,11 @@ export function Footer() {
               © {currentYear} Revvy. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-sm text-gray-600">
-              <span>Made with ❤️ for Nigerian creators</span>
+              <span className="inline-flex items-center gap-1.5">
+                Made with
+                <Heart className="h-4 w-4 fill-current text-red-500" aria-label="love" />
+                for Nigerian creators
+              </span>
             </div>
           </div>
         </div>

@@ -46,7 +46,7 @@ export async function GET() {
       !!process.env.FACEBOOK_APP_ID && !!process.env.FACEBOOK_APP_SECRET;
 
     // Twitter
-    let twitter: {
+    const twitter: {
       connected: boolean;
       tokenOk: boolean;
       username: string | null;

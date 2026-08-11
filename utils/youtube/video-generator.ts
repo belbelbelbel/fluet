@@ -216,7 +216,7 @@ export async function generateVideo(
     const audioDuration = await getAudioDuration(audioPath);
     const videoDuration = await getVideoDuration(visualPath);
 
-    console.log(`[Video Composer] 🎬 Creating professional video composition`);
+    console.log(`[Video Composer] Creating professional video composition`);
     console.log(`[Video Composer] Audio: ${audioAsset.name} (${audioDuration}s)`);
     console.log(`[Video Composer] Visual: ${visualAsset.name} (${videoDuration}s)`);
     console.log(`[Video Composer] Target duration: ${targetDuration}s (${formatDuration(targetDuration)})`);
@@ -387,7 +387,7 @@ export async function generateVideo(
         ])
         .output(outputPath)
         .on("start", (commandLine) => {
-          console.log(`[Video Composer] 🚀 Starting composition...`);
+          console.log(`[Video Composer] Starting composition...`);
         })
         .on("progress", (progress) => {
           if (progress.timemark) {
@@ -411,7 +411,7 @@ export async function generateVideo(
             
             // Only log every 5% to reduce console spam
             if (actualPercent % 5 === 0 || actualPercent === 100) {
-              console.log(`[Video Composer] ⏳ Progress: ${actualPercent}% (${formatDuration(currentSeconds)} / ${formatDuration(targetDuration)})`);
+              console.log(`[Video Composer] Progress: ${actualPercent}% (${formatDuration(currentSeconds)} / ${formatDuration(targetDuration)})`);
             }
           } else if (progress.percent) {
             // Fallback: cap at 100% if using percent
@@ -423,7 +423,7 @@ export async function generateVideo(
             }
             
             if (cappedPercent % 5 === 0 || cappedPercent === 100) {
-              console.log(`[Video Composer] ⏳ Progress: ${cappedPercent}%`);
+              console.log(`[Video Composer] Progress: ${cappedPercent}%`);
             }
           }
         })
@@ -433,10 +433,10 @@ export async function generateVideo(
             const stats = await fs.stat(outputPath);
             const finalDuration = await getVideoDuration(outputPath);
 
-            console.log(`[Video Composer] ✅ Professional video created successfully!`);
-            console.log(`[Video Composer] 📁 Output: ${outputPath}`);
-            console.log(`[Video Composer] ⏱️  Duration: ${finalDuration}s (${(finalDuration / 60).toFixed(2)} minutes)`);
-            console.log(`[Video Composer] 💾 File size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
+            console.log(`[Video Composer] Professional video created successfully!`);
+            console.log(`[Video Composer] Output: ${outputPath}`);
+            console.log(`[Video Composer] Duration: ${finalDuration}s (${(finalDuration / 60).toFixed(2)} minutes)`);
+            console.log(`[Video Composer] File size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`);
 
             // Mark progress as completed
             if (jobId) {
@@ -457,7 +457,7 @@ export async function generateVideo(
           }
         })
         .on("error", (err) => {
-          console.error(`[Video Composer] ❌ Error:`, err);
+          console.error(`[Video Composer] Error:`, err);
           
           // Mark progress as error
           if (jobId) {

@@ -12,7 +12,6 @@ import {
   TrendingUp,
   TrendingDown,
   BarChart3,
-  Loader2,
   FileText,
   CheckCircle2,
 } from "lucide-react";

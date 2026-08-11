@@ -44,6 +44,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
   CopyIcon,
+  AlertTriangleIcon,
 } from "lucide-react";
 
 type ContentType = "twitter" | "instagram" | "linkedin" | "tiktok" | "youtube";
@@ -974,10 +975,11 @@ export default function DashboardSchedulePage() {
                           : "bg-gray-50 border-gray-200"
                       }`}>
                         {post.platform === "youtube" ? (
-                          <p className={`text-sm leading-relaxed ${
+                          <p className={`flex items-center gap-2 text-sm leading-relaxed ${
                             isDark ? "text-slate-200" : "text-gray-900"
                           }`}>
-                            🎬 YouTube Video - {post.content || "Video scheduled"}
+                            <YoutubeIcon className="h-4 w-4 shrink-0" />
+                            YouTube Video - {post.content || "Video scheduled"}
                           </p>
                         ) : (
                           <pre className={`whitespace-pre-wrap text-sm leading-relaxed line-clamp-2 ${
@@ -1055,10 +1057,11 @@ export default function DashboardSchedulePage() {
                       </div>
                     </div>
                       {post.platform === "youtube" ? (
-                        <p className={`text-xs leading-relaxed ${
+                        <p className={`flex items-center gap-2 text-xs leading-relaxed ${
                           isDark ? "text-slate-300" : "text-gray-700"
                         }`}>
-                          🎬 YouTube Video - {post.content || "Video scheduled"}
+                          <YoutubeIcon className="h-3.5 w-3.5 shrink-0" />
+                          YouTube Video - {post.content || "Video scheduled"}
                         </p>
                       ) : (
                         <pre className={`whitespace-pre-wrap text-xs leading-relaxed line-clamp-2 ${
@@ -1177,10 +1180,11 @@ export default function DashboardSchedulePage() {
                     ? "bg-yellow-950/30 border-yellow-800"
                     : "bg-yellow-50 border-yellow-200"
                 }`}>
-                  <p className={`text-sm ${
+                  <p className={`flex items-start gap-2 text-sm ${
                     isDark ? "text-yellow-300" : "text-yellow-800"
                   }`}>
-                    ⚠️ YouTube account not connected. Please connect your YouTube account in Settings first.
+                    <AlertTriangleIcon className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>YouTube account not connected. Please connect your YouTube account in Settings first.</span>
                   </p>
                 </div>
               )}

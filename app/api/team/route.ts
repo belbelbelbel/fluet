@@ -64,7 +64,7 @@ export async function GET(req: Request) {
       /* ignore */
     }
 
-    let assignmentsByUser = new Map<
+    const assignmentsByUser = new Map<
       number,
       { clientId: number; clientName: string }[]
     >();

@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     const webhookSecret = process.env.KORA_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
-      console.error("❌ KORA_WEBHOOK_SECRET is not configured");
+      console.error("KORA_WEBHOOK_SECRET is not configured");
       return NextResponse.json(
         { error: "Webhook secret not configured" },
         { status: 500 }
@@ -63,15 +63,15 @@ export async function POST(req: Request) {
     if (headerSignature) {
       const isValid = verifyKoraSignature(body, headerSignature, webhookSecret);
       if (!isValid) {
-        console.error("❌ Invalid Kora webhook signature");
+        console.error("Invalid Kora webhook signature");
         return NextResponse.json(
           { error: "Invalid signature" },
           { status: 401 }
         );
       }
-      console.log("✅ Kora webhook signature verified");
+      console.log("Kora webhook signature verified");
     } else {
-      console.warn("⚠️ No signature header found - proceeding without verification (not recommended for production)");
+      console.warn("No signature header found - proceeding without verification (not recommended for production)");
     }
 
     const event = JSON.parse(body);
@@ -94,22 +94,22 @@ export async function POST(req: Request) {
       case "failed":
       case "failure":
         // Payment failed
-        console.error("❌ Kora payment failed:", event.data || event);
+        console.error("Kora payment failed:", event.data || event);
         await handleFailedPayment(event.data || event);
         break;
 
       case "charge.pending":
       case "pending":
-        console.log("ℹ️ Kora payment pending:", event.data || event);
+        console.log("Kora payment pending:", event.data || event);
         break;
 
       default:
-        console.log(`ℹ️ Unhandled Kora webhook event: ${eventType}`, event);
+        console.log(`Unhandled Kora webhook event: ${eventType}`, event);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("❌ Error processing Kora webhook:", error);
+    console.error("Error processing Kora webhook:", error);
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 }
@@ -150,7 +150,7 @@ async function handleSuccessfulPayment(eventData: KoraWebhookData) {
                      `kora_${Date.now()}`;
 
     if (!userId) {
-      console.error("❌ Missing userId in Kora webhook:", eventData);
+      console.error("Missing userId in Kora webhook:", eventData);
       return;
     }
 
@@ -159,7 +159,7 @@ async function handleSuccessfulPayment(eventData: KoraWebhookData) {
     // Get or create user
     const user = await GetUserByClerkId(userId);
     if (!user) {
-      console.error(`❌ User not found for Clerk ID: ${userId}`);
+      console.error(`User not found for Clerk ID: ${userId}`);
       return;
     }
 
@@ -195,7 +195,7 @@ async function handleSuccessfulPayment(eventData: KoraWebhookData) {
         .where(eq(Subscription.userid, user.id))
         .execute();
       
-      console.log(`✅ Updated Kora subscription for user ${user.id}: ${planName}`);
+      console.log(`Updated Kora subscription for user ${user.id}: ${planName}`);
     } else {
       // Create new subscription
       await db.insert(Subscription).values({
@@ -207,10 +207,10 @@ async function handleSuccessfulPayment(eventData: KoraWebhookData) {
         canceldate: false,
       });
       
-      console.log(`✅ Created new Kora subscription for user ${user.id}: ${planName}`);
+      console.log(`Created new Kora subscription for user ${user.id}: ${planName}`);
     }
   } catch (error) {
-    console.error("❌ Error handling successful Kora payment:", error);
+    console.error("Error handling successful Kora payment:", error);
     throw error;
   }
 }
@@ -221,12 +221,12 @@ async function handleFailedPayment(eventData: KoraWebhookData) {
     const userId = eventData.metadata?.userId || eventData.customer?.userId;
     const reference = eventData.reference || eventData.id;
     
-    console.warn(`⚠️ Kora payment failed for user: ${userId}, reference: ${reference}`);
+    console.warn(`Kora payment failed for user: ${userId}, reference: ${reference}`);
     
     // Optionally: Notify user, mark subscription as past due, etc.
     // For now, we just log it
   } catch (error) {
-    console.error("❌ Error handling failed Kora payment:", error);
+    console.error("Error handling failed Kora payment:", error);
   }
 }
 

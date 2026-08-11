@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
     // Log authentication status for debugging
     if (!clerkUserId) {
-      console.warn("⚠️ No userId found - auth failed, trying fallbacks");
+      console.warn("No userId found - auth failed, trying fallbacks");
     }
 
     if (!prompt || !prompt.trim()) {
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
     // At this point, clerkUserId should be defined, but TypeScript doesn't know that
     if (!clerkUserId) {
-      console.error("❌ Authentication failed - no userId available");
+      console.error("Authentication failed - no userId available");
       return NextResponse.json(
         { 
           error: "Authentication required",
@@ -133,13 +133,13 @@ export async function POST(req: Request) {
           if (!user || !user.id) {
             throw new Error("CreateOrUpdateUser returned null or user without id");
           }
-          console.log(`[Generate API] ✅ User created/updated successfully: ${user.id}`);
+          console.log(`[Generate API] User created/updated successfully: ${user.id}`);
         } catch (createError) {
-          console.error("[Generate API] ❌ Error creating user:", createError);
+          console.error("[Generate API] Error creating user:", createError);
           throw new Error(`Failed to create user: ${createError instanceof Error ? createError.message : String(createError)}`);
         }
       } else {
-        console.log(`[Generate API] ✅ User found: ${user.id}`);
+        console.log(`[Generate API] User found: ${user.id}`);
       }
       
       // Check usage limits using professional limits manager
@@ -154,7 +154,7 @@ export async function POST(req: Request) {
         monthlyLimit = 10;
       }
     } catch (error) {
-      console.error("[Generate API] ❌ Error getting/creating user:", error);
+      console.error("[Generate API] Error getting/creating user:", error);
       console.error("[Generate API] Error details:", error instanceof Error ? error.stack : String(error));
       return NextResponse.json(
         { 
@@ -168,7 +168,7 @@ export async function POST(req: Request) {
     
     // Ensure we have a valid user before proceeding
     if (!user || !user.id) {
-      console.error("❌ No valid user after creation attempt");
+      console.error("No valid user after creation attempt");
       return NextResponse.json(
         { error: "Failed to create user account" },
         { status: 500 }
@@ -201,7 +201,7 @@ export async function POST(req: Request) {
         ? `You've used all ${monthlyLimit} free posts this month. Upgrade to a paid plan to continue generating content.`
         : `You've used all ${monthlyLimit} posts for your ${usageStatus.planName} plan this month. Upgrade your plan or wait ${usageStatus.daysUntilReset} days for your quota to reset.`;
       
-      console.warn(`[Generate API] ⚠️ Limit exceeded for user ${user.id}: ${usageCount}/${monthlyLimit} (${usageStatus.planName} plan)`);
+      console.warn(`[Generate API] Limit exceeded for user ${user.id}: ${usageCount}/${monthlyLimit} (${usageStatus.planName} plan)`);
       
       return NextResponse.json(
         { 
@@ -223,7 +223,7 @@ export async function POST(req: Request) {
     
     // Log warning if near limit
     if (usageStatus.isNearLimit) {
-      console.log(`[Generate API] ⚠️ User ${user.id} is near limit: ${usageCount}/${monthlyLimit} (${usageStatus.remaining} remaining, ${usageStatus.percentageUsed.toFixed(1)}% used)`);
+      console.log(`[Generate API] User ${user.id} is near limit: ${usageCount}/${monthlyLimit} (${usageStatus.remaining} remaining, ${usageStatus.percentageUsed.toFixed(1)}% used)`);
     }
 
     // ============================================
@@ -289,7 +289,7 @@ export async function POST(req: Request) {
     const generatedContent = generationResult.content;
     
     // Log generation metrics
-    console.log(`[Generate API] ✅ Content generated | Model: ${generationResult.model} | Tokens: ${generationResult.tokensUsed} | Cost: $${generationResult.cost.toFixed(4)}`);
+    console.log(`[Generate API] Content generated | Model: ${generationResult.model} | Tokens: ${generationResult.tokensUsed} | Cost: $${generationResult.cost.toFixed(4)}`);
 
     // Verify user exists in database before saving
     try {
@@ -298,9 +298,9 @@ export async function POST(req: Request) {
         console.error(`User ID mismatch: Expected ${user.id}, Got ${verifyUser?.id}`);
         throw new Error("User verification failed - user ID mismatch");
       }
-      console.log(`✅ Verified user exists: ${user.id}`);
+      console.log(`Verified user exists: ${user.id}`);
     } catch (verifyError) {
-      console.error("❌ User verification failed:", verifyError);
+      console.error("User verification failed:", verifyError);
       return NextResponse.json(
         { 
           error: "User verification failed",
@@ -335,12 +335,12 @@ export async function POST(req: Request) {
       }
       
       savedContentId = savedContent.id;
-      console.log("✅ Content saved to database with ID:", savedContentId);
+      console.log("Content saved to database with ID:", savedContentId);
 
       // Cost alert: log if agency AI spend exceeds threshold (operational visibility)
       checkCostAlert(user.id).catch(() => {});
     } catch (saveError) {
-      console.error("❌ Error saving content to database:", saveError);
+      console.error("Error saving content to database:", saveError);
       // Log detailed error for debugging
       if (saveError instanceof Error) {
         console.error("Save error message:", saveError.message);

@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   const signature = (await headers()).get("stripe-signature");
 
   if (!signature) {
-    console.error("❌ Stripe webhook: No signature provided");
+    console.error("Stripe webhook: No signature provided");
     return NextResponse.json(
       { error: "No signature" },
       { status: 400 }
@@ -39,9 +39,9 @@ export async function POST(req: Request) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-    console.log(`✅ Stripe webhook verified: ${event.type}`);
+    console.log(`Stripe webhook verified: ${event.type}`);
   } catch (err) {
-    console.error("❌ Stripe webhook signature verification failed:", err);
+    console.error("Stripe webhook signature verification failed:", err);
     return NextResponse.json(
       { error: "Invalid signature" },
       { status: 400 }
@@ -76,12 +76,12 @@ export async function POST(req: Request) {
         break;
       }
       default:
-        console.log(`ℹ️ Unhandled Stripe webhook event: ${event.type}`);
+        console.log(`Unhandled Stripe webhook event: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("❌ Error processing Stripe webhook:", error);
+    console.error("Error processing Stripe webhook:", error);
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 }
@@ -98,7 +98,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const clerkUserId = session.metadata?.userId || session.client_reference_id;
     
     if (!clerkUserId) {
-      console.error("❌ No userId found in checkout session metadata");
+      console.error("No userId found in checkout session metadata");
       // Try to get from customer email as fallback
       const customerEmail = session.customer_details?.email;
       if (customerEmail) {
@@ -157,7 +157,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     const user = await GetUserByClerkId(clerkUserId);
     if (!user) {
-      console.error(`❌ User not found for Clerk ID: ${clerkUserId}`);
+      console.error(`User not found for Clerk ID: ${clerkUserId}`);
       throw new Error(`User not found: ${clerkUserId}`);
     }
 
@@ -190,7 +190,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         .where(eq(DbSubscription.userid, user.id))
         .execute();
       
-      console.log(`✅ Updated subscription for user ${user.id}: ${planName} (${startDate.toISOString()} - ${endDate.toISOString()})`);
+      console.log(`Updated subscription for user ${user.id}: ${planName} (${startDate.toISOString()} - ${endDate.toISOString()})`);
     } else {
       // Create new subscription
       await db.insert(DbSubscription).values({
@@ -202,13 +202,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         canceldate: false,
       });
       
-      console.log(`✅ Created new subscription for user ${user.id}: ${planName} (${startDate.toISOString()} - ${endDate.toISOString()})`);
+      console.log(`Created new subscription for user ${user.id}: ${planName} (${startDate.toISOString()} - ${endDate.toISOString()})`);
     }
 
     // Return success for idempotency tracking
     return { success: true, userId: user.id, plan: planName };
   } catch (error) {
-    console.error("❌ Error handling checkout completed:", error);
+    console.error("Error handling checkout completed:", error);
     // Don't throw - log and return to prevent webhook retry loops
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -235,13 +235,13 @@ async function handleSubscriptionUpdated(subscriptionParam: Stripe.Subscription)
     }
 
     if (!clerkUserId) {
-      console.error("❌ Could not find userId for subscription update");
+      console.error("Could not find userId for subscription update");
       return;
     }
 
     const user = await GetUserByClerkId(clerkUserId);
     if (!user) {
-      console.error(`❌ User not found for Clerk ID: ${clerkUserId}`);
+      console.error(`User not found for Clerk ID: ${clerkUserId}`);
       return;
     }
 
@@ -264,9 +264,9 @@ async function handleSubscriptionUpdated(subscriptionParam: Stripe.Subscription)
       .where(eq(DbSubscription.userid, user.id))
       .execute();
 
-    console.log(`✅ Updated subscription for user ${user.id}: ${planName} (status: ${subscription.status})`);
+    console.log(`Updated subscription for user ${user.id}: ${planName} (status: ${subscription.status})`);
   } catch (error) {
-    console.error("❌ Error handling subscription updated:", error);
+    console.error("Error handling subscription updated:", error);
     throw error;
   }
 }
@@ -284,13 +284,13 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     }
 
     if (!clerkUserId) {
-      console.error("❌ Could not find userId for subscription deletion");
+      console.error("Could not find userId for subscription deletion");
       return;
     }
 
     const user = await GetUserByClerkId(clerkUserId);
     if (!user) {
-      console.error(`❌ User not found for Clerk ID: ${clerkUserId}`);
+      console.error(`User not found for Clerk ID: ${clerkUserId}`);
       return;
     }
 
@@ -303,9 +303,9 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       .where(eq(DbSubscription.userid, user.id))
       .execute();
 
-    console.log(`✅ Cancelled subscription for user ${user.id}`);
+    console.log(`Cancelled subscription for user ${user.id}`);
   } catch (error) {
-    console.error("❌ Error handling subscription deleted:", error);
+    console.error("Error handling subscription deleted:", error);
     throw error;
   }
 }
@@ -313,10 +313,10 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   // Optionally handle successful invoice payments
   // This can be used to extend subscription periods or handle renewals
-  console.log(`✅ Invoice payment succeeded: ${invoice.id}`);
+  console.log(`Invoice payment succeeded: ${invoice.id}`);
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   // Handle failed payments - you might want to notify the user or mark subscription as past due
-  console.warn(`⚠️ Invoice payment failed: ${invoice.id}`);
+  console.warn(`Invoice payment failed: ${invoice.id}`);
 }

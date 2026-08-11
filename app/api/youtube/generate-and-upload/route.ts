@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     try {
       body = await req.json();
     } catch (jsonError) {
-      console.error("[Generate & Upload] ❌ Error parsing request body:", jsonError);
+      console.error("[Generate & Upload] Error parsing request body:", jsonError);
       return NextResponse.json(
         { error: "Invalid request body", details: "Failed to parse JSON" },
         { status: 400 }
@@ -127,7 +127,7 @@ export async function POST(req: Request) {
     try {
       youtubeTokens = await getYouTubeTokens(clerkUserId);
     } catch (tokenError) {
-      console.error("[Generate & Upload] ❌ Error getting YouTube tokens:", tokenError);
+      console.error("[Generate & Upload] Error getting YouTube tokens:", tokenError);
       return NextResponse.json(
         { 
           error: "Failed to retrieve YouTube account information",
@@ -144,9 +144,9 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log(`[Generate & Upload] 🎬 Starting video generation and upload`);
+    console.log(`[Generate & Upload] Starting video generation and upload`);
     console.log(`[Generate & Upload] Content: ${contentType} | Duration: ${durationMinutes}min | Quality: ${quality}`);
-    console.log(`[Generate & Upload] ⏱️  Time limit: 5 minutes (Vercel Hobby plan)`);
+    console.log(`[Generate & Upload] Time limit: 5 minutes (Vercel Hobby plan)`);
 
     // Generate job ID for progress tracking
     jobId = `video-${clerkUserId}-${Date.now()}`;
@@ -194,7 +194,7 @@ export async function POST(req: Request) {
         });
       }
     } catch (videoGenError) {
-      console.error("[Generate & Upload] ❌ Video generation error:", videoGenError);
+      console.error("[Generate & Upload] Video generation error:", videoGenError);
       errorProgress(jobId, videoGenError instanceof Error ? videoGenError.message : "Video generation failed");
       return NextResponse.json(
         { 
@@ -213,7 +213,7 @@ export async function POST(req: Request) {
     }
 
     const generationTime = checkTimeout();
-    console.log(`[Generate & Upload] ✅ Video generated: ${path.basename(outputPath)} (took ${Math.round(generationTime / 1000)}s)`);
+    console.log(`[Generate & Upload] Video generated: ${path.basename(outputPath)} (took ${Math.round(generationTime / 1000)}s)`);
 
     // Step 2: Prepare metadata
     const categoryId = getCategoryId(category);
@@ -229,7 +229,7 @@ export async function POST(req: Request) {
     ];
 
     // Step 3: Upload to YouTube
-    console.log(`[Generate & Upload] 📤 Uploading to YouTube...`);
+    console.log(`[Generate & Upload] Uploading to YouTube...`);
     
     // Update progress to uploading
     updateProgress(jobId, videoResult.duration || durationMinutes * 60, "uploading", "Uploading video to YouTube...");
@@ -250,7 +250,7 @@ export async function POST(req: Request) {
       
       // Validate the date is valid
       if (isNaN(scheduledDate.getTime())) {
-        console.error(`[Generate & Upload] ❌ Invalid scheduled date: ${scheduledPublishTime}`);
+        console.error(`[Generate & Upload] Invalid scheduled date: ${scheduledPublishTime}`);
         validScheduledPublishTime = undefined; // Don't send invalid date
       } else {
         // Use 40 minutes buffer to account for all delays and timezone issues
@@ -263,7 +263,7 @@ export async function POST(req: Request) {
         
         const minutesUntilScheduled = Math.round((scheduledDate.getTime() - now.getTime()) / 60000);
         
-        console.log(`[Generate & Upload] 🔍 Validation check (UTC times):`);
+        console.log(`[Generate & Upload] Validation check (UTC times):`);
         console.log(`[Generate & Upload]   - Original scheduled time (UTC): ${scheduledPublishTime}`);
         console.log(`[Generate & Upload]   - Current server time (UTC): ${now.toISOString()}`);
         console.log(`[Generate & Upload]   - Minutes until scheduled: ${minutesUntilScheduled}`);
@@ -273,13 +273,13 @@ export async function POST(req: Request) {
         if (minutesUntilScheduled < SAFETY_BUFFER_MINUTES) {
           validScheduledPublishTime = minScheduledTime.toISOString();
           const newMinutesAway = Math.round((minScheduledTime.getTime() - now.getTime()) / 60000);
-          console.log(`[Generate & Upload] ⚠️  ADJUSTED: ${scheduledPublishTime} (${minutesUntilScheduled} min) → ${validScheduledPublishTime} (${newMinutesAway} min)`);
+          console.log(`[Generate & Upload]  ADJUSTED: ${scheduledPublishTime} (${minutesUntilScheduled} min) → ${validScheduledPublishTime} (${newMinutesAway} min)`);
         } else {
-          console.log(`[Generate & Upload] ✅ VALID: ${scheduledPublishTime} (${minutesUntilScheduled} minutes away)`);
+          console.log(`[Generate & Upload] VALID: ${scheduledPublishTime} (${minutesUntilScheduled} minutes away)`);
         }
       }
     } else {
-      console.log(`[Generate & Upload] ℹ️  No scheduled time provided - video will be published immediately`);
+      console.log(`[Generate & Upload] No scheduled time provided - video will be published immediately`);
     }
     
     // Refresh tokens right before upload to ensure they're valid
@@ -288,7 +288,7 @@ export async function POST(req: Request) {
     try {
       freshTokens = await getYouTubeTokens(clerkUserId);
     } catch (tokenError) {
-      console.error("[Generate & Upload] ❌ Error refreshing YouTube tokens:", tokenError);
+      console.error("[Generate & Upload] Error refreshing YouTube tokens:", tokenError);
       errorProgress(jobId, "Failed to refresh YouTube tokens");
       return NextResponse.json(
         { 
@@ -319,7 +319,7 @@ export async function POST(req: Request) {
       const ABSOLUTE_MINIMUM = 15; // YouTube's hard requirement
       const SAFE_MINIMUM = 40; // Our safety buffer
       
-      console.log(`[Generate & Upload] 🔍 PRE-UPLOAD CHECK (after video generation):`);
+      console.log(`[Generate & Upload] PRE-UPLOAD CHECK (after video generation):`);
       console.log(`[Generate & Upload]   - Time to send to YouTube (UTC): ${validScheduledPublishTime}`);
       console.log(`[Generate & Upload]   - Current server time (UTC): ${finalNow.toISOString()}`);
       console.log(`[Generate & Upload]   - Minutes away: ${finalMinutesAway}`);
@@ -329,14 +329,14 @@ export async function POST(req: Request) {
         const emergencyTime = new Date(finalNow.getTime() + SAFE_MINIMUM * 60 * 1000);
         validScheduledPublishTime = emergencyTime.toISOString();
         const newMinutesAway = Math.round((emergencyTime.getTime() - finalNow.getTime()) / 60000);
-        console.log(`[Generate & Upload] 🚨 EMERGENCY ADJUST: Time was only ${finalMinutesAway} min away! Adjusted to ${validScheduledPublishTime} (${newMinutesAway} min away)`);
+        console.log(`[Generate & Upload] EMERGENCY ADJUST: Time was only ${finalMinutesAway} min away! Adjusted to ${validScheduledPublishTime} (${newMinutesAway} min away)`);
       } else if (finalMinutesAway < ABSOLUTE_MINIMUM) {
         // This should never happen, but if it does, we MUST adjust
         const emergencyTime = new Date(finalNow.getTime() + ABSOLUTE_MINIMUM * 60 * 1000);
         validScheduledPublishTime = emergencyTime.toISOString();
-        console.log(`[Generate & Upload] 🚨 CRITICAL: Time was below YouTube's 15-min minimum! Adjusted to ${validScheduledPublishTime}`);
+        console.log(`[Generate & Upload] CRITICAL: Time was below YouTube's 15-min minimum! Adjusted to ${validScheduledPublishTime}`);
       } else {
-        console.log(`[Generate & Upload] ✅ FINAL VALIDATION PASSED: ${finalMinutesAway} minutes away (safe)`);
+        console.log(`[Generate & Upload] FINAL VALIDATION PASSED: ${finalMinutesAway} minutes away (safe)`);
       }
     }
     
@@ -344,7 +344,7 @@ export async function POST(req: Request) {
     const timeBeforeUpload = checkTimeout();
     const remainingSeconds = Math.round((MAX_EXECUTION_TIME - timeBeforeUpload) / 1000);
     if (remainingSeconds < 20) {
-      console.warn(`[Generate & Upload] ⚠️  Only ${remainingSeconds}s remaining - upload may timeout`);
+      console.warn(`[Generate & Upload]  Only ${remainingSeconds}s remaining - upload may timeout`);
     }
     
     let uploadResult;
@@ -370,9 +370,9 @@ export async function POST(req: Request) {
       throw uploadError; // Re-throw to be caught by outer try-catch
     }
 
-    console.log(`[Generate & Upload] ✅ Video uploaded successfully!`);
-    console.log(`[Generate & Upload] 🎬 Video ID: ${uploadResult.videoId}`);
-    console.log(`[Generate & Upload] 🔗 URL: ${uploadResult.videoUrl}`);
+    console.log(`[Generate & Upload] Video uploaded successfully!`);
+    console.log(`[Generate & Upload] Video ID: ${uploadResult.videoId}`);
+    console.log(`[Generate & Upload] URL: ${uploadResult.videoUrl}`);
 
     // Mark progress as completed
     completeProgress(jobId, "Video uploaded successfully!");
@@ -380,9 +380,9 @@ export async function POST(req: Request) {
     // Step 4: Cleanup - Delete temporary video file
     try {
       await fs.unlink(outputPath);
-      console.log(`[Generate & Upload] 🗑️  Cleaned up temporary file`);
+      console.log(`[Generate & Upload]  Cleaned up temporary file`);
     } catch (cleanupError) {
-      console.warn(`[Generate & Upload] ⚠️  Failed to cleanup temporary file: ${cleanupError}`);
+      console.warn(`[Generate & Upload]  Failed to cleanup temporary file: ${cleanupError}`);
       // Don't fail the request if cleanup fails
     }
 
@@ -403,7 +403,7 @@ export async function POST(req: Request) {
         : "Video generated and uploaded successfully!",
     });
   } catch (error) {
-    console.error("[Generate & Upload] ❌ Error:", error);
+    console.error("[Generate & Upload] Error:", error);
 
     // Mark progress as error if we have a jobId
     if (jobId) {
@@ -414,9 +414,9 @@ export async function POST(req: Request) {
     if (generatedVideoPath) {
       try {
         await fs.unlink(generatedVideoPath);
-        console.log(`[Generate & Upload] 🗑️  Cleaned up temporary file after error`);
+        console.log(`[Generate & Upload]  Cleaned up temporary file after error`);
       } catch (cleanupError) {
-        console.warn(`[Generate & Upload] ⚠️  Failed to cleanup after error: ${cleanupError}`);
+        console.warn(`[Generate & Upload]  Failed to cleanup after error: ${cleanupError}`);
       }
     }
 

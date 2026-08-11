@@ -28,7 +28,7 @@ export function ClosingCTA() {
 
           <div className="relative">
             <h2 className="font-display mx-auto max-w-2xl text-[clamp(2.2rem,5vw,3.5rem)] text-white">
-              Your next post shouldn't need
+              Your next post shouldn&apos;t need
               <br className="hidden sm:block" /> a{" "}
               <span className="italic">follow-up message</span>.
             </h2>

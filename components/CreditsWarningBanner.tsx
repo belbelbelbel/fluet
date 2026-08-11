@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp, X } from "lucide-react";
+import { TrendingUp, X, AlertOctagon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -42,10 +42,10 @@ export function CreditsWarningBanner({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-1">
-              <TrendingUp className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400" />
+              <AlertOctagon className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                  🚫 Credits exceeded for {clientName} ({postsUsed}/{postsPerMonth} used)
+                  Credits exceeded for {clientName} ({postsUsed}/{postsPerMonth} used)
                 </p>
                 <p className="text-xs text-red-700 dark:text-red-300 mt-0.5">
                   Upgrade your plan to continue generating content
@@ -83,7 +83,7 @@ export function CreditsWarningBanner({
             <TrendingUp className="w-5 h-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                📊 Credits at {Math.round(percentageUsed)}% for {clientName} ({postsUsed}/{postsPerMonth} used)
+                Credits at {Math.round(percentageUsed)}% for {clientName} ({postsUsed}/{postsPerMonth} used)
               </p>
             </div>
           </div>

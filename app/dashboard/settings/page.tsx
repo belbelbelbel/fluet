@@ -11,13 +11,14 @@ import {
   Bot,
   Brain,
   Check,
+  CheckCircle2,
+  Circle,
   Save,
   Loader2,
   ChevronDown,
   PlayIcon,
   LinkIcon,
   Cpu,
-  Code,
   Calendar,
   CreditCard,
 } from "lucide-react";
@@ -41,43 +42,36 @@ const niches = [
     id: "home_food_vendor" as Niche,
     name: "Home Food Vendor",
     icon: UtensilsCrossed,
-    emoji: "🍲"
   },
   {
     id: "street_food_seller" as Niche,
     name: "Street Food Seller",
     icon: ShoppingBag,
-    emoji: "🍔"
   },
   {
     id: "baker_cake_vendor" as Niche,
     name: "Baker / Cake Vendor",
     icon: Cake,
-    emoji: "🎂"
   },
   {
     id: "fashion_seller" as Niche,
     name: "Fashion Seller",
     icon: Shirt,
-    emoji: "👗"
   },
   {
     id: "beauty_hair_vendor" as Niche,
     name: "Beauty / Hair Vendor",
     icon: Scissors,
-    emoji: "💇🏽"
   },
   {
     id: "business_coach" as Niche,
     name: "Business / Coach",
     icon: Briefcase,
-    emoji: "💼"
   },
   {
     id: "online_vendor" as Niche,
     name: "Online Vendor (IG Shop)",
     icon: Store,
-    emoji: "📱"
   },
 ];
 
@@ -252,8 +246,10 @@ export default function SettingsPage() {
       if (response.ok) {
         const data = await response.json();
         setSettings({ ...data, theme: currentTheme });
-        // Apply theme if it's different
-        if (data.theme && data.theme !== currentTheme) {
+        // Only adopt the server's theme when it was actually saved. A missing
+        // row — or a failed query — returns the default with persisted:false,
+        // and applying that would silently overwrite the local choice.
+        if (data.persisted && data.theme && data.theme !== currentTheme) {
           setCurrentTheme(data.theme);
         }
       } else if (response.status === 401) {
@@ -817,7 +813,14 @@ export default function SettingsPage() {
                                 : "text-amber-800"
                           }
                         >
-                          {c.ok ? "✓" : "○"} {c.label}
+                          <span className="flex items-center gap-2">
+                            {c.ok ? (
+                              <Check className="h-3.5 w-3.5 shrink-0" />
+                            ) : (
+                              <Circle className="h-3.5 w-3.5 shrink-0" />
+                            )}
+                            {c.label}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -879,12 +882,17 @@ export default function SettingsPage() {
                   }`}>
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm break-words ${
+                        <p className={`flex items-center gap-2 text-sm break-words ${
                           isDark ? "text-gray-300" : "text-gray-600"
                         }`}>
-                          {settings.youtubeConnected 
-                            ? "✅ Connected - Ready for automated uploads"
-                            : "Not connected - Click to connect your YouTube account"}
+                          {settings.youtubeConnected ? (
+                            <>
+                              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                              Connected - Ready for automated uploads
+                            </>
+                          ) : (
+                            "Not connected - Click to connect your YouTube account"
+                          )}
                         </p>
                       </div>
                     </div>
@@ -966,10 +974,15 @@ export default function SettingsPage() {
                 <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
                   isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
                 }`}>
-                  <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-                    {settings.twitterConnected
-                      ? "✅ Connected — scheduled tweets can auto-publish"
-                      : "Not connected — connect to enable auto-posting"}
+                  <p className={`flex items-center gap-2 text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                    {settings.twitterConnected ? (
+                      <>
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                        Connected — scheduled tweets can auto-publish
+                      </>
+                    ) : (
+                      "Not connected — connect to enable auto-posting"
+                    )}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     {settings.twitterConnected ? (
@@ -1035,10 +1048,15 @@ export default function SettingsPage() {
                 <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
                   isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
                 }`}>
-                  <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-                    {settings.instagramConnected
-                      ? "✅ Connected — image posts can auto-publish"
-                      : "Not connected — connect a Business/Creator account"}
+                  <p className={`flex items-center gap-2 text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                    {settings.instagramConnected ? (
+                      <>
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                        Connected — image posts can auto-publish
+                      </>
+                    ) : (
+                      "Not connected — connect a Business/Creator account"
+                    )}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     {settings.instagramConnected ? (
@@ -1106,10 +1124,15 @@ export default function SettingsPage() {
                 <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
                   isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
                 }`}>
-                  <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-                    {settings.googleCalendarConnected
-                      ? "✅ Connected — due posts can create calendar events"
-                      : "Not connected — optional reminders for manual platforms"}
+                  <p className={`flex items-center gap-2 text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                    {settings.googleCalendarConnected ? (
+                      <>
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                        Connected — due posts can create calendar events
+                      </>
+                    ) : (
+                      "Not connected — optional reminders for manual platforms"
+                    )}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     {settings.googleCalendarConnected ? (

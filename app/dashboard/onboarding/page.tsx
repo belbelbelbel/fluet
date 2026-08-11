@@ -204,15 +204,15 @@ export default function OnboardingPage() {
                     className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"
                   >
                     <option value="">Select industry</option>
-                    <option value="food_beverage">🍲 Food & Beverage</option>
-                    <option value="fashion_beauty">💄 Fashion & Beauty</option>
-                    <option value="coaching_consulting">💼 Coaching & Consulting</option>
-                    <option value="retail_ecommerce">🛒 Retail & E-commerce</option>
-                    <option value="health_fitness">💪 Health & Fitness</option>
-                    <option value="real_estate">🏠 Real Estate</option>
-                    <option value="creative_services">🎨 Creative Services</option>
-                    <option value="tech_startups">🚀 Tech & Startups</option>
-                    <option value="other">✨ Other</option>
+                    <option value="food_beverage">Food & Beverage</option>
+                    <option value="fashion_beauty">Fashion & Beauty</option>
+                    <option value="coaching_consulting">Coaching & Consulting</option>
+                    <option value="retail_ecommerce">Retail & E-commerce</option>
+                    <option value="health_fitness">Health & Fitness</option>
+                    <option value="real_estate">Real Estate</option>
+                    <option value="creative_services">Creative Services</option>
+                    <option value="tech_startups">Tech & Startups</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
                 {(primaryIndustry === "other" || ["health_fitness", "real_estate", "creative_services", "tech_startups"].includes(primaryIndustry)) && (

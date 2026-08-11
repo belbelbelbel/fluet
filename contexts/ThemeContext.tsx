@@ -25,14 +25,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Apply theme changes (landing path never gets .dark on <html>)
   const applyTheme = (newTheme: Theme) => {
-    let resolved: "light" | "dark" = "light";
-
-    if (newTheme === "system") {
-      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      resolved = systemPrefersDark ? "dark" : "light";
-    } else {
-      resolved = newTheme;
-    }
+    // "system" deliberately resolves to light rather than following the OS.
+    // Only the settings page has real dark styling — the rest of the dashboard
+    // has almost no `dark:` variants — so honouring an OS dark preference made
+    // settings render dark while every other page stayed white. Dark is
+    // opt-in until the rest of the app is themed.
+    const resolved: "light" | "dark" = newTheme === "dark" ? "dark" : "light";
 
     setResolvedTheme(resolved);
 
@@ -86,15 +84,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     applyTheme(newTheme);
   };
 
-  // Listen for system theme changes
-  useEffect(() => {
-    if (theme === "system") {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      const handleChange = () => applyTheme("system");
-      mediaQuery.addEventListener("change", handleChange);
-      return () => mediaQuery.removeEventListener("change", handleChange);
-    }
-  }, [theme]);
+  // No OS-preference listener: "system" resolves to light (see applyTheme).
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>

@@ -24,7 +24,7 @@ export async function createCalendarEvent(
   summary: string;
 }> {
   const event = {
-    summary: `📱 ${post.platform.charAt(0).toUpperCase() + post.platform.slice(1)} Post: ${post.title.substring(0, 50)}`,
+    summary: `${post.platform.charAt(0).toUpperCase() + post.platform.slice(1)} Post: ${post.title.substring(0, 50)}`,
     description: `Platform: ${post.platform}\n\nContent:\n${post.content}\n\n---\n\nClick here to open in Fluet: ${post.appLink}\n\nThis is an automated reminder from Fluet.`,
     start: {
       dateTime: post.scheduledFor.toISOString(),

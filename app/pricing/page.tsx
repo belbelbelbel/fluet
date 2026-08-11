@@ -71,10 +71,10 @@ const pricingPlans = [
 //   { name: "AI-generated posts per month", basic: "100", pro: "500", enterprise: "Unlimited" },
 //   { name: "Social media platforms", basic: "2", pro: "4", enterprise: "All" },
 //   { name: "Content templates", basic: "Basic", pro: "Advanced", enterprise: "Custom" },
-//   { name: "We post for you automatically", basic: "❌", pro: "✅", enterprise: "✅" },
+//   { name: "We post for you automatically", basic: "No", pro: "Yes", enterprise: "Yes" },
 //   { name: "Analytics dashboard", basic: "Basic", pro: "Advanced", enterprise: "Enterprise" },
-//   { name: "Bulk generation", basic: "❌", pro: "✅", enterprise: "✅" },
-//   { name: "API access", basic: "❌", pro: "❌", enterprise: "✅" },
+//   { name: "Bulk generation", basic: "No", pro: "Yes", enterprise: "Yes" },
+//   { name: "API access", basic: "No", pro: "No", enterprise: "Yes" },
 //   { name: "Support", basic: "Email", pro: "Priority", enterprise: "Dedicated" },
 // ];
 

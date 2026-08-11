@@ -168,7 +168,7 @@ export async function POST(
       }
     }
 
-    console.log(`[Accept Invitation] ✅ User ${user.id} accepted invitation ${invitationId}`);
+    console.log(`[Accept Invitation] User ${user.id} accepted invitation ${invitationId}`);
 
     return NextResponse.json({
       success: true,

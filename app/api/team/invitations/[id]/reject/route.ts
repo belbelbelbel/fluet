@@ -96,7 +96,7 @@ export async function POST(
       .where(eq(TeamInvitations.id, invitationId))
       .execute();
 
-    console.log(`[Reject Invitation] ✅ User ${user.id} rejected invitation ${invitationId}`);
+    console.log(`[Reject Invitation] User ${user.id} rejected invitation ${invitationId}`);
 
     return NextResponse.json({
       success: true,

@@ -18,7 +18,7 @@ interface NavbarProps {
   forceLight?: boolean;
 }
 
-export function Navbar(_props: NavbarProps = {}) {
+export function Navbar({}: NavbarProps = {}) {
   const { userId } = useAuth();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);

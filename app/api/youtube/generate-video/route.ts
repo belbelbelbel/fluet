@@ -94,7 +94,7 @@ export async function POST(req: Request) {
     const filename = `${safeTitle}-${timestamp}.mp4`;
     const outputPath = path.join(outputDir, filename);
 
-    console.log(`[Video Generation API] 🎬 Starting professional video generation`);
+    console.log(`[Video Generation API] Starting professional video generation`);
     console.log(`[Video Generation API] Content: ${contentType} | Duration: ${durationMinutes}min | Quality: ${quality}`);
 
     // Generate video based on content type
@@ -145,7 +145,7 @@ export async function POST(req: Request) {
       message: "Professional video generated successfully!",
     });
   } catch (error) {
-    console.error("[Video Generation API] ❌ Error:", error);
+    console.error("[Video Generation API] Error:", error);
     return NextResponse.json(
       {
         error: "Video generation failed",

@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
             const authResult = await auth();
             clerkUserId = authResult?.userId || null;
             if (clerkUserId) {
-                console.log("[Clients API GET] ✅ Got userId from auth():", clerkUserId);
+                console.log("[Clients API GET] Got userId from auth():", clerkUserId);
             }
         } catch (authError) {
             console.warn("[Clients API GET] auth() failed:", authError);
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
                 const user = await currentUser();
                 clerkUserId = user?.id ?? null;
                 if (clerkUserId) {
-                    console.log("[Clients API GET] ✅ Got userId from currentUser():", clerkUserId);
+                    console.log("[Clients API GET] Got userId from currentUser():", clerkUserId);
                 }
             } catch (userError) {
                 console.warn("[Clients API GET] currentUser() failed:", userError);
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
             const queryUserId = searchParams.get("userId");
             if (queryUserId) {
                 clerkUserId = queryUserId;
-                console.log("[Clients API GET] ✅ Got userId from query params:", clerkUserId);
+                console.log("[Clients API GET] Got userId from query params:", clerkUserId);
             }
         }
         
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
         }
         
         if (!clerkUserId) {
-            console.warn("[Clients API GET] ❌ No userId from any auth method");
+            console.warn("[Clients API GET] No userId from any auth method");
             return NextResponse.json(
                 { 
                     error: "Unauthorized",
@@ -112,7 +112,7 @@ export async function GET(req: NextRequest) {
                         { status: 500 }
                     );
                 }
-                console.log(`[Clients API GET] ✅ User created successfully: ${user.id}`);
+                console.log(`[Clients API GET] User created successfully: ${user.id}`);
             } catch (createError) {
                 console.error("[Clients API GET] Error creating user:", createError);
                 return NextResponse.json(
@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
                 );
             }
         } else {
-            console.log(`[Clients API GET] ✅ User found: ${user.id}`);
+            console.log(`[Clients API GET] User found: ${user.id}`);
         }
 
         // Owners/admins/managers see all agency clients; others see assignments only
@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
             const authResult = await auth();
             clerkUserId = authResult?.userId || null;
             if (clerkUserId) {
-                console.log("[Clients API POST] ✅ Got userId from auth():", clerkUserId);
+                console.log("[Clients API POST] Got userId from auth():", clerkUserId);
             }
         } catch (authError) {
             console.warn("[Clients API POST] auth() failed:", authError);
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
                 const user = await currentUser();
                 clerkUserId = user?.id ?? null;
                 if (clerkUserId) {
-                    console.log("[Clients API POST] ✅ Got userId from currentUser():", clerkUserId);
+                    console.log("[Clients API POST] Got userId from currentUser():", clerkUserId);
                 }
             } catch (userError) {
                 console.warn("[Clients API POST] currentUser() failed:", userError);
@@ -219,7 +219,7 @@ export async function POST(req: NextRequest) {
             // If we don't have userId from auth, try to get it from body
             if (!clerkUserId && body.userId) {
                 clerkUserId = body.userId;
-                console.log("[Clients API POST] ✅ Got userId from request body:", clerkUserId);
+                console.log("[Clients API POST] Got userId from request body:", clerkUserId);
             }
         } catch (bodyError) {
             console.warn("[Clients API POST] Could not parse request body:", bodyError);
@@ -242,7 +242,7 @@ export async function POST(req: NextRequest) {
         }
         
         if (!clerkUserId) {
-            console.warn("[Clients API POST] ❌ No userId from any auth method");
+            console.warn("[Clients API POST] No userId from any auth method");
             return NextResponse.json(
                 { 
                     error: "Unauthorized",
@@ -288,7 +288,7 @@ export async function POST(req: NextRequest) {
                         }
                     );
                 }
-                console.log(`[Clients API POST] ✅ User created/updated successfully: ${user.id}`);
+                console.log(`[Clients API POST] User created/updated successfully: ${user.id}`);
             } catch (createError) {
                 console.error("[Clients API POST] Error creating user:", createError);
                 const errorMessage = createError instanceof Error ? createError.message : String(createError);
@@ -358,7 +358,7 @@ export async function POST(req: NextRequest) {
                 );
             }
 
-            console.log(`[Clients API POST] ✅ Client created successfully: ${client.id}`);
+            console.log(`[Clients API POST] Client created successfully: ${client.id}`);
 
             return NextResponse.json({
                 success: true,
