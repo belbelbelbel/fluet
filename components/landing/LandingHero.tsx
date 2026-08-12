@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { ArrowRightIcon } from "lucide-react";
 import { authPath } from "@/lib/auth-redirect";
-import { ApprovalMock } from "./ApprovalMock";
+import { ApprovalProof } from "./ApprovalProof";
 import { Reveal } from "./Reveal";
 
 export function LandingHero() {
@@ -94,7 +94,7 @@ export function LandingHero() {
           </Reveal>
         </div>
 
-        {/* ---- Photograph, with the approval trail beneath it ---- */}
+        {/* ---- Photograph ---- */}
         <Reveal delay={180}>
           <div className="relative">
             {/* Offset accent shape so the photo has something to sit against */}
@@ -116,12 +116,10 @@ export function LandingHero() {
 
           </div>
 
-          {/* The trail sits UNDER the photograph on the canvas, not over it.
-              As bare type it has no opaque ground, so overlaying it on the image
-              made it unreadable — and giving it one would just be the panel this
-              is deliberately not. */}
+          {/* One line of proof rather than a product diagram — see
+              ApprovalProof for why four mock attempts were abandoned. */}
           <div className="mt-9 sm:mt-11">
-            <ApprovalMock />
+            <ApprovalProof />
           </div>
         </Reveal>
       </div>
