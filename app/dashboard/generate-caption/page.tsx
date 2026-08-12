@@ -172,7 +172,7 @@ function GenerateCaptionPageInner() {
 
   if (!idea) {
     return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
+      <div className={`min-h-dvh flex items-center justify-center transition-colors duration-300 bg-background`}>
         <RefreshCw className={`w-8 h-8 animate-spin ${
           "text-blue-600 dark:text-purple-400"
         }`} />
@@ -181,7 +181,7 @@ function GenerateCaptionPageInner() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 bg-background`}>
+    <div className={`min-h-dvh transition-colors duration-300 bg-background`}>
       <div className="max-w-5xl mx-auto lg:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8 lg:mb-10">

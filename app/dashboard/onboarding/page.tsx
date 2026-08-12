@@ -89,7 +89,7 @@ export default function OnboardingPage() {
 
   if (hasClients === null) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-dvh bg-white flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     );
@@ -100,7 +100,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
+    <div className="min-h-dvh bg-white flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-lg">
         {step === "welcome" && (
           <Card className="border-2 shadow-lg">

@@ -31,12 +31,12 @@ function ClearSessionInner() {
     clearEverything()
   }, [signOut, signInHref])
 
-  return <div className="min-h-screen bg-background" aria-hidden />
+  return <div className="min-h-dvh bg-background" aria-hidden />
 }
 
 export default function ClearSessionPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background" aria-hidden />}>
+    <Suspense fallback={<div className="min-h-dvh bg-background" aria-hidden />}>
       <ClearSessionInner />
     </Suspense>
   )

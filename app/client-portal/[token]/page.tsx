@@ -206,7 +206,7 @@ export default function ClientApprovalPage() {
 
   if (loading) {
     return (
-      <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0b1220]">
+      <div className="relative min-h-dvh flex items-center justify-center overflow-hidden bg-[#0b1220]">
         <PortalAtmosphere />
         <div className="relative z-10 flex flex-col items-center gap-4">
           <Logo size="lg" variant="full" forceDark className="opacity-90" />
@@ -218,7 +218,7 @@ export default function ClientApprovalPage() {
 
   if (error || !approval || !post) {
     return (
-      <div className="relative min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden bg-[#0b1220]">
+      <div className="relative min-h-dvh flex flex-col items-center justify-center p-6 overflow-hidden bg-[#0b1220]">
         <PortalAtmosphere />
         <div
           className={cn(
@@ -251,7 +251,7 @@ export default function ClientApprovalPage() {
         : "warn";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b1220] text-white">
+    <div className="relative min-h-dvh overflow-hidden bg-[#0b1220] text-white">
       <PortalAtmosphere />
 
       <header className="relative z-20">

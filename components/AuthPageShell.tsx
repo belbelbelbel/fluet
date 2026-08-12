@@ -11,7 +11,7 @@ interface AuthPageShellProps {
 
 export function AuthPageShell({ children, title, subtitle }: AuthPageShellProps) {
   return (
-    <div className="min-h-screen bg-muted dark:bg-slate-900 flex flex-col">
+    <div className="min-h-dvh bg-muted dark:bg-slate-900 flex flex-col">
       <header className="border-b border-border dark:border-slate-600 bg-white dark:bg-slate-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center">
           <Link href="/" className="inline-flex items-center gap-2">

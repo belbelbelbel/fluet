@@ -134,7 +134,7 @@ export function DashboardSidebar({ onWidthChange }: DashboardSidebarProps) {
 
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card transition-transform duration-300 ease-in-out",
+          "fixed left-0 top-0 z-40 h-dvh w-64 border-r border-border bg-card transition-transform duration-300 ease-in-out",
           isMobile && !isMobileOpen && "-translate-x-full",
           isMobile && isMobileOpen && "translate-x-0"
         )}

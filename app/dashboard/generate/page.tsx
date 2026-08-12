@@ -555,7 +555,7 @@ function DashboardGeneratePageInner() {
     []
   );
 
-  const containerClassName = "min-h-screen transition-colors duration-300 bg-white dark:min-h-screen dark:transition-colors dark:duration-300 dark:bg-slate-900";
+  const containerClassName = "min-h-dvh transition-colors duration-300 bg-white dark:min-h-dvh dark:transition-colors dark:duration-300 dark:bg-slate-900";
 
   return (
     <div className={containerClassName}>

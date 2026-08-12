@@ -361,7 +361,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className={`min-h-screen max-w-8xl mx-auto transition-colors duration-300 flex flex-col bg-background`}>
+    <div className={`min-h-dvh max-w-8xl mx-auto transition-colors duration-300 flex flex-col bg-background`}>
       {/* Top Header */}
       <div className={`sticky top-0 z-10 border-b border-border dark:border-slate-600 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300 bg-background`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">

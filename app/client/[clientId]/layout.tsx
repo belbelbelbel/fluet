@@ -14,7 +14,7 @@ export default async function ClientDashboardLayout({
   await requireClientAccess(clientId);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b1220] text-white">
+    <div className="relative min-h-dvh overflow-hidden bg-[#0b1220] text-white">
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(45,212,191,0.12),_transparent_50%),radial-gradient(ellipse_at_bottom_left,_rgba(56,189,248,0.08),_transparent_45%),linear-gradient(180deg,#0b1220_0%,#111827_100%)]" />
         <div className="absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-teal-400/15 blur-3xl" />

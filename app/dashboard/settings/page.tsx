@@ -406,7 +406,7 @@ export default function SettingsPage() {
   const isDark = resolvedTheme ? (currentTheme === "dark" || (currentTheme === "system" && resolvedTheme === "dark")) : false;
 
   return (
-    <div className={`space-y-6 pt-6 max-w-4xl mx-auto px-4 transition-colors duration-300 bg-background min-h-screen`}>
+    <div className={`space-y-6 pt-6 max-w-4xl mx-auto px-4 transition-colors duration-300 bg-background min-h-dvh`}>
       {/* Header */}
       <div className="mb-6">
         <h1 className={`text-2xl font-semibold mb-1 text-foreground`}>Settings</h1>

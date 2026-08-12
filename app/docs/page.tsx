@@ -272,7 +272,7 @@ export default function DocsPage() {
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
+    <div className={`min-h-dvh transition-colors duration-300 ${
       "bg-white text-foreground dark:bg-gray-950 dark:text-gray-100"
     }`}>
       <Navbar />

@@ -17,7 +17,7 @@ import { LandingFooter } from "@/components/landing/LandingFooter";
  */
 export default function Home() {
   return (
-    <div className="landing min-h-screen antialiased">
+    <div className="landing min-h-dvh antialiased">
       {/* Reveal animations hide content until observed. Without JS there is no
           observer, so unhide everything rather than ship a blank page. */}
       <noscript>

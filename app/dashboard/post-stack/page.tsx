@@ -99,7 +99,7 @@ export default function PostStackPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
+      <div className={`min-h-dvh flex items-center justify-center transition-colors duration-300 bg-background`}>
         <div className="text-center">
           <Clock className={`w-8 h-8 animate-pulse mx-auto mb-4 ${
             "text-foreground dark:text-purple-400"
@@ -111,7 +111,7 @@ export default function PostStackPage() {
   }
 
   return (
-    <div className={`min-h-screen py-4 sm:py-6 lg:py-8 transition-colors duration-300 bg-background`}>
+    <div className={`min-h-dvh py-4 sm:py-6 lg:py-8 transition-colors duration-300 bg-background`}>
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8">

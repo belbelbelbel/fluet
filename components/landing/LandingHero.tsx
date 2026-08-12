@@ -110,7 +110,14 @@ export function LandingHero() {
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 46vw"
-                className="object-cover object-[20%_center]"
+                /* Desaturated on purpose. The photograph's out-of-focus right
+                   side is a strong caramel, which was the only warm element left
+                   once the palette went pure white — it read as a stock photo
+                   rather than as art direction. Monochrome ties it to the black
+                   type and leaves the forest accent as the page's single colour.
+                   grayscale(1) with a slight contrast lift keeps it from going
+                   flat. */
+                className="object-cover object-[20%_center] [filter:grayscale(1)_contrast(1.06)]"
               />
             </div>
 

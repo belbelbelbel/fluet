@@ -74,7 +74,9 @@ export function Features() {
           const Icon = feature.icon;
           return (
             <Reveal key={feature.title} delay={(i % 3) * 80}>
-              <div className="group h-full bg-[rgb(var(--canvas))] p-7 transition-colors duration-300 hover:bg-[rgb(var(--surface))] sm:p-8">
+              {/* hover shifts to --inset: with canvas and surface both pure
+                  white, the old hover:bg-surface was a no-op */}
+              <div className="group h-full bg-[rgb(var(--canvas))] p-7 transition-colors duration-300 hover:bg-[rgb(var(--inset))] sm:p-8">
                 <Icon
                   className="h-[18px] w-[18px] text-[rgb(var(--accent))]"
                   strokeWidth={1.75}

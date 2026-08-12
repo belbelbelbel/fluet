@@ -43,11 +43,11 @@ export default function DashboardLayout({
 
   // Keep dashboard shell visible; only gate page content while Clerk loads
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
+    <div className="min-h-dvh bg-background transition-colors duration-300">
       <RouteTransition />
       <DashboardSidebar onWidthChange={(width) => setSidebarWidth(width)} />
       <main
-        className="min-h-screen bg-background transition-all duration-200"
+        className="min-h-dvh bg-background transition-all duration-200"
         style={{ 
           marginLeft: isMobile ? '0' : `${sidebarWidth}px`,
         }}

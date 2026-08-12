@@ -94,7 +94,7 @@ function OAuthCallbackContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-dvh bg-white flex items-center justify-center p-4">
       <Card className="max-w-md w-full border border-border rounded-2xl">
         <CardContent className="p-8 text-center">
           {status === "loading" && (
@@ -146,7 +146,7 @@ function OAuthCallbackContent() {
 export default function OAuthCallbackPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="min-h-dvh bg-white flex items-center justify-center p-4">
         <Card className="max-w-md w-full border border-border rounded-2xl">
           <CardContent className="p-8 text-center">
             <Loader2 className="w-12 h-12 text-foreground animate-spin mx-auto mb-4" />

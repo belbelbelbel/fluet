@@ -13,7 +13,7 @@ import { LandingNav } from "@/components/landing/LandingNav";
  * last step of the marketing funnel, so it should read like the pricing page
  * that sent the visitor here rather than like the app they haven't bought yet.
  *
- * That means the warm canvas, Fraunces for the heading, and Geist Mono for every
+ * That means the white canvas, Fraunces for the heading, and Geist Mono for every
  * number — and the deep-forest accent instead of the dashboard's purple.
  *
  * The summary is deliberately shaped as a receipt (mono figures, tabular
@@ -239,7 +239,7 @@ function CheckoutContent() {
   // Same as dashboard: only wait for Clerk to load, never auto-redirect (prevents loop)
   if (!isLoaded) {
     return (
-      <div className="landing min-h-screen antialiased">
+      <div className="landing min-h-dvh antialiased">
         <LandingNav />
         <div className="flex min-h-[60vh] items-center justify-center">
           <div className="text-center">
@@ -256,7 +256,7 @@ function CheckoutContent() {
   if (!isSignedIn) {
     const signInUrl = `/sign-in?redirect_url=${encodeURIComponent(`/checkout?plan=${planId}&billing=${billingCycle}`)}`;
     return (
-      <div className="landing min-h-screen antialiased">
+      <div className="landing min-h-dvh antialiased">
         <LandingNav />
         <div className="flex min-h-[60vh] items-center justify-center px-5">
           <div className="max-w-sm text-center">
@@ -279,7 +279,7 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="landing min-h-screen antialiased">
+    <div className="landing min-h-dvh antialiased">
       <LandingNav />
       <main className="mx-auto max-w-5xl px-5 pb-24 pt-10 sm:px-6 sm:pt-14 lg:px-8">
         <div>
@@ -514,7 +514,7 @@ function CheckoutContent() {
                   {/* Kora Payment - Just button */}
                   {selectedProvider === "kora" && (
                     <form onSubmit={handleSubmit} className="space-y-4">
-                      <div className="rounded-lg border border-[rgb(var(--rule))] bg-[rgb(var(--canvas))] px-3.5 py-3">
+                      <div className="rounded-lg border border-[rgb(var(--rule))] bg-[rgb(var(--inset))] px-3.5 py-3">
                         <p className="text-[13px] leading-relaxed text-[rgb(var(--ink-soft))]">
                           You will be redirected to Kora to complete your payment securely.
                         </p>
@@ -559,7 +559,7 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="landing flex min-h-screen items-center justify-center antialiased">
+      <div className="landing flex min-h-dvh items-center justify-center antialiased">
         <div className="text-center">
           <div className="mx-auto mb-4 h-7 w-7 animate-spin rounded-full border-2 border-[rgb(var(--rule))] border-t-[rgb(var(--accent))]" />
           <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[rgb(var(--ink-faint))]">

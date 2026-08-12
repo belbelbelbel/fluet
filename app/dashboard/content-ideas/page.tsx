@@ -330,7 +330,7 @@ function ContentIdeasPageInner() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
+      <div className={`min-h-dvh flex items-center justify-center transition-colors duration-300 bg-background`}>
         <div className="text-center">
           <RefreshCw className={`w-8 h-8 animate-spin mx-auto mb-4 ${
             "text-blue-600 dark:text-purple-400"
@@ -345,7 +345,7 @@ function ContentIdeasPageInner() {
   if (!niche) {
     const customIndustries = ["other", "health_fitness", "real_estate", "creative_services", "tech_startups"];
     return (
-      <div className={`min-h-screen py-8 px-4 sm:px-6 transition-colors duration-300 bg-background`}>
+      <div className={`min-h-dvh py-8 px-4 sm:px-6 transition-colors duration-300 bg-background`}>
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <h1 className={`text-2xl font-bold mb-2 text-foreground`}>

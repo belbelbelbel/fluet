@@ -119,7 +119,7 @@ export default function NewTaskPage() {
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 bg-background`}>
+    <div className={`min-h-dvh transition-colors duration-300 bg-background`}>
       <div className="max-w-2xl mx-auto py-6 sm:py-8">
         <div className="flex items-center gap-3 sm:gap-4 mb-6">
           <Button

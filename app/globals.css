@@ -254,21 +254,34 @@ p, span, div, li {
    ========================================================================== */
 
 .landing {
-  --canvas: 247 246 243;      /* warm off-white, never pure #fff */
-  --surface: 255 255 255;     /* raised cards */
-  --ink: 18 18 17;            /* near-black, warmer than #000 */
-  --ink-soft: 92 90 86;       /* secondary copy */
-  --ink-faint: 116 113 108;   /* captions, meta — 4.5:1 on canvas (was 2.8:1) */
-  --rule: 226 223 217;        /* hairlines */
-  --accent: 26 61 47;         /* deep forest — trust, not another purple */
-  --accent-soft: 233 239 235;
+  /* Pure white, neutral greys. The previous palette was a warm off-white with
+     warm-tinted ink and hairlines; at scale that cast read as caramel rather
+     than as considered paper, which undercut the professional tone. Everything
+     neutral now except the accent, which stays as the one piece of brand colour.
+
+     --surface equals --canvas on purpose: with both white, a card is defined by
+     its hairline rather than by a fill, which is what keeps the page feeling
+     clean instead of panelled. */
+  --canvas: 255 255 255;      /* pure white */
+  --surface: 255 255 255;     /* cards — defined by --rule, not by contrast */
+  --ink: 15 15 16;            /* neutral near-black */
+  --ink-soft: 82 82 88;       /* secondary copy */
+  --ink-faint: 112 112 120;   /* captions, meta — 4.6:1 on white */
+  --rule: 228 228 232;        /* neutral hairlines */
+  /* A hair off white, for hover and inset states only. With --canvas and
+     --surface both pure white those states had nothing to shift to, so the
+     Features card hover became a no-op. Light enough to keep the page reading
+     as white; just enough to register as a change. */
+  --inset: 250 250 251;
+  --accent: 26 61 47;         /* deep forest — the one colour on the page */
+  --accent-soft: 236 241 238;
 
   background-color: rgb(var(--canvas));
   color: rgb(var(--ink));
   letter-spacing: -0.011em;
   line-height: 1.5;
   /* `clip` not `hidden`: hidden would make this a scroll container and break
-     the sticky nav inside it. Contains the hero mock's offset cards on mobile. */
+     the sticky nav inside it. */
   overflow-x: clip;
 }
 
