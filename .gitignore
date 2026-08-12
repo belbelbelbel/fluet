@@ -65,3 +65,5 @@ app/fonts/*.zip
 
 # env files
 .env
+# verification builds (see distDir in next.config.mjs)
+/.next-verify/

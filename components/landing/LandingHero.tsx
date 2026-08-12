@@ -105,19 +105,21 @@ export function LandingHero() {
 
             <div className="relative aspect-[4/3.6] w-full overflow-hidden rounded-[2.5rem] sm:aspect-[4/3.3]">
               <Image
-                src="/images/landing/hero-agency.jpg"
-                alt="A social media manager reviewing client work on a laptop"
+                src="/images/landing/hero-studio.jpg"
+                alt="Two creatives reviewing a client photo on a laptop in a studio"
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 46vw"
-                /* Desaturated on purpose. The photograph's out-of-focus right
-                   side is a strong caramel, which was the only warm element left
-                   once the palette went pure white — it read as a stock photo
-                   rather than as art direction. Monochrome ties it to the black
-                   type and leaves the forest accent as the page's single colour.
-                   grayscale(1) with a slight contrast lift keeps it from going
-                   flat. */
-                className="object-cover object-[20%_center] [filter:grayscale(1)_contrast(1.06)]"
+                /* object-center, not the old 20%: the source is 1.5:1 inside a
+                   1.21:1 frame, so ~10% comes off each side. Centred keeps both
+                   subjects — biasing left would cut the foreground figure whose
+                   hands are the point of the shot.
+
+                   Shown in full colour. The studio is already near-monochrome
+                   (white room, black equipment), so it sits on the pure-white
+                   palette without the caramel problem the previous photo had —
+                   no grayscale filter needed. */
+                className="object-cover object-center"
               />
             </div>
 

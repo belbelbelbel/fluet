@@ -1,5 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /**
+   * Verification builds can target a different directory so they don't clobber a
+   * running `next dev`, which shares `.next` and breaks with "missing required
+   * error components" when a production build lands on top of it.
+   *
+   *   NEXT_BUILD_DIR=.next-verify npx next build
+   *
+   * Unset everywhere else, including on Vercel, so normal builds are unaffected.
+   */
+  distDir: process.env.NEXT_BUILD_DIR || ".next",
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
