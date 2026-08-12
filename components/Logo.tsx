@@ -28,17 +28,24 @@ const sizeMap = {
 function getLogoSrc(variant: LogoProps["variant"], isDark: boolean) {
   // A CSS `dark:` variant cannot swap an <img> src, so this stays a JS branch
   // on the resolved theme rather than moving to a token/variant.
+  //
+  // The filenames describe the INK, not the background they belong on:
+  //   *-light-transparent = white ink   -> only legible on a dark surface
+  //   *-dark-transparent  = purple ink  -> legible on white and on the canvas
+  // These were wired the other way round, so the light theme served the white
+  // mark and the logo was invisible against the white navbar.
+  //
+  // logo-icon.png is not an option for either: it is baked onto a solid white
+  // square and shows as a white box on any tinted surface.
   if (variant === "icon") {
-    // The light variant must be the transparent asset — logo-icon.png is baked
-    // onto solid white and shows as a white box on any tinted surface.
     return isDark
-      ? "/images/Revvylogo/logo-icon-dark-transparent.png"
-      : "/images/Revvylogo/logo-icon-light-transparent.png";
+      ? "/images/Revvylogo/logo-icon-light-transparent.png"
+      : "/images/Revvylogo/logo-icon-dark-transparent.png";
   }
   if (variant === "full") {
     return isDark
-      ? "/images/Revvylogo/logo-dark-transparent.png"
-      : "/images/Revvylogo/logo-light-transparent.png";
+      ? "/images/Revvylogo/logo-light-transparent.png"
+      : "/images/Revvylogo/logo-dark-transparent.png";
   }
   return "/images/Revvylogo/logo-2-square.png";
 }

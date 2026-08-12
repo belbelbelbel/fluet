@@ -178,9 +178,11 @@ export default function RootLayout({
             as="image"
             fetchPriority="high"
           />
+          {/* The mark the light theme actually serves. Preloading logo-icon.png
+              warmed an asset the Logo component never requests. */}
           <link
             rel="preload"
-            href="/images/Revvylogo/logo-icon.png"
+            href="/images/Revvylogo/logo-icon-dark-transparent.png"
             as="image"
             fetchPriority="high"
           />
