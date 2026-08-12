@@ -1,128 +1,136 @@
 "use client";
 
-import { CheckIcon, InstagramIcon, MousePointer2Icon } from "lucide-react";
-
 /**
- * The hero's product card: a client approving a post, on a 7s loop.
+ * The hero's product moment — deliberately NOT a card.
  *
- * Sits overlaid on the hero photograph, so it stays deliberately compact — one
- * card, no soft-blur ground, no second floating panel. Built in DOM rather than
- * as a screenshot so it stays sharp at any resolution and survives the dashboard
- * redesign that's still in flight.
+ * Previous versions were a rounded panel with window chrome and two buttons,
+ * which is the house style of every generated landing page and said nothing
+ * about this product. A bordered box also competes with the photograph it sits
+ * on instead of belonging to it.
  *
- * Deliberately NOT a fake browser window. Three traffic-light dots are the
- * default shorthand for "this is software" and say nothing about this product.
- * What's actually unique here is that the approver's identity is proven: the
- * portal link is a bearer token, so possession alone can't approve, and a code
- * sent to the client's address on file closes that gap. The verified address in
- * the header is the whole differentiator, so it leads.
+ * This is an audit trail instead: a hairline rail, mono timestamps, and the
+ * approval landing at the end on its own. It argues the headline directly —
+ * the sequence finishes without anyone chasing it — and it shows the thing only
+ * Revvy does, which is prove *who* approved. The portal link is a bearer token,
+ * so possession alone must not be enough; the verified step is the product.
  *
- * Layout is asymmetric on purpose — thumbnail beside the copy, Approve wider
- * than Request changes — because evenly-split halves read as a wireframe.
+ * Legibility over the photo comes from placement (the flat, out-of-focus warm
+ * area) plus one soft radial scrim. The scrim is blurred with no edge or radius
+ * on purpose — it lifts the text without reintroducing a panel.
  *
- * Choreography is one shared timeline in globals.css (`.anim`); the `.anim-*`
- * hooks let prefers-reduced-motion resolve it to a single coherent frame.
+ * Motion notes:
+ * - The two status labels keep the `.anim-status-before` / `.anim-status-after`
+ *   class names so the existing prefers-reduced-motion rules in globals.css
+ *   resolve this to the settled, approved frame with no extra CSS.
+ * - Everything else rests VISIBLE in base CSS, so when reduced-motion sets
+ *   `animation: none`, the trail simply reads as a finished record.
  */
 export function ApprovalMock() {
   return (
     <div className="relative select-none" aria-hidden>
-      <div className="mock-loop relative rounded-2xl border border-[rgb(var(--rule))] bg-[rgb(var(--surface))] shadow-[0_2px_4px_rgba(18,18,17,0.04),0_24px_48px_-20px_rgba(18,18,17,0.28)]">
-        {/* Who is approving, and the proof it's really them */}
-        <div className="flex items-start justify-between gap-3 px-4 pt-4">
-          <div className="flex items-start gap-2.5">
-            {/* Ring rather than a flat fill — reads as an avatar slot, not a dot */}
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--accent-soft))] font-mono text-[10px] font-semibold text-[rgb(var(--accent))] ring-1 ring-[rgb(var(--accent))]/15">
-              CD
-            </div>
-            <div className="leading-tight">
-              <p className="text-[13px] font-medium text-[rgb(var(--ink))]">
-                Chukwuma Davis
-              </p>
-              <p className="mt-0.5 flex items-center gap-1 font-mono text-[9.5px] text-[rgb(var(--ink-faint))]">
-                chukwuma@sisiyemmie.co
-                <span className="inline-flex items-center gap-0.5 text-[rgb(var(--accent))]">
-                  <CheckIcon className="h-2.5 w-2.5" strokeWidth={3} />
-                  VERIFIED
-                </span>
-              </p>
-            </div>
-          </div>
-          <InstagramIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[rgb(var(--ink-faint))]" />
-        </div>
+      {/* Soft ground for legibility — blurred, edgeless, not a panel */}
+      <div
+        className="pointer-events-none absolute -inset-x-8 -inset-y-10 -z-10"
+        style={{
+          background:
+            "radial-gradient(60% 55% at 45% 45%, rgba(247,246,243,0.94), rgba(247,246,243,0.62) 55%, rgba(247,246,243,0) 78%)",
+          filter: "blur(6px)",
+        }}
+      />
 
-        {/* The work itself — thumbnail beside the copy, inset on canvas so the
-            card above it reads as the raised surface */}
-        <div className="mx-4 mt-3.5 flex gap-3 rounded-xl bg-[rgb(var(--canvas))] p-3 ring-1 ring-inset ring-[rgb(var(--rule))]">
-          <div
-            className="h-14 w-14 shrink-0 rounded-lg ring-1 ring-[rgb(var(--ink))]/10"
-            style={{
-              // Stands in for the photograph being approved. Warm tones tie it
-              // to the hero rather than sitting there as a grey placeholder.
-              backgroundImage:
-                "radial-gradient(120% 90% at 25% 18%, rgba(255,255,255,0.55), transparent 55%), linear-gradient(150deg, #e8a765 0%, #d4813f 48%, #a8552a 100%)",
-            }}
-          />
-          <div className="min-w-0">
-            <p className="text-[12.5px] leading-snug text-[rgb(var(--ink))]">
-              Fresh batch just landed. Jollof, small chops and the good stuff —
-              open till 10 tonight.
-            </p>
-            <p className="mt-2 font-mono text-[9px] uppercase tracking-wide text-[rgb(var(--ink-faint))]">
-              Instagram · Tue 09:00
-            </p>
-          </div>
-        </div>
+      <ol className="relative pl-[4.25rem]">
+        {/* The rail. Stops short of the last node so the approval sits free. */}
+        <span className="absolute left-[4.25rem] top-2 h-[4.6rem] w-px -translate-x-1/2 bg-[rgb(var(--ink))]/14" />
 
-        {/* Decision. One label swaps for the other mid-loop. */}
-        <div className="px-4 pb-4">
-          <div className="relative mt-3 h-4">
-            <div
-              className="anim anim-status-before absolute inset-0 flex items-center gap-1.5"
+        {/* 1 — the ask goes out */}
+        <li className="relative pb-5">
+          <span className="absolute -left-[4.25rem] top-[0.1rem] font-mono text-[9.5px] tabular-nums text-[rgb(var(--ink-faint))]">
+            09:02
+          </span>
+          <span className="absolute left-0 top-[0.3rem] h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[rgb(var(--ink))]/25" />
+          <p className="text-[12.5px] leading-none text-[rgb(var(--ink-soft))]">
+            Review link sent
+          </p>
+          <p className="mt-1 font-mono text-[9.5px] text-[rgb(var(--ink-faint))]">
+            chukwuma@sisiyemmie.co
+          </p>
+        </li>
+
+        {/* 2 — the part that makes the approval mean something */}
+        <li className="relative pb-5">
+          <span className="absolute -left-[4.25rem] top-[0.1rem] font-mono text-[9.5px] tabular-nums text-[rgb(var(--ink-faint))]">
+            09:11
+          </span>
+          <span className="absolute left-0 top-[0.3rem] h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[rgb(var(--ink))]/25" />
+          <p className="text-[12.5px] leading-none text-[rgb(var(--ink-soft))]">
+            Identity verified
+          </p>
+          <p className="mt-1 font-mono text-[9.5px] text-[rgb(var(--ink-faint))]">
+            emailed code · link alone can&apos;t approve
+          </p>
+        </li>
+
+        {/* 3 — the landing. No dot on the rail; the drawn check is the marker. */}
+        <li className="relative">
+          <span className="absolute -left-[4.25rem] top-[0.35rem] font-mono text-[9.5px] tabular-nums text-[rgb(var(--accent))]">
+            09:14
+          </span>
+
+          {/* Check draws itself, then holds for the rest of the loop */}
+          <svg
+            viewBox="0 0 24 24"
+            className="absolute left-0 top-[0.15rem] h-[1.15rem] w-[1.15rem] -translate-x-1/2 overflow-visible"
+            fill="none"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="11"
+              className="fill-[rgb(var(--accent-soft))]"
+            />
+            <path
+              d="M6.5 12.4l3.6 3.5L17.6 8.6"
+              stroke="rgb(var(--accent))"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              // Base state is drawn, so reduced-motion shows a finished check.
+              strokeDasharray="22"
+              strokeDashoffset="0"
+              className="anim"
+              style={{
+                animationName: "revvy-draw-loop",
+                animationTimingFunction: "cubic-bezier(0.65,0,0.35,1)",
+              }}
+            />
+          </svg>
+
+          {/* One label swaps for the other, mid-loop */}
+          <div className="relative h-[1.75rem]">
+            <p
+              className="anim anim-status-before absolute inset-0 text-[12.5px] leading-none text-[rgb(var(--ink-soft))]"
               style={{ animationName: "revvy-status" }}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-              <span className="text-[11.5px] text-[rgb(var(--ink-soft))]">
-                Awaiting approval
-              </span>
-            </div>
-            <div
-              className="anim anim-status-after absolute inset-0 flex items-center gap-1.5"
+              Awaiting approval
+            </p>
+            <p
+              className="anim anim-status-after font-display absolute inset-0 text-[1.6rem] leading-none tracking-[-0.02em] text-[rgb(var(--ink))]"
               style={{ animationName: "revvy-status-in" }}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--accent))]" />
-              <span className="text-[11.5px] font-medium text-[rgb(var(--accent))]">
-                Approved
-              </span>
-              {/* The audit trail, in mono — this is what gets recorded */}
-              <span className="font-mono text-[9px] text-[rgb(var(--ink-faint))]">
-                09:14 · CHUKWUMA
-              </span>
-            </div>
+              Approved.
+            </p>
           </div>
 
-          {/* Weighted, not split down the middle */}
-          <div className="mt-3 flex items-center gap-2">
-            <div
-              className="anim relative flex basis-[60%] items-center justify-center gap-1.5 rounded-lg bg-[rgb(var(--ink))] py-2 text-[12px] font-medium text-white shadow-[0_1px_2px_rgba(18,18,17,0.18)]"
-              style={{ animationName: "revvy-press" }}
-            >
-              <CheckIcon className="h-3 w-3" strokeWidth={2.5} />
-              Approve
-            </div>
-            <div className="flex-1 rounded-lg py-2 text-center text-[12px] text-[rgb(var(--ink-soft))] ring-1 ring-[rgb(var(--rule))]">
-              Request changes
-            </div>
-          </div>
-        </div>
+          <p className="font-mono text-[9.5px] uppercase tracking-[0.08em] text-[rgb(var(--ink-faint))]">
+            Chukwuma · Instagram · Tue
+          </p>
+        </li>
+      </ol>
 
-        {/* Cursor travels in, clicks Approve, leaves */}
-        <div
-          className="anim anim-cursor absolute bottom-[3.1rem] left-[26%] z-20"
-          style={{ animationName: "revvy-cursor" }}
-        >
-          <MousePointer2Icon className="h-4 w-4 fill-[rgb(var(--ink))] text-white drop-shadow-sm" />
-        </div>
-      </div>
+      {/* The headline's promise, stated as a fact about the record */}
+      <p className="mt-5 pl-[4.25rem] font-mono text-[9px] uppercase tracking-[0.14em] text-[rgb(var(--ink-faint))]">
+        No follow-up sent
+      </p>
     </div>
   );
 }

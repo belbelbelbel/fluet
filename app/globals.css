@@ -365,6 +365,15 @@ p, span, div, li {
   to { stroke-dashoffset: 0; }
 }
 
+/* Loop-safe variant of revvy-draw for the hero trail's check. `revvy-draw` has
+   no start state, so on the shared 7s infinite timeline it would hold drawn
+   forever. The hold until 30% syncs the stroke with revvy-status-in, which
+   flips the label to "Approved." at 32-38%. */
+@keyframes revvy-draw-loop {
+  0%, 30%   { stroke-dashoffset: 22; }
+  46%, 100% { stroke-dashoffset: 0; }
+}
+
 @keyframes revvy-float {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-7px); }
