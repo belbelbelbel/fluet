@@ -3,21 +3,19 @@
  * Checks if user has an active Instagram connection
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { GetUserByClerkId, GetLinkedAccount } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // Get authenticated user
     const authResult = await auth();
     const user = await currentUser();
-    const searchParams = req.nextUrl.searchParams;
-    const clientUserId = searchParams.get("userId");
 
-    const clerkUserId: string | null | undefined = authResult?.userId || user?.id || clientUserId;
+    const clerkUserId: string | null | undefined = authResult?.userId || user?.id;
 
     if (!clerkUserId) {
       return NextResponse.json(

@@ -18,13 +18,11 @@ import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url);
-    const queryUserId = searchParams.get("userId");
 
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || queryUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
 
     if (!clerkUserId) {
       try {

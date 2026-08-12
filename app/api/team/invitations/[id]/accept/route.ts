@@ -12,21 +12,10 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Get userId from request body first (from frontend)
-    let bodyUserId: string | null = null;
-    try {
-      const body = await req.json();
-      if (body && typeof body === 'object' && body.userId) {
-        bodyUserId = body.userId;
-      }
-    } catch {
-      // Body might be empty or invalid JSON, that's okay - we'll use other auth methods
-      console.log("[Accept Invitation] Could not parse request body, using other auth methods");
-    }
     
     // Get authentication from Clerk - try multiple methods
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || bodyUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     
     if (!clerkUserId) {
       try {

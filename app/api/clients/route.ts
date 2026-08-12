@@ -56,7 +56,6 @@ export async function GET(req: NextRequest) {
             const searchParams = req.nextUrl.searchParams;
             const queryUserId = searchParams.get("userId");
             if (queryUserId) {
-                clerkUserId = queryUserId;
                 console.log("[Clients API GET] Got userId from query params:", clerkUserId);
             }
         }

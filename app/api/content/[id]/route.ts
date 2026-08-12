@@ -13,8 +13,6 @@ export async function DELETE(
 ) {
   try {
     // Parse query params to get client userId as fallback
-    const { searchParams } = new URL(req.url);
-    const clientUserId = searchParams.get("userId");
     
     // Try multiple methods to get the user ID (same pattern as other routes)
     const authResult = await auth();
@@ -31,9 +29,6 @@ export async function DELETE(
     }
     
     // Use clientUserId as final fallback if provided
-    if (!clerkUserId && clientUserId) {
-      clerkUserId = clientUserId;
-    }
 
     if (!clerkUserId) {
       console.error("[Delete API] No userId found - auth failed");

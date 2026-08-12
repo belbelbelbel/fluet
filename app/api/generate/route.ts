@@ -14,13 +14,13 @@ export async function POST(req: Request) {
   try {
     // Parse body first to get client userId
     const body = await req.json();
-    const { prompt, contentType, tone, style, length, userId: clientUserId, clientId: bodyClientId, generationMode } = body;
+    const { prompt, contentType, tone, style, length, clientId: bodyClientId, generationMode } = body;
     const clientId = bodyClientId != null ? parseInt(String(bodyClientId), 10) : null;
     const validClientId = Number.isNaN(clientId) ? null : clientId;
 
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {

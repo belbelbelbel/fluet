@@ -70,12 +70,11 @@ export async function POST(req: Request) {
       showDuration = true,
       colorGrading = "natural",
       category = "Music",
-      userId: clientUserId,
     } = body;
 
     // Authentication
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
 
     if (!clerkUserId) {
       try {

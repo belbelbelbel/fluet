@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const { code, userId: clientUserId } = await request.json();
+    const { code } = await request.json();
 
     if (!code) {
       return NextResponse.json(
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     // Get authenticated user
     const authResult = await auth();
     const user = await currentUser();
-    const clerkUserId: string | null | undefined = authResult?.userId || user?.id || clientUserId;
+    const clerkUserId: string | null | undefined = authResult?.userId || user?.id;
 
     if (!clerkUserId) {
       return NextResponse.json(

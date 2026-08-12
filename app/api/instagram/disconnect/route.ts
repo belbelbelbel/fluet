@@ -3,21 +3,19 @@
  * Deactivates Instagram connection for user
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { GetUserByClerkId, DisconnectLinkedAccount } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     // Get authenticated user
     const authResult = await auth();
     const user = await currentUser();
-    const body = await req.json().catch(() => ({}));
-    const clientUserId = body.userId;
 
-    const clerkUserId: string | null | undefined = authResult?.userId || user?.id || clientUserId;
+    const clerkUserId: string | null | undefined = authResult?.userId || user?.id;
 
     if (!clerkUserId) {
       return NextResponse.json(

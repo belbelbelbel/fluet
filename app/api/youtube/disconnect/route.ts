@@ -12,11 +12,11 @@ export async function POST(request: Request) {
   try {
     // Parse body first to get client userId (same pattern as other routes)
     const body = await request.json();
-    const { userId: clientUserId } = body;
+    const {} = body;
 
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {

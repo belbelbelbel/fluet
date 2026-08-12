@@ -9,7 +9,6 @@ export async function GET(req: Request) {
   try {
     // Parse query params first to get client userId (same pattern as generate API)
     const { searchParams } = new URL(req.url);
-    const clientUserId = searchParams.get("userId");
     const clientIdParam = searchParams.get("clientId");
     const clientId = clientIdParam != null ? parseInt(clientIdParam, 10) : undefined;
     const validClientId = Number.isNaN(clientId) ? undefined : clientId;
@@ -19,7 +18,7 @@ export async function GET(req: Request) {
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback (same as generate)
     if (!clerkUserId) {

@@ -19,9 +19,9 @@ import { sendPendingApprovalsToClient } from "@/utils/approvals/notify";
 
 export const dynamic = "force-dynamic";
 
-async function resolveClerkId(fallback?: string | null) {
+async function resolveClerkId() {
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || fallback || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     if (!clerkUserId) {
         try {
             const user = await currentUser();
@@ -41,8 +41,7 @@ export async function GET(
     { params }: { params: { id: string } }
 ) {
     try {
-        const queryUserId = req.nextUrl.searchParams.get("userId");
-        const clerkUserId = await resolveClerkId(queryUserId);
+        const clerkUserId = await resolveClerkId();
 
         if (!clerkUserId) {
             return NextResponse.json(

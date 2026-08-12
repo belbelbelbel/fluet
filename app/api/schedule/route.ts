@@ -25,15 +25,13 @@ import {
 export const dynamic = "force-dynamic";
 
 // Get all scheduled posts
-export async function GET(req: Request) {
+export async function GET() {
   try {
     // Parse query params first to get client userId (same pattern as generate API)
-    const { searchParams } = new URL(req.url);
-    const clientUserId = searchParams.get("userId");
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId || null;
+    let clerkUserId = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
@@ -75,11 +73,11 @@ export async function POST(req: Request) {
   try {
     // Parse body first to get client userId (same pattern as generate API)
     const body = await req.json();
-    const { contentId, platform, content, scheduledFor, userId: clientUserId, clientId, requiresApproval } = body;
+    const { contentId, platform, content, scheduledFor, clientId, requiresApproval } = body;
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId || null;
+    let clerkUserId = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
@@ -248,11 +246,11 @@ export async function PUT(req: Request) {
   try {
     // Parse body first to get client userId (same pattern as generate API)
     const body = await req.json();
-    const { id, content, scheduledFor, platform, posted, userId: clientUserId } = body;
+    const { id, content, scheduledFor, platform, posted } = body;
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
-    let clerkUserId = authResult?.userId || clientUserId || null;
+    let clerkUserId = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {
@@ -349,7 +347,6 @@ export async function DELETE(req: Request) {
     // Parse query params first to get client userId (same pattern as generate API)
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const clientUserId = searchParams.get("userId");
 
     // Use the EXACT same auth pattern as generate API (which works)
     const authResult = await auth();
@@ -366,9 +363,6 @@ export async function DELETE(req: Request) {
     }
     
     // Use clientUserId as final fallback if provided
-    if (!clerkUserId && clientUserId) {
-      clerkUserId = clientUserId;
-    }
 
     if (!clerkUserId) {
       return NextResponse.json(

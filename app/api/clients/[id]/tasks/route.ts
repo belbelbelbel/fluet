@@ -135,11 +135,10 @@ export async function POST(
         const resolvedParams = await Promise.resolve(params);
         // Get userId from request body first (from frontend)
         const body = await req.json();
-        const bodyUserId = body.userId || null;
         
         // Get authentication from Clerk - try multiple methods
         const authResult = await auth();
-        let clerkUserId: string | null | undefined = authResult?.userId || bodyUserId || null;
+        let clerkUserId: string | null | undefined = authResult?.userId || null;
         
         // If auth() didn't work, try currentUser() as fallback
         if (!clerkUserId) {

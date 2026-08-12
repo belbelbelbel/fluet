@@ -10,15 +10,13 @@ import { getYouTubeTokens } from "@/utils/youtube/token-manager";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     // Parse query params to get client userId (same pattern as other routes)
-    const { searchParams } = new URL(request.url);
-    const clientUserId = searchParams.get("userId");
 
     // Get authentication from Clerk - try multiple methods (same pattern as other routes)
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {

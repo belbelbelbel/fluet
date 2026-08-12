@@ -8,11 +8,9 @@ import { eq, and, gte, sql, count, sum } from "drizzle-orm";
 export const dynamic = "force-dynamic";
 export const revalidate = 60; // Cache for 60 seconds
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     // Get userId from query params first (from frontend)
-    const { searchParams } = new URL(req.url);
-    const queryUserId = searchParams.get("userId");
     
     // Get authentication from Clerk - try multiple methods
     let userId: string | null | undefined = null;
@@ -20,7 +18,7 @@ export async function GET(req: Request) {
     // Try auth() first
     try {
       const authResult = await auth();
-      userId = authResult?.userId || queryUserId || null;
+      userId = authResult?.userId || null;
     } catch (authError) {
       console.warn("[Dashboard Stats API] auth() failed:", authError);
       // Continue to try other methods
@@ -38,9 +36,6 @@ export async function GET(req: Request) {
     }
     
     // Use query param as final fallback
-    if (!userId && queryUserId) {
-      userId = queryUserId;
-    }
     
     if (!userId) {
       console.warn("[Dashboard Stats API] No userId from auth() - returning default stats");

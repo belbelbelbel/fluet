@@ -1,18 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { GetUserByClerkId, GetTeamInvitationsByEmail } from "@/utils/db/actions";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // Get userId from query params first (from frontend)
-    const searchParams = req.nextUrl.searchParams;
-    const queryUserId = searchParams.get("userId");
     
     // Get authentication from Clerk - try multiple methods
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || queryUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
     
     // If auth() didn't work, try currentUser() as fallback
     if (!clerkUserId) {

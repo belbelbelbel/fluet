@@ -36,12 +36,11 @@ export async function POST(req: Request) {
       showWatermark = false,
       showDuration = true,
       colorGrading = "natural",
-      userId: clientUserId,
     } = body;
 
     // Authentication
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
 
     if (!clerkUserId) {
       try {

@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, userId: clientUserId, role, clientIds } = body as {
+    const { email, role, clientIds } = body as {
       email?: string;
       userId?: string;
       role?: string;
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     };
 
     const authResult = await auth();
-    let clerkUserId: string | null | undefined = authResult?.userId || clientUserId || null;
+    let clerkUserId: string | null | undefined = authResult?.userId || null;
 
     if (!clerkUserId) {
       try {

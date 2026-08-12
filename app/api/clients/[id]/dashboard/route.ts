@@ -19,11 +19,9 @@ export async function GET(
 ) {
   try {
     const resolvedParams = await Promise.resolve(params);
-    const searchParams = req.nextUrl.searchParams;
-    const queryUserId = searchParams.get("userId");
 
     const authResult = await auth();
-    let clerkUserId: string | null = authResult?.userId || queryUserId || null;
+    let clerkUserId: string | null = authResult?.userId || null;
 
     if (!clerkUserId) {
       try {
