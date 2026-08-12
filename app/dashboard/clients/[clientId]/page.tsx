@@ -204,10 +204,10 @@ export default function ClientDashboardPage() {
 
   if (!client) {
     return (
-      <div className={`text-center py-12 transition-colors duration-300 ${isDark ? "bg-slate-900" : "bg-white"}`}>
-        <AlertCircle className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-slate-400" : "text-gray-400"}`} />
-        <h2 className={`text-xl font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Client not found</h2>
-        <p className={`mb-6 ${isDark ? "text-slate-400" : "text-gray-600"}`}>The client you&apos;re looking for doesn&apos;t exist.</p>
+      <div className={`text-center py-12 transition-colors duration-300 bg-background`}>
+        <AlertCircle className={`w-12 h-12 mx-auto mb-4 text-muted-foreground`} />
+        <h2 className={`text-xl font-semibold mb-2 text-foreground`}>Client not found</h2>
+        <p className={`mb-6 text-muted-foreground`}>The client you&apos;re looking for doesn&apos;t exist.</p>
         <Button 
           onClick={() => router.push("/dashboard")}
           className="bg-primary hover:bg-primary/90 text-primary-foreground"
@@ -224,7 +224,7 @@ export default function ClientDashboardPage() {
     : 0;
 
   return (
-    <div className={`space-y-6 transition-colors duration-300 ${isDark ? "bg-slate-900" : "bg-white"}`}>
+    <div className={`space-y-6 transition-colors duration-300 bg-background`}>
       {/* Client Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -234,7 +234,7 @@ export default function ClientDashboardPage() {
               alt={client.name}
               width={48}
               height={48}
-              className={`w-12 h-12 rounded-lg object-cover border ${isDark ? "border-slate-700" : "border-gray-200"}`}
+              className={`w-12 h-12 rounded-lg object-cover border border-border`}
               unoptimized={client.logoUrl.startsWith("http")}
               priority
               fetchPriority="high"
@@ -246,7 +246,7 @@ export default function ClientDashboardPage() {
           )}
           <div>
             <div className="flex items-center gap-2">
-              <h1 className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{client.name}</h1>
+              <h1 className={`text-2xl font-bold text-foreground`}>{client.name}</h1>
               <Button
                 variant="ghost"
                 size="icon"
@@ -258,7 +258,7 @@ export default function ClientDashboardPage() {
               </Button>
             </div>
             {client.email && (
-              <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+              <p className={`text-sm mt-1 text-muted-foreground`}>
                 {client.email}
               </p>
             )}
@@ -329,25 +329,25 @@ export default function ClientDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200 hover:border-gray-300"}`}>
           <CardHeader className="pb-3">
-            <CardTitle className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-gray-600"}`}>
+            <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Posts This Month
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
-              <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span className={`text-2xl font-bold text-foreground`}>
                 {stats.postsThisMonth}
               </span>
-              <span className={`text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>/ {stats.postsLimit}</span>
+              <span className={`text-sm text-muted-foreground`}>/ {stats.postsLimit}</span>
             </div>
             <div className="mt-2">
-              <div className={`w-full rounded-full h-2 ${isDark ? "bg-slate-700" : "bg-gray-200"}`}>
+              <div className={`w-full rounded-full h-2 bg-accent`}>
                 <div
                   className="bg-primary h-2 rounded-full transition-all"
                   style={{ width: `${Math.min(postsPercentage, 100)}%` }}
                 />
               </div>
-              <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+              <p className={`text-xs mt-1 text-muted-foreground`}>
                 {postsRemaining} posts remaining
               </p>
             </div>
@@ -356,17 +356,17 @@ export default function ClientDashboardPage() {
 
         <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200 hover:border-gray-300"}`}>
           <CardHeader className="pb-3">
-            <CardTitle className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-gray-600"}`}>
+            <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Pending Approvals
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
-              <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span className={`text-2xl font-bold text-foreground`}>
                 {stats.pendingApprovals}
               </span>
             </div>
-            <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+            <p className={`text-xs mt-1 text-muted-foreground`}>
               Awaiting client approval
             </p>
           </CardContent>
@@ -374,17 +374,17 @@ export default function ClientDashboardPage() {
 
         <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200 hover:border-gray-300"}`}>
           <CardHeader className="pb-3">
-            <CardTitle className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-gray-600"}`}>
+            <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Scheduled Posts
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
-              <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span className={`text-2xl font-bold text-foreground`}>
                 {stats.scheduledPosts}
               </span>
             </div>
-            <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+            <p className={`text-xs mt-1 text-muted-foreground`}>
               Upcoming posts
             </p>
           </CardContent>
@@ -392,7 +392,7 @@ export default function ClientDashboardPage() {
 
         <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200 hover:border-gray-300"}`}>
           <CardHeader className="pb-3">
-            <CardTitle className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-gray-600"}`}>
+            <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Engagement Rate
             </CardTitle>
           </CardHeader>
@@ -400,21 +400,21 @@ export default function ClientDashboardPage() {
             {stats.engagementMetricsAvailable && stats.engagementRate != null ? (
               <>
                 <div className="flex items-baseline gap-2">
-                  <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  <span className={`text-2xl font-bold text-foreground`}>
                     {stats.engagementRate}%
                   </span>
                   <TrendingUp className={`w-4 h-4 ${isDark ? "text-green-400" : "text-green-600"}`} />
                 </div>
-                <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                <p className={`text-xs mt-1 text-muted-foreground`}>
                   Average across platforms
                 </p>
               </>
             ) : (
               <>
                 <div className="flex items-baseline gap-2">
-                  <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>—</span>
+                  <span className={`text-2xl font-bold text-foreground`}>—</span>
                 </div>
-                <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                <p className={`text-xs mt-1 text-muted-foreground`}>
                   Engagement metrics coming soon
                 </p>
               </>
@@ -480,13 +480,13 @@ export default function ClientDashboardPage() {
         </TabsList>
 
         <TabsContent value="calendar" className="space-y-4">
-          <Card className={`border transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+          <Card className={`border transition-colors duration-300 bg-card border-border`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 gap-4 pb-4">
               <div className="min-w-0">
-                <CardTitle className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                <CardTitle className={`text-base font-semibold text-foreground`}>
                   Upcoming
                 </CardTitle>
-                <p className={`text-sm mt-0.5 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                <p className={`text-sm mt-0.5 text-muted-foreground`}>
                   {upcomingPosts.length > 0
                     ? `Next ${upcomingPosts.length} post${upcomingPosts.length !== 1 ? "s" : ""} in the queue`
                     : "Nothing scheduled yet"}
@@ -510,10 +510,10 @@ export default function ClientDashboardPage() {
                   }`}>
                     <Calendar className="h-5 w-5" />
                   </div>
-                  <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  <h3 className={`text-sm font-semibold text-foreground`}>
                     Nothing scheduled
                   </h3>
-                  <p className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                  <p className={`mt-1 text-sm text-muted-foreground`}>
                     Queue a post and it&apos;ll show up here.
                   </p>
                   <Button
@@ -548,10 +548,10 @@ export default function ClientDashboardPage() {
         </TabsContent>
 
         <TabsContent value="approvals" className="space-y-4">
-          <Card className={`border transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+          <Card className={`border transition-colors duration-300 bg-card border-border`}>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-2.5">
-                <CardTitle className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                <CardTitle className={`text-base font-semibold text-foreground`}>
                   Waiting on the client
                 </CardTitle>
                 {pendingApprovals.length > 0 && (
@@ -560,7 +560,7 @@ export default function ClientDashboardPage() {
                   </span>
                 )}
               </div>
-              <p className={`text-sm mt-0.5 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+              <p className={`text-sm mt-0.5 text-muted-foreground`}>
                 Only {client?.email || "the client's email on file"} can sign these off.
               </p>
             </CardHeader>
@@ -572,10 +572,10 @@ export default function ClientDashboardPage() {
                   }`}>
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
-                  <h3 className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  <h3 className={`text-sm font-semibold text-foreground`}>
                     All clear
                   </h3>
-                  <p className={`mt-1 text-sm max-w-xs mx-auto ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                  <p className={`mt-1 text-sm max-w-xs mx-auto text-muted-foreground`}>
                     Schedule a post for this client to send an approval request.
                   </p>
                 </div>
@@ -620,12 +620,12 @@ export default function ClientDashboardPage() {
         </TabsContent>
 
         <TabsContent value="tasks" className="space-y-4">
-          <Card className={`border transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
-            <CardHeader className={`border-b ${isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"}`}>
+          <Card className={`border transition-colors duration-300 bg-card border-border`}>
+            <CardHeader className={`border-b border-border bg-muted`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Tasks</CardTitle>
-                  <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                  <CardTitle className={`text-lg font-semibold text-foreground`}>Tasks</CardTitle>
+                  <p className={`text-sm mt-1 text-muted-foreground`}>
                     Manage tasks and assignments for this client
                   </p>
                 </div>
@@ -642,8 +642,8 @@ export default function ClientDashboardPage() {
             <CardContent className="pt-6">
               <div className="text-center py-8">
                 <FileText className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
-                <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Task Management</h3>
-                <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                <h3 className={`text-lg font-semibold mb-2 text-foreground`}>Task Management</h3>
+                <p className={`mb-4 text-muted-foreground`}>
                   Create and assign tasks to team members
                 </p>
                 <Button
@@ -658,12 +658,12 @@ export default function ClientDashboardPage() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
-          <Card className={`border transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
-            <CardHeader className={`border-b ${isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"}`}>
+          <Card className={`border transition-colors duration-300 bg-card border-border`}>
+            <CardHeader className={`border-b border-border bg-muted`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Analytics Dashboard</CardTitle>
-                  <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                  <CardTitle className={`text-lg font-semibold text-foreground`}>Analytics Dashboard</CardTitle>
+                  <p className={`text-sm mt-1 text-muted-foreground`}>
                     Performance metrics and insights
                   </p>
                 </div>
@@ -697,11 +697,11 @@ export default function ClientDashboardPage() {
           onClick={() => !editSaving && setEditModalOpen(false)}
         >
           <Card
-            className={`w-full max-w-md border shadow-2xl mx-4 transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}
+            className={`w-full max-w-md border shadow-2xl mx-4 transition-colors duration-300 bg-card border-border`}
             onClick={(e) => e.stopPropagation()}
           >
-            <CardHeader className={`flex flex-row items-center justify-between pb-4 ${isDark ? "border-slate-700" : "border-gray-200"}`}>
-              <CardTitle className={`text-lg ${isDark ? "text-white" : "text-gray-950"}`}>Edit Client</CardTitle>
+            <CardHeader className={`flex flex-row items-center justify-between pb-4 border-border`}>
+              <CardTitle className={`text-lg text-foreground`}>Edit Client</CardTitle>
               <button
                 onClick={() => !editSaving && setEditModalOpen(false)}
                 className={`p-2 rounded-lg transition-colors ${isDark ? "text-slate-400 hover:text-white hover:bg-slate-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"}`}
@@ -712,7 +712,7 @@ export default function ClientDashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                   Client Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -724,7 +724,7 @@ export default function ClientDashboardPage() {
                 />
               </div>
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                   Client Email (Optional)
                 </label>
                 <input
@@ -734,12 +734,12 @@ export default function ClientDashboardPage() {
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
                   placeholder="client@example.com"
                 />
-                <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                <p className={`text-xs mt-1 text-muted-foreground`}>
                   Used for sending approval links directly to your client
                 </p>
               </div>
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                   Logo URL (Optional)
                 </label>
                 <input

@@ -155,7 +155,7 @@ export default function ReportsPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-foreground animate-spin mx-auto mb-4" />
-          <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+          <p className={`text-sm text-muted-foreground`}>
             Loading reports...
           </p>
         </div>
@@ -169,16 +169,12 @@ export default function ReportsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1
-            className={`text-2xl sm:text-3xl font-bold ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-2xl sm:text-3xl font-bold text-foreground`}
           >
             Reports
           </h1>
           <p
-            className={`mt-1 text-sm ${
-              isDark ? "text-slate-400" : "text-gray-600"
-            }`}
+            className={`mt-1 text-sm text-muted-foreground`}
           >
             Exportable reports and client-facing summaries
           </p>
@@ -222,11 +218,7 @@ export default function ReportsPage() {
       {/* Reports List */}
       {reports.length === 0 ? (
         <Card
-          className={`${
-            isDark
-              ? "bg-slate-800 border-slate-700"
-              : "bg-white border-gray-200"
-          }`}
+          className={`bg-card border-border`}
         >
           <CardContent className="pt-12 pb-12">
             <div className="text-center">
@@ -236,16 +228,12 @@ export default function ReportsPage() {
                 }`}
               />
               <h2
-                className={`text-xl font-semibold mb-2 ${
-                  isDark ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-xl font-semibold mb-2 text-foreground`}
               >
                 No reports yet
               </h2>
               <p
-                className={`mb-6 ${
-                  isDark ? "text-slate-400" : "text-gray-600"
-                }`}
+                className={`mb-6 text-muted-foreground`}
               >
                 Generate your first report to get started
               </p>
@@ -265,32 +253,22 @@ export default function ReportsPage() {
           {reports.map((report) => (
             <Card
               key={report.id}
-              className={`${
-                isDark
-                  ? "bg-slate-800 border-slate-700"
-                  : "bg-white border-gray-200"
-              } min-w-0`}
+              className={`bg-card border-border min-w-0`}
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle
-                      className={`text-lg ${
-                        isDark ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-lg text-foreground`}
                     >
                       {report.clientName}
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-2">
                       <Calendar
-                        className={`w-4 h-4 ${
-                          isDark ? "text-slate-400" : "text-gray-500"
-                        }`}
+                        className={`w-4 h-4 text-muted-foreground`}
                       />
                       <span
-                        className={`text-xs ${
-                          isDark ? "text-slate-400" : "text-gray-500"
-                        }`}
+                        className={`text-xs text-muted-foreground`}
                       >
                         {new Date(report.periodStart).toLocaleDateString()} -{" "}
                         {new Date(report.periodEnd).toLocaleDateString()}
@@ -312,9 +290,7 @@ export default function ReportsPage() {
               </CardHeader>
               <CardContent>
                 {report.reportData && (
-                  <div className={`grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3 text-xs ${
-                    isDark ? "text-slate-400" : "text-gray-600"
-                  }`}>
+                  <div className={`grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3 text-xs text-muted-foreground`}>
                     <span>Scheduled: {report.reportData.postsScheduled}</span>
                     <span>Published: {report.reportData.postsPublished}</span>
                     <span>Content: {report.reportData.contentGenerated}</span>
@@ -323,9 +299,7 @@ export default function ReportsPage() {
                 )}
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <span
-                    className={`text-xs ${
-                      isDark ? "text-slate-500" : "text-gray-400"
-                    }`}
+                    className={`text-xs text-muted-foreground/70`}
                   >
                     Created: {new Date(report.createdAt).toLocaleDateString()}
                   </span>
@@ -351,15 +325,11 @@ export default function ReportsPage() {
 
       {/* Info Card */}
       <Card
-        className={`${
-          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-        }`}
+        className={`bg-card border-border`}
       >
         <CardHeader>
           <CardTitle
-            className={`flex items-center gap-2 ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}
+            className={`flex items-center gap-2 text-foreground`}
           >
             <AlertCircle className="w-5 h-5 text-foreground" />
             About Reports
@@ -367,9 +337,7 @@ export default function ReportsPage() {
         </CardHeader>
         <CardContent>
           <p
-            className={`text-sm ${
-              isDark ? "text-slate-400" : "text-gray-600"
-            }`}
+            className={`text-sm text-muted-foreground`}
           >
             Reports provide exportable summaries of your client&apos;s performance.
             Generate monthly reports to share with clients, track progress, and

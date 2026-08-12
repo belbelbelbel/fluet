@@ -122,7 +122,7 @@ export default function NewTaskPage() {
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-slate-900" : "bg-white"}`}>
+    <div className={`min-h-screen transition-colors duration-300 bg-background`}>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="flex items-center gap-3 sm:gap-4 mb-6">
           <Button
@@ -132,14 +132,14 @@ export default function NewTaskPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className={`text-xl sm:text-2xl font-bold ${isDark ? "text-white" : "text-gray-950"}`}>
+          <h1 className={`text-xl sm:text-2xl font-bold text-foreground`}>
             Create New Task
           </h1>
         </div>
 
-        <Card className={`border transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+        <Card className={`border transition-colors duration-300 bg-card border-border`}>
           <CardHeader className={`${isDark ? "border-slate-700" : ""} px-4 sm:px-6 pt-4 sm:pt-6`}>
-            <CardTitle className={`text-lg sm:text-xl ${isDark ? "text-white" : "text-gray-950"}`}>
+            <CardTitle className={`text-lg sm:text-xl text-foreground`}>
               Task Details
             </CardTitle>
           </CardHeader>
@@ -148,7 +148,7 @@ export default function NewTaskPage() {
               <div>
                 <label
                   htmlFor="type"
-                  className={`block text-sm font-medium mb-3 ${isDark ? "text-slate-300" : "text-gray-700"}`}
+                  className={`block text-sm font-medium mb-3 text-foreground/80`}
                 >
                   Task Type <span className="text-red-500">*</span>
                 </label>
@@ -178,7 +178,7 @@ export default function NewTaskPage() {
               <div>
                 <label
                   htmlFor="description"
-                  className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}
+                  className={`block text-sm font-medium mb-2 text-foreground/80`}
                 >
                   Description
                 </label>
@@ -195,12 +195,12 @@ export default function NewTaskPage() {
               <div>
                 <label
                   htmlFor="assignedTo"
-                  className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}
+                  className={`block text-sm font-medium mb-2 text-foreground/80`}
                 >
                   Assign To
                 </label>
                 <div className="relative">
-                  <User className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDark ? "text-slate-400" : "text-gray-400"}`} />
+                  <User className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground`} />
                   <select
                     id="assignedTo"
                     value={formData.assignedTo}
@@ -220,12 +220,12 @@ export default function NewTaskPage() {
               <div>
                 <label
                   htmlFor="dueDate"
-                  className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}
+                  className={`block text-sm font-medium mb-2 text-foreground/80`}
                 >
                   Due Date
                 </label>
                 <div className="relative">
-                  <Calendar className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDark ? "text-slate-400" : "text-gray-400"}`} />
+                  <Calendar className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground`} />
                   <input
                     type="datetime-local"
                     id="dueDate"

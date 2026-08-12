@@ -58,8 +58,8 @@ export default function CreditsPage() {
   if (!credits) {
     return (
       <div className="text-center py-12">
-        <AlertCircle className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-slate-500" : "text-gray-400"}`} />
-        <h2 className={`text-xl font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Credits not found</h2>
+        <AlertCircle className={`w-12 h-12 mx-auto mb-4 text-muted-foreground/70`} />
+        <h2 className={`text-xl font-semibold mb-2 text-foreground`}>Credits not found</h2>
         <p className={isDark ? "text-slate-400" : "text-gray-600"}>Credits information is not available for this client.</p>
       </div>
     );
@@ -81,7 +81,7 @@ export default function CreditsPage() {
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <h1 className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>Content Credits</h1>
+        <h1 className={`text-2xl font-bold text-foreground`}>Content Credits</h1>
       </div>
 
       {/* Posts Credit Card */}
@@ -91,14 +91,14 @@ export default function CreditsPage() {
         ? "border-yellow-300 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/40"
         : isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"
       }`}>
-        <CardHeader className={`border-b ${isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"}`}>
+        <CardHeader className={`border-b border-border bg-muted/50`}>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className={`text-lg font-semibold flex items-center gap-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+              <CardTitle className={`text-lg font-semibold flex items-center gap-2 text-foreground`}>
                 <CreditCard className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-foreground"}`} />
                 Monthly Posts
               </CardTitle>
-              <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+              <p className={`text-sm mt-1 text-muted-foreground`}>
                 Resets on {new Date(credits.resetDate).toLocaleDateString("en-US", { month: "long", day: "numeric" })}
               </p>
             </div>
@@ -121,12 +121,12 @@ export default function CreditsPage() {
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className={`text-sm font-medium ${isDark ? "text-slate-300" : "text-gray-700"}`}>Usage</span>
-                <span className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                <span className={`text-sm font-medium text-foreground/80`}>Usage</span>
+                <span className={`text-sm font-semibold text-foreground`}>
                   {credits.postsUsed} / {credits.postsPerMonth}
                 </span>
               </div>
-              <div className={`w-full rounded-full h-3 overflow-hidden ${isDark ? "bg-slate-700" : "bg-gray-200"}`}>
+              <div className={`w-full rounded-full h-3 overflow-hidden bg-accent`}>
                 <div
                   className={`h-full rounded-full transition-all ${
                     isAtLimit
@@ -139,10 +139,10 @@ export default function CreditsPage() {
                 />
               </div>
               <div className="flex items-center justify-between mt-2">
-                <span className={`text-xs ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                <span className={`text-xs text-muted-foreground`}>
                   {postsRemaining} posts remaining
                 </span>
-                <span className={`text-xs ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                <span className={`text-xs text-muted-foreground`}>
                   {Math.round(postsPercentage)}% used
                 </span>
               </div>
@@ -183,18 +183,18 @@ export default function CreditsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
           <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-            <CardTitle className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+            <CardTitle className={`text-base font-semibold text-foreground`}>
               Revisions Per Post
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
-              <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span className={`text-2xl font-bold text-foreground`}>
                 {credits.revisionsPerPost}
               </span>
               <CheckCircle2 className="w-8 h-8 text-green-500 dark:text-green-400" />
             </div>
-            <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+            <p className={`text-xs mt-2 text-muted-foreground`}>
               Allowed revisions per post
             </p>
           </CardContent>
@@ -202,23 +202,23 @@ export default function CreditsPage() {
 
         <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
           <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-            <CardTitle className={`text-base font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+            <CardTitle className={`text-base font-semibold text-foreground`}>
               Rush Requests
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                <span className={`text-2xl font-bold text-foreground`}>
                   {rushRemaining}
                 </span>
-                <span className={`text-sm ml-2 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                <span className={`text-sm ml-2 text-muted-foreground`}>
                   / {credits.rushRequests}
                 </span>
               </div>
               <TrendingUp className="w-8 h-8 text-purple-500 dark:text-purple-400" />
             </div>
-            <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+            <p className={`text-xs mt-2 text-muted-foreground`}>
               Rush requests remaining this month
             </p>
           </CardContent>

@@ -406,23 +406,15 @@ export default function SettingsPage() {
   const isDark = resolvedTheme ? (currentTheme === "dark" || (currentTheme === "system" && resolvedTheme === "dark")) : false;
 
   return (
-    <div className={`space-y-6 pt-6 max-w-4xl mx-auto px-4 transition-colors duration-300 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    } min-h-screen`}>
+    <div className={`space-y-6 pt-6 max-w-4xl mx-auto px-4 transition-colors duration-300 bg-background min-h-screen`}>
       {/* Header */}
       <div className="mb-6">
-        <h1 className={`text-2xl font-semibold mb-1 ${
-          isDark ? "text-white" : "text-gray-950"
-        }`}>Settings</h1>
-        <p className={`text-sm ${
-          isDark ? "text-gray-400" : "text-gray-600"
-        }`}>Manage your preferences and AI model selection</p>
+        <h1 className={`text-2xl font-semibold mb-1 text-foreground`}>Settings</h1>
+        <p className={`text-sm text-muted-foreground`}>Manage your preferences and AI model selection</p>
       </div>
 
       <Tabs defaultValue="ai" className="space-y-6">
-        <div className={`border-b transition-colors duration-300 ${
-          isDark ? "border-slate-700" : "border-gray-200"
-        } -mx-4 sm:mx-0 px-4 sm:px-0`}>
+        <div className={`border-b transition-colors duration-300 border-border -mx-4 sm:mx-0 px-4 sm:px-0`}>
           <TabsList className={`bg-transparent h-auto p-0 w-full justify-start gap-0 flex-wrap sm:flex-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide border-0 ${
             isDark ? "" : ""
           }`}>
@@ -490,24 +482,16 @@ export default function SettingsPage() {
         {/* AI Models Tab */}
         {/* Agency Profile Tab */}
         <TabsContent value="agency" className="space-y-6">
-          <Card className={`${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          } rounded-xl shadow-sm`}>
-            <CardHeader className={`border-b ${
-              isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"
-            }`}>
-              <CardTitle className={`text-lg font-semibold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Agency Information</CardTitle>
+          <Card className={`bg-card border-border rounded-xl shadow-sm`}>
+            <CardHeader className={`border-b border-border bg-muted/50`}>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>Agency Information</CardTitle>
               <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
                 Manage your agency profile and contact details
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-6">
         <div>
-                <label className={`block text-sm font-medium mb-2 ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}>
+                <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                   Agency Name
                 </label>
                 <input
@@ -527,9 +511,7 @@ export default function SettingsPage() {
           </p>
         </div>
               <div>
-                <label className={`block text-sm font-medium mb-2 ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}>
+                <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                   Email Address
                 </label>
                 <input
@@ -546,9 +528,7 @@ export default function SettingsPage() {
               <div className={`pt-4 border-t ${
                 isDark ? "border-gray-800" : "border-gray-200"
               }`}>
-                <h3 className={`text-sm font-semibold mb-4 ${
-                  isDark ? "text-white" : "text-gray-900"
-                }`}>Quick Stats</h3>
+                <h3 className={`text-sm font-semibold mb-4 text-foreground`}>Quick Stats</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className={`p-4 rounded-lg border ${
                     isDark
@@ -595,7 +575,7 @@ export default function SettingsPage() {
         <TabsContent value="billing" className="space-y-6">
           <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
             <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>
                 Plan & usage
               </CardTitle>
               <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
@@ -605,8 +585,8 @@ export default function SettingsPage() {
             <div className="p-6 space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>Current plan</p>
-                  <p className={`text-xl font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                  <p className={`text-sm text-muted-foreground`}>Current plan</p>
+                  <p className={`text-xl font-semibold text-foreground`}>
                     {usage?.plan || "Free"}
                   </p>
                 </div>
@@ -633,9 +613,7 @@ export default function SettingsPage() {
                   </span>
                 </div>
                 <div
-                  className={`h-2 rounded-full overflow-hidden ${
-                    isDark ? "bg-slate-700" : "bg-gray-100"
-                  }`}
+                  className={`h-2 rounded-full overflow-hidden bg-accent`}
                 >
                   <div
                     className={`h-full rounded-full transition-all ${
@@ -650,7 +628,7 @@ export default function SettingsPage() {
                     }}
                   />
                 </div>
-                <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                <p className={`text-xs mt-2 text-muted-foreground/70`}>
                   {usage
                     ? usage.limit === Infinity || !Number.isFinite(usage.limit)
                       ? "Unlimited on your plan."
@@ -674,7 +652,7 @@ export default function SettingsPage() {
         <TabsContent value="integrations" className="space-y-6">
           <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
             <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Social Media Integrations</CardTitle>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>Social Media Integrations</CardTitle>
               <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Connect your social media accounts for automated posting
               </CardDescription>
@@ -682,16 +660,14 @@ export default function SettingsPage() {
             <div className="p-6 space-y-6">
               {/* Prove publish loop */}
               <div
-                className={`rounded-xl border p-4 ${
-                  isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"
-                }`}
+                className={`rounded-xl border p-4 bg-muted/50 border-border`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-3">
                   <div>
-                    <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                    <h3 className={`font-semibold text-foreground`}>
                       Publish readiness
                     </h3>
-                    <p className={`text-sm mt-0.5 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                    <p className={`text-sm mt-0.5 text-muted-foreground`}>
                       Prove Twitter/Instagram auto-post without waiting on cron
                     </p>
                   </div>
@@ -831,20 +807,20 @@ export default function SettingsPage() {
                             <span className="font-medium capitalize">#{p.id} {p.platform}</span>
                             {" — "}
                             {p.ready ? "ready" : p.reason}
-                            <span className={`block text-xs truncate ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                            <span className={`block text-xs truncate text-muted-foreground/70`}>
                               {p.preview}
                             </span>
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className={`text-xs ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                      <p className={`text-xs text-muted-foreground`}>
                         {publishReport.tip}
                       </p>
                     )}
                     {publishReport.lastRun ? (
                       <div className={`pt-2 border-t ${isDark ? "border-slate-700" : "border-gray-100"}`}>
-                        <p className={`text-xs font-medium mb-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                        <p className={`text-xs font-medium mb-1 text-muted-foreground`}>
                           Last run: {publishReport.lastRun.successful} posted ·{" "}
                           {publishReport.lastRun.failed} failed · {publishReport.lastRun.skipped} skipped
                         </p>
@@ -862,29 +838,21 @@ export default function SettingsPage() {
               </div>
 
               {/* YouTube Integration */}
-              <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+              <div className={`rounded-xl border p-4 bg-muted/50 border-border`}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0">
                     <PlayIcon className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${
-                      isDark ? "text-white" : "text-gray-950"
-                    }`}>YouTube</h3>
-                    <p className={`text-sm ${
-                      isDark ? "text-gray-400" : "text-gray-600"
-                    }`}>Automated video uploads</p>
+                    <h3 className={`font-semibold text-foreground`}>YouTube</h3>
+                    <p className={`text-sm text-muted-foreground`}>Automated video uploads</p>
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
-                    isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-                  }`}>
+                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border bg-card border-border`}>
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="flex-1 min-w-0">
-                        <p className={`flex items-center gap-2 text-sm break-words ${
-                          isDark ? "text-gray-300" : "text-gray-600"
-                        }`}>
+                        <p className={`flex items-center gap-2 text-sm break-words text-muted-foreground`}>
                           {settings.youtubeConnected ? (
                             <>
                               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
@@ -957,24 +925,22 @@ export default function SettingsPage() {
               </div>
 
               {/* Twitter */}
-              <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+              <div className={`rounded-xl border p-4 bg-muted/50 border-border`}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">
                     X
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                    <h3 className={`font-semibold text-foreground`}>
                       Twitter / X
                     </h3>
-                    <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                    <p className={`text-sm text-muted-foreground`}>
                       Auto-post scheduled tweets when connected
                     </p>
                   </div>
                 </div>
-                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
-                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-                }`}>
-                  <p className={`flex items-center gap-2 text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border bg-card border-border`}>
+                  <p className={`flex items-center gap-2 text-sm text-muted-foreground`}>
                     {settings.twitterConnected ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
@@ -1031,24 +997,22 @@ export default function SettingsPage() {
               </div>
 
               {/* Instagram */}
-              <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+              <div className={`rounded-xl border p-4 bg-muted/50 border-border`}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center flex-shrink-0 text-white font-bold text-xs">
                     IG
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                    <h3 className={`font-semibold text-foreground`}>
                       Instagram
                     </h3>
-                    <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                    <p className={`text-sm text-muted-foreground`}>
                       Auto-publish image posts when a public image URL is set
                     </p>
                   </div>
                 </div>
-                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
-                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-                }`}>
-                  <p className={`flex items-center gap-2 text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border bg-card border-border`}>
+                  <p className={`flex items-center gap-2 text-sm text-muted-foreground`}>
                     {settings.instagramConnected ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
@@ -1105,7 +1069,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Google Calendar */}
-              <div className={`rounded-xl border p-4 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+              <div className={`rounded-xl border p-4 bg-muted/50 border-border`}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                     isDark ? "bg-blue-900" : "bg-blue-100"
@@ -1113,18 +1077,16 @@ export default function SettingsPage() {
                     <Calendar className={`w-5 h-5 ${isDark ? "text-blue-300" : "text-blue-700"}`} />
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                    <h3 className={`font-semibold text-foreground`}>
                       Google Calendar
                     </h3>
-                    <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                    <p className={`text-sm text-muted-foreground`}>
                       Calendar reminders for LinkedIn / TikTok manual posts
                     </p>
                   </div>
                 </div>
-                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border ${
-                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-                }`}>
-                  <p className={`flex items-center gap-2 text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border bg-card border-border`}>
+                  <p className={`flex items-center gap-2 text-sm text-muted-foreground`}>
                     {settings.googleCalendarConnected ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
@@ -1197,7 +1159,7 @@ export default function SettingsPage() {
             <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Team Management</CardTitle>
+                  <CardTitle className={`text-lg font-semibold text-foreground`}>Team Management</CardTitle>
                   <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                     Invite team members, assign roles, and manage permissions
                   </CardDescription>
@@ -1213,8 +1175,8 @@ export default function SettingsPage() {
             <div className="p-6">
               <div className="text-center py-8">
                 <Check className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
-                <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Team Collaboration</h3>
-                <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                <h3 className={`text-lg font-semibold mb-2 text-foreground`}>Team Collaboration</h3>
+                <p className={`mb-4 text-muted-foreground`}>
                   Invite team members, assign roles, and manage permissions for your agency
                 </p>
                 <Button
@@ -1233,16 +1195,16 @@ export default function SettingsPage() {
         <TabsContent value="workflow" className="space-y-6">
           <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
             <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Workflow Preferences</CardTitle>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>Workflow Preferences</CardTitle>
               <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Configure default workflow settings for your agency
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-4">
-              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border bg-muted/50 border-border`}>
                 <div className="flex-1 min-w-0">
-                  <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-950"}`}>Require Approval by Default</h3>
-                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                  <h3 className={`font-semibold mb-1 text-foreground`}>Require Approval by Default</h3>
+                  <p className={`text-sm text-muted-foreground`}>
                     New posts will require client approval by default (can be changed per post)
                   </p>
                 </div>
@@ -1270,14 +1232,14 @@ export default function SettingsPage() {
         <TabsContent value="appearance" className="space-y-6">
           <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
             <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Appearance</CardTitle>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>Appearance</CardTitle>
               <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Customize the look and feel of your dashboard
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-4">
               <div>
-                <label className={`text-sm font-semibold mb-3 block ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                <label className={`text-sm font-semibold mb-3 block text-foreground/80`}>
                   Theme
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -1319,7 +1281,7 @@ export default function SettingsPage() {
             <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Team Management</CardTitle>
+                  <CardTitle className={`text-lg font-semibold text-foreground`}>Team Management</CardTitle>
                   <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                     Invite team members, assign roles, and manage permissions
                   </CardDescription>
@@ -1335,8 +1297,8 @@ export default function SettingsPage() {
             <div className="p-6">
               <div className="text-center py-8">
                 <Check className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
-                <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Team Collaboration</h3>
-                <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                <h3 className={`text-lg font-semibold mb-2 text-foreground`}>Team Collaboration</h3>
+                <p className={`mb-4 text-muted-foreground`}>
                   Invite team members, assign roles, and manage permissions for your agency
                 </p>
                 <Button
@@ -1355,16 +1317,16 @@ export default function SettingsPage() {
         <TabsContent value="notifications" className="space-y-6">
           <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
             <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Email Notifications</CardTitle>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>Email Notifications</CardTitle>
               <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Configure when you receive email notifications
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-4">
-              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"}`}>
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border bg-muted/50 border-border`}>
                 <div className="flex-1 min-w-0">
-                  <h3 className={`font-semibold mb-1 ${isDark ? "text-white" : "text-gray-950"}`}>Approval Notifications</h3>
-                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                  <h3 className={`font-semibold mb-1 text-foreground`}>Approval Notifications</h3>
+                  <p className={`text-sm text-muted-foreground`}>
                     Receive emails when clients approve or request changes to posts
                   </p>
                         </div>
@@ -1384,16 +1346,10 @@ export default function SettingsPage() {
                   />
                 </button>
                             </div>
-              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${
-                isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"
-              }`}>
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border bg-muted/50 border-border`}>
                 <div className="flex-1 min-w-0">
-                  <h3 className={`font-semibold mb-1 ${
-                    isDark ? "text-white" : "text-gray-950"
-                  }`}>Task Assignment Notifications</h3>
-                  <p className={`text-sm ${
-                    isDark ? "text-gray-400" : "text-gray-600"
-                  }`}>
+                  <h3 className={`font-semibold mb-1 text-foreground`}>Task Assignment Notifications</h3>
+                  <p className={`text-sm text-muted-foreground`}>
                     Get notified when tasks are assigned to you or your team members
                   </p>
                         </div>
@@ -1413,16 +1369,10 @@ export default function SettingsPage() {
                   />
                 </button>
                       </div>
-              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${
-                isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"
-              }`}>
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border bg-muted/50 border-border`}>
                 <div className="flex-1 min-w-0">
-                  <h3 className={`font-semibold mb-1 ${
-                    isDark ? "text-white" : "text-gray-950"
-                  }`}>General Notifications</h3>
-                  <p className={`text-sm ${
-                    isDark ? "text-gray-400" : "text-gray-600"
-                  }`}>
+                  <h3 className={`font-semibold mb-1 text-foreground`}>General Notifications</h3>
+                  <p className={`text-sm text-muted-foreground`}>
                     Receive email updates about your content and account activity
                   </p>
                     </div>
@@ -1450,7 +1400,7 @@ export default function SettingsPage() {
         <TabsContent value="ai" className="space-y-6">
           <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
             <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-              <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>AI Model Selection</CardTitle>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>AI Model Selection</CardTitle>
               <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
                 Choose your preferred AI model for content generation
               </CardDescription>
@@ -1458,7 +1408,7 @@ export default function SettingsPage() {
             <div className="p-6">
               {/* Simple Dropdown Selector */}
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                   Select AI Model
                 </label>
                 <div className="relative" ref={modelDropdownRef}>
@@ -1473,12 +1423,10 @@ export default function SettingsPage() {
                         if (!selectedModel) return null;
                         return (
                           <>
-                            <div className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                            <div className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-muted-foreground`}>
                               {selectedModel.icon}
                             </div>
-                            <span className={`font-medium text-sm ${
-                              isDark ? "text-white" : "text-gray-950"
-                            }`}>{selectedModel.name}</span>
+                            <span className={`font-medium text-sm text-foreground`}>{selectedModel.name}</span>
                             <span className={`text-xs ${
                               isDark ? "text-gray-500" : "text-gray-500"
                             }`}>•</span>
@@ -1520,9 +1468,7 @@ export default function SettingsPage() {
                                   : isSelected ? "bg-gray-50" : "hover:bg-gray-50"
                               }`}
                             >
-                              <div className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ${
-                                isDark ? "text-gray-400" : "text-gray-600"
-                              }`}>
+                              <div className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-muted-foreground`}>
                                 {model.icon}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -1558,15 +1504,9 @@ export default function SettingsPage() {
             </div>
           </Card>
 
-          <Card className={`${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          } rounded-xl shadow-sm`}>
-            <CardHeader className={`border-b ${
-              isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"
-            }`}>
-              <CardTitle className={`text-lg font-semibold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Niche Selection</CardTitle>
+          <Card className={`bg-card border-border rounded-xl shadow-sm`}>
+            <CardHeader className={`border-b border-border bg-muted/50`}>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>Niche Selection</CardTitle>
               <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
                 Choose your niche to get personalized content ideas
               </CardDescription>
@@ -1634,30 +1574,18 @@ export default function SettingsPage() {
             </div>
           </Card>
 
-          <Card className={`${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          } rounded-xl shadow-sm`}>
-            <CardHeader className={`border-b ${
-              isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"
-            }`}>
-              <CardTitle className={`text-lg font-semibold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Content Settings</CardTitle>
+          <Card className={`bg-card border-border rounded-xl shadow-sm`}>
+            <CardHeader className={`border-b border-border bg-muted/50`}>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>Content Settings</CardTitle>
               <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
                 Configure your content generation preferences
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-4">
-              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${
-                isDark ? "bg-slate-800/50 border-slate-700" : "bg-gray-50 border-gray-200"
-              }`}>
+              <div className={`flex items-center justify-between gap-4 p-4 rounded-xl border bg-muted/50 border-border`}>
                 <div className="flex-1 min-w-0">
-                  <h3 className={`font-semibold mb-1 ${
-                    isDark ? "text-white" : "text-gray-950"
-                  }`}>Auto-save Content</h3>
-                  <p className={`text-sm ${
-                    isDark ? "text-gray-400" : "text-gray-600"
-                  }`}>
+                  <h3 className={`font-semibold mb-1 text-foreground`}>Auto-save Content</h3>
+                  <p className={`text-sm text-muted-foreground`}>
                     Automatically save generated content to history
                   </p>
                 </div>
@@ -1683,24 +1611,16 @@ export default function SettingsPage() {
 
         {/* Appearance Tab */}
         <TabsContent value="appearance" className="space-y-6">
-          <Card className={`${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          } rounded-xl shadow-sm`}>
-            <CardHeader className={`border-b ${
-              isDark ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"
-            }`}>
-              <CardTitle className={`text-lg font-semibold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Appearance</CardTitle>
+          <Card className={`bg-card border-border rounded-xl shadow-sm`}>
+            <CardHeader className={`border-b border-border bg-muted/50`}>
+              <CardTitle className={`text-lg font-semibold text-foreground`}>Appearance</CardTitle>
               <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
                 Customize the look and feel of your dashboard
               </CardDescription>
             </CardHeader>
             <div className="p-6 space-y-4">
               <div>
-                <label className={`text-sm font-semibold mb-3 block ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}>
+                <label className={`text-sm font-semibold mb-3 block text-foreground/80`}>
                   Theme
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -1747,8 +1667,8 @@ export default function SettingsPage() {
       <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t ${
         isDark ? "border-gray-800" : "border-gray-200"
       }`}>
-        <p className={`text-sm max-w-xl ${isDark ? "text-slate-400" : "text-gray-600"}`}>
-          <span className={`font-medium ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+        <p className={`text-sm max-w-xl text-muted-foreground`}>
+          <span className={`font-medium text-foreground/80`}>
             Preferences save to your account.
           </span>{" "}
           Connected accounts (Google, YouTube) are managed separately in Integrations.

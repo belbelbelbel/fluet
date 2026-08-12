@@ -568,13 +568,13 @@ function DashboardGeneratePageInner() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${isDark ? "text-white" : "text-gray-950"}`}>
+          <h1 className={`text-2xl sm:text-3xl font-bold mb-2 text-foreground`}>
             Generate Content
             {clientName && (
               <span className="text-foreground dark:text-purple-400 font-semibold ml-2">for {clientName}</span>
             )}
           </h1>
-          <p className={`${isDark ? "text-slate-400" : "text-gray-600"} flex flex-wrap items-center gap-x-2 gap-y-1`}>
+          <p className={`text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1`}>
             <span>Create engaging content for your social media platforms</span>
             {clientIdFromQuery && (
               <>
@@ -609,9 +609,9 @@ function DashboardGeneratePageInner() {
             {/* Left Column - Generation Form */}
             <div className="lg:col-span-2 space-y-6">
               {/* Platform Selection */}
-              <Card className={`border rounded-xl transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+              <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
                 <CardContent className="p-4 sm:p-6">
-                  <label className={`block text-sm font-semibold mb-3 ${isDark ? "text-white" : "text-gray-950"}`}>Platform</label>
+                  <label className={`block text-sm font-semibold mb-3 text-foreground`}>Platform</label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {contentTypes.map((type) => (
                       <button
@@ -636,7 +636,7 @@ function DashboardGeneratePageInner() {
               </Card>
 
               {/* Prompt Input */}
-              <Card className={`border rounded-xl transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+              <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
                 <CardContent className="p-4 sm:p-6">
                   <Label className="mb-3 block">What do you want to create?</Label>
                   <Textarea
@@ -645,9 +645,7 @@ function DashboardGeneratePageInner() {
                     placeholder="Describe what you want to post about... (e.g., 'A post about launching our new product')"
                     rows={4}
                   />
-                  <div className={`mt-2 text-xs text-right ${
-                    isDark ? "text-slate-400" : "text-gray-500"
-                  }`}>
+                  <div className={`mt-2 text-xs text-right text-muted-foreground`}>
                     {prompt.length} characters
                   </div>
                 </CardContent>
@@ -672,13 +670,13 @@ function DashboardGeneratePageInner() {
               </div>
 
               {/* Options (collapsible) */}
-              <Card className={`border rounded-xl transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+              <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
                 <CardContent className="p-4 sm:p-6">
                   <button
                     onClick={() => setShowOptions(!showOptions)}
                     className="flex items-center justify-between w-full"
                   >
-                    <label className={`block text-sm font-semibold ${isDark ? "text-white" : "text-gray-950"}`}>
+                    <label className={`block text-sm font-semibold text-foreground`}>
                       Options
                     </label>
                     <span className={`text-xs transition-colors duration-200 ${isDark ? "text-slate-400 hover:text-white" : "text-gray-600 hover:text-gray-950"}`}>
@@ -691,10 +689,10 @@ function DashboardGeneratePageInner() {
                       {/* Brand Voice (when client) */}
                       {clientIdFromQuery && (
                         <div>
-                          <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                          <label className={`block text-xs font-medium mb-2 text-foreground/80`}>
                             Brand Voice
                           </label>
-                          <p className={`text-xs mb-1 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                          <p className={`text-xs mb-1 text-muted-foreground`}>
                             {brandVoice ? (
                               brandVoice.brandDescription
                                 ? `${brandVoice.brandDescription.slice(0, 100)}${brandVoice.brandDescription.length > 100 ? "…" : ""}`
@@ -714,7 +712,7 @@ function DashboardGeneratePageInner() {
 
                       {/* Generation Mode */}
                       <div>
-                        <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                        <label className={`block text-xs font-medium mb-2 text-foreground/80`}>
                           Generation Mode
                         </label>
                         <select
@@ -735,7 +733,7 @@ function DashboardGeneratePageInner() {
                       {/* Templates */}
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <label className={`block text-xs font-medium ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                          <label className={`block text-xs font-medium text-foreground/80`}>
                             Templates
                           </label>
                           <button
@@ -757,8 +755,8 @@ function DashboardGeneratePageInner() {
                                     isDark ? "border-slate-700 bg-slate-700/50 hover:border-slate-600" : "border-gray-200 hover:border-gray-300"
                                   }`}
                                 >
-                                  <div className={`font-medium ${isDark ? "text-white" : "text-gray-950"}`}>{template.name}</div>
-                                  <div className={`text-xs truncate ${isDark ? "text-slate-400" : "text-gray-600"}`}>{template.description}</div>
+                                  <div className={`font-medium text-foreground`}>{template.name}</div>
+                                  <div className={`text-xs truncate text-muted-foreground`}>{template.description}</div>
                                 </button>
                               ))}
                           </div>
@@ -767,7 +765,7 @@ function DashboardGeneratePageInner() {
 
                       {/* Tone */}
                       <div>
-                        <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>Tone</label>
+                        <label className={`block text-xs font-medium mb-2 text-foreground/80`}>Tone</label>
                         <div className="flex flex-wrap gap-2">
                           {tones.map((t) => (
                             <button
@@ -783,7 +781,7 @@ function DashboardGeneratePageInner() {
 
                       {/* Style */}
                       <div>
-                        <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>Style</label>
+                        <label className={`block text-xs font-medium mb-2 text-foreground/80`}>Style</label>
                         <div className="flex flex-wrap gap-2">
                           {styles.map((s) => (
                             <button
@@ -799,7 +797,7 @@ function DashboardGeneratePageInner() {
 
                       {/* Length */}
                       <div>
-                        <label className={`block text-xs font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>Length</label>
+                        <label className={`block text-xs font-medium mb-2 text-foreground/80`}>Length</label>
                         <div className="flex flex-wrap gap-2">
                           {lengths.map((l) => (
                             <button
@@ -833,10 +831,10 @@ function DashboardGeneratePageInner() {
 
             {/* Right Column - Recent Content */}
             <div className="space-y-6">
-              <Card className={`border rounded-xl shadow-md transition-colors duration-300 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
+              <Card className={`border rounded-xl shadow-md transition-colors duration-300 bg-card border-border`}>
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-950"}`}>Recent Content</h2>
+                    <h2 className={`text-lg font-bold text-foreground`}>Recent Content</h2>
                     <button
                       onClick={() => fetchRecentContent()}
                       disabled={loadingRecent}
@@ -848,8 +846,8 @@ function DashboardGeneratePageInner() {
                   </div>
                   {loadingRecent ? (
                     <div className="text-center py-8">
-                      <Loader2Icon className={`w-6 h-6 animate-spin mx-auto mb-2 ${isDark ? "text-slate-400" : "text-gray-400"}`} />
-                      <p className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>Loading...</p>
+                      <Loader2Icon className={`w-6 h-6 animate-spin mx-auto mb-2 text-muted-foreground`} />
+                      <p className={`text-xs text-muted-foreground`}>Loading...</p>
                     </div>
                   ) : recentContent.length > 0 ? (
                     <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
@@ -875,7 +873,7 @@ function DashboardGeneratePageInner() {
                               {/* Platform Name and Status */}
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
-                                  <span className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-950"}`}>
+                                  <span className={`text-sm font-bold text-foreground`}>
                                     {getPlatformLabel(item.platform)}
                                   </span>
                                   <div className="w-4 h-4 text-blue-500">
@@ -889,12 +887,12 @@ function DashboardGeneratePageInner() {
                               </div>
                               
                               {/* Content Text */}
-                              <p className={`text-sm mb-1.5 leading-relaxed line-clamp-2 ${isDark ? "text-slate-200" : "text-gray-950"}`}>
+                              <p className={`text-sm mb-1.5 leading-relaxed line-clamp-2 text-foreground`}>
                                 {item.content}
                               </p>
                               
                               {/* Secondary Status Text */}
-                              <p className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                              <p className={`text-xs text-muted-foreground`}>
                                 In. {getPlatformLabel(item.platform)} {item.status === "Published" ? "Published" : item.status === "Scheduled" ? "Scheduled" : "Generated"}
                               </p>
                             </div>
@@ -904,11 +902,9 @@ function DashboardGeneratePageInner() {
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <FileTextIcon className={`w-8 h-8 mx-auto mb-2 ${
-                        isDark ? "text-slate-500" : "text-gray-400"
-                      }`} />
-                      <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>No recent content</p>
-                      <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-gray-500"}`}>Generate content to see it here</p>
+                      <FileTextIcon className={`w-8 h-8 mx-auto mb-2 text-muted-foreground/70`} />
+                      <p className={`text-sm text-muted-foreground`}>No recent content</p>
+                      <p className={`text-xs mt-1 text-muted-foreground`}>Generate content to see it here</p>
                     </div>
                   )}
                 </CardContent>
@@ -922,19 +918,17 @@ function DashboardGeneratePageInner() {
       {isGenerating && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div
-            className={`rounded-2xl shadow-xl max-w-md w-full p-8 text-center border transition-colors duration-300 ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
+            className={`rounded-2xl shadow-xl max-w-md w-full p-8 text-center border transition-colors duration-300 bg-card border-border`}
           >
             <Loader2Icon
               className={`w-12 h-12 animate-spin mx-auto mb-4 ${
                 isDark ? "text-purple-400" : "text-foreground"
               }`}
             />
-            <h3 className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-950"}`}>
+            <h3 className={`text-lg font-semibold mb-2 text-foreground`}>
               {loadingMessage || "Generating…"}
             </h3>
-            <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+            <p className={`text-sm text-muted-foreground`}>
               This usually takes a few seconds
             </p>
           </div>
@@ -946,8 +940,8 @@ function DashboardGeneratePageInner() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowContentModal(false)}>
           <div className={`rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col transition-colors duration-300 ${isDark ? "bg-slate-800 border border-slate-700" : "bg-white"}`} onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className={`flex items-center justify-between p-6 border-b transition-colors duration-300 ${isDark ? "border-slate-700" : "border-gray-200"}`}>
-              <h3 className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-950"}`}>Generated Content</h3>
+            <div className={`flex items-center justify-between p-6 border-b transition-colors duration-300 border-border`}>
+              <h3 className={`text-lg font-bold text-foreground`}>Generated Content</h3>
               <button
                 onClick={() => setShowContentModal(false)}
                 className={`p-2 rounded-lg transition-all duration-200 ${isDark ? "hover:bg-slate-700 text-slate-300" : "hover:bg-gray-100 text-gray-600"}`}
@@ -988,9 +982,7 @@ function DashboardGeneratePageInner() {
                       ? "bg-slate-900/50 border-slate-700"
                       : "bg-gray-50 border-gray-200"
                   }`}>
-                    <pre className={`whitespace-pre-wrap text-sm leading-relaxed ${
-                      isDark ? "text-slate-200" : "text-gray-900"
-                    }`}>
+                    <pre className={`whitespace-pre-wrap text-sm leading-relaxed text-foreground`}>
                       {generatedContent}
                     </pre>
                   </div>
@@ -999,9 +991,7 @@ function DashboardGeneratePageInner() {
             </div>
 
             {/* Modal Footer */}
-            <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-6 border-t gap-3 transition-colors duration-300 ${
-              isDark ? "border-slate-700" : "border-gray-200"
-            }`}>
+            <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-6 border-t gap-3 transition-colors duration-300 border-border`}>
               <div className="flex flex-wrap items-center gap-2">
                 {!isEditing && (
                   <>

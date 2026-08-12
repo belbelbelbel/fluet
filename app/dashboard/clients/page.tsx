@@ -191,16 +191,12 @@ export default function ClientsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1
-            className={`text-2xl font-medium ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-2xl font-medium text-foreground`}
           >
             Clients
           </h1>
           <p
-            className={`mt-1 text-sm ${
-              isDark ? "text-slate-400" : "text-gray-600"
-            }`}
+            className={`mt-1 text-sm text-muted-foreground`}
           >
             {clients.length} {clients.length === 1 ? "client" : "clients"} — manage all your accounts
           </p>
@@ -225,9 +221,7 @@ export default function ClientsPage() {
         }`}>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-                isDark ? "text-slate-500" : "text-gray-400"
-              }`} />
+              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70`} />
               <input
                 type="text"
                 placeholder="Search by name or email..."
@@ -280,9 +274,7 @@ export default function ClientsPage() {
             </div>
           </div>
           {(searchQuery || statusFilter !== "all") && (
-            <p className={`mt-3 text-sm ${
-              isDark ? "text-slate-400" : "text-gray-600"
-            }`}>
+            <p className={`mt-3 text-sm text-muted-foreground`}>
               Showing {totalFiltered} of {clients.length} clients
             </p>
           )}
@@ -300,27 +292,19 @@ export default function ClientsPage() {
         >
           <CardContent className="pt-12 pb-12">
             <div className="text-center">
-              <div className={`w-14 h-14 mx-auto mb-4 rounded-xl border flex items-center justify-center ${
-                isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"
-              }`}>
+              <div className={`w-14 h-14 mx-auto mb-4 rounded-xl border flex items-center justify-center border-border bg-muted`}>
                 <Users
-                  className={`w-6 h-6 ${
-                    isDark ? "text-slate-500" : "text-gray-400"
-                  }`}
+                  className={`w-6 h-6 text-muted-foreground/70`}
                   strokeWidth={1.75}
                 />
               </div>
               <h2
-                className={`text-lg font-medium mb-2 ${
-                  isDark ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-lg font-medium mb-2 text-foreground`}
               >
                 No clients yet
               </h2>
               <p
-                className={`mb-6 ${
-                  isDark ? "text-slate-400" : "text-gray-600"
-                }`}
+                className={`mb-6 text-muted-foreground`}
               >
                 Get started by creating your first client
               </p>
@@ -342,15 +326,11 @@ export default function ClientsPage() {
         <Card className={isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}>
           <CardContent className="pt-12 pb-12">
             <div className="text-center">
-              <Search className={`w-12 h-12 mx-auto mb-4 ${
-                isDark ? "text-slate-500" : "text-gray-400"
-              }`} />
-              <h2 className={`text-lg font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>
+              <Search className={`w-12 h-12 mx-auto mb-4 text-muted-foreground/70`} />
+              <h2 className={`text-lg font-semibold mb-2 text-foreground`}>
                 No clients match your search
               </h2>
-              <p className={`mb-4 ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+              <p className={`mb-4 text-muted-foreground`}>
                 Try adjusting your search or filters
               </p>
               <Button
@@ -387,25 +367,19 @@ export default function ClientsPage() {
                   />
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-sm font-medium truncate ${
-                        isDark ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-sm font-medium truncate text-foreground`}
                     >
                       {client.name}
                     </p>
                     {client.email ? (
                       <p
-                        className={`text-xs mt-0.5 truncate ${
-                          isDark ? "text-slate-400" : "text-gray-500"
-                        }`}
+                        className={`text-xs mt-0.5 truncate text-muted-foreground`}
                       >
                         {client.email}
                       </p>
                     ) : (
                       <p
-                        className={`text-xs mt-0.5 ${
-                          isDark ? "text-slate-500" : "text-gray-400"
-                        }`}
+                        className={`text-xs mt-0.5 text-muted-foreground/70`}
                       >
                         No email
                       </p>
@@ -419,9 +393,7 @@ export default function ClientsPage() {
                 >
                   {getStatusBadge(client)}
                   <span
-                    className={`text-xs tabular-nums ${
-                      isDark ? "text-slate-500" : "text-gray-400"
-                    }`}
+                    className={`text-xs tabular-nums text-muted-foreground/70`}
                   >
                     {new Date(client.createdAt).toLocaleDateString()}
                   </span>
@@ -432,9 +404,7 @@ export default function ClientsPage() {
         </div>
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className={`flex items-center justify-between pt-6 ${
-            isDark ? "text-slate-400" : "text-gray-600"
-          }`}>
+          <div className={`flex items-center justify-between pt-6 text-muted-foreground`}>
             <p className="text-sm">
               Page {page} of {totalPages} · {totalFiltered} clients
             </p>

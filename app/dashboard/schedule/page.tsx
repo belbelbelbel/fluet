@@ -697,15 +697,11 @@ export default function DashboardSchedulePage() {
   // };
 
   return (
-    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
+    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 bg-background`}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>
-          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 ${
-            isDark ? "text-white" : "text-gray-950"
-          }`}>Schedule Posts</h1>
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-foreground`}>Schedule Posts</h1>
           <p className={isDark ? "text-slate-400" : "text-gray-600"}>We post for you automatically</p>
         </div>
         <Button
@@ -778,40 +774,22 @@ export default function DashboardSchedulePage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <Card className={`border rounded-xl transition-colors duration-300 ${
-          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-        }`}>
+        <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
           <CardContent className="p-4 sm:p-6">
-            <p className={`text-sm mb-2 font-medium ${
-              isDark ? "text-slate-400" : "text-gray-600"
-            }`}>Upcoming</p>
-            <p className={`text-2xl font-bold ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}>{upcomingPosts.length}</p>
+            <p className={`text-sm mb-2 font-medium text-muted-foreground`}>Upcoming</p>
+            <p className={`text-2xl font-bold text-foreground`}>{upcomingPosts.length}</p>
           </CardContent>
         </Card>
-        <Card className={`border rounded-xl transition-colors duration-300 ${
-          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-        }`}>
+        <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
           <CardContent className="p-4 sm:p-6">
-            <p className={`text-sm mb-2 font-medium ${
-              isDark ? "text-slate-400" : "text-gray-600"
-            }`}>Posted</p>
-            <p className={`text-2xl font-bold ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}>{pastPosts.filter((p) => p.posted).length}</p>
+            <p className={`text-sm mb-2 font-medium text-muted-foreground`}>Posted</p>
+            <p className={`text-2xl font-bold text-foreground`}>{pastPosts.filter((p) => p.posted).length}</p>
           </CardContent>
         </Card>
-        <Card className={`border rounded-xl transition-colors duration-300 ${
-          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-        }`}>
+        <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
           <CardContent className="p-4 sm:p-6">
-            <p className={`text-sm mb-2 font-medium ${
-              isDark ? "text-slate-400" : "text-gray-600"
-            }`}>Total</p>
-            <p className={`text-2xl font-bold ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}>{scheduledPosts.length}</p>
+            <p className={`text-sm mb-2 font-medium text-muted-foreground`}>Total</p>
+            <p className={`text-2xl font-bold text-foreground`}>{scheduledPosts.length}</p>
           </CardContent>
         </Card>
       </div>
@@ -826,18 +804,10 @@ export default function DashboardSchedulePage() {
       ) : viewMode === "calendar" ? (
         /* Calendar View */
         upcomingPosts.length === 0 ? (
-          <div className={`text-center py-12 border rounded-xl transition-colors duration-300 ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          }`}>
-            <CalendarIcon className={`w-12 h-12 mx-auto mb-3 ${
-              isDark ? "text-slate-500" : "text-gray-400"
-            }`} />
-            <h3 className={`text-lg font-semibold mb-1.5 ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}>No scheduled posts</h3>
-            <p className={`text-sm mb-4 ${
-              isDark ? "text-slate-400" : "text-gray-600"
-            }`}>
+          <div className={`text-center py-12 border rounded-xl transition-colors duration-300 bg-card border-border`}>
+            <CalendarIcon className={`w-12 h-12 mx-auto mb-3 text-muted-foreground/70`} />
+            <h3 className={`text-lg font-semibold mb-1.5 text-foreground`}>No scheduled posts</h3>
+            <p className={`text-sm mb-4 text-muted-foreground`}>
               Schedule your first post to see it on the calendar
             </p>
             <Button
@@ -872,9 +842,7 @@ export default function DashboardSchedulePage() {
           {/* List View - Upcoming Posts */}
           {upcomingPosts.length > 0 && (
             <div>
-              <h2 className={`text-xl font-bold mb-6 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Upcoming</h2>
+              <h2 className={`text-xl font-bold mb-6 text-foreground`}>Upcoming</h2>
               <div className="space-y-4">
                 {upcomingPosts.map((post) => (
                   <Card
@@ -891,9 +859,7 @@ export default function DashboardSchedulePage() {
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                           <div className="flex items-center gap-2">
                             {getPlatformIcon(post.platform)}
-                            <span className={`text-sm font-semibold capitalize ${
-                              isDark ? "text-white" : "text-gray-900"
-                            }`}>
+                            <span className={`text-sm font-semibold capitalize text-foreground`}>
                               {post.platform}
                             </span>
                           </div>
@@ -934,9 +900,7 @@ export default function DashboardSchedulePage() {
                             {getTimeUntil(post.scheduledFor)}
                           </span>
                         </div>
-                          <span className={`text-xs ${
-                            isDark ? "text-slate-400" : "text-gray-600"
-                          }`}>
+                          <span className={`text-xs text-muted-foreground`}>
                           {formatDateTime(post.scheduledFor)}
                         </span>
                       </div>
@@ -975,16 +939,12 @@ export default function DashboardSchedulePage() {
                           : "bg-gray-50 border-gray-200"
                       }`}>
                         {post.platform === "youtube" ? (
-                          <p className={`flex items-center gap-2 text-sm leading-relaxed ${
-                            isDark ? "text-slate-200" : "text-gray-900"
-                          }`}>
+                          <p className={`flex items-center gap-2 text-sm leading-relaxed text-foreground`}>
                             <YoutubeIcon className="h-4 w-4 shrink-0" />
                             YouTube Video - {post.content || "Video scheduled"}
                           </p>
                         ) : (
-                          <pre className={`whitespace-pre-wrap text-sm leading-relaxed line-clamp-2 ${
-                            isDark ? "text-slate-200" : "text-gray-900"
-                          }`}>
+                          <pre className={`whitespace-pre-wrap text-sm leading-relaxed line-clamp-2 text-foreground`}>
                             {post.content}
                           </pre>
                         )}
@@ -999,26 +959,18 @@ export default function DashboardSchedulePage() {
           {/* Past Posts */}
           {pastPosts.length > 0 && (
             <div>
-              <h2 className={`text-xl font-bold mb-6 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Past</h2>
+              <h2 className={`text-xl font-bold mb-6 text-foreground`}>Past</h2>
               <div className="space-y-4">
                 {pastPosts.map((post) => (
                   <Card
                     key={post.id}
-                    className={`border rounded-xl opacity-80 transition-colors duration-300 ${
-                      isDark
-                        ? "bg-slate-800/50 border-slate-700"
-                        : "bg-gray-50 border-gray-200"
-                    }`}
+                    className={`border rounded-xl opacity-80 transition-colors duration-300 bg-muted/50 border-border`}
                   >
                     <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         {getPlatformIcon(post.platform)}
-                          <span className={`text-sm font-medium capitalize ${
-                            isDark ? "text-slate-300" : "text-gray-700"
-                          }`}>
+                          <span className={`text-sm font-medium capitalize text-foreground/80`}>
                           {post.platform}
                         </span>
                         {post.posted ? (
@@ -1049,24 +1001,18 @@ export default function DashboardSchedulePage() {
                             Mark posted
                           </Button>
                         ) : null}
-                        <span className={`text-xs ${
-                          isDark ? "text-slate-400" : "text-gray-600"
-                        }`}>
+                        <span className={`text-xs text-muted-foreground`}>
                           {formatDateTime(post.scheduledFor)}
                         </span>
                       </div>
                     </div>
                       {post.platform === "youtube" ? (
-                        <p className={`flex items-center gap-2 text-xs leading-relaxed ${
-                          isDark ? "text-slate-300" : "text-gray-700"
-                        }`}>
+                        <p className={`flex items-center gap-2 text-xs leading-relaxed text-foreground/80`}>
                           <YoutubeIcon className="h-3.5 w-3.5 shrink-0" />
                           YouTube Video - {post.content || "Video scheduled"}
                         </p>
                       ) : (
-                        <pre className={`whitespace-pre-wrap text-xs leading-relaxed line-clamp-2 ${
-                          isDark ? "text-slate-300" : "text-gray-700"
-                        }`}>
+                        <pre className={`whitespace-pre-wrap text-xs leading-relaxed line-clamp-2 text-foreground/80`}>
                       {post.content}
                     </pre>
                       )}
@@ -1078,18 +1024,10 @@ export default function DashboardSchedulePage() {
           )}
 
           {scheduledPosts.length === 0 && (
-            <div className={`text-center py-12 border rounded-xl transition-colors duration-300 ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}>
-              <CalendarIcon className={`w-12 h-12 mx-auto mb-3 ${
-                isDark ? "text-slate-500" : "text-gray-400"
-              }`} />
-              <h3 className={`text-lg font-semibold mb-1.5 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>No scheduled posts</h3>
-              <p className={`text-sm mb-4 ${
-                isDark ? "text-slate-400" : "text-gray-600"
-              }`}>
+            <div className={`text-center py-12 border rounded-xl transition-colors duration-300 bg-card border-border`}>
+              <CalendarIcon className={`w-12 h-12 mx-auto mb-3 text-muted-foreground/70`} />
+              <h3 className={`text-lg font-semibold mb-1.5 text-foreground`}>No scheduled posts</h3>
+              <p className={`text-sm mb-4 text-muted-foreground`}>
                 We post for you automatically
               </p>
               <Button
@@ -1117,9 +1055,7 @@ export default function DashboardSchedulePage() {
         }}
       >
         <DialogContent className="max-w-2xl max-h-[90vh] p-0 gap-0 overflow-hidden flex flex-col sm:max-w-2xl">
-          <DialogHeader className={`p-4 sm:p-6 border-b shrink-0 ${
-            isDark ? "border-slate-700" : "border-gray-200"
-          }`}>
+          <DialogHeader className={`p-4 sm:p-6 border-b shrink-0 border-border`}>
             <DialogTitle>
               {editingPost ? "Edit Post" : "Schedule Post"}
             </DialogTitle>
@@ -1127,9 +1063,7 @@ export default function DashboardSchedulePage() {
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
               <div>
-                <label className={`block text-xs font-semibold mb-2 ${
-                  isDark ? "text-slate-300" : "text-gray-700"
-                }`}>Platform</label>
+                <label className={`block text-xs font-semibold mb-2 text-foreground/80`}>Platform</label>
                 <div className="grid grid-cols-2 sm:flex gap-2">
                   {contentTypes.map((type) => (
                     <button
@@ -1154,9 +1088,7 @@ export default function DashboardSchedulePage() {
 
               {selectedPlatform !== "youtube" && (
                 <div>
-                  <label className={`block text-xs font-semibold mb-2 ${
-                    isDark ? "text-slate-300" : "text-gray-700"
-                  }`}>
+                  <label className={`block text-xs font-semibold mb-2 text-foreground/80`}>
                     Client
                   </label>
                   <ClientSelector
@@ -1165,9 +1097,7 @@ export default function DashboardSchedulePage() {
                     onClientChange={setScheduleClientId}
                     autoSelectFirst={false}
                   />
-                  <p className={`mt-1.5 text-xs ${
-                    isDark ? "text-slate-400" : "text-gray-500"
-                  }`}>
+                  <p className={`mt-1.5 text-xs text-muted-foreground`}>
                     Select a client to send the post for approval. Leave empty to schedule without approval.
                   </p>
                 </div>
@@ -1193,9 +1123,7 @@ export default function DashboardSchedulePage() {
               {selectedPlatform === "youtube" ? (
                 <>
                   <div>
-                    <label className={`block text-xs font-semibold mb-2 ${
-                      isDark ? "text-slate-300" : "text-gray-700"
-                    }`}>Video Title *</label>
+                    <label className={`block text-xs font-semibold mb-2 text-foreground/80`}>Video Title *</label>
                     <input
                       type="text"
                       value={youtubeVideoTitle}
@@ -1210,9 +1138,7 @@ export default function DashboardSchedulePage() {
                   </div>
 
                   <div>
-                    <label className={`block text-xs font-semibold mb-2 ${
-                      isDark ? "text-slate-300" : "text-gray-700"
-                    }`}>Description</label>
+                    <label className={`block text-xs font-semibold mb-2 text-foreground/80`}>Description</label>
                     <textarea
                       value={youtubeDescription}
                       onChange={(e) => setYoutubeDescription(e.target.value)}
@@ -1250,9 +1176,7 @@ export default function DashboardSchedulePage() {
                     </div>
 
                     <div>
-                      <label className={`block text-xs font-semibold mb-2 ${
-                        isDark ? "text-slate-300" : "text-gray-700"
-                      }`}>Duration (minutes)</label>
+                      <label className={`block text-xs font-semibold mb-2 text-foreground/80`}>Duration (minutes)</label>
                       <input
                         type="number"
                         value={youtubeDuration}
@@ -1312,9 +1236,7 @@ export default function DashboardSchedulePage() {
                 /* Regular Text Content Form */
                 <>
               <div>
-                    <label className={`block text-xs font-semibold mb-2 ${
-                      isDark ? "text-slate-300" : "text-gray-700"
-                    }`}>Content</label>
+                    <label className={`block text-xs font-semibold mb-2 text-foreground/80`}>Content</label>
                 <textarea
                   value={selectedContent}
                   onChange={(e) => setSelectedContent(e.target.value)}
@@ -1326,9 +1248,7 @@ export default function DashboardSchedulePage() {
                       }`}
                   rows={6}
                 />
-                    <div className={`mt-1.5 text-xs text-right ${
-                      isDark ? "text-slate-400" : "text-gray-500"
-                    }`}>
+                    <div className={`mt-1.5 text-xs text-right text-muted-foreground`}>
                   {selectedContent.length} chars
                 </div>
               </div>
@@ -1337,9 +1257,7 @@ export default function DashboardSchedulePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={`block text-xs font-semibold mb-1.5 ${
-                    isDark ? "text-slate-300" : "text-gray-700"
-                  }`}>Date</label>
+                  <label className={`block text-xs font-semibold mb-1.5 text-foreground/80`}>Date</label>
                   <input
                     type="date"
                     value={scheduledDate}
@@ -1353,14 +1271,10 @@ export default function DashboardSchedulePage() {
                   />
                 </div>
                 <div>
-                  <label className={`block text-xs font-semibold mb-1.5 ${
-                    isDark ? "text-slate-300" : "text-gray-700"
-                  }`}>
+                  <label className={`block text-xs font-semibold mb-1.5 text-foreground/80`}>
                     Time
                     {selectedPlatform === "youtube" && scheduledDate === getTodayDate() && (
-                      <span className={`font-normal ml-1 ${
-                        isDark ? "text-slate-400" : "text-gray-500"
-                      }`}>(min 40 min from now)</span>
+                      <span className={`font-normal ml-1 text-muted-foreground`}>(min 40 min from now)</span>
                     )}
                   </label>
                   <input
@@ -1389,9 +1303,7 @@ export default function DashboardSchedulePage() {
                     }`}
                   />
                   {selectedPlatform === "youtube" && scheduledDate === getTodayDate() && (
-                    <p className={`text-xs mt-1 ${
-                      isDark ? "text-slate-400" : "text-gray-500"
-                    }`}>
+                    <p className={`text-xs mt-1 text-muted-foreground`}>
                       YouTube requires scheduled videos to be at least 15 minutes in the future. We require 40+ minutes to account for video generation time (15-20 min), timezone differences, and processing delays.
                     </p>
                   )}
@@ -1412,25 +1324,19 @@ export default function DashboardSchedulePage() {
                       <Loader2Icon className={`w-4 h-4 animate-spin ${
                         isDark ? "text-purple-400" : "text-foreground"
                       }`} />
-                      <span className={`text-sm font-semibold ${
-                        isDark ? "text-white" : "text-gray-900"
-                      }`}>
+                      <span className={`text-sm font-semibold text-foreground`}>
                         {progress.status === "generating" ? "Generating Video..." : 
                          progress.status === "uploading" ? "Uploading to YouTube..." :
                          progress.status === "completed" ? "Completed!" :
                          "Processing..."}
                       </span>
                     </div>
-                    <span className={`text-sm font-semibold ${
-                      isDark ? "text-slate-300" : "text-gray-700"
-                    }`}>
+                    <span className={`text-sm font-semibold text-foreground/80`}>
                       {progress.percentage}%
                     </span>
                   </div>
                   <Progress value={progress.percentage} className="h-2" />
-                  <div className={`flex items-center justify-between text-xs ${
-                    isDark ? "text-slate-400" : "text-gray-600"
-                  }`}>
+                  <div className={`flex items-center justify-between text-xs text-muted-foreground`}>
                     <span>
                       {formatTime(progress.currentTime)} / {formatTime(progress.totalDuration)}
                     </span>
@@ -1465,9 +1371,7 @@ export default function DashboardSchedulePage() {
               </div>
             )}
 
-            <div className={`p-4 sm:p-6 border-t flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 transition-colors duration-300 ${
-              isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"
-            }`}>
+            <div className={`p-4 sm:p-6 border-t flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 transition-colors duration-300 border-border bg-muted`}>
               <Button
                 onClick={resetScheduleModalState}
                 size="sm"

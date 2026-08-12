@@ -147,9 +147,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className={`max-w-7xl mx-auto space-y-4 sm:space-y-6 transition-colors duration-300 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
+    <div className={`max-w-7xl mx-auto space-y-4 sm:space-y-6 transition-colors duration-300 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-background`}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-3 sm:gap-4">
           <Button
@@ -163,9 +161,7 @@ export default function CalendarPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className={`text-xl sm:text-2xl font-bold ${
-            isDark ? "text-white" : "text-gray-900"
-          }`}>Content Calendar</h1>
+          <h1 className={`text-xl sm:text-2xl font-bold text-foreground`}>Content Calendar</h1>
         </div>
         <Button
           onClick={() => router.push(`/dashboard/schedule?clientId=${clientId}`)}
@@ -175,16 +171,10 @@ export default function CalendarPage() {
         </Button>
       </div>
 
-      <Card className={`border shadow-sm transition-colors duration-300 ${
-        isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-      }`}>
-        <CardHeader className={`border-b transition-colors duration-300 px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 ${
-          isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"
-        }`}>
+      <Card className={`border shadow-sm transition-colors duration-300 bg-card border-border`}>
+        <CardHeader className={`border-b transition-colors duration-300 px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-border bg-muted`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-            <CardTitle className={`text-base sm:text-lg font-semibold flex items-center gap-2 ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}>
+            <CardTitle className={`text-base sm:text-lg font-semibold flex items-center gap-2 text-foreground`}>
               <CalendarIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${
                 isDark ? "text-purple-400" : "text-foreground"
               }`} />
@@ -237,9 +227,7 @@ export default function CalendarPage() {
             {weekDays.map((day) => (
               <div
                 key={day}
-                className={`text-center text-xs sm:text-sm font-semibold py-1 sm:py-2 ${
-                  isDark ? "text-slate-400" : "text-gray-600"
-                }`}
+                className={`text-center text-xs sm:text-sm font-semibold py-1 sm:py-2 text-muted-foreground`}
               >
                 {day}
               </div>
@@ -326,9 +314,7 @@ export default function CalendarPage() {
                           </div>
                         ))}
                         {dayPosts.length > 3 && (
-                          <div className={`text-xs text-center ${
-                            isDark ? "text-slate-400" : "text-gray-500"
-                          }`}>
+                          <div className={`text-xs text-center text-muted-foreground`}>
                             +{dayPosts.length - 3} more
                           </div>
                         )}
@@ -343,34 +329,26 @@ export default function CalendarPage() {
       </Card>
 
       {/* Legend */}
-      <Card className={`border transition-colors duration-300 ${
-        isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-      }`}>
+      <Card className={`border transition-colors duration-300 bg-card border-border`}>
         <CardContent className="pt-4">
           <div className="flex items-center gap-6 flex-wrap">
             <div className="flex items-center gap-2">
               <div className={`w-4 h-4 rounded border ${
                 isDark ? "bg-purple-950/50 border-purple-800" : "bg-purple-100 border-purple-200"
               }`} />
-              <span className={`text-sm ${
-                isDark ? "text-slate-300" : "text-gray-700"
-              }`}>Scheduled</span>
+              <span className={`text-sm text-foreground/80`}>Scheduled</span>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-4 h-4 rounded border ${
                 isDark ? "bg-yellow-950/50 border-yellow-800" : "bg-yellow-100 border-yellow-200"
               }`} />
-              <span className={`text-sm ${
-                isDark ? "text-slate-300" : "text-gray-700"
-              }`}>Pending Approval</span>
+              <span className={`text-sm text-foreground/80`}>Pending Approval</span>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-4 h-4 rounded border ${
                 isDark ? "bg-green-950/50 border-green-800" : "bg-green-100 border-green-200"
               }`} />
-              <span className={`text-sm ${
-                isDark ? "text-slate-300" : "text-gray-700"
-              }`}>Posted</span>
+              <span className={`text-sm text-foreground/80`}>Posted</span>
             </div>
           </div>
         </CardContent>

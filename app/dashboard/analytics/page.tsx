@@ -152,16 +152,10 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className={`space-y-6 sm:space-y-8 pb-8 pt-4 sm:pt-6 lg:pt-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
-      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 sm:pb-8 border-b-2 transition-colors duration-300 ${
-        isDark ? "border-slate-700" : "border-gray-200"
-      }`}>
+    <div className={`space-y-6 sm:space-y-8 pb-8 pt-4 sm:pt-6 lg:pt-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 bg-background`}>
+      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 sm:pb-8 border-b-2 transition-colors duration-300 border-border`}>
         <div className="flex-1">
-          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-3 ${
-            isDark ? "text-white" : "text-gray-950"
-          }`}>Analytics Dashboard</h1>
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-3 text-foreground`}>Analytics Dashboard</h1>
           <p className={isDark ? "text-slate-400" : "text-gray-600"}>
             Live activity from your workspace — social engagement connects next
           </p>
@@ -186,7 +180,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div>
-        <h2 className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-950"}`}>
+        <h2 className={`text-xl font-bold mb-6 text-foreground`}>
           Your Activity
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -195,14 +189,10 @@ export default function AnalyticsPage() {
             return (
               <Card
                 key={index}
-                className={`border-2 rounded-xl transition-colors duration-300 ${
-                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-                }`}
+                className={`border-2 rounded-xl transition-colors duration-300 bg-card border-border`}
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <CardTitle className={`text-sm font-bold uppercase tracking-wide ${
-                    isDark ? "text-slate-300" : "text-gray-700"
-                  }`}>
+                  <CardTitle className={`text-sm font-bold uppercase tracking-wide text-foreground/80`}>
                     {metric.title}
                   </CardTitle>
                   <div className={`p-3 rounded-xl ${
@@ -212,11 +202,9 @@ export default function AnalyticsPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-950"}`}>
+                  <div className={`text-2xl font-bold text-foreground`}>
                     {loading ? (
-                      <div className={`h-10 w-28 rounded animate-pulse ${
-                        isDark ? "bg-slate-700" : "bg-gray-200"
-                      }`} />
+                      <div className={`h-10 w-28 rounded animate-pulse bg-accent`} />
                     ) : (
                       metric.value
                     )}
@@ -229,7 +217,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div>
-        <h2 className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-950"}`}>
+        <h2 className={`text-xl font-bold mb-6 text-foreground`}>
           Engagement Metrics
         </h2>
         {data.engagementMetricsAvailable ? (
@@ -240,14 +228,10 @@ export default function AnalyticsPage() {
                 return (
                   <Card
                     key={index}
-                    className={`border-2 rounded-xl transition-colors duration-300 ${
-                      isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-                    }`}
+                    className={`border-2 rounded-xl transition-colors duration-300 bg-card border-border`}
                   >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                      <CardTitle className={`text-sm font-bold uppercase tracking-wide ${
-                        isDark ? "text-slate-300" : "text-gray-700"
-                      }`}>
+                      <CardTitle className={`text-sm font-bold uppercase tracking-wide text-foreground/80`}>
                         {metric.title}
                       </CardTitle>
                       <div className={`p-3 rounded-xl ${
@@ -257,11 +241,9 @@ export default function AnalyticsPage() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-950"}`}>
+                      <div className={`text-2xl font-bold text-foreground`}>
                         {loading ? (
-                          <div className={`h-10 w-28 rounded animate-pulse ${
-                            isDark ? "bg-slate-700" : "bg-gray-200"
-                          }`} />
+                          <div className={`h-10 w-28 rounded animate-pulse bg-accent`} />
                         ) : (
                           metric.value
                         )}
@@ -272,9 +254,7 @@ export default function AnalyticsPage() {
               })}
             </div>
 
-            <Card className={`border-2 rounded-xl transition-colors duration-300 ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}>
+            <Card className={`border-2 rounded-xl transition-colors duration-300 bg-card border-border`}>
               <CardHeader className="pb-4">
                 <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
                   Engagement Rate
@@ -284,7 +264,7 @@ export default function AnalyticsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-950"}`}>
+                <div className={`text-3xl font-bold text-foreground`}>
                   {data.engagementRate != null ? `${data.engagementRate}%` : "—"}
                 </div>
               </CardContent>
@@ -302,12 +282,10 @@ export default function AnalyticsPage() {
 
       {data.engagementMetricsAvailable && (
         <div>
-          <h2 className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-950"}`}>
+          <h2 className={`text-xl font-bold mb-6 text-foreground`}>
             Platform Performance
           </h2>
-          <Card className={`border-2 rounded-xl transition-colors duration-300 ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          }`}>
+          <Card className={`border-2 rounded-xl transition-colors duration-300 bg-card border-border`}>
             <CardHeader className="pb-4">
               <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
                 Performance by Platform
@@ -333,15 +311,15 @@ export default function AnalyticsPage() {
                         {getPlatformIcon(platform.platform)}
                       </div>
                       <div>
-                        <p className={`font-bold capitalize ${isDark ? "text-white" : "text-gray-950"}`}>
+                        <p className={`font-bold capitalize text-foreground`}>
                           {platform.platform}
                         </p>
-                        <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                        <p className={`text-sm text-muted-foreground`}>
                           {platform.posts} posts • {platform.views.toLocaleString()} views
                         </p>
                       </div>
                     </div>
-                    <p className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-950"}`}>
+                    <p className={`text-xl font-bold text-foreground`}>
                       {platform.engagement}%
                     </p>
                   </div>
@@ -355,13 +333,11 @@ export default function AnalyticsPage() {
       {/* Activity by platform (real scheduled posts) */}
       {data.activityPlatformStats.length > 0 && (
         <div>
-          <h2 className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-950"}`}>
+          <h2 className={`text-xl font-bold mb-6 text-foreground`}>
             Scheduled by platform
           </h2>
           <Card
-            className={`border-2 rounded-xl transition-colors duration-300 ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
+            className={`border-2 rounded-xl transition-colors duration-300 bg-card border-border`}
           >
             <CardContent className="pt-6 space-y-3">
               {data.activityPlatformStats.map((platform) => {
@@ -373,9 +349,7 @@ export default function AnalyticsPage() {
                   <div key={platform.platform} className="space-y-1.5">
                     <div className="flex items-center justify-between text-sm">
                       <span
-                        className={`capitalize font-medium flex items-center gap-2 ${
-                          isDark ? "text-slate-200" : "text-gray-800"
-                        }`}
+                        className={`capitalize font-medium flex items-center gap-2 text-foreground`}
                       >
                         {getPlatformIcon(platform.platform)}
                         {platform.platform}
@@ -385,9 +359,7 @@ export default function AnalyticsPage() {
                       </span>
                     </div>
                     <div
-                      className={`h-2 rounded-full overflow-hidden ${
-                        isDark ? "bg-slate-700" : "bg-gray-100"
-                      }`}
+                      className={`h-2 rounded-full overflow-hidden bg-accent`}
                     >
                       <div
                         className="h-full rounded-full bg-primary transition-all duration-500"
@@ -403,14 +375,12 @@ export default function AnalyticsPage() {
       )}
 
       <div>
-        <h2 className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-gray-950"}`}>
+        <h2 className={`text-xl font-bold mb-6 text-foreground`}>
           Performance Trends
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card
-            className={`border-2 rounded-xl ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
+            className={`border-2 rounded-xl bg-card border-border`}
           >
             <CardHeader className="pb-4">
               <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
@@ -423,9 +393,7 @@ export default function AnalyticsPage() {
             <CardContent>
               {loading ? (
                 <div
-                  className={`h-40 rounded-xl animate-pulse ${
-                    isDark ? "bg-slate-700" : "bg-gray-100"
-                  }`}
+                  className={`h-40 rounded-xl animate-pulse bg-accent`}
                 />
               ) : (
                 <VolumeChart series={data.contentVolume} isDark={isDark} />
@@ -434,9 +402,7 @@ export default function AnalyticsPage() {
           </Card>
 
           <Card
-            className={`border-2 rounded-xl ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
+            className={`border-2 rounded-xl bg-card border-border`}
           >
             <CardHeader className="pb-4">
               <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
@@ -451,23 +417,23 @@ export default function AnalyticsPage() {
                 <div className="space-y-4 py-2">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                      <p className={`text-xs text-muted-foreground`}>
                         Views
                       </p>
-                      <p className={`text-2xl font-bold tabular-nums ${isDark ? "text-white" : "text-gray-950"}`}>
+                      <p className={`text-2xl font-bold tabular-nums text-foreground`}>
                         {data.totalViews.toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <p className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                      <p className={`text-xs text-muted-foreground`}>
                         Engagement rate
                       </p>
-                      <p className={`text-2xl font-bold tabular-nums ${isDark ? "text-white" : "text-gray-950"}`}>
+                      <p className={`text-2xl font-bold tabular-nums text-foreground`}>
                         {data.engagementRate != null ? `${data.engagementRate}%` : "—"}
                       </p>
                     </div>
                   </div>
-                  <p className={`text-xs ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                  <p className={`text-xs text-muted-foreground/70`}>
                     Synced from Twitter after auto-post (cron). More platforms next.
                   </p>
                 </div>
@@ -497,7 +463,7 @@ function VolumeChart({
 }) {
   if (!series.length) {
     return (
-      <p className={`text-sm py-10 text-center ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+      <p className={`text-sm py-10 text-center text-muted-foreground`}>
         No activity in this range yet.
       </p>
     );
@@ -552,7 +518,7 @@ function VolumeChart({
           />
           <span className={isDark ? "text-slate-400" : "text-gray-500"}>Scheduled</span>
         </span>
-        <span className={`ml-auto ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+        <span className={`ml-auto text-muted-foreground/70`}>
           <Calendar className="w-3 h-3 inline mr-1" />
           {series[0]?.date?.slice(5)} → {series[series.length - 1]?.date?.slice(5)}
         </span>

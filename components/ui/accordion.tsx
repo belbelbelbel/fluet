@@ -26,17 +26,13 @@ function AccordionItem({ question, answer, isOpen, onToggle, isDark = false }: A
             : "hover:bg-gray-50"
         }`}
       >
-        <h3 className={`text-base font-semibold pr-4 ${
-          isDark ? "text-white" : "text-gray-950"
-        }`}>
+        <h3 className={`text-base font-semibold pr-4 text-foreground`}>
           {question}
         </h3>
         <ChevronDown
           className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${
             isOpen ? "transform rotate-180" : ""
-          } ${
-            isDark ? "text-gray-400" : "text-gray-600"
-          }`}
+          } text-muted-foreground`}
         />
       </button>
       <div
@@ -44,9 +40,7 @@ function AccordionItem({ question, answer, isOpen, onToggle, isDark = false }: A
           isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className={`px-5 pb-5 ${
-          isDark ? "text-gray-300" : "text-gray-600"
-        }`}>
+        <div className={`px-5 pb-5 text-muted-foreground`}>
           <p className="text-sm leading-relaxed">{answer}</p>
         </div>
       </div>

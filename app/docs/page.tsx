@@ -295,14 +295,10 @@ export default function DocsPage() {
                 isDark ? "text-purple-300" : "text-gray-700"
               }`}>Complete Guide</span>
             </div>
-            <h1 className={`text-3xl sm:text-4xl font-bold mb-4 ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}>
+            <h1 className={`text-3xl sm:text-4xl font-bold mb-4 text-foreground`}>
               Documentation
             </h1>
-            <p className={`text-base max-w-2xl mx-auto ${
-              isDark ? "text-gray-300" : "text-gray-600"
-            }`}>
+            <p className={`text-base max-w-2xl mx-auto text-muted-foreground`}>
               Everything you need to know about using Revvy to create amazing social media content
             </p>
           </div>
@@ -324,9 +320,7 @@ export default function DocsPage() {
                   <Icon className={`w-5 h-5 mx-auto mb-2 ${
                     isDark ? "text-purple-400" : "text-gray-700"
                   }`} />
-                  <div className={`text-xs ${
-                    isDark ? "text-gray-300" : "text-gray-600"
-                  }`}>{link.title}</div>
+                  <div className={`text-xs text-muted-foreground`}>{link.title}</div>
                 </Link>
               );
             })}
@@ -343,53 +337,35 @@ export default function DocsPage() {
                 isDark ? "text-purple-400" : "text-gray-700"
               }`} />
               <div>
-                <h2 className={`text-xl font-semibold mb-3 ${
-                  isDark ? "text-white" : "text-gray-900"
-                }`}>
+                <h2 className={`text-xl font-semibold mb-3 text-foreground`}>
                   Quick Start Guide
                 </h2>
-                <p className={`mb-4 ${
-                  isDark ? "text-gray-300" : "text-gray-600"
-                }`}>
+                <p className={`mb-4 text-muted-foreground`}>
                   New to Revvy? Follow these steps to create your first post:
                 </p>
-                <ol className={`space-y-3 ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}>
+                <ol className={`space-y-3 text-foreground/80`}>
                   <li className="flex gap-3">
-                    <span className={`font-semibold ${
-                      isDark ? "text-white" : "text-gray-900"
-                    }`}>1.</span>
+                    <span className={`font-semibold text-foreground`}>1.</span>
                     <span>Sign up for an account and choose a subscription plan</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className={`font-semibold ${
-                      isDark ? "text-white" : "text-gray-900"
-                    }`}>2.</span>
+                    <span className={`font-semibold text-foreground`}>2.</span>
                     <span>Go to the Generate page and select your platform</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className={`font-semibold ${
-                      isDark ? "text-white" : "text-gray-900"
-                    }`}>3.</span>
+                    <span className={`font-semibold text-foreground`}>3.</span>
                     <span>Enter your topic or use Content Ideas to get started</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className={`font-semibold ${
-                      isDark ? "text-white" : "text-gray-900"
-                    }`}>4.</span>
+                    <span className={`font-semibold text-foreground`}>4.</span>
                     <span>Customize tone, style, and length (optional)</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className={`font-semibold ${
-                      isDark ? "text-white" : "text-gray-900"
-                    }`}>5.</span>
+                    <span className={`font-semibold text-foreground`}>5.</span>
                     <span>Click Generate and review your content</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className={`font-semibold ${
-                      isDark ? "text-white" : "text-gray-900"
-                    }`}>6.</span>
+                    <span className={`font-semibold text-foreground`}>6.</span>
                     <span>Edit if needed, then copy, export, or schedule your post</span>
                   </li>
                 </ol>
@@ -401,9 +377,7 @@ export default function DocsPage() {
           <div className="space-y-12">
             {sections.map((section, sectionIndex) => (
               <div key={sectionIndex}>
-                <h2 className={`text-2xl font-semibold mb-6 flex items-center gap-3 ${
-                  isDark ? "text-white" : "text-gray-900"
-                }`}>
+                <h2 className={`text-2xl font-semibold mb-6 flex items-center gap-3 text-foreground`}>
                   <CodeIcon className={`w-6 h-6 ${
                     isDark ? "text-purple-400" : "text-gray-700"
                   }`} />
@@ -428,12 +402,8 @@ export default function DocsPage() {
               <Lightbulb className={`w-6 h-6 mb-3 ${
                 isDark ? "text-purple-400" : "text-gray-700"
               }`} />
-              <h3 className={`font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Content Ideas</h3>
-              <p className={`text-sm ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}>
+              <h3 className={`font-semibold mb-2 text-foreground`}>Content Ideas</h3>
+              <p className={`text-sm text-muted-foreground`}>
                 Get daily personalized content ideas based on your niche
               </p>
             </div>
@@ -445,12 +415,8 @@ export default function DocsPage() {
               <Youtube className={`w-6 h-6 mb-3 ${
                 isDark ? "text-purple-400" : "text-gray-700"
               }`} />
-              <h3 className={`font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>YouTube Automation</h3>
-              <p className={`text-sm ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}>
+              <h3 className={`font-semibold mb-2 text-foreground`}>YouTube Automation</h3>
+              <p className={`text-sm text-muted-foreground`}>
                 Automatically generate and upload videos to YouTube
               </p>
             </div>
@@ -462,12 +428,8 @@ export default function DocsPage() {
               <Palette className={`w-6 h-6 mb-3 ${
                 isDark ? "text-purple-400" : "text-gray-700"
               }`} />
-              <h3 className={`font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Theme Customization</h3>
-              <p className={`text-sm ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}>
+              <h3 className={`font-semibold mb-2 text-foreground`}>Theme Customization</h3>
+              <p className={`text-sm text-muted-foreground`}>
                 Choose between light, dark, or system theme
               </p>
             </div>
@@ -479,12 +441,8 @@ export default function DocsPage() {
               <Bot className={`w-6 h-6 mb-3 ${
                 isDark ? "text-purple-400" : "text-gray-700"
               }`} />
-              <h3 className={`font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>AI Model Selection</h3>
-              <p className={`text-sm ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}>
+              <h3 className={`font-semibold mb-2 text-foreground`}>AI Model Selection</h3>
+              <p className={`text-sm text-muted-foreground`}>
                 Choose from multiple AI models (GPT-4, Claude, Gemini)
               </p>
             </div>
@@ -496,12 +454,8 @@ export default function DocsPage() {
               <Users className={`w-6 h-6 mb-3 ${
                 isDark ? "text-purple-400" : "text-gray-700"
               }`} />
-              <h3 className={`font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Team Collaboration</h3>
-              <p className={`text-sm ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}>
+              <h3 className={`font-semibold mb-2 text-foreground`}>Team Collaboration</h3>
+              <p className={`text-sm text-muted-foreground`}>
                 Invite team members and collaborate on content
               </p>
             </div>
@@ -513,12 +467,8 @@ export default function DocsPage() {
               <KeyboardIcon className={`w-6 h-6 mb-3 ${
                 isDark ? "text-purple-400" : "text-gray-700"
               }`} />
-              <h3 className={`font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}>Keyboard Shortcuts</h3>
-              <p className={`text-sm ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}>
+              <h3 className={`font-semibold mb-2 text-foreground`}>Keyboard Shortcuts</h3>
+              <p className={`text-sm text-muted-foreground`}>
                 Work faster with keyboard shortcuts (Ctrl/Cmd + /)
               </p>
             </div>
@@ -530,14 +480,10 @@ export default function DocsPage() {
               ? "bg-gray-800/50 border-gray-700" 
               : "bg-gray-50 border-gray-200"
           }`}>
-            <h2 className={`text-2xl font-bold mb-4 ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}>
+            <h2 className={`text-2xl font-bold mb-4 text-foreground`}>
               Still have questions?
             </h2>
-            <p className={`mb-6 max-w-2xl mx-auto ${
-              isDark ? "text-gray-300" : "text-gray-600"
-            }`}>
+            <p className={`mb-6 max-w-2xl mx-auto text-muted-foreground`}>
               Can&apos;t find what you&apos;re looking for? Check out our pricing plans or try generating your first post.
             </p>
             <div className="flex flex-wrap justify-center gap-3">

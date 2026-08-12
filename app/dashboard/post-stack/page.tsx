@@ -102,9 +102,7 @@ export default function PostStackPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}>
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
         <div className="text-center">
           <Clock className={`w-8 h-8 animate-pulse mx-auto mb-4 ${
             isDark ? "text-purple-400" : "text-foreground"
@@ -116,17 +114,13 @@ export default function PostStackPage() {
   }
 
   return (
-    <div className={`min-h-screen py-4 sm:py-6 lg:py-8 transition-colors duration-300 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
+    <div className={`min-h-screen py-4 sm:py-6 lg:py-8 transition-colors duration-300 bg-background`}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="flex-1">
-              <h1 className={`text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
+              <h1 className={`text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 text-foreground`}>
                 Post Stack
               </h1>
               <p className={isDark ? "text-slate-400" : "text-gray-600"}>
@@ -166,9 +160,7 @@ export default function PostStackPage() {
                           isDark ? "text-purple-400" : "text-foreground"
                         }`} />
                       </div>
-                      <h3 className={`text-lg font-semibold flex-1 ${
-                        isDark ? "text-white" : "text-gray-950"
-                      }`}>
+                      <h3 className={`text-lg font-semibold flex-1 text-foreground`}>
                         {item.topic}
                       </h3>
                     </div>
@@ -176,30 +168,22 @@ export default function PostStackPage() {
                     {/* Caption or Hook */}
                     {item.caption ? (
                       <div className="mb-4">
-                        <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${
-                          isDark ? "text-slate-400" : "text-gray-600"
-                        }`}>Caption</p>
+                        <p className={`text-xs font-semibold uppercase tracking-wide mb-2 text-muted-foreground`}>Caption</p>
                         <div className={`border rounded-lg p-3 ${
                           isDark ? "bg-slate-900/50 border-slate-700" : "bg-gray-50 border-gray-200"
                         }`}>
-                          <p className={`text-sm leading-relaxed ${
-                            isDark ? "text-slate-200" : "text-gray-950"
-                          }`}>
+                          <p className={`text-sm leading-relaxed text-foreground`}>
                             {item.caption}
                           </p>
                         </div>
                       </div>
                     ) : item.hookExample ? (
                       <div className="mb-4">
-                        <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${
-                          isDark ? "text-slate-400" : "text-gray-600"
-                        }`}>Hook Example</p>
+                        <p className={`text-xs font-semibold uppercase tracking-wide mb-2 text-muted-foreground`}>Hook Example</p>
                         <div className={`border rounded-lg p-3 ${
                           isDark ? "bg-slate-900/50 border-slate-700" : "bg-gray-50 border-gray-200"
                         }`}>
-                          <p className={`text-sm leading-relaxed ${
-                            isDark ? "text-slate-200" : "text-gray-950"
-                          }`}>
+                          <p className={`text-sm leading-relaxed text-foreground`}>
                             &ldquo;{item.hookExample}&rdquo;
                           </p>
                         </div>
@@ -227,9 +211,7 @@ export default function PostStackPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 border-t ${
-                      isDark ? "border-slate-700" : "border-gray-200"
-                    }`}>
+                    <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-4 border-t border-border`}>
                       <Button
                         onClick={() => handleSchedule(item)}
                         className={`flex-1 rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md ${
@@ -272,21 +254,13 @@ export default function PostStackPage() {
             })}
           </div>
         ) : (
-          <Card className={`border rounded-xl ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          }`}>
+          <Card className={`border rounded-xl bg-card border-border`}>
             <CardContent className="p-8 sm:p-12 text-center">
-              <Calendar className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 ${
-                isDark ? "text-slate-500" : "text-gray-400"
-              }`} />
-              <h3 className={`text-base sm:text-lg font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
+              <Calendar className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-muted-foreground/70`} />
+              <h3 className={`text-base sm:text-lg font-semibold mb-2 text-foreground`}>
                 Your stack is empty
               </h3>
-              <p className={`text-sm sm:text-base mb-4 sm:mb-6 ${
-                isDark ? "text-slate-400" : "text-gray-600"
-              }`}>
+              <p className={`text-sm sm:text-base mb-4 sm:mb-6 text-muted-foreground`}>
                 Save content ideas to build your post stack
               </p>
               <Button

@@ -86,8 +86,8 @@ export default function AnalyticsPage() {
   if (!analytics) {
     return (
       <div className="text-center py-12">
-        <BarChart3 className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-slate-500" : "text-gray-400"}`} />
-        <h2 className={`text-xl font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>No activity yet</h2>
+        <BarChart3 className={`w-12 h-12 mx-auto mb-4 text-muted-foreground/70`} />
+        <h2 className={`text-xl font-semibold mb-2 text-foreground`}>No activity yet</h2>
         <p className={isDark ? "text-slate-400" : "text-gray-600"}>
           Post counts will appear here once you schedule content for this client.
         </p>
@@ -103,10 +103,10 @@ export default function AnalyticsPage() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+            <h1 className={`text-2xl font-bold text-foreground`}>
               Client Analytics
             </h1>
-            <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+            <p className={`text-sm text-muted-foreground`}>
               Scheduled activity plus synced Twitter/Instagram engagement
             </p>
           </div>
@@ -131,16 +131,16 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
           <CardHeader className="pb-3">
-            <CardTitle className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+            <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Total Posts
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
-              <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span className={`text-2xl font-bold text-foreground`}>
                 {analytics.totalPosts}
               </span>
-              <span className={`text-sm ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+              <span className={`text-sm text-muted-foreground`}>
                 {analytics.postsThisMonth} this month
               </span>
             </div>
@@ -150,7 +150,7 @@ export default function AnalyticsPage() {
               ) : (
                 <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
               )}
-              <span className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+              <span className={`text-xs text-muted-foreground`}>
                 {Math.abs(analytics.postsThisMonth - analytics.postsLastMonth)} vs last month
               </span>
             </div>
@@ -159,18 +159,18 @@ export default function AnalyticsPage() {
 
         <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
           <CardHeader className="pb-3">
-            <CardTitle className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+            <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Published
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
               <CheckCircle2 className={`w-5 h-5 ${isDark ? "text-green-400" : "text-green-600"}`} />
-              <span className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span className={`text-2xl font-bold text-foreground`}>
                 {analytics.postedPosts}
               </span>
             </div>
-            <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+            <p className={`text-xs mt-2 text-muted-foreground`}>
               Posts marked as published
             </p>
           </CardContent>
@@ -178,18 +178,18 @@ export default function AnalyticsPage() {
 
         <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
           <CardHeader className="pb-3">
-            <CardTitle className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+            <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Top Platform
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
               <FileText className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-foreground"}`} />
-              <span className={`text-2xl font-bold capitalize ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span className={`text-2xl font-bold capitalize text-foreground`}>
                 {analytics.topPlatform ?? "—"}
               </span>
             </div>
-            <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+            <p className={`text-xs mt-2 text-muted-foreground`}>
               Most scheduled posts by platform
             </p>
           </CardContent>
@@ -197,17 +197,17 @@ export default function AnalyticsPage() {
 
         <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
           <CardHeader className="pb-3">
-            <CardTitle className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+            <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Engagement
             </CardTitle>
           </CardHeader>
           <CardContent>
             {analytics.engagementMetricsAvailable ? (
               <>
-                <span className={`text-2xl font-bold tabular-nums ${isDark ? "text-white" : "text-gray-900"}`}>
+                <span className={`text-2xl font-bold tabular-nums text-foreground`}>
                   {(analytics.totalEngagement ?? 0).toLocaleString()}
                 </span>
-                <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                <p className={`text-xs mt-2 text-muted-foreground`}>
                   {analytics.averageEngagementRate != null
                     ? `${analytics.averageEngagementRate}% avg rate`
                     : "Likes + shares + comments"}
@@ -215,8 +215,8 @@ export default function AnalyticsPage() {
               </>
             ) : (
               <>
-                <span className={`text-2xl font-bold ${isDark ? "text-slate-500" : "text-gray-400"}`}>—</span>
-                <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                <span className={`text-2xl font-bold text-muted-foreground/70`}>—</span>
+                <p className={`text-xs mt-2 text-muted-foreground`}>
                   Syncs after Twitter/IG auto-post
                 </p>
               </>
@@ -228,7 +228,7 @@ export default function AnalyticsPage() {
       {analytics.platformBreakdown.length > 0 && (
         <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
           <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-            <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+            <CardTitle className={`text-lg font-semibold text-foreground`}>
               Posts by Platform
             </CardTitle>
           </CardHeader>
@@ -236,10 +236,10 @@ export default function AnalyticsPage() {
             <div className="space-y-4">
               {analytics.platformBreakdown.map((platform) => (
                 <div key={platform.platform} className="flex items-center justify-between gap-3">
-                  <span className={`text-sm font-medium capitalize ${isDark ? "text-white" : "text-gray-900"}`}>
+                  <span className={`text-sm font-medium capitalize text-foreground`}>
                     {platform.platform}
                   </span>
-                  <span className={`text-sm text-right ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+                  <span className={`text-sm text-right text-muted-foreground`}>
                     {platform.posts} posts
                     {platform.engagement != null
                       ? ` · ${platform.engagement.toLocaleString()} eng.`
@@ -257,7 +257,7 @@ export default function AnalyticsPage() {
 
       <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
         <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
-          <CardTitle className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+          <CardTitle className={`text-lg font-semibold text-foreground`}>
             Engagement & Performance
           </CardTitle>
         </CardHeader>
@@ -275,8 +275,8 @@ export default function AnalyticsPage() {
                     key={m.label}
                     className={`rounded-lg p-3 ${isDark ? "bg-slate-700/50" : "bg-gray-50"}`}
                   >
-                    <p className={`text-xs ${isDark ? "text-slate-400" : "text-gray-500"}`}>{m.label}</p>
-                    <p className={`text-lg font-semibold tabular-nums ${isDark ? "text-white" : "text-gray-950"}`}>
+                    <p className={`text-xs text-muted-foreground`}>{m.label}</p>
+                    <p className={`text-lg font-semibold tabular-nums text-foreground`}>
                       {m.value.toLocaleString()}
                     </p>
                   </div>
@@ -286,11 +286,11 @@ export default function AnalyticsPage() {
                 <div
                   className={`rounded-lg p-4 ${isDark ? "bg-slate-700/40" : "bg-gray-50"}`}
                 >
-                  <p className={`text-xs font-medium uppercase tracking-wide mb-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                  <p className={`text-xs font-medium uppercase tracking-wide mb-1 text-muted-foreground`}>
                     Top performing · {analytics.topPerformingPost.platform} ·{" "}
                     {analytics.topPerformingPost.engagementRate}%
                   </p>
-                  <p className={`text-sm ${isDark ? "text-slate-200" : "text-gray-800"}`}>
+                  <p className={`text-sm text-foreground`}>
                     {analytics.topPerformingPost.content}
                     {analytics.topPerformingPost.content.length >= 160 ? "…" : ""}
                   </p>

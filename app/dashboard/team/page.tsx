@@ -383,7 +383,7 @@ export default function TeamPage() {
       case "manager":
         return <Shield className="w-4 h-4 text-blue-500" />;
       default:
-        return <User className={`w-4 h-4 ${isDark ? "text-slate-400" : "text-gray-400"}`} />;
+        return <User className={`w-4 h-4 text-muted-foreground`} />;
     }
   };
 
@@ -403,14 +403,12 @@ export default function TeamPage() {
   }) => (
     <div className="space-y-2">
       <label
-        className={`text-sm font-semibold block ${
-          isDark ? "text-slate-300" : "text-gray-700"
-        }`}
+        className={`text-sm font-semibold block text-foreground/80`}
       >
         Assign to clients
       </label>
       {clients.length === 0 ? (
-        <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+        <p className={`text-sm text-muted-foreground`}>
           No clients yet — add clients first, then assign them here.
         </p>
       ) : (
@@ -442,7 +440,7 @@ export default function TeamPage() {
           })}
         </div>
       )}
-      <p className={`text-xs ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+      <p className={`text-xs text-muted-foreground`}>
         They&apos;ll only work on the clients you select.
       </p>
     </div>
@@ -450,20 +448,14 @@ export default function TeamPage() {
 
   return (
     <div
-      className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}
+      className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 bg-background`}
     >
       <div
-        className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b ${
-          isDark ? "border-slate-700" : "border-gray-200"
-        }`}
+        className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-border`}
       >
         <div>
           <h1
-            className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 ${
-              isDark ? "text-white" : "text-gray-950"
-            }`}
+            className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-foreground`}
           >
             Team
           </h1>
@@ -491,22 +483,18 @@ export default function TeamPage() {
           return (
             <Card
               key={stat.title}
-              className={`border rounded-xl ${
-                isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-              }`}
+              className={`border rounded-xl bg-card border-border`}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle
-                  className={`text-sm font-semibold ${
-                    isDark ? "text-slate-300" : "text-gray-600"
-                  }`}
+                  className={`text-sm font-semibold text-muted-foreground`}
                 >
                   {stat.title}
                 </CardTitle>
-                <Icon className={`h-4 w-4 ${isDark ? "text-slate-400" : "text-gray-500"}`} />
+                <Icon className={`h-4 w-4 text-muted-foreground`} />
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-950"}`}>
+                <div className={`text-2xl font-bold text-foreground`}>
                   {loading ? "—" : stat.value}
                 </div>
               </CardContent>
@@ -516,9 +504,7 @@ export default function TeamPage() {
       </div>
 
       <Card
-        className={`border rounded-xl ${
-          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-        }`}
+        className={`border rounded-xl bg-card border-border`}
       >
         <CardHeader>
           <CardTitle className={isDark ? "text-white" : "text-gray-950"}>Team members</CardTitle>
@@ -532,9 +518,7 @@ export default function TeamPage() {
               {[1, 2].map((i) => (
                 <div
                   key={i}
-                  className={`h-24 rounded-xl animate-pulse ${
-                    isDark ? "bg-slate-700" : "bg-gray-200"
-                  }`}
+                  className={`h-24 rounded-xl animate-pulse bg-accent`}
                 />
               ))}
             </div>
@@ -556,9 +540,7 @@ export default function TeamPage() {
                     <div className="min-w-0 space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p
-                          className={`font-semibold ${
-                            isDark ? "text-white" : "text-gray-950"
-                          }`}
+                          className={`font-semibold text-foreground`}
                         >
                           {member.name}
                         </p>
@@ -568,9 +550,7 @@ export default function TeamPage() {
                         </Badge>
                       </div>
                       <p
-                        className={`text-sm flex items-center gap-1.5 ${
-                          isDark ? "text-slate-300" : "text-gray-600"
-                        }`}
+                        className={`text-sm flex items-center gap-1.5 text-muted-foreground`}
                       >
                         <Mail className="w-3 h-3" />
                         {member.email}
@@ -578,9 +558,7 @@ export default function TeamPage() {
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         {member.role === "owner" ? (
                           <span
-                            className={`text-xs inline-flex items-center gap-1 ${
-                              isDark ? "text-slate-400" : "text-gray-500"
-                            }`}
+                            className={`text-xs inline-flex items-center gap-1 text-muted-foreground`}
                           >
                             <Briefcase className="w-3 h-3" />
                             All clients
@@ -647,9 +625,7 @@ export default function TeamPage() {
 
       {sentInvitations.length > 0 && (
         <Card
-          className={`border rounded-xl ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          }`}
+          className={`border rounded-xl bg-card border-border`}
         >
           <CardHeader>
             <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
@@ -669,10 +645,10 @@ export default function TeamPage() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <p className={`font-medium ${isDark ? "text-white" : "text-gray-950"}`}>
+                    <p className={`font-medium text-foreground`}>
                       {inv.email}
                     </p>
-                    <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                    <p className={`text-xs mt-1 text-muted-foreground`}>
                       {teamRoleLabel(inv.role)} · pending
                       {inv.expiresAt
                         ? ` · expires ${new Date(inv.expiresAt).toLocaleDateString()}`
@@ -703,9 +679,7 @@ export default function TeamPage() {
 
       {receivedInvitations.length > 0 && (
         <Card
-          className={`border rounded-xl ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          }`}
+          className={`border rounded-xl bg-card border-border`}
         >
           <CardHeader>
             <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
@@ -720,7 +694,7 @@ export default function TeamPage() {
                   isDark ? "border-slate-600" : "border-gray-200"
                 }`}
               >
-                <p className={`text-sm ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+                <p className={`text-sm text-foreground/80`}>
                   Team invitation
                   {invitation.expiresAt
                     ? ` · expires ${new Date(invitation.expiresAt).toLocaleDateString()}`
@@ -781,9 +755,7 @@ export default function TeamPage() {
           onClick={() => !inviting && setShowInviteModal(false)}
         >
           <Card
-            className={`w-full max-w-md border rounded-xl max-h-[90vh] overflow-y-auto ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
+            className={`w-full max-w-md border rounded-xl max-h-[90vh] overflow-y-auto bg-card border-border`}
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader>
@@ -797,9 +769,7 @@ export default function TeamPage() {
             <CardContent className="space-y-4">
               <div>
                 <label
-                  className={`text-sm font-semibold mb-2 block ${
-                    isDark ? "text-slate-300" : "text-gray-700"
-                  }`}
+                  className={`text-sm font-semibold mb-2 block text-foreground/80`}
                 >
                   Email
                 </label>
@@ -815,9 +785,7 @@ export default function TeamPage() {
 
               <div>
                 <label
-                  className={`text-sm font-semibold mb-2 block ${
-                    isDark ? "text-slate-300" : "text-gray-700"
-                  }`}
+                  className={`text-sm font-semibold mb-2 block text-foreground/80`}
                 >
                   Role
                 </label>
@@ -832,7 +800,7 @@ export default function TeamPage() {
                     </option>
                   ))}
                 </select>
-                <p className={`text-xs mt-1.5 ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                <p className={`text-xs mt-1.5 text-muted-foreground`}>
                   {TEAM_ROLES.find((r) => r.id === inviteRole)?.description}
                 </p>
               </div>
@@ -873,21 +841,19 @@ export default function TeamPage() {
           onClick={() => closeEdit()}
         >
           <Card
-            className={`w-full max-w-lg border rounded-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
+            className={`w-full max-w-lg border rounded-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl bg-card border-border`}
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader className="pb-3 border-b border-border/60 shrink-0">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <CardTitle
-                    className={`text-lg truncate ${isDark ? "text-white" : "text-gray-950"}`}
+                    className={`text-lg truncate text-foreground`}
                   >
                     {editMember.name}
                   </CardTitle>
                   <CardDescription
-                    className={`truncate ${isDark ? "text-slate-400" : "text-gray-600"}`}
+                    className={`truncate text-muted-foreground`}
                   >
                     {editMember.email}
                   </CardDescription>
@@ -911,9 +877,7 @@ export default function TeamPage() {
             <CardContent className="space-y-6 overflow-y-auto py-5">
               <section className="space-y-2">
                 <label
-                  className={`text-xs font-semibold uppercase tracking-wide ${
-                    isDark ? "text-slate-400" : "text-gray-500"
-                  }`}
+                  className={`text-xs font-semibold uppercase tracking-wide text-muted-foreground`}
                 >
                   Role
                 </label>
@@ -937,17 +901,15 @@ export default function TeamPage() {
               <section className="space-y-3">
                 <div className="flex items-center gap-2">
                   <ListTodo
-                    className={`w-4 h-4 ${isDark ? "text-slate-300" : "text-gray-700"}`}
+                    className={`w-4 h-4 text-foreground/80`}
                   />
                   <div>
                     <p
-                      className={`text-sm font-semibold ${
-                        isDark ? "text-slate-200" : "text-gray-800"
-                      }`}
+                      className={`text-sm font-semibold text-foreground`}
                     >
                       Assign work
                     </p>
-                    <p className={`text-xs ${isDark ? "text-slate-500" : "text-gray-500"}`}>
+                    <p className={`text-xs text-muted-foreground`}>
                       Give them open tasks, or create one now
                     </p>
                   </div>
@@ -965,9 +927,7 @@ export default function TeamPage() {
                   </p>
                 ) : loadingEditTasks ? (
                   <div
-                    className={`flex items-center gap-2 text-sm py-3 ${
-                      isDark ? "text-slate-400" : "text-gray-500"
-                    }`}
+                    className={`flex items-center gap-2 text-sm py-3 text-muted-foreground`}
                   >
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Loading tasks…
@@ -982,9 +942,7 @@ export default function TeamPage() {
                   >
                     {editOpenTasks.length === 0 ? (
                       <p
-                        className={`text-sm px-3 py-3 ${
-                          isDark ? "text-slate-400" : "text-gray-500"
-                        }`}
+                        className={`text-sm px-3 py-3 text-muted-foreground`}
                       >
                         No open tasks on these clients yet.
                       </p>
@@ -1018,9 +976,7 @@ export default function TeamPage() {
                                 {typeLabel}
                                 {task.description ? (
                                   <span
-                                    className={`font-normal ${
-                                      isDark ? "text-slate-400" : "text-gray-500"
-                                    }`}
+                                    className={`font-normal text-muted-foreground`}
                                   >
                                     {" · "}
                                     {task.description.length > 48
@@ -1030,9 +986,7 @@ export default function TeamPage() {
                                 ) : null}
                               </span>
                               <span
-                                className={`block text-xs mt-0.5 ${
-                                  isDark ? "text-slate-500" : "text-gray-500"
-                                }`}
+                                className={`block text-xs mt-0.5 text-muted-foreground`}
                               >
                                 {task.clientName}
                                 {task.assignedTo &&
@@ -1054,9 +1008,7 @@ export default function TeamPage() {
                   }`}
                 >
                   <p
-                    className={`text-xs font-semibold uppercase tracking-wide ${
-                      isDark ? "text-slate-400" : "text-gray-500"
-                    }`}
+                    className={`text-xs font-semibold uppercase tracking-wide text-muted-foreground`}
                   >
                     New task for them
                   </p>

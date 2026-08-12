@@ -333,9 +333,7 @@ function ContentIdeasPageInner() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}>
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
         <div className="text-center">
           <RefreshCw className={`w-8 h-8 animate-spin mx-auto mb-4 ${
             isDark ? "text-purple-400" : "text-blue-600"
@@ -350,12 +348,10 @@ function ContentIdeasPageInner() {
   if (!niche) {
     const customIndustries = ["other", "health_fitness", "real_estate", "creative_services", "tech_startups"];
     return (
-      <div className={`min-h-screen py-8 px-4 sm:px-6 transition-colors duration-300 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}>
+      <div className={`min-h-screen py-8 px-4 sm:px-6 transition-colors duration-300 bg-background`}>
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className={`text-2xl font-bold mb-2 ${isDark ? "text-white" : "text-gray-950"}`}>
+            <h1 className={`text-2xl font-bold mb-2 text-foreground`}>
               {clientIdFromQuery ? "Pick industry for this client" : "Pick your industry"}
             </h1>
             <p className={isDark ? "text-slate-400" : "text-gray-600"}>
@@ -395,14 +391,14 @@ function ContentIdeasPageInner() {
                   >
                     <Icon className="h-5 w-5" strokeWidth={1.75} />
                   </span>
-                  <span className={`font-medium ${isDark ? "text-white" : "text-gray-950"}`}>
+                  <span className={`font-medium text-foreground`}>
                     {opt.name}
                   </span>
                 </button>
               );
             })}
           </div>
-          <div className={`p-4 rounded-xl border ${isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"}`}>
+          <div className={`p-4 rounded-xl border border-border bg-muted`}>
             <p className={`text-sm font-medium mb-2 ${isDark ? "text-slate-200" : "text-gray-700"}`}>
               Health & Fitness, Real Estate, Tech, Creative, or Other?
             </p>
@@ -432,17 +428,11 @@ function ContentIdeasPageInner() {
   }
 
   return (
-    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
+    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 bg-background`}>
       {/* Header */}
-      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 sm:pb-6 border-b transition-colors duration-300 ${
-        isDark ? "border-slate-700" : "border-gray-200"
-      }`}>
+      <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 sm:pb-6 border-b transition-colors duration-300 border-border`}>
         <div className="flex-1 min-w-0">
-          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2 ${
-            isDark ? "text-white" : "text-gray-950"
-          }`}>
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2 text-foreground`}>
             Daily Content Ideas
             {clientName && (
               <span className="text-foreground dark:text-purple-400 font-semibold ml-2">
@@ -450,7 +440,7 @@ function ContentIdeasPageInner() {
               </span>
             )}
           </h1>
-          <p className={`text-sm sm:text-base ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+          <p className={`text-sm sm:text-base text-muted-foreground`}>
             Fresh ideas tailored for {clientName ? "this client" : "your niche"}
           </p>
         </div>
@@ -523,26 +513,20 @@ function ContentIdeasPageInner() {
                         isDark ? "text-purple-400" : "text-foreground"
                       }`} />
                     </div>
-                    <h3 className={`text-base sm:text-lg font-semibold flex-1 leading-tight ${
-                      isDark ? "text-white" : "text-gray-950"
-                    }`}>
+                    <h3 className={`text-base sm:text-lg font-semibold flex-1 leading-tight text-foreground`}>
                       {idea.topic}
                     </h3>
                   </div>
 
                     {/* Hook Example */}
                     <div className="mb-3 sm:mb-4">
-                      <p className={`text-xs font-semibold uppercase tracking-wide mb-1.5 sm:mb-2 ${
-                        isDark ? "text-slate-400" : "text-gray-600"
-                      }`}>Hook Example</p>
+                      <p className={`text-xs font-semibold uppercase tracking-wide mb-1.5 sm:mb-2 text-muted-foreground`}>Hook Example</p>
                       <div className={`border rounded-lg p-2.5 sm:p-3 ${
                         isDark 
                           ? "bg-slate-900/50 border-slate-700" 
                           : "bg-gray-50 border-gray-200"
                       }`}>
-                        <p className={`text-xs sm:text-sm leading-relaxed ${
-                          isDark ? "text-slate-200" : "text-gray-950"
-                        }`}>
+                        <p className={`text-xs sm:text-sm leading-relaxed text-foreground`}>
                           &ldquo;{idea.hookExample}&rdquo;
                         </p>
                         {idea.strategyTip && (
@@ -582,18 +566,14 @@ function ContentIdeasPageInner() {
                       {formatLabels[idea.format].label}
                     </Badge>
                     {idea.description && (
-                      <p className={`text-sm ml-auto ${
-                        isDark ? "text-slate-400" : "text-gray-600"
-                      }`}>
+                      <p className={`text-sm ml-auto text-muted-foreground`}>
                         {idea.description}
                       </p>
                     )}
                   </div>
 
                   {/* Actions */}
-                  <div className={`flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4 border-t transition-colors duration-300 ${
-                    isDark ? "border-slate-700" : "border-gray-200"
-                  }`}>
+                  <div className={`flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4 border-t transition-colors duration-300 border-border`}>
                     <Button
                       onClick={() => handleGenerateCaption(idea)}
                       className={`flex-1 rounded-xl py-2.5 sm:py-2 text-sm transition-all duration-200 shadow-sm hover:shadow-md ${
@@ -622,21 +602,15 @@ function ContentIdeasPageInner() {
               );
             })
         ) : niche === "custom" && clientIdFromQuery ? (
-          <Card className={`border rounded-xl transition-colors duration-300 ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          }`}>
+          <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
             <CardContent className="p-12 text-center">
               <Lightbulb className={`w-12 h-12 mx-auto mb-4 ${
                 isDark ? "text-purple-400" : "text-foreground"
               }`} />
-              <h3 className={`text-lg font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
+              <h3 className={`text-lg font-semibold mb-2 text-foreground`}>
                 Generate ideas for your niche
               </h3>
-              <p className={`text-base mb-4 ${
-                isDark ? "text-slate-400" : "text-gray-600"
-              }`}>
+              <p className={`text-base mb-4 text-muted-foreground`}>
                 AI will create 10 tailored content ideas for &ldquo;{nicheDescription || "your niche"}&rdquo;. Strategic, scroll-stopping, ready to use.
               </p>
               {refreshLimits && !refreshLimits.canRefresh && (
@@ -662,21 +636,13 @@ function ContentIdeasPageInner() {
             </CardContent>
           </Card>
         ) : (
-          <Card className={`border rounded-xl transition-colors duration-300 ${
-            isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-          }`}>
+          <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
             <CardContent className="p-12 text-center">
-              <Lightbulb className={`w-12 h-12 mx-auto mb-4 ${
-                isDark ? "text-slate-500" : "text-gray-400"
-              }`} />
-              <h3 className={`text-lg font-semibold mb-2 ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
+              <Lightbulb className={`w-12 h-12 mx-auto mb-4 text-muted-foreground/70`} />
+              <h3 className={`text-lg font-semibold mb-2 text-foreground`}>
                 No content ideas yet
               </h3>
-              <p className={`text-base mb-4 ${
-                isDark ? "text-slate-400" : "text-gray-600"
-              }`}>
+              <p className={`text-base mb-4 text-muted-foreground`}>
                 We&apos;re working on adding more ideas for your niche
               </p>
               <Button

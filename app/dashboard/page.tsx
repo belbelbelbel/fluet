@@ -364,25 +364,15 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className={`min-h-screen max-w-8xl mx-auto transition-colors duration-300 flex flex-col ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
+    <div className={`min-h-screen max-w-8xl mx-auto transition-colors duration-300 flex flex-col bg-background`}>
       {/* Top Header */}
-      <div className={`sticky top-0 z-10 border-b border-gray-200 dark:border-slate-600 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300 ${
-        isDark
-          ? "bg-slate-900"
-          : "bg-white"
-      }`}>
+      <div className={`sticky top-0 z-10 border-b border-gray-200 dark:border-slate-600 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300 bg-background`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
-            <h1 className={`text-xl sm:text-2xl font-medium truncate ${
-              isDark ? "text-white" : "text-gray-950"
-            }`}>
+            <h1 className={`text-xl sm:text-2xl font-medium truncate text-foreground`}>
               Welcome, {userName}
           </h1>
-            <p className={`text-xs sm:text-sm mt-0.5 sm:mt-1 ${
-              isDark ? "text-gray-400" : "text-gray-600"
-            }`}>{currentDate}</p>
+            <p className={`text-xs sm:text-sm mt-0.5 sm:mt-1 text-muted-foreground`}>{currentDate}</p>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="relative">
@@ -420,18 +410,12 @@ export default function DashboardPage() {
         <div className="w-full max-w-7xl space-y-4 sm:space-y-6">
           {/* KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <Card className={`rounded-xl transition-colors ${
-            isDark ? "bg-slate-800" : "bg-white"
-          }`}>
+          <Card className={`rounded-xl transition-colors bg-card`}>
             <CardContent className="p-4 sm:p-6">
-              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
-                isDark ? "text-gray-400" : "text-gray-600"
-              }`}>
+              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 text-muted-foreground`}>
                 Total posts
               </div>
-              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
+              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 text-foreground`}>
                 {loading ? (
                   <div className="h-8 sm:h-9 w-16 sm:w-20 bg-gray-200 rounded animate-pulse" />
                 ) : (
@@ -445,25 +429,19 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className={`rounded-xl transition-colors ${
-            isDark ? "bg-slate-800" : "bg-white"
-          }`}>
+          <Card className={`rounded-xl transition-colors bg-card`}>
             <CardContent className="p-4 sm:p-6">
-              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
-                isDark ? "text-gray-400" : "text-gray-600"
-              }`}>
+              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 text-muted-foreground`}>
                 Scheduled posts
               </div>
-              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
+              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 text-foreground`}>
                 {loading ? (
                   <div className="h-8 sm:h-9 w-16 sm:w-20 bg-gray-200 rounded animate-pulse" />
                 ) : (
                   stats.scheduledPosts
                 )}
               </div>
-              <div className={`text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+              <div className={`text-xs sm:text-sm text-muted-foreground`}>
                 Upcoming in your queue
               </div>
             </CardContent>
@@ -473,21 +451,17 @@ export default function DashboardPage() {
             isDark ? "bg-gray-900" : "bg-white"
           }`}>
             <CardContent className="p-4 sm:p-6">
-              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 ${
-                isDark ? "text-gray-400" : "text-gray-600"
-              }`}>
+              <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 text-muted-foreground`}>
                 Top platform
               </div>
-              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 capitalize ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
+              <div className={`text-2xl sm:text-3xl font-medium mb-1.5 sm:mb-2 capitalize text-foreground`}>
                 {loading ? (
                   <div className="h-8 sm:h-9 w-16 sm:w-20 bg-gray-200 rounded animate-pulse" />
                 ) : (
                   stats.topPlatform ?? "—"
                 )}
               </div>
-              <div className={`text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+              <div className={`text-xs sm:text-sm text-muted-foreground`}>
                 Based on content you&apos;ve created
               </div>
             </CardContent>
@@ -496,9 +470,7 @@ export default function DashboardPage() {
 
         {/* Your clients — always visible; shows list or "No clients" */}
         {!loading && userId && (
-          <Card className={`rounded-xl transition-colors ${
-            isDark ? "bg-slate-800" : "bg-white"
-          }`}>
+          <Card className={`rounded-xl transition-colors bg-card`}>
             <CardHeader className="pb-3 px-4 sm:px-6 pt-4 sm:pt-6 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-base sm:text-lg font-medium">
                 Your clients
@@ -538,21 +510,15 @@ export default function DashboardPage() {
                         }`}
                       >
                         <ClientAvatar name={client.name} size="sm" />
-                        <span className={`font-medium truncate text-sm ${
-                          isDark ? "text-slate-200" : "text-gray-900"
-                        }`}>
+                        <span className={`font-medium truncate text-sm text-foreground`}>
                           {client.name}
                         </span>
-                        <ChevronRight className={`w-4 h-4 flex-shrink-0 ${
-                          isDark ? "text-slate-500" : "text-gray-400"
-                        }`} />
+                        <ChevronRight className={`w-4 h-4 flex-shrink-0 text-muted-foreground/70`} />
                       </button>
                     ))}
                   </div>
                   {clients.length > 6 && (
-                    <p className={`text-xs mt-3 ${
-                      isDark ? "text-slate-500" : "text-gray-500"
-                    }`}>
+                    <p className={`text-xs mt-3 text-muted-foreground`}>
                       +{clients.length - 6} more —{" "}
                       <button
                         type="button"
@@ -568,17 +534,11 @@ export default function DashboardPage() {
                 <div className={`py-6 text-center rounded-lg border border-dashed border-gray-200 dark:border-slate-600 ${
                   isDark ? "bg-slate-900/30" : "bg-gray-50"
                 }`}>
-                  <Building2 className={`w-10 h-10 mx-auto mb-2 ${
-                    isDark ? "text-slate-500" : "text-gray-400"
-                  }`} />
-                  <p className={`text-sm font-medium ${
-                    isDark ? "text-slate-400" : "text-gray-600"
-                  }`}>
+                  <Building2 className={`w-10 h-10 mx-auto mb-2 text-muted-foreground/70`} />
+                  <p className={`text-sm font-medium text-muted-foreground`}>
                     No clients yet
                   </p>
-                  <p className={`text-xs mt-1 ${
-                    isDark ? "text-slate-500" : "text-gray-500"
-                  }`}>
+                  <p className={`text-xs mt-1 text-muted-foreground`}>
                     Create your first client to get started
                   </p>
                 </div>
@@ -595,14 +555,10 @@ export default function DashboardPage() {
           {/* Left Column - 2 spans */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* My Social Overview */}
-            <Card className={`rounded-xl transition-colors ${
-              isDark ? "bg-slate-800" : "bg-white"
-            }`}>
+            <Card className={`rounded-xl transition-colors bg-card`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2">
-                  <CardTitle className={`text-base sm:text-lg font-medium ${
-                    isDark ? "text-white" : "text-gray-950"
-                  }`}>
+                  <CardTitle className={`text-base sm:text-lg font-medium text-foreground`}>
                     Activity overview
                 </CardTitle>
                   <div className="flex items-center gap-2">
@@ -638,13 +594,9 @@ export default function DashboardPage() {
             </Card>
 
             {/* Engagement Rate Metrics */}
-            <Card className={`rounded-xl transition-colors ${
-              isDark ? "bg-slate-800" : "bg-white"
-            }`}>
+            <Card className={`rounded-xl transition-colors bg-card`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className={`text-base sm:text-lg font-medium ${
-                  isDark ? "text-white" : "text-gray-950"
-                }`}>
+                <CardTitle className={`text-base sm:text-lg font-medium text-foreground`}>
                   Engagement
                 </CardTitle>
               </CardHeader>
@@ -673,22 +625,16 @@ export default function DashboardPage() {
                         >
                           <div className="flex items-center gap-1.5 mb-1">
                             <item.icon
-                              className={`h-3.5 w-3.5 ${
-                                isDark ? "text-slate-400" : "text-gray-500"
-                              }`}
+                              className={`h-3.5 w-3.5 text-muted-foreground`}
                             />
                             <span
-                              className={`text-xs ${
-                                isDark ? "text-slate-400" : "text-gray-500"
-                              }`}
+                              className={`text-xs text-muted-foreground`}
                             >
                               {item.label}
                             </span>
                           </div>
                           <p
-                            className={`text-lg font-semibold tabular-nums ${
-                              isDark ? "text-white" : "text-gray-950"
-                            }`}
+                            className={`text-lg font-semibold tabular-nums text-foreground`}
                           >
                             {typeof item.value === "number"
                               ? item.value.toLocaleString()
@@ -705,9 +651,7 @@ export default function DashboardPage() {
                             className="flex items-center justify-between text-sm"
                           >
                             <span
-                              className={`capitalize ${
-                                isDark ? "text-slate-300" : "text-gray-700"
-                              }`}
+                              className={`capitalize text-foreground/80`}
                             >
                               {p.platform}
                             </span>
@@ -728,16 +672,12 @@ export default function DashboardPage() {
                     }`}
                   >
                     <p
-                      className={`text-sm font-medium ${
-                        isDark ? "text-slate-200" : "text-gray-800"
-                      }`}
+                      className={`text-sm font-medium text-foreground`}
                     >
                       No engagement data yet
                     </p>
                     <p
-                      className={`text-xs mt-1.5 max-w-sm mx-auto ${
-                        isDark ? "text-slate-400" : "text-gray-500"
-                      }`}
+                      className={`text-xs mt-1.5 max-w-sm mx-auto text-muted-foreground`}
                     >
                       Connect Twitter in Settings and auto-post — metrics sync on each cron run.
                     </p>
@@ -756,13 +696,9 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-4 sm:space-y-6">
             {/* Platform mix */}
-            <Card className={`rounded-xl transition-colors ${
-              isDark ? "bg-slate-800" : "bg-white"
-            }`}>
+            <Card className={`rounded-xl transition-colors bg-card`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className={`text-base sm:text-lg font-medium ${
-                  isDark ? "text-white" : "text-gray-950"
-                }`}>
+                <CardTitle className={`text-base sm:text-lg font-medium text-foreground`}>
                   Platforms
                 </CardTitle>
               </CardHeader>
@@ -778,9 +714,7 @@ export default function DashboardPage() {
                         <div key={p.platform}>
                           <div className="flex items-center justify-between text-sm mb-1">
                             <span
-                              className={`capitalize ${
-                                isDark ? "text-slate-200" : "text-gray-800"
-                              }`}
+                              className={`capitalize text-foreground`}
                             >
                               {p.platform}
                             </span>
@@ -791,9 +725,7 @@ export default function DashboardPage() {
                             </span>
                           </div>
                           <div
-                            className={`h-1.5 rounded-full overflow-hidden ${
-                              isDark ? "bg-slate-700" : "bg-gray-100"
-                            }`}
+                            className={`h-1.5 rounded-full overflow-hidden bg-accent`}
                           >
                             <div
                               className="h-full rounded-full bg-primary"
@@ -806,9 +738,7 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <p
-                    className={`text-sm py-4 text-center ${
-                      isDark ? "text-slate-400" : "text-gray-500"
-                    }`}
+                    className={`text-sm py-4 text-center text-muted-foreground`}
                   >
                     Schedule posts to see platform mix.
                   </p>
@@ -817,13 +747,9 @@ export default function DashboardPage() {
             </Card>
 
             {/* My Post Planner */}
-            <Card className={`rounded-xl transition-colors ${
-              isDark ? "bg-slate-800" : "bg-white"
-            }`}>
+            <Card className={`rounded-xl transition-colors bg-card`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <CardTitle className={`text-base sm:text-lg font-medium ${
-                  isDark ? "text-white" : "text-gray-950"
-                }`}>
+                <CardTitle className={`text-base sm:text-lg font-medium text-foreground`}>
                   My post planner
             </CardTitle>
           </CardHeader>
@@ -851,14 +777,10 @@ export default function DashboardPage() {
             </Card>
 
             {/* Workspace inbox preview */}
-            <Card className={`rounded-xl transition-colors ${
-              isDark ? "bg-slate-800" : "bg-white"
-            }`}>
+            <Card className={`rounded-xl transition-colors bg-card`}>
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
                 <div className="flex items-center justify-between gap-2">
-                  <CardTitle className={`text-base sm:text-lg font-medium ${
-                    isDark ? "text-white" : "text-gray-950"
-                  }`}>
+                  <CardTitle className={`text-base sm:text-lg font-medium text-foreground`}>
                     Inbox
                   </CardTitle>
                   <Link
@@ -873,7 +795,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
                 <ActivityFeed maxItems={5} autoRefresh={false} embedded />
-                <p className={`text-xs mt-3 ${isDark ? "text-slate-500" : "text-gray-400"}`}>
+                <p className={`text-xs mt-3 text-muted-foreground/70`}>
                   Approvals & tasks now · social comments when platforms connect
                 </p>
               </CardContent>
@@ -895,7 +817,7 @@ function MiniVolumeChart({
 }) {
   if (!series.length) {
     return (
-      <p className={`text-sm py-10 text-center ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+      <p className={`text-sm py-10 text-center text-muted-foreground`}>
         No activity in this range yet.
       </p>
     );
@@ -941,9 +863,7 @@ function MiniVolumeChart({
         })}
       </div>
       <div
-        className={`flex flex-wrap gap-4 text-xs ${
-          isDark ? "text-slate-400" : "text-gray-500"
-        }`}
+        className={`flex flex-wrap gap-4 text-xs text-muted-foreground`}
       >
         <span className="inline-flex items-center gap-1.5">
           <span className={`h-2 w-2 rounded-sm ${isDark ? "bg-sky-400" : "bg-sky-500"}`} />

@@ -175,9 +175,7 @@ function GenerateCaptionPageInner() {
 
   if (!idea) {
     return (
-      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
-        isDark ? "bg-slate-900" : "bg-white"
-      }`}>
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
         <RefreshCw className={`w-8 h-8 animate-spin ${
           isDark ? "text-purple-400" : "text-blue-600"
         }`} />
@@ -186,9 +184,7 @@ function GenerateCaptionPageInner() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
+    <div className={`min-h-screen transition-colors duration-300 bg-background`}>
       <div className="max-w-5xl mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8 lg:mb-10">
@@ -204,9 +200,7 @@ function GenerateCaptionPageInner() {
             Back
           </button>
           <div>
-            <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${
-              isDark ? "text-white" : "text-gray-950"
-            }`}>
+            <h1 className={`text-2xl sm:text-3xl font-bold mb-2 text-foreground`}>
               Generate Caption
               {clientName && (
                 <span className="text-foreground dark:text-purple-400 font-semibold ml-2">
@@ -214,7 +208,7 @@ function GenerateCaptionPageInner() {
                 </span>
               )}
             </h1>
-            <p className={`text-sm sm:text-base ${isDark ? "text-slate-400" : "text-gray-600"}`}>
+            <p className={`text-sm sm:text-base text-muted-foreground`}>
               Choose your Naija tone and create a custom caption
             </p>
           </div>
@@ -226,28 +220,20 @@ function GenerateCaptionPageInner() {
             {/* Content Idea Section */}
             <div className="space-y-4 sm:space-y-6">
               <div>
-                <p className={`text-xs font-semibold uppercase tracking-wider mb-2 sm:mb-3 ${
-                  isDark ? "text-slate-400" : "text-gray-500"
-                }`}>
+                <p className={`text-xs font-semibold uppercase tracking-wider mb-2 sm:mb-3 text-muted-foreground`}>
                   Content Idea
                 </p>
                 <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <h2 className={`text-xl sm:text-2xl font-bold mb-1 ${
-                      isDark ? "text-white" : "text-gray-950"
-                    }`}>
+                    <h2 className={`text-xl sm:text-2xl font-bold mb-1 text-foreground`}>
                       {idea.topic}
                     </h2>
                   </div>
                   <div className={`border-l-4 pl-3 sm:pl-4 py-2 ${
                     isDark ? "border-purple-500" : "border-primary"
                   }`}>
-                    <p className={`text-xs sm:text-sm mb-1 ${
-                      isDark ? "text-slate-400" : "text-gray-500"
-                    }`}>Hook</p>
-                    <p className={`text-sm sm:text-base italic leading-relaxed ${
-                      isDark ? "text-slate-200" : "text-gray-950"
-                    }`}>
+                    <p className={`text-xs sm:text-sm mb-1 text-muted-foreground`}>Hook</p>
+                    <p className={`text-sm sm:text-base italic leading-relaxed text-foreground`}>
                       &ldquo;{idea.hookExample}&rdquo;
                     </p>
                   </div>
@@ -257,9 +243,7 @@ function GenerateCaptionPageInner() {
 
             {/* Naija Tone Selector */}
             <div>
-              <p className={`text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4 ${
-                isDark ? "text-slate-400" : "text-gray-500"
-              }`}>
+              <p className={`text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4 text-muted-foreground`}>
                 Select Naija Tone
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
@@ -338,25 +322,15 @@ function GenerateCaptionPageInner() {
                     ? "border-slate-700 bg-slate-800/50" 
                     : "border-gray-200 bg-white"
                 }`}>
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                    isDark ? "bg-slate-700" : "bg-gray-100"
-                  }`}>
-                    <Lightbulb className={`w-8 h-8 ${
-                      isDark ? "text-slate-500" : "text-gray-400"
-                    }`} />
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-accent`}>
+                    <Lightbulb className={`w-8 h-8 text-muted-foreground/70`} />
                   </div>
-                  <p className={`text-sm ${
-                    isDark ? "text-slate-400" : "text-gray-500"
-                  }`}>
+                  <p className={`text-sm text-muted-foreground`}>
                     Your generated caption will appear here
                   </p>
                 </div>
               ) : (
-                <div className={`border rounded-xl overflow-hidden transition-colors duration-300 ${
-                  isDark 
-                    ? "border-slate-700 bg-slate-800" 
-                    : "border-gray-200 bg-white"
-                }`}>
+                <div className={`border rounded-xl overflow-hidden transition-colors duration-300 border-border bg-card`}>
                   <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold text-white">
@@ -390,29 +364,19 @@ function GenerateCaptionPageInner() {
                       {isGenerating ? (
                         <div className="flex items-center justify-center py-12">
                           <div className="text-center">
-                            <RefreshCw className={`w-6 h-6 animate-spin mx-auto mb-3 ${
-                              isDark ? "text-slate-400" : "text-gray-400"
-                            }`} />
-                            <span className={`text-sm ${
-                              isDark ? "text-slate-400" : "text-gray-600"
-                            }`}>Generating...</span>
+                            <RefreshCw className={`w-6 h-6 animate-spin mx-auto mb-3 text-muted-foreground`} />
+                            <span className={`text-sm text-muted-foreground`}>Generating...</span>
                           </div>
                         </div>
                       ) : (
-                        <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
-                          isDark ? "text-slate-200" : "text-gray-950"
-                        }`}>
+                        <p className={`text-sm leading-relaxed whitespace-pre-wrap text-foreground`}>
                           {generatedCaption}
                         </p>
                       )}
                     </div>
                     {generatedCaption && !isGenerating && (
-                      <div className={`mt-4 pt-4 border-t flex items-center justify-between transition-colors duration-300 ${
-                        isDark ? "border-slate-700" : "border-gray-200"
-                      }`}>
-                        <span className={`text-xs ${
-                          isDark ? "text-slate-400" : "text-gray-500"
-                        }`}>
+                      <div className={`mt-4 pt-4 border-t flex items-center justify-between transition-colors duration-300 border-border`}>
+                        <span className={`text-xs text-muted-foreground`}>
                           {generatedCaption.length} characters
                         </span>
                         <div className="flex gap-2">

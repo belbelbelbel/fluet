@@ -193,15 +193,11 @@ export default function DashboardHistoryPage() {
   const contentTypes = useMemo(() => (["twitter", "instagram", "linkedin", "tiktok"] as ContentType[]), []);
 
   return (
-    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
-      isDark ? "bg-slate-900" : "bg-white"
-    }`}>
+    <div className={`space-y-6 sm:space-y-8 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 bg-background`}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 ${
-            isDark ? "text-white" : "text-gray-950"
-          }`}>Content History</h1>
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-foreground`}>Content History</h1>
           <p className={isDark ? "text-slate-400" : "text-gray-600"}>Your generated content</p>
         </div>
         <Button
@@ -256,46 +252,26 @@ export default function DashboardHistoryPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className={`border rounded-xl animate-pulse transition-colors duration-300 ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}>
+            <Card key={i} className={`border rounded-xl animate-pulse transition-colors duration-300 bg-card border-border`}>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-xl ${
-                    isDark ? "bg-slate-700" : "bg-gray-200"
-                  }`}></div>
+                  <div className={`w-10 h-10 rounded-xl bg-accent`}></div>
                   <div className="flex-1">
-                    <div className={`h-4 rounded w-1/4 mb-2 ${
-                      isDark ? "bg-slate-700" : "bg-gray-200"
-                    }`}></div>
-                    <div className={`h-3 rounded w-1/2 ${
-                      isDark ? "bg-slate-700" : "bg-gray-200"
-                    }`}></div>
+                    <div className={`h-4 rounded w-1/4 mb-2 bg-accent`}></div>
+                    <div className={`h-3 rounded w-1/2 bg-accent`}></div>
                   </div>
                 </div>
-                <div className={`h-16 rounded mb-2 ${
-                  isDark ? "bg-slate-700" : "bg-gray-200"
-                }`}></div>
-                <div className={`h-24 rounded ${
-                  isDark ? "bg-slate-700" : "bg-gray-200"
-                }`}></div>
+                <div className={`h-16 rounded mb-2 bg-accent`}></div>
+                <div className={`h-24 rounded bg-accent`}></div>
               </CardContent>
             </Card>
           ))}
         </div>
       ) : content.length === 0 ? (
-        <div className={`text-center py-12 border rounded-xl transition-colors duration-300 ${
-          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-        }`}>
-          <FileTextIcon className={`w-12 h-12 mx-auto mb-3 ${
-            isDark ? "text-slate-500" : "text-gray-400"
-          }`} />
-          <h3 className={`text-lg font-semibold mb-1.5 ${
-            isDark ? "text-white" : "text-gray-950"
-          }`}>No content history yet</h3>
-          <p className={`text-sm mb-4 ${
-            isDark ? "text-slate-400" : "text-gray-600"
-          }`}>
+        <div className={`text-center py-12 border rounded-xl transition-colors duration-300 bg-card border-border`}>
+          <FileTextIcon className={`w-12 h-12 mx-auto mb-3 text-muted-foreground/70`} />
+          <h3 className={`text-lg font-semibold mb-1.5 text-foreground`}>No content history yet</h3>
+          <p className={`text-sm mb-4 text-muted-foreground`}>
             {userId 
               ? "Generate your first piece of content to see it here"
               : "Please sign in to view your content history"}
@@ -323,16 +299,12 @@ export default function DashboardHistoryPage() {
               <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-xl ${
-                      isDark ? "bg-slate-700" : "bg-gray-100"
-                    }`}>
+                    <div className={`p-2 rounded-xl bg-accent`}>
                       {getContentTypeIcon(item.contentType)}
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`font-semibold capitalize text-sm sm:text-base ${
-                          isDark ? "text-white" : "text-gray-950"
-                        }`}>
+                        <span className={`font-semibold capitalize text-sm sm:text-base text-foreground`}>
                           {item.contentType}
                         </span>
                         {item.posted === true && (
@@ -346,9 +318,7 @@ export default function DashboardHistoryPage() {
                           </span>
                         )}
                       </div>
-                      <div className={`flex flex-wrap items-center gap-2 text-xs mt-1 ${
-                        isDark ? "text-slate-400" : "text-gray-600"
-                      }`}>
+                      <div className={`flex flex-wrap items-center gap-2 text-xs mt-1 text-muted-foreground`}>
                         <div className="flex items-center space-x-1">
                           <CalendarIcon className="w-3 h-3" />
                           <span>{formatDate(item.createdAt)}</span>
@@ -426,9 +396,7 @@ export default function DashboardHistoryPage() {
                 </div>
               </div>
               <div className="mb-4">
-                <p className={`text-xs mb-1.5 font-medium ${
-                  isDark ? "text-slate-400" : "text-gray-600"
-                }`}>Prompt</p>
+                <p className={`text-xs mb-1.5 font-medium text-muted-foreground`}>Prompt</p>
                 <p className={`text-sm px-3 py-2 rounded-xl border transition-colors duration-300 ${
                   isDark
                     ? "text-slate-200 bg-slate-900/50 border-slate-700"
@@ -441,16 +409,10 @@ export default function DashboardHistoryPage() {
                   : "bg-gray-50 border-gray-200"
               }`}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className={`text-xs font-medium ${
-                    isDark ? "text-slate-400" : "text-gray-600"
-                  }`}>Content</p>
-                  <span className={`text-xs ${
-                    isDark ? "text-slate-500" : "text-gray-500"
-                  }`}>{item.content.length} chars</span>
+                  <p className={`text-xs font-medium text-muted-foreground`}>Content</p>
+                  <span className={`text-xs text-muted-foreground`}>{item.content.length} chars</span>
                 </div>
-                <pre className={`whitespace-pre-wrap text-sm leading-relaxed max-h-40 overflow-y-auto ${
-                  isDark ? "text-slate-200" : "text-gray-950"
-                }`}>
+                <pre className={`whitespace-pre-wrap text-sm leading-relaxed max-h-40 overflow-y-auto text-foreground`}>
                   {item.content}
                 </pre>
               </div>
@@ -467,17 +429,11 @@ export default function DashboardHistoryPage() {
           onClick={() => setViewingContent(null)}
         >
           <div 
-            className={`rounded-xl border max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors duration-300 ${
-              isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
-            }`}
+            className={`rounded-xl border max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors duration-300 bg-card border-border`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className={`p-4 border-b flex items-center justify-between transition-colors duration-300 ${
-              isDark ? "border-slate-700" : "border-gray-200"
-            }`}>
-              <h3 className={`text-lg font-semibold capitalize ${
-                isDark ? "text-white" : "text-gray-950"
-              }`}>
+            <div className={`p-4 border-b flex items-center justify-between transition-colors duration-300 border-border`}>
+              <h3 className={`text-lg font-semibold capitalize text-foreground`}>
                 {viewingContent.contentType}
               </h3>
               <button
@@ -494,9 +450,7 @@ export default function DashboardHistoryPage() {
 
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               <div>
-                <p className={`text-xs mb-1.5 font-medium ${
-                  isDark ? "text-slate-400" : "text-gray-600"
-                }`}>Prompt</p>
+                <p className={`text-xs mb-1.5 font-medium text-muted-foreground`}>Prompt</p>
                 <p className={`text-sm px-3 py-2 rounded-xl border transition-colors duration-300 ${
                   isDark
                     ? "text-slate-200 bg-slate-900/50 border-slate-700"
@@ -531,30 +485,22 @@ export default function DashboardHistoryPage() {
               )}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className={`text-xs font-medium ${
-                    isDark ? "text-slate-400" : "text-gray-600"
-                  }`}>Content</p>
-                  <span className={`text-xs ${
-                    isDark ? "text-slate-400" : "text-gray-600"
-                  }`}>{viewingContent.content.length} chars</span>
+                  <p className={`text-xs font-medium text-muted-foreground`}>Content</p>
+                  <span className={`text-xs text-muted-foreground`}>{viewingContent.content.length} chars</span>
                 </div>
                 <div className={`rounded-xl p-4 border transition-colors duration-300 ${
                   isDark
                     ? "bg-slate-900/50 border-slate-700"
                     : "bg-gray-50 border-gray-200"
                 }`}>
-                  <pre className={`whitespace-pre-wrap text-sm leading-relaxed ${
-                    isDark ? "text-slate-200" : "text-gray-950"
-                  }`}>
+                  <pre className={`whitespace-pre-wrap text-sm leading-relaxed text-foreground`}>
                     {viewingContent.content}
                   </pre>
                 </div>
               </div>
             </div>
 
-            <div className={`p-4 border-t flex items-center justify-end gap-2 transition-colors duration-300 ${
-              isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-gray-50"
-            }`}>
+            <div className={`p-4 border-t flex items-center justify-end gap-2 transition-colors duration-300 border-border bg-muted`}>
               <Button
                 onClick={() => {
                   handleCopy(viewingContent.content, viewingContent.id);
