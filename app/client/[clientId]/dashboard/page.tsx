@@ -10,6 +10,7 @@ import {
   BarChart3,
   Settings,
   FileText,
+  History,
   Loader2,
   ExternalLink,
   Twitter,
@@ -154,6 +155,19 @@ export default function ClientDashboardPage() {
   const pendingApprovals = data?.pendingApprovals ?? [];
   const platforms = data?.platformBreakdown ?? [];
 
+  // Posts splits into what is still coming and what actually went out. The
+  // History tab is the record of work delivered, so it reads newest-first by
+  // the time it published, falling back to the scheduled time for older rows
+  // where postedAt was never recorded.
+  const upcomingPosts = posts.filter((p) => !p.posted);
+  const publishedPosts = posts
+    .filter((p) => p.posted)
+    .sort((a, b) => {
+      const at = new Date(a.postedAt ?? a.scheduledFor ?? 0).getTime();
+      const bt = new Date(b.postedAt ?? b.scheduledFor ?? 0).getTime();
+      return bt - at;
+    });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[320px]">
@@ -222,13 +236,14 @@ export default function ClientDashboardPage() {
       >
         <TabsList className="p-1 h-auto gap-1 rounded-2xl bg-white/[0.04] border border-white/10 w-full sm:w-auto justify-start overflow-x-auto">
           {[
-            { value: "posts", label: "Posts", icon: Calendar },
+            { value: "posts", label: "Upcoming", icon: Calendar },
             {
               value: "approvals",
               label: "Approvals",
               icon: CheckCircle2,
               badge: stats.pendingApprovals,
             },
+            { value: "history", label: "History", icon: History },
             { value: "analytics", label: "Activity", icon: BarChart3 },
             { value: "preferences", label: "Preferences", icon: Settings },
           ].map((tab) => (
@@ -250,15 +265,15 @@ export default function ClientDashboardPage() {
 
         <TabsContent value="posts" className="mt-0">
           <Surface>
-            {posts.length === 0 ? (
+            {upcomingPosts.length === 0 ? (
               <Empty
                 icon={FileText}
-                title="No posts yet"
-                body="When your agency schedules content, it shows up here."
+                title="Nothing upcoming"
+                body="When your agency schedules content, it shows up here. Anything already published is under History."
               />
             ) : (
               <ul className="divide-y divide-white/8">
-                {posts.map((post) => (
+                {upcomingPosts.map((post) => (
                   <li
                     key={post.id}
                     className="px-5 py-4 sm:px-6 hover:bg-white/[0.03] transition-colors"
@@ -284,6 +299,53 @@ export default function ClientDashboardPage() {
                       ) : null}
                     </div>
                     <p className="text-sm text-slate-200/90 line-clamp-2 leading-relaxed">
+                      {post.content}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Surface>
+        </TabsContent>
+
+        <TabsContent value="history" className="mt-0">
+          <Surface>
+            {publishedPosts.length === 0 ? (
+              <Empty
+                icon={History}
+                title="Nothing published yet"
+                body="Once a post goes live it is recorded here, so you always have a record of what went out."
+              />
+            ) : (
+              <ul className="divide-y divide-white/8">
+                {publishedPosts.map((post) => (
+                  <li
+                    key={post.id}
+                    className="px-5 py-4 sm:px-6 hover:bg-white/[0.03] transition-colors"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-lg capitalize bg-white/8 text-slate-200">
+                        <PlatformIcon platform={post.platform} />
+                        {post.platform}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-teal-300">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Published
+                      </span>
+                      {post.postedAt ? (
+                        <span className="text-xs text-slate-400">
+                          ·{" "}
+                          {new Date(post.postedAt).toLocaleString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="text-sm text-slate-200/90 line-clamp-3 leading-relaxed">
                       {post.content}
                     </p>
                   </li>

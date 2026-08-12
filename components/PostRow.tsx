@@ -43,7 +43,13 @@ function platformMeta(platform: string) {
   );
 }
 
-export type PostStatus = "pending" | "approved" | "changes_requested" | "rejected" | "scheduled";
+export type PostStatus =
+  | "pending"
+  | "approved"
+  | "changes_requested"
+  | "rejected"
+  | "scheduled"
+  | "published";
 
 const STATUS: Record<PostStatus, { label: string; rail: string; dot: string; fg: string }> = {
   pending: { label: "Awaiting approval", rail: "bg-amber-400", dot: "bg-amber-400", fg: "text-amber-600 dark:text-amber-400" },
@@ -51,6 +57,9 @@ const STATUS: Record<PostStatus, { label: string; rail: string; dot: string; fg:
   changes_requested: { label: "Changes requested", rail: "bg-orange-500", dot: "bg-orange-500", fg: "text-orange-600 dark:text-orange-400" },
   rejected: { label: "Rejected", rail: "bg-rose-500", dot: "bg-rose-500", fg: "text-rose-600 dark:text-rose-400" },
   scheduled: { label: "Scheduled", rail: "bg-slate-300 dark:bg-slate-600", dot: "bg-slate-400", fg: "text-slate-500" },
+  // Terminal state — a teal rail separates "went out" from the amber/emerald
+  // of the approval pipeline at a glance.
+  published: { label: "Published", rail: "bg-teal-500", dot: "bg-teal-500", fg: "text-teal-600 dark:text-teal-400" },
 };
 
 /**

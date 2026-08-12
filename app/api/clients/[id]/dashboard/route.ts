@@ -62,6 +62,16 @@ export async function GET(
       (p) => !p.posted && p.scheduledFor && new Date(p.scheduledFor) > now
     );
 
+    // Record of what actually went out for this client, newest first. Falls
+    // back to scheduledFor for rows published before postedAt was recorded.
+    const publishedPosts = posts
+      .filter((p) => p.posted)
+      .sort(
+        (a, b) =>
+          new Date(b.postedAt ?? b.scheduledFor ?? 0).getTime() -
+          new Date(a.postedAt ?? a.scheduledFor ?? 0).getTime()
+      );
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const pendingApprovals = approvals.map((a) => {
@@ -86,6 +96,7 @@ export async function GET(
         postsLimit: credits?.postsPerMonth ?? 12,
         pendingApprovals: pendingApprovals.length,
         scheduledPosts: upcomingPosts.length,
+        publishedPosts: publishedPosts.length,
         engagementRate: null as number | null,
         engagementMetricsAvailable: false,
       },
@@ -97,6 +108,14 @@ export async function GET(
         scheduledFor: p.scheduledFor,
         posted: p.posted,
         approvalStatus: p.approvalStatus,
+      })),
+      publishedPosts: publishedPosts.slice(0, 20).map((p) => ({
+        id: p.id,
+        platform: p.platform,
+        content: p.content,
+        scheduledFor: p.scheduledFor,
+        postedAt: p.postedAt,
+        posted: p.posted,
       })),
     });
   } catch (error) {

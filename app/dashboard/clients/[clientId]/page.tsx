@@ -22,6 +22,7 @@ import {
   Loader2,
   Copy,
   ExternalLink,
+  History as HistoryIcon,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PostRow, type PostStatus } from "@/components/PostRow";
@@ -68,6 +69,16 @@ interface UpcomingPost {
   approvalStatus: string | null;
 }
 
+/** A post that actually went out — the client's record of work delivered. */
+interface PublishedPost {
+  id: number;
+  platform: string;
+  content: string;
+  scheduledFor: string | null;
+  postedAt: string | null;
+  posted: boolean | null;
+}
+
 export default function ClientDashboardPage() {
   const params = useParams();
   const router = useRouter();
@@ -88,6 +99,7 @@ export default function ClientDashboardPage() {
   });
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
   const [upcomingPosts, setUpcomingPosts] = useState<UpcomingPost[]>([]);
+  const [publishedPosts, setPublishedPosts] = useState<PublishedPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -126,6 +138,7 @@ export default function ClientDashboardPage() {
           }
           setPendingApprovals(Array.isArray(dashboardData.pendingApprovals) ? dashboardData.pendingApprovals : []);
           setUpcomingPosts(Array.isArray(dashboardData.upcomingPosts) ? dashboardData.upcomingPosts : []);
+          setPublishedPosts(Array.isArray(dashboardData.publishedPosts) ? dashboardData.publishedPosts : []);
         } else {
           console.error("Failed to load client dashboard:", dashboardResponse.status);
         }
@@ -457,8 +470,22 @@ export default function ClientDashboardPage() {
             <FileText className="w-4 h-4 mr-2" />
             Tasks
           </TabsTrigger>
-          <TabsTrigger 
-            value="analytics" 
+          <TabsTrigger
+            value="history"
+            className={cn(
+              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
+            )}
+          >
+            <HistoryIcon className="w-4 h-4 mr-2" />
+            History
+            {publishedPosts.length > 0 && (
+              <span className="ml-2 px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-xs">
+                {publishedPosts.length}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger
+            value="analytics"
             className={cn(
               "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
@@ -467,6 +494,51 @@ export default function ClientDashboardPage() {
             Analytics
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="history" className="space-y-4">
+          <Card className={`border transition-colors duration-300 bg-card border-border`}>
+            <CardHeader className="pb-4">
+              <CardTitle className={`text-base font-semibold text-foreground`}>
+                Published
+              </CardTitle>
+              <p className={`text-sm mt-0.5 text-muted-foreground`}>
+                {publishedPosts.length > 0
+                  ? `${publishedPosts.length} post${publishedPosts.length !== 1 ? "s" : ""} delivered for ${client?.name ?? "this client"}`
+                  : "Nothing has gone out yet"}
+              </p>
+            </CardHeader>
+            <CardContent className="pt-0 pb-3">
+              {publishedPosts.length === 0 ? (
+                <div className="text-center py-10">
+                  <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${
+                    "bg-slate-100 text-slate-400 dark:bg-slate-700/60 dark:text-slate-400"
+                  }`}>
+                    <HistoryIcon className="h-5 w-5" />
+                  </div>
+                  <h3 className={`text-sm font-semibold text-foreground`}>
+                    No history yet
+                  </h3>
+                  <p className={`mt-1 text-sm text-muted-foreground`}>
+                    Once a scheduled post publishes, it&apos;s recorded here.
+                  </p>
+                </div>
+              ) : (
+                <div className="-mx-1">
+                  {publishedPosts.map((post) => (
+                    <PostRow
+                      key={post.id}
+                      platform={post.platform}
+                      content={post.content}
+                      // Show when it actually went out, not when it was queued.
+                      scheduledFor={post.postedAt ?? post.scheduledFor}
+                      status="published"
+                    />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="calendar" className="space-y-4">
           <Card className={`border transition-colors duration-300 bg-card border-border`}>
