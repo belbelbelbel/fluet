@@ -182,7 +182,7 @@ function GenerateCaptionPageInner() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 bg-background`}>
-      <div className="max-w-5xl mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto lg:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8 lg:mb-10">
           <button

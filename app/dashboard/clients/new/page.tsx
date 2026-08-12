@@ -70,7 +70,7 @@ export default function CreateClientPage() {
 
   return (
     <div className="min-h-screen bg-background py-6 lg:py-8">
-      <div className="mx-auto max-w-2xl space-y-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-2xl space-y-6">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />

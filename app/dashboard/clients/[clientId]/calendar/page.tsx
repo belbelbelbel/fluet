@@ -147,7 +147,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className={`max-w-7xl mx-auto space-y-4 sm:space-y-6 transition-colors duration-300 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-background`}>
+    <div className={`max-w-7xl mx-auto space-y-4 sm:space-y-6 transition-colors duration-300 bg-background`}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-3 sm:gap-4">
           <Button

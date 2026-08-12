@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className={`space-y-6 sm:space-y-8 pb-8 pt-4 sm:pt-6 lg:pt-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300 bg-background`}>
+    <div className={`space-y-6 sm:space-y-8 pb-8 pt-4 sm:pt-6 lg:pt-8 max-w-5xl mx-auto transition-colors duration-300 bg-background`}>
       <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 sm:pb-8 border-b-2 transition-colors duration-300 border-border`}>
         <div className="flex-1">
           <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-3 text-foreground`}>Analytics Dashboard</h1>
