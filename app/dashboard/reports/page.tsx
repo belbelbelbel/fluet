@@ -185,7 +185,7 @@ export default function ReportsPage() {
               )
             }
             className={`w-full sm:w-auto min-w-0 px-4 py-2.5 sm:py-2 rounded-lg border text-sm ${
-              "bg-white border-gray-300 text-gray-900 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+              "bg-white border-border text-foreground dark:bg-slate-800 dark:border-slate-700 dark:text-white"
             }`}
           >
             <option value="">All Clients</option>
@@ -219,7 +219,7 @@ export default function ReportsPage() {
             <div className="text-center">
               <FileText
                 className={`w-16 h-16 mx-auto mb-4 ${
-                  "text-gray-400 dark:text-slate-600"
+                  "text-muted-foreground/70 dark:text-slate-600"
                 }`}
               />
               <h2
@@ -301,7 +301,7 @@ export default function ReportsPage() {
                     variant="outline"
                     size="sm"
                     className={`w-full sm:w-auto min-h-[40px] touch-manipulation ${
-                      "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                      "border-border text-foreground/80 hover:bg-gray-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                     }`}
                   >
                     <Download className="w-4 h-4 mr-1" />

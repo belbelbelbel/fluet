@@ -363,7 +363,7 @@ export default function DashboardPage() {
   return (
     <div className={`min-h-screen max-w-8xl mx-auto transition-colors duration-300 flex flex-col bg-background`}>
       {/* Top Header */}
-      <div className={`sticky top-0 z-10 border-b border-gray-200 dark:border-slate-600 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300 bg-background`}>
+      <div className={`sticky top-0 z-10 border-b border-border dark:border-slate-600 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300 bg-background`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
             <h1 className={`text-xl sm:text-2xl font-medium truncate text-foreground`}>
@@ -374,13 +374,13 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="relative">
               <Bell className={`w-5 h-5 cursor-pointer ${
-                "text-gray-600 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                "text-muted-foreground hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
               }`} />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </div>
             <div className="relative flex-1 sm:flex-none">
               <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                "text-gray-400 dark:text-gray-500"
+                "text-muted-foreground/70 dark:text-gray-500"
               }`} />
               <Input
                 type="text"
@@ -388,7 +388,7 @@ export default function DashboardPage() {
                 className="pl-9 w-full sm:w-48 lg:w-64"
               />
               <span className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs hidden sm:inline ${
-                "text-gray-400 dark:text-gray-500"
+                "text-muted-foreground/70 dark:text-gray-500"
               }`}>
                 /
               </span>
@@ -477,7 +477,7 @@ export default function DashboardPage() {
                     size="sm"
                     onClick={() => router.push("/dashboard/clients")}
                     className={`text-xs sm:text-sm ${
-                      "text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700"
+                      "text-muted-foreground hover:text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700"
                     }`}
                   >
                     Manage all
@@ -526,8 +526,8 @@ export default function DashboardPage() {
                   )}
                 </>
               ) : (
-                <div className={`py-6 text-center rounded-lg border border-dashed border-gray-200 dark:border-slate-600 ${
-                  "bg-gray-50 dark:bg-slate-900/30"
+                <div className={`py-6 text-center rounded-lg border border-dashed border-border dark:border-slate-600 ${
+                  "bg-muted dark:bg-slate-900/30"
                 }`}>
                   <Building2 className={`w-10 h-10 mx-auto mb-2 text-muted-foreground/70`} />
                   <p className={`text-sm font-medium text-muted-foreground`}>
@@ -563,7 +563,7 @@ export default function DashboardPage() {
                         setOverviewRange(e.target.value as "7d" | "30d" | "90d")
                       }
                       className={`flex-1 sm:flex-none text-xs sm:text-sm border rounded-lg px-2 sm:px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring ${
-                      "bg-white border-gray-200 text-gray-700 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
+                      "bg-white border-border text-foreground/80 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
                     }`}
                     >
                       <option value="7d">Last 7 days</option>
@@ -573,7 +573,7 @@ export default function DashboardPage() {
                     <Link
                       href="/dashboard/analytics"
                       className={`text-xs font-medium whitespace-nowrap ${
-                        "text-gray-600 hover:text-gray-950 dark:text-slate-300 dark:hover:text-white"
+                        "text-muted-foreground hover:text-gray-950 dark:text-slate-300 dark:hover:text-white"
                       }`}
                     >
                       Full analytics
@@ -613,7 +613,7 @@ export default function DashboardPage() {
                         <div
                           key={item.label}
                           className={`rounded-lg p-3 ${
-                            "bg-gray-50 dark:bg-slate-700/60"
+                            "bg-muted dark:bg-slate-700/60"
                           }`}
                         >
                           <div className="flex items-center gap-1.5 mb-1">
@@ -661,7 +661,7 @@ export default function DashboardPage() {
                 ) : (
                   <div
                     className={`rounded-lg px-4 py-6 text-center ${
-                      "bg-gray-50 dark:bg-slate-700/40"
+                      "bg-muted dark:bg-slate-700/40"
                     }`}
                   >
                     <p
@@ -754,7 +754,7 @@ export default function DashboardPage() {
                       className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg text-center min-w-[60px] sm:min-w-[70px] ${
                         date.isToday
                           ? "bg-primary text-primary-foreground"
-                          : "bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+                          : "bg-muted text-foreground/80 hover:bg-gray-100 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
                       }`}
                     >
                       <div className="text-xs font-medium">{date.day}</div>
@@ -777,7 +777,7 @@ export default function DashboardPage() {
                   <Link
                     href="/dashboard/inbox"
                     className={`text-xs font-medium ${
-                      "text-gray-600 hover:text-gray-950 dark:text-slate-300 dark:hover:text-white"
+                      "text-muted-foreground hover:text-gray-950 dark:text-slate-300 dark:hover:text-white"
                     }`}
                   >
                     Open all

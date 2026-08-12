@@ -115,7 +115,7 @@ export function PostReminderModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl gap-0 p-0 overflow-hidden">
-        <DialogHeader className="p-6 pb-4 border-b border-gray-200 dark:border-slate-600">
+        <DialogHeader className="p-6 pb-4 border-b border-border dark:border-slate-600">
           <DialogTitle className="text-lg">
             Time to post on {getPlatformName(post.platform)}
           </DialogTitle>
@@ -126,35 +126,35 @@ export function PostReminderModal({
 
         <div className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-slate-300">
+            <label className="block text-sm font-medium mb-2 text-foreground/80 dark:text-slate-300">
               Your content
             </label>
             <div className="relative">
               <textarea
                 readOnly
                 value={post.content}
-                className="w-full h-32 p-4 border border-gray-200 dark:border-slate-600 rounded-lg resize-none bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:outline-none"
+                className="w-full h-32 p-4 border border-border dark:border-slate-600 rounded-lg resize-none bg-muted dark:bg-slate-900 text-foreground dark:text-white text-sm focus:outline-none"
               />
               <button
                 type="button"
                 onClick={handleCopy}
-                className="absolute top-3 right-3 p-2 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                className="absolute top-3 right-3 p-2 border border-border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 title="Copy to clipboard"
               >
                 {copied ? (
                   <CheckIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 ) : (
-                  <CopyIcon className="w-4 h-4 text-gray-500 dark:text-slate-400" />
+                  <CopyIcon className="w-4 h-4 text-muted-foreground dark:text-slate-400" />
                 )}
               </button>
             </div>
           </div>
 
-          <div className="rounded-lg p-4 border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/50">
-            <h3 className="text-sm font-medium mb-2 text-gray-900 dark:text-slate-200">
+          <div className="rounded-lg p-4 border border-border dark:border-slate-600 bg-muted dark:bg-slate-900/50">
+            <h3 className="text-sm font-medium mb-2 text-foreground dark:text-slate-200">
               How to post
             </h3>
-            <ol className="text-sm space-y-1 list-decimal list-inside text-gray-600 dark:text-slate-400">
+            <ol className="text-sm space-y-1 list-decimal list-inside text-muted-foreground dark:text-slate-400">
               <li>Copy your content above</li>
               <li>Open {getPlatformName(post.platform)} in a new tab</li>
               <li>Paste and publish</li>
@@ -163,7 +163,7 @@ export function PostReminderModal({
           </div>
         </div>
 
-        <DialogFooter className="p-6 pt-4 border-t border-gray-200 dark:border-slate-600 flex-col sm:flex-col gap-2">
+        <DialogFooter className="p-6 pt-4 border-t border-border dark:border-slate-600 flex-col sm:flex-col gap-2">
           <div className="flex flex-col sm:flex-row gap-2 w-full">
             <Button onClick={handleCopy} variant="outline" className="flex-1 rounded-xl">
               {copied ? (

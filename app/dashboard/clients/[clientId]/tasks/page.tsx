@@ -253,7 +253,7 @@ export default function TasksPage() {
       case "assigned":
         return "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
+        return "bg-accent text-foreground/80 border-border dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
     }
   };
 
@@ -262,7 +262,7 @@ export default function TasksPage() {
       "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
       active
         ? "bg-slate-900 text-white dark:bg-slate-700 dark:text-white"
-        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800"
+        : "text-muted-foreground hover:text-gray-900 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800"
     );
 
   if (loading) {
@@ -325,7 +325,7 @@ export default function TasksPage() {
 
       {/* Tasks List */}
       {filteredTasks.length === 0 ? (
-        <Card className={"border-gray-200 dark:border-slate-700 dark:bg-slate-800"}>
+        <Card className={"border-border dark:border-slate-700 dark:bg-slate-800"}>
           <CardContent className="pt-12 pb-12 text-center">
             <Clock
               className={cn(
@@ -363,7 +363,7 @@ export default function TasksPage() {
               key={task.id}
               className={cn(
                 "shadow-sm hover:shadow-md transition-shadow",
-                "border-gray-200 dark:border-slate-700 dark:bg-slate-800"
+                "border-border dark:border-slate-700 dark:bg-slate-800"
               )}
             >
               <CardContent className="pt-4">

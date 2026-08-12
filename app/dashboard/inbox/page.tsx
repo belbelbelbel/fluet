@@ -231,7 +231,7 @@ export default function InboxPage() {
               "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
               filter === f
                 ? "bg-primary text-primary-foreground"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                : "bg-accent text-foreground/80 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             )}
           >
             {f === "all" ? "All" : `Unread${unreadCount ? ` (${unreadCount})` : ""}`}

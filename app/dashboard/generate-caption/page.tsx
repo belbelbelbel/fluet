@@ -188,7 +188,7 @@ function GenerateCaptionPageInner() {
           <button
             onClick={() => router.back()}
             className={`inline-flex items-center text-sm mb-4 sm:mb-6 transition-all duration-200 ${
-              "text-gray-600 hover:text-gray-950 dark:text-slate-400 dark:hover:text-white"
+              "text-muted-foreground hover:text-gray-950 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -250,7 +250,7 @@ function GenerateCaptionPageInner() {
                     className={`relative p-4 sm:p-5 rounded-xl border transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed ${
                       selectedTone === tone
                         ? "border-primary bg-muted dark:border-purple-500 dark:bg-purple-900/50"
-                        : "border-gray-200 bg-white hover:border-purple-200 hover:bg-muted/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-purple-500 dark:hover:bg-purple-900/30"
+                        : "border-border bg-white hover:border-purple-200 hover:bg-muted/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-purple-500 dark:hover:bg-purple-900/30"
                     }`}
                   >
                     {selectedTone === tone && (
@@ -307,7 +307,7 @@ function GenerateCaptionPageInner() {
             <div className="sticky top-8">
               {!hasGenerated ? (
                 <div className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors duration-300 ${
-                  "border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-800/50"
+                  "border-border bg-white dark:border-slate-700 dark:bg-slate-800/50"
                 }`}>
                   <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-accent`}>
                     <Lightbulb className={`w-8 h-8 text-muted-foreground/70`} />
@@ -387,7 +387,7 @@ function GenerateCaptionPageInner() {
                             variant="outline"
                             size="sm"
                             className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
-                              "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                              "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                             }`}
                           >
                             Another

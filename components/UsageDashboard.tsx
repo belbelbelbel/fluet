@@ -49,9 +49,9 @@ export function UsageDashboard() {
 
   if (loading) {
     return (
-      <Card className="border-2 border-gray-200">
+      <Card className="border-2 border-border">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900">
+          <CardTitle className="flex items-center gap-2 text-foreground">
             <Bolt className="w-5 h-5 text-blue-600" />
             Usage This Month
           </CardTitle>
@@ -76,7 +76,7 @@ export function UsageDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600">{error || "Unable to load usage information"}</p>
+          <p className="text-sm text-muted-foreground">{error || "Unable to load usage information"}</p>
           <Button
             onClick={fetchUsageStats}
             size="sm"
@@ -114,17 +114,17 @@ export function UsageDashboard() {
         ? "border-red-200 bg-red-50" 
         : isNearLimit 
         ? "border-yellow-200 bg-yellow-50" 
-        : "border-gray-200 bg-white"
+        : "border-border bg-white"
     }`}>
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center justify-between text-gray-900">
+        <CardTitle className="flex items-center justify-between text-foreground">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-              <Bolt className="w-5 h-5 text-gray-700" />
+            <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+              <Bolt className="w-5 h-5 text-foreground/80" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">Usage This Month</h3>
-              <p className="text-xs text-gray-600">Track your content generation</p>
+              <p className="text-xs text-muted-foreground">Track your content generation</p>
             </div>
           </div>
           {hasActiveSubscription && (
@@ -140,11 +140,11 @@ export function UsageDashboard() {
           {/* Usage Stats */}
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-foreground/80">
                 {usageCount} / {limit === Infinity ? "∞" : limit} posts
               </span>
               <span className={`text-base font-semibold ${
-                isAtLimit ? "text-red-600" : isNearLimit ? "text-yellow-600" : "text-gray-900"
+                isAtLimit ? "text-red-600" : isNearLimit ? "text-yellow-600" : "text-foreground"
               }`}>
                 {usagePercentage}%
               </span>
@@ -159,18 +159,18 @@ export function UsageDashboard() {
           {/* Stats Grid - Cleaner */}
           <div className="grid grid-cols-3 gap-3">
             {limit !== Infinity && (
-              <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-xl font-bold text-gray-900 mb-1">{remainingQuota}</p>
-                <p className="text-xs text-gray-600">Remaining</p>
+              <div className="text-center p-3 bg-muted rounded-lg border border-border">
+                <p className="text-xl font-bold text-foreground mb-1">{remainingQuota}</p>
+                <p className="text-xs text-muted-foreground">Remaining</p>
               </div>
             )}
-            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xl font-bold text-gray-900 mb-1">{plan}</p>
-              <p className="text-xs text-gray-600">Current Plan</p>
+            <div className="text-center p-3 bg-muted rounded-lg border border-border">
+              <p className="text-xl font-bold text-foreground mb-1">{plan}</p>
+              <p className="text-xs text-muted-foreground">Current Plan</p>
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-xl font-bold text-gray-900 mb-1">{daysUntilReset}</p>
-              <p className="text-xs text-gray-600">Days Until Reset</p>
+            <div className="text-center p-3 bg-muted rounded-lg border border-border">
+              <p className="text-xl font-bold text-foreground mb-1">{daysUntilReset}</p>
+              <p className="text-xs text-muted-foreground">Days Until Reset</p>
             </div>
           </div>
 
@@ -181,7 +181,7 @@ export function UsageDashboard() {
                 <AlertCircle className="w-4 h-4" />
                 <span className="text-sm font-medium">Limit Reached</span>
               </div>
-              <p className="text-xs text-gray-600 mb-3">
+              <p className="text-xs text-muted-foreground mb-3">
                 {hasActiveSubscription
                   ? `You've used all ${limit} posts for your ${plan} plan this month. Upgrade to continue generating content.`
                   : `You've used all ${limit} free posts this month. Upgrade to a paid plan to continue.`}
@@ -201,7 +201,7 @@ export function UsageDashboard() {
                 <AlertCircle className="w-4 h-4" />
                 <span className="text-sm font-medium">Running Low</span>
               </div>
-              <p className="text-xs text-gray-600 mb-2">
+              <p className="text-xs text-muted-foreground mb-2">
                 You have {remainingQuota} {remainingQuota === 1 ? "post" : "posts"} remaining this month.
               </p>
               <Link href="/pricing" className="block">
@@ -223,7 +223,7 @@ export function UsageDashboard() {
                 <TrendingUp className="w-4 h-4" />
                 <span className="text-sm font-medium">Upgrade for More</span>
               </div>
-              <p className="text-xs text-gray-600 mb-2">
+              <p className="text-xs text-muted-foreground mb-2">
                 Get 100+ posts per month with a paid plan
               </p>
               <Link href="/pricing" className="block">

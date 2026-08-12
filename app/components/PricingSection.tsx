@@ -93,22 +93,22 @@ export function PricingSection() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-purple-50 border border-purple-200 rounded-full mb-6">
               <span className="text-sm text-purple-900 font-medium">Pricing</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-gray-900">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
               Simple Pricing, Powerful Features
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               Simple, transparent pricing that grows with you. Try any plan free for 30 days.
             </p>
 
             {/* Billing Toggle */}
             <div className="flex items-center justify-center mb-12">
-              <div className="inline-flex items-center bg-white border border-gray-200 rounded-full p-1">
+              <div className="inline-flex items-center bg-white border border-border rounded-full p-1">
                 <button
                   onClick={() => setBillingCycle("monthly")}
                   className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
                     billingCycle === "monthly"
-                      ? "bg-blue-50 text-gray-900"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-blue-50 text-foreground"
+                      : "text-muted-foreground hover:text-gray-900"
                   }`}
                 >
                   Monthly billing
@@ -117,8 +117,8 @@ export function PricingSection() {
                   onClick={() => setBillingCycle("yearly")}
                   className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
                     billingCycle === "yearly"
-                      ? "bg-blue-50 text-gray-900"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-blue-50 text-foreground"
+                      : "text-muted-foreground hover:text-gray-900"
                   }`}
                 >
                   Annual billing
@@ -142,7 +142,7 @@ export function PricingSection() {
                   className={`relative rounded-xl transition-all ${
                     isPopular
                       ? "bg-gradient-to-b from-purple-900 to-purple-800 text-white"
-                      : "bg-white border border-gray-200 hover:border-gray-300"
+                      : "bg-white border border-border hover:border-gray-300"
                   }`}
                 >
                   {isPopular && (
@@ -162,7 +162,7 @@ export function PricingSection() {
                     </div>
 
                     {/* Plan Name */}
-                    <h3 className={`text-xl font-bold mb-2 ${isPopular ? "text-white" : "text-gray-900"}`}>
+                    <h3 className={`text-xl font-bold mb-2 ${isPopular ? "text-white" : "text-foreground"}`}>
                       {plan.name}
                     </h3>
 
@@ -171,21 +171,21 @@ export function PricingSection() {
                       <div className="flex items-baseline gap-2 mb-1">
                         {plan.price !== "Custom" ? (
                           <>
-                            <span className={`text-5xl font-bold ${isPopular ? "text-white" : "text-gray-900"}`}>
+                            <span className={`text-5xl font-bold ${isPopular ? "text-white" : "text-foreground"}`}>
                               {plan.priceDisplay || `₦${parseInt(displayPrice).toLocaleString('en-NG')}`}
                             </span>
-                            <span className={`text-lg ${isPopular ? "text-white/80" : "text-gray-600"}`}>
+                            <span className={`text-lg ${isPopular ? "text-white/80" : "text-muted-foreground"}`}>
                               /month
                             </span>
                           </>
                         ) : (
-                          <span className={`text-5xl font-bold ${isPopular ? "text-white" : "text-gray-900"}`}>
+                          <span className={`text-5xl font-bold ${isPopular ? "text-white" : "text-foreground"}`}>
                             Custom
                           </span>
                         )}
                       </div>
                       {billingCycle === "yearly" && plan.price !== "Custom" && (
-                        <p className={`text-sm ${isPopular ? "text-white/70" : "text-gray-500"}`}>
+                        <p className={`text-sm ${isPopular ? "text-white/70" : "text-muted-foreground"}`}>
                           Billed annually. Save 2 months.
                         </p>
                       )}
@@ -196,11 +196,11 @@ export function PricingSection() {
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-3">
                           <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                            isPopular ? "bg-white/20" : "bg-gray-100"
+                            isPopular ? "bg-white/20" : "bg-accent"
                           }`}>
                             <CheckIcon className={`w-3 h-3 ${isPopular ? "text-white" : "text-blue-600"}`} />
                           </div>
-                          <span className={`text-sm ${isPopular ? "text-white/90" : "text-gray-600"}`}>
+                          <span className={`text-sm ${isPopular ? "text-white/90" : "text-muted-foreground"}`}>
                             {feature}
                           </span>
                         </li>
@@ -227,20 +227,20 @@ export function PricingSection() {
 
           {/* Trust Indicators */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            <div className="text-center p-6 bg-white rounded-xl border border-gray-200">
-              <ShieldIcon className="w-8 h-8 text-gray-700 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Secure Payments</h3>
-              <p className="text-sm text-gray-600">256-bit SSL encryption</p>
+            <div className="text-center p-6 bg-white rounded-xl border border-border">
+              <ShieldIcon className="w-8 h-8 text-foreground/80 mx-auto mb-3" />
+              <h3 className="font-semibold text-foreground mb-2">Secure Payments</h3>
+              <p className="text-sm text-muted-foreground">256-bit SSL encryption</p>
             </div>
-            <div className="text-center p-6 bg-white rounded-xl border border-gray-200">
-              <Bolt className="w-8 h-8 text-gray-700 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Cancel Anytime</h3>
-              <p className="text-sm text-gray-600">No long-term contracts</p>
+            <div className="text-center p-6 bg-white rounded-xl border border-border">
+              <Bolt className="w-8 h-8 text-foreground/80 mx-auto mb-3" />
+              <h3 className="font-semibold text-foreground mb-2">Cancel Anytime</h3>
+              <p className="text-sm text-muted-foreground">No long-term contracts</p>
             </div>
-            <div className="text-center p-6 bg-white rounded-xl border border-gray-200">
-              <StarIcon className="w-8 h-8 text-gray-700 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">14-Day Money Back</h3>
-              <p className="text-sm text-gray-600">Risk-free guarantee</p>
+            <div className="text-center p-6 bg-white rounded-xl border border-border">
+              <StarIcon className="w-8 h-8 text-foreground/80 mx-auto mb-3" />
+              <h3 className="font-semibold text-foreground mb-2">14-Day Money Back</h3>
+              <p className="text-sm text-muted-foreground">Risk-free guarantee</p>
             </div>
           </div>
         </div>

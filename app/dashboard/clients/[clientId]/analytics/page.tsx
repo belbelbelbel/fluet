@@ -270,7 +270,7 @@ export default function AnalyticsPage() {
                 ].map((m) => (
                   <div
                     key={m.label}
-                    className={`rounded-lg p-3 ${"bg-gray-50 dark:bg-slate-700/50"}`}
+                    className={`rounded-lg p-3 ${"bg-muted dark:bg-slate-700/50"}`}
                   >
                     <p className={`text-xs text-muted-foreground`}>{m.label}</p>
                     <p className={`text-lg font-semibold tabular-nums text-foreground`}>
@@ -281,7 +281,7 @@ export default function AnalyticsPage() {
               </div>
               {analytics.topPerformingPost && (
                 <div
-                  className={`rounded-lg p-4 ${"bg-gray-50 dark:bg-slate-700/40"}`}
+                  className={`rounded-lg p-4 ${"bg-muted dark:bg-slate-700/40"}`}
                 >
                   <p className={`text-xs font-medium uppercase tracking-wide mb-1 text-muted-foreground`}>
                     Top performing · {analytics.topPerformingPost.platform} ·{" "}

@@ -376,12 +376,12 @@ function ContentIdeasPageInner() {
                     handleSelectNiche(mapped === "custom" ? "custom" : (mapped as Niche), undefined);
                   }}
                   className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
-                    "border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-500 dark:hover:bg-slate-700/50"
+                    "border-border bg-white hover:border-gray-400 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-500 dark:hover:bg-slate-700/50"
                   }`}
                 >
                   <span
                     className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                      "bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-100"
+                      "bg-accent text-gray-800 dark:bg-slate-700 dark:text-slate-100"
                     }`}
                   >
                     <Icon className="h-5 w-5" strokeWidth={1.75} />
@@ -394,7 +394,7 @@ function ContentIdeasPageInner() {
             })}
           </div>
           <div className={`p-4 rounded-xl border border-border bg-muted`}>
-            <p className={`text-sm font-medium mb-2 ${"text-gray-700 dark:text-slate-200"}`}>
+            <p className={`text-sm font-medium mb-2 ${"text-foreground/80 dark:text-slate-200"}`}>
               Health & Fitness, Real Estate, Tech, Creative, or Other?
             </p>
             <div className="flex gap-2">
@@ -405,7 +405,7 @@ function ContentIdeasPageInner() {
                 onChange={(e) => setCustomNicheInput(e.target.value)}
                 placeholder="e.g. Online Fitness Coach for Women"
                 className={`flex-1 px-4 py-2 rounded-lg border ${
-                  "bg-white border-gray-300 text-gray-900 dark:bg-slate-900 dark:border-slate-600 dark:text-white"
+                  "bg-white border-border text-foreground dark:bg-slate-900 dark:border-slate-600 dark:text-white"
                 }`}
               />
               <Button
@@ -444,7 +444,7 @@ function ContentIdeasPageInner() {
             value={strategyFilter}
             onChange={(e) => handleStrategyChange(e.target.value as ContentStrategy | "all")}
             className={`rounded-xl border text-sm px-3 py-2 ${
-              "bg-white border-gray-300 text-gray-900 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
+              "bg-white border-border text-foreground dark:bg-slate-800 dark:border-slate-600 dark:text-white"
             }`}
           >
             <option value="all">All strategies</option>
@@ -462,7 +462,7 @@ function ContentIdeasPageInner() {
             }
             variant="outline"
             className={`flex-1 sm:flex-none rounded-xl text-xs sm:text-sm transition-all duration-200 ${
-              "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+              "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
             }`}
           >
             {clientIdFromQuery ? "Edit in Brand Voice" : "Change Niche"}
@@ -471,7 +471,7 @@ function ContentIdeasPageInner() {
             onClick={handleRefresh}
             variant="outline"
             className={`flex-1 sm:flex-none rounded-xl text-xs sm:text-sm transition-all duration-200 ${
-              "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+              "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
             }`}
           >
             <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
@@ -488,7 +488,7 @@ function ContentIdeasPageInner() {
             
             return (
               <Card key={idea.id} className={`border rounded-xl transition-all duration-200 ${
-                "bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
+                "bg-white border-border hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
               }`}>
                 <CardContent className="p-4 sm:p-5">
                   {/* Topic Header */}
@@ -509,14 +509,14 @@ function ContentIdeasPageInner() {
                     <div className="mb-3 sm:mb-4">
                       <p className={`text-xs font-semibold uppercase tracking-wide mb-1.5 sm:mb-2 text-muted-foreground`}>Hook Example</p>
                       <div className={`border rounded-lg p-2.5 sm:p-3 ${
-                        "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
+                        "bg-muted border-border dark:bg-slate-900/50 dark:border-slate-700"
                       }`}>
                         <p className={`text-xs sm:text-sm leading-relaxed text-foreground`}>
                           &ldquo;{idea.hookExample}&rdquo;
                         </p>
                         {idea.strategyTip && (
                           <p className={`text-xs mt-2 pt-2 border-t ${
-                            "border-gray-200 text-gray-500 dark:border-slate-700 dark:text-slate-400"
+                            "border-border text-muted-foreground dark:border-slate-700 dark:text-slate-400"
                           }`}>
                             Why it works: {idea.strategyTip}
                           </p>
@@ -534,12 +534,12 @@ function ContentIdeasPageInner() {
                       </Badge>
                     )}
                     <Badge className={`${
-                      "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
+                      "bg-accent text-foreground/80 border-border dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
                     }`}>
                       {hookStyleLabels[idea.hookStyle]} Hook
                     </Badge>
                     <Badge className={`flex items-center gap-1.5 ${
-                      "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
+                      "bg-accent text-foreground/80 border-border dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
                     }`}>
                       <FormatIcon className="w-3.5 h-3.5" />
                       {formatLabels[idea.format].label}
@@ -565,7 +565,7 @@ function ContentIdeasPageInner() {
                       onClick={() => handleSaveToStack(idea)}
                       variant="outline"
                       className={`flex-1 rounded-xl flex items-center justify-center gap-2 py-2.5 sm:py-2 text-sm transition-all duration-200 ${
-                        "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                        "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       <Calendar className="w-4 h-4" />
@@ -622,7 +622,7 @@ function ContentIdeasPageInner() {
                 onClick={handleRefresh}
                 variant="outline"
                 className={`rounded-xl transition-all duration-200 ${
-                  "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                  "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 Try Again
@@ -638,7 +638,7 @@ function ContentIdeasPageInner() {
           onClick={() => router.push("/dashboard/post-stack")}
           variant="outline"
           className={`rounded-xl transition-all duration-200 ${
-            "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+            "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
           }`}
         >
           View Post Stack

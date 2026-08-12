@@ -21,13 +21,13 @@ export function FeatureComingSoon({
       className={`flex flex-col items-center justify-center text-center rounded-xl border ${
         compact ? "py-8 px-4" : "py-12 sm:py-16 px-6"
       } ${
-        "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
+        "bg-muted border-border dark:bg-slate-900/50 dark:border-slate-700"
       }`}
     >
       <div
         className={`flex items-center justify-center rounded-full mb-4 ${
           compact ? "w-12 h-12" : "w-16 h-16 sm:w-20 sm:h-20"
-        } ${"bg-white border border-gray-200 dark:bg-slate-800"}`}
+        } ${"bg-white border border-border dark:bg-slate-800"}`}
       >
         <Icon
           className={`${compact ? "w-6 h-6" : "w-8 h-8 sm:w-10 sm:h-10"} ${

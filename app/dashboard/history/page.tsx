@@ -202,7 +202,7 @@ export default function DashboardHistoryPage() {
           size="sm"
           variant="outline"
           className={`rounded-xl transition-all duration-200 ${
-            "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+            "border-border text-foreground/80 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
           }`}
           title="Refresh"
         >
@@ -218,7 +218,7 @@ export default function DashboardHistoryPage() {
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               filter === "all"
                 ? "bg-primary text-primary-foreground"
-                : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-600"
+                : "bg-white border border-border text-foreground/80 hover:bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-600"
             }`}
           >
             All
@@ -230,7 +230,7 @@ export default function DashboardHistoryPage() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                 filter === type
                   ? "bg-primary text-primary-foreground"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-600"
+                  : "bg-white border border-border text-foreground/80 hover:bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-600"
               }`}
             >
               {getContentTypeIcon(type)}
@@ -282,7 +282,7 @@ export default function DashboardHistoryPage() {
             <Card
               key={item.id}
               className={`border rounded-xl transition-all duration-200 ${
-                "bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
+                "bg-white border-border hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
               }`}
             >
               <CardContent className="p-4 sm:p-6">
@@ -314,7 +314,7 @@ export default function DashboardHistoryPage() {
                           <>
                             <span>•</span>
                             <span className={`capitalize px-2 py-0.5 rounded-lg ${
-                              "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
+                              "bg-accent text-foreground/80 dark:bg-slate-700 dark:text-slate-300"
                             }`}>
                               {item.tone}
                             </span>
@@ -324,7 +324,7 @@ export default function DashboardHistoryPage() {
                           <>
                             <span>•</span>
                             <span className={`capitalize px-2 py-0.5 rounded-lg ${
-                              "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
+                              "bg-accent text-foreground/80 dark:bg-slate-700 dark:text-slate-300"
                             }`}>
                               {item.style}
                             </span>
@@ -339,7 +339,7 @@ export default function DashboardHistoryPage() {
                       size="sm"
                       variant="outline"
                       className={`h-8 w-8 p-0 rounded-xl transition-all duration-200 ${
-                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                        "border-border text-foreground/80 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                       title="Copy"
                     >
@@ -354,7 +354,7 @@ export default function DashboardHistoryPage() {
                       size="sm"
                       variant="outline"
                       className={`rounded-xl transition-all duration-200 ${
-                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                        "border-border text-foreground/80 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       View
@@ -364,7 +364,7 @@ export default function DashboardHistoryPage() {
                       size="sm"
                       variant="outline"
                       className={`rounded-xl transition-all duration-200 ${
-                        "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-slate-600 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-500 dark:hover:text-red-300"
+                        "border-border text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-slate-600 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-500 dark:hover:text-red-300"
                       }`}
                       title="Delete"
                     >
@@ -375,11 +375,11 @@ export default function DashboardHistoryPage() {
               <div className="mb-4">
                 <p className={`text-xs mb-1.5 font-medium text-muted-foreground`}>Prompt</p>
                 <p className={`text-sm px-3 py-2 rounded-xl border transition-colors duration-300 ${
-                  "text-gray-700 bg-gray-50 border-gray-200 dark:text-slate-200 dark:bg-slate-900/50 dark:border-slate-700"
+                  "text-foreground/80 bg-muted border-border dark:text-slate-200 dark:bg-slate-900/50 dark:border-slate-700"
                 }`}>{item.prompt}</p>
               </div>
               <div className={`p-4 rounded-xl border transition-colors duration-300 ${
-                "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
+                "bg-muted border-border dark:bg-slate-900/50 dark:border-slate-700"
               }`}>
                 <div className="flex items-center justify-between mb-2">
                   <p className={`text-xs font-medium text-muted-foreground`}>Content</p>
@@ -412,7 +412,7 @@ export default function DashboardHistoryPage() {
               <button
                 onClick={() => setViewingContent(null)}
                 className={`transition-all duration-200 p-1.5 rounded-xl ${
-                  "text-gray-600 hover:text-gray-950 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"
+                  "text-muted-foreground hover:text-gray-950 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"
                 }`}
               >
                 <XIcon className="w-4 h-4" />
@@ -423,7 +423,7 @@ export default function DashboardHistoryPage() {
               <div>
                 <p className={`text-xs mb-1.5 font-medium text-muted-foreground`}>Prompt</p>
                 <p className={`text-sm px-3 py-2 rounded-xl border transition-colors duration-300 ${
-                  "text-gray-700 bg-gray-50 border-gray-200 dark:text-slate-200 dark:bg-slate-900/50 dark:border-slate-700"
+                  "text-foreground/80 bg-muted border-border dark:text-slate-200 dark:bg-slate-900/50 dark:border-slate-700"
                 }`}>
                   {viewingContent.prompt}
                 </p>
@@ -432,7 +432,7 @@ export default function DashboardHistoryPage() {
                 <div className="flex items-center gap-2 text-xs">
                   <span className={"text-muted-foreground"}>Tone:</span>
                   <span className={`px-2 py-0.5 rounded-lg capitalize ${
-                    "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
+                    "bg-accent text-foreground/80 dark:bg-slate-700 dark:text-slate-300"
                   }`}>
                     {viewingContent.tone}
                   </span>
@@ -440,7 +440,7 @@ export default function DashboardHistoryPage() {
                     <>
                       <span className={"text-muted-foreground"}>Style:</span>
                       <span className={`px-2 py-0.5 rounded-lg capitalize ${
-                        "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
+                        "bg-accent text-foreground/80 dark:bg-slate-700 dark:text-slate-300"
                       }`}>
                         {viewingContent.style}
                       </span>
@@ -454,7 +454,7 @@ export default function DashboardHistoryPage() {
                   <span className={`text-xs text-muted-foreground`}>{viewingContent.content.length} chars</span>
                 </div>
                 <div className={`rounded-xl p-4 border transition-colors duration-300 ${
-                  "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
+                  "bg-muted border-border dark:bg-slate-900/50 dark:border-slate-700"
                 }`}>
                   <pre className={`whitespace-pre-wrap text-sm leading-relaxed text-foreground`}>
                     {viewingContent.content}
@@ -471,7 +471,7 @@ export default function DashboardHistoryPage() {
                 size="sm"
                 variant="outline"
                 className={`rounded-xl transition-all duration-200 ${
-                  "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                  "border-border text-foreground/80 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 {copiedId === viewingContent.id ? (
@@ -498,7 +498,7 @@ export default function DashboardHistoryPage() {
                 size="sm"
                 variant="ghost"
                 className={`transition-all duration-200 ${
-                  "text-gray-400 hover:text-gray-950 hover:bg-gray-200 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"
+                  "text-muted-foreground/70 hover:text-gray-950 hover:bg-gray-200 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"
                 }`}
               >
                 Close

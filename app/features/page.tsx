@@ -65,7 +65,7 @@ export default function FeaturesPage() {
                 Features
               </h1>
             </div>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto px-4">
+            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground/70 max-w-2xl mx-auto px-4">
               Everything you need to create amazing social media content
             </p>
           </div>

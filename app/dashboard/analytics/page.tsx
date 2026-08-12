@@ -165,7 +165,7 @@ export default function AnalyticsPage() {
               className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 timeRange === range
                   ? "bg-primary text-primary-foreground shadow-md"
-                  : "bg-white border-[0.5px] border-border text-gray-700 hover:bg-accent/50 dark:bg-slate-800 dark:border-[0.5px] dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+                  : "bg-white border-[0.5px] border-border text-foreground/80 hover:bg-accent/50 dark:bg-slate-800 dark:border-[0.5px] dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
             >
               {range === "7d" ? "7 Days" : range === "30d" ? "30 Days" : "90 Days"}
@@ -191,7 +191,7 @@ export default function AnalyticsPage() {
                     {metric.title}
                   </CardTitle>
                   <div className={`p-3 rounded-xl ${
-                    "text-gray-700 bg-gray-100 dark:text-slate-300 dark:bg-slate-700"
+                    "text-foreground/80 bg-accent dark:text-slate-300 dark:bg-slate-700"
                   }`}>
                     <Icon className="h-6 w-6" />
                   </div>
@@ -230,7 +230,7 @@ export default function AnalyticsPage() {
                         {metric.title}
                       </CardTitle>
                       <div className={`p-3 rounded-xl ${
-                        "text-gray-700 bg-gray-100 dark:text-slate-300 dark:bg-slate-700"
+                        "text-foreground/80 bg-accent dark:text-slate-300 dark:bg-slate-700"
                       }`}>
                         <Icon className="h-6 w-6" />
                       </div>
@@ -291,12 +291,12 @@ export default function AnalyticsPage() {
                   <div
                     key={index}
                     className={`flex items-center justify-between p-4 sm:p-6 rounded-xl border ${
-                      "bg-gray-50 border-gray-200 dark:bg-slate-700/50 dark:border-slate-700"
+                      "bg-muted border-border dark:bg-slate-700/50 dark:border-slate-700"
                     }`}
                   >
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 ${
-                        "bg-white border-gray-200 text-gray-700 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300"
+                        "bg-white border-border text-foreground/80 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300"
                       }`}>
                         {getPlatformIcon(platform.platform)}
                       </div>

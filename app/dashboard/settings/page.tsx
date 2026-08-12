@@ -419,45 +419,45 @@ export default function SettingsPage() {
             ""
           }`}>
             <TabsTrigger value="agency" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-muted-foreground hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Bot className="w-4 h-4 mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Agency Profile</span>
               <span className="sm:hidden">Agency</span>
             </TabsTrigger>
             <TabsTrigger value="integrations" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-muted-foreground hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <LinkIcon className="w-4 h-4 mr-2 flex-shrink-0" />
               Integrations
             </TabsTrigger>
             <TabsTrigger value="team" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-muted-foreground hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Check className="w-4 h-4 mr-2 flex-shrink-0" />
               Team
             </TabsTrigger>
             <TabsTrigger value="notifications" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-muted-foreground hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
               <span className="hidden md:inline">Notifications</span>
               <span className="md:hidden">Notify</span>
             </TabsTrigger>
             <TabsTrigger value="ai" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-muted-foreground hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Brain className="w-4 h-4 mr-2 flex-shrink-0" />
               AI
             </TabsTrigger>
             <TabsTrigger value="workflow" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-muted-foreground hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Cpu className="w-4 h-4 mr-2 flex-shrink-0" />
               Workflow
             </TabsTrigger>
             <TabsTrigger value="billing" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-muted-foreground hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <CreditCard className="w-4 h-4 mr-2 flex-shrink-0" />
               Billing
@@ -485,7 +485,7 @@ export default function SettingsPage() {
                   value={user?.fullName || ""}
                   readOnly
                   className={`w-full px-4 py-2 border rounded-lg ${
-                    "border-gray-300 bg-gray-50 text-gray-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                    "border-border bg-muted text-muted-foreground dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                   }`}
                 />
                 <p className={`text-xs mt-1 ${
@@ -503,12 +503,12 @@ export default function SettingsPage() {
                   value={user?.primaryEmailAddress?.emailAddress || ""}
                   readOnly
                   className={`w-full px-4 py-2 border rounded-lg ${
-                    "border-gray-300 bg-gray-50 text-gray-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                    "border-border bg-muted text-muted-foreground dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                   }`}
                 />
               </div>
               <div className={`pt-4 border-t ${
-                "border-gray-200 dark:border-gray-800"
+                "border-border dark:border-gray-800"
               }`}>
                 <h3 className={`text-sm font-semibold mb-4 text-foreground`}>Quick Stats</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -740,7 +740,7 @@ export default function SettingsPage() {
                 {publishReport ? (
                   <div
                     className={`rounded-xl border p-4 space-y-3 text-sm ${
-                      "bg-white border-gray-200 dark:bg-slate-900/60 dark:border-slate-700"
+                      "bg-white border-border dark:bg-slate-900/60 dark:border-slate-700"
                     }`}
                   >
                     <p className={"text-foreground/80"}>
@@ -1233,7 +1233,7 @@ export default function SettingsPage() {
                       className={`p-4 rounded-xl border text-center transition-all ${
                         currentTheme === theme
                           ? "border-primary bg-muted dark:border-purple-500 dark:bg-purple-900/40"
-                          : "border-gray-200 bg-white hover:border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
+                          : "border-border bg-white hover:border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
                       }`}
                     >
                       <p className={`font-semibold capitalize text-sm ${
@@ -1387,7 +1387,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-md text-left focus:outline-none focus:ring-1 focus-visible:ring-ring focus-visible:border-ring transition-colors text-sm ${"bg-white border-gray-300 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:hover:border-slate-500"}`}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-md text-left focus:outline-none focus:ring-1 focus-visible:ring-ring focus-visible:border-ring transition-colors text-sm ${"bg-white border-border hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:hover:border-slate-500"}`}
                   >
                     <div className="flex items-center gap-2.5 flex-1 min-w-0">
                       {(() => {
@@ -1411,7 +1411,7 @@ export default function SettingsPage() {
                     </div>
                     <ChevronDown 
                       className={`w-4 h-4 flex-shrink-0 transition-transform ${
-                        "text-gray-400 dark:text-gray-500"
+                        "text-muted-foreground/70 dark:text-gray-500"
                       } ${isModelDropdownOpen ? 'transform rotate-180' : ''}`}
                     />
                   </button>
@@ -1419,7 +1419,7 @@ export default function SettingsPage() {
                   {/* Simple Dropdown Menu */}
                   {isModelDropdownOpen && (
                     <div className={`absolute z-50 w-full mt-1 border rounded-md shadow-lg max-h-64 overflow-y-auto ${
-                      "bg-white border-gray-300 dark:bg-slate-800 dark:border-slate-700"
+                      "bg-white border-border dark:bg-slate-800 dark:border-slate-700"
                     }`}>
                       <div className="py-1">
                         {aiModels.map((model) => {
@@ -1435,7 +1435,7 @@ export default function SettingsPage() {
                               className={`w-full flex items-center gap-2.5 px-3 py-2.5 transition-colors text-left text-sm ${
                                 isDark
                                   ? isSelected ? "bg-slate-700" : "hover:bg-slate-700"
-                                  : isSelected ? "bg-gray-50" : "hover:bg-gray-50"
+                                  : isSelected ? "bg-muted" : "hover:bg-gray-50"
                               }`}
                             >
                               <div className={`w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-muted-foreground`}>
@@ -1451,14 +1451,14 @@ export default function SettingsPage() {
                                     {model.name}
                                   </span>
                                   <span className={`text-xs ${
-                                    "text-gray-400 dark:text-gray-600"
+                                    "text-muted-foreground/70 dark:text-gray-600"
                                   }`}>•</span>
                                   <span className={`text-xs ${
                                     "text-muted-foreground"
                                   }`}>{model.provider}</span>
                                   {isSelected && (
                                     <Check className={`w-4 h-4 ml-auto flex-shrink-0 ${
-                                      "text-gray-950 dark:text-purple-400"
+                                      "text-foreground dark:text-purple-400"
                                     }`} />
                                   )}
                                 </div>
@@ -1501,7 +1501,7 @@ export default function SettingsPage() {
                       className={`relative p-4 rounded-xl border transition-all text-left ${
                         isSelected
                           ? "border-primary bg-muted text-purple-900 dark:border-primary dark:bg-purple-950/50 dark:text-purple-200"
-                          : "border-gray-200 bg-white hover:border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-500"
+                          : "border-border bg-white hover:border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-500"
                       }`}
                     >
                       {isSelected && (
@@ -1514,7 +1514,7 @@ export default function SettingsPage() {
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                           isSelected
                             ? "bg-purple-100 dark:bg-purple-900/50"
-                            : "bg-gray-100 dark:bg-gray-700"
+                            : "bg-accent dark:bg-gray-700"
                         }`}>
                           <Icon className={`w-5 h-5 ${
                             isSelected
@@ -1526,7 +1526,7 @@ export default function SettingsPage() {
                         <div className="flex-1 min-w-0">
                           <h3 className={`font-semibold text-sm ${
                             isSelected
-                              ? "text-gray-950 dark:text-slate-100"
+                              ? "text-foreground dark:text-slate-100"
                               : "text-foreground"
                           }`}>
                             {niche.name}
@@ -1608,7 +1608,7 @@ export default function SettingsPage() {
                       className={`p-4 rounded-xl border text-center transition-all ${
                         currentTheme === theme
                           ? "border-primary bg-muted dark:border-primary dark:bg-purple-950/50"
-                          : "border-gray-200 bg-white hover:border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-500"
+                          : "border-border bg-white hover:border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-500"
                       }`}
                     >
                       <p className={`font-semibold capitalize text-sm ${
@@ -1627,7 +1627,7 @@ export default function SettingsPage() {
 
       {/* Save notice + button */}
       <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t ${
-        "border-gray-200 dark:border-gray-800"
+        "border-border dark:border-gray-800"
       }`}>
         <p className={`text-sm max-w-xl text-muted-foreground`}>
           <span className={`font-medium text-foreground/80`}>
@@ -1640,7 +1640,7 @@ export default function SettingsPage() {
           disabled={saving}
           variant="outline"
           className={`rounded-md px-6 py-2 text-sm font-medium shrink-0 ${
-            "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+            "border-border text-foreground/80 hover:bg-gray-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
           }`}
         >
           {saving ? (

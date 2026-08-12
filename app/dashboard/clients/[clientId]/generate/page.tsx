@@ -22,7 +22,7 @@ export default function ClientGeneratePage() {
 
   return (
     <div className="min-h-[200px] flex items-center justify-center">
-      <p className="text-gray-500">Redirecting to Generate...</p>
+      <p className="text-muted-foreground">Redirecting to Generate...</p>
     </div>
   );
 }

@@ -154,7 +154,7 @@ export default function CalendarPage() {
             variant="ghost"
             onClick={() => router.back()}
             className={`p-2 transition-colors duration-200 ${
-              "text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800"
+              "text-foreground/80 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800"
             }`}
           >
             <ArrowLeft className="w-5 h-5" />
@@ -184,7 +184,7 @@ export default function CalendarPage() {
                 size="sm"
                 onClick={() => navigateMonth("prev")}
                 className={`p-2 transition-all duration-200 ${
-                  "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                  "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -194,7 +194,7 @@ export default function CalendarPage() {
                 size="sm"
                 onClick={() => setCurrentDate(new Date())}
                 className={`px-3 transition-all duration-200 ${
-                  "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                  "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 Today
@@ -204,7 +204,7 @@ export default function CalendarPage() {
                 size="sm"
                 onClick={() => navigateMonth("next")}
                 className={`p-2 transition-all duration-200 ${
-                  "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
+                  "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -236,8 +236,8 @@ export default function CalendarPage() {
                   className={cn(
                     "min-h-[60px] sm:min-h-[80px] lg:min-h-[100px] border rounded-lg p-1 sm:p-2 transition-all duration-200",
                     date
-                      ? "bg-white border-gray-200 hover:bg-gray-50 cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600 dark:cursor-pointer"
-                      : "bg-gray-50 border-gray-200 dark:bg-slate-900 dark:border-slate-800",
+                      ? "bg-white border-border hover:bg-gray-50 cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600 dark:cursor-pointer"
+                      : "bg-muted border-border dark:bg-slate-900 dark:border-slate-800",
                     isCurrentDay && isDark
                       ? "border-primary border bg-purple-950/50"
                       : isCurrentDay

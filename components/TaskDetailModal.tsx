@@ -107,7 +107,7 @@ export function TaskDetailModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <Card className={`w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-xl border-border bg-card`}>
-        <CardHeader className={`border-b flex flex-row items-center justify-between ${"border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/80"}`}>
+        <CardHeader className={`border-b flex flex-row items-center justify-between ${"border-border bg-muted dark:border-slate-700 dark:bg-slate-800/80"}`}>
           <CardTitle className={`text-xl font-semibold text-foreground`}>Edit Task</CardTitle>
           <button
             onClick={onClose}
@@ -127,7 +127,7 @@ export function TaskDetailModal({
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${
-                  errors.type ? "border-red-300" : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  errors.type ? "border-red-300" : "border-border bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 }`}
               >
                 <option value="">Select type</option>
@@ -151,7 +151,7 @@ export function TaskDetailModal({
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${
-                  errors.status ? "border-red-300" : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  errors.status ? "border-red-300" : "border-border bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 }`}
               >
                 {TASK_STATUSES.map((status) => (
@@ -174,7 +174,7 @@ export function TaskDetailModal({
                 value={formData.description || ""}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none resize-none ${"border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-500"}`}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none resize-none ${"border-border bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-500"}`}
                 placeholder="Add task description..."
               />
             </div>
@@ -217,7 +217,7 @@ export function TaskDetailModal({
                       dueDate: e.target.value ? new Date(e.target.value).toISOString() : undefined,
                     })
                   }
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${"border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"}`}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${"border-border bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"}`}
                 />
               </div>
             </div>
@@ -238,7 +238,7 @@ export function TaskDetailModal({
             )}
           </div>
         </CardContent>
-        <div className={`border-t px-6 py-4 flex items-center justify-end gap-3 ${"border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/80"}`}>
+        <div className={`border-t px-6 py-4 flex items-center justify-end gap-3 ${"border-border bg-muted dark:border-slate-700 dark:bg-slate-800/80"}`}>
           <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancel
           </Button>

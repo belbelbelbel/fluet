@@ -206,7 +206,7 @@ export default function ClientsPage() {
       {/* Search, filters, sort */}
       {clients.length > 0 && (
         <div className={`rounded-xl border p-4 ${
-          "bg-white border-gray-200 dark:bg-slate-800/50 dark:border-slate-600"
+          "bg-white border-border dark:bg-slate-800/50 dark:border-slate-600"
         }`}>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
@@ -217,7 +217,7 @@ export default function ClientsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-slate-600 ${
-                  "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 dark:bg-slate-900 dark:border-slate-600 dark:text-white dark:placeholder-slate-500"
+                  "bg-muted border-border text-foreground placeholder-gray-400 dark:bg-slate-900 dark:border-slate-600 dark:text-white dark:placeholder-slate-500"
                 }`}
                 aria-label="Search clients"
               />
@@ -232,7 +232,7 @@ export default function ClientsPage() {
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       statusFilter === f
                         ? "bg-gray-950 text-white dark:bg-white dark:text-gray-950"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-700/50 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                        : "bg-accent text-muted-foreground hover:bg-gray-200 dark:bg-slate-700/50 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
                     }`}
                   >
                     {f === "all" ? "All" : f === "active" ? "Active" : f === "payment_due" ? "Payment Due" : "On Hold"}
@@ -268,7 +268,7 @@ export default function ClientsPage() {
       {clients.length === 0 ? (
         <Card
           className={`${
-            "bg-white border-gray-200 dark:bg-slate-800 dark:border-slate-600"
+            "bg-white border-border dark:bg-slate-800 dark:border-slate-600"
           }`}
         >
           <CardContent className="pt-12 pb-12">
@@ -365,7 +365,7 @@ export default function ClientsPage() {
                 </div>
                 <div
                   className={`flex items-center justify-between mt-3 pt-3 border-t ${
-                    "border-gray-200 dark:border-slate-600"
+                    "border-border dark:border-slate-600"
                   }`}
                 >
                   {getStatusBadge(client)}

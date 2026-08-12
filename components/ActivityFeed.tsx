@@ -129,11 +129,11 @@ export function ActivityFeed({
         )}
       >
         {!embedded && (
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-sm font-semibold text-foreground dark:text-white mb-2">
             Recent Activity
           </h3>
         )}
-        <p className="text-sm text-gray-500">Loading activity...</p>
+        <p className="text-sm text-muted-foreground">Loading activity...</p>
       </div>
     );
   }
@@ -151,10 +151,10 @@ export function ActivityFeed({
                 "text-muted-foreground/70"
               )}
             />
-            <p className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            <p className="text-sm font-medium text-foreground/80 dark:text-slate-300 mb-1">
               No recent activity
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Add a client, create tasks, get approvals, or schedule posts to see
               updates here.
             </p>
@@ -180,10 +180,10 @@ export function ActivityFeed({
             <div className="flex items-start gap-3">
               <div className="mt-0.5">{getActivityIcon(activity.type)}</div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900 dark:text-white">
+                <p className="text-sm text-foreground dark:text-white">
                   {activity.message}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
                   {formatTimestamp(activity.timestamp)}
                 </p>
               </div>
@@ -204,14 +204,14 @@ export function ActivityFeed({
         "bg-card border-border"
       )}
     >
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+      <div className="flex items-center justify-between p-4 border-b border-border dark:border-slate-700">
+        <h3 className="text-sm font-semibold text-foreground dark:text-white">
           Recent Activity
         </h3>
         {activities.length > 0 && (
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-xs text-muted-foreground hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             {isCollapsed ? "Expand" : "Collapse"}
           </button>

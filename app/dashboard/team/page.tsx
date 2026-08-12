@@ -387,7 +387,7 @@ export default function TeamPage() {
   const clientNameById = (id: number) =>
     clients.find((c) => c.id === id)?.name || `Client #${id}`;
 
-  const fieldClass = "bg-white border-gray-300 text-gray-950 dark:bg-slate-700 dark:border-slate-600 dark:text-white";
+  const fieldClass = "bg-white border-border text-foreground dark:bg-slate-700 dark:border-slate-600 dark:text-white";
 
   const ClientChecklist = ({
     selected,
@@ -409,7 +409,7 @@ export default function TeamPage() {
       ) : (
         <div
           className={`max-h-40 overflow-y-auto rounded-xl border p-2 space-y-1 ${
-            "border-gray-200 dark:border-slate-600"
+            "border-border dark:border-slate-600"
           }`}
         >
           {clients.map((client) => {
@@ -425,7 +425,7 @@ export default function TeamPage() {
                   type="checkbox"
                   checked={checked}
                   onChange={() => onChange(toggleId(selected, client.id))}
-                  className="rounded border-gray-300"
+                  className="rounded border-border"
                 />
                 <span className={"text-foreground"}>
                   {client.name}
@@ -523,7 +523,7 @@ export default function TeamPage() {
                 <div
                   key={`${member.id}-${member.membershipId || "owner"}`}
                   className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border ${
-                    "bg-gray-50 border-gray-200 dark:bg-slate-700/50 dark:border-slate-700"
+                    "bg-muted border-border dark:bg-slate-700/50 dark:border-slate-700"
                   }`}
                 >
                   <div className="flex items-start gap-3 min-w-0">
@@ -569,7 +569,7 @@ export default function TeamPage() {
                             <span
                               key={c.clientId}
                               className={`text-xs px-2 py-0.5 rounded-full ${
-                                "bg-white border border-gray-200 text-gray-700 dark:bg-slate-600 dark:text-slate-200"
+                                "bg-white border border-border text-foreground/80 dark:bg-slate-600 dark:text-slate-200"
                               }`}
                             >
                               {c.clientName}
@@ -654,7 +654,7 @@ export default function TeamPage() {
                       <span
                         key={id}
                         className={`text-xs px-2 py-0.5 rounded-full ${
-                          "bg-white border text-gray-700 dark:bg-slate-600 dark:text-slate-200"
+                          "bg-white border text-foreground/80 dark:bg-slate-600 dark:text-slate-200"
                         }`}
                       >
                         {clientNameById(id)}
@@ -682,7 +682,7 @@ export default function TeamPage() {
               <div
                 key={invitation.id}
                 className={`flex items-center justify-between gap-3 p-4 rounded-xl border ${
-                  "border-gray-200 dark:border-slate-600"
+                  "border-border dark:border-slate-600"
                 }`}
               >
                 <p className={`text-sm text-foreground/80`}>
@@ -854,7 +854,7 @@ export default function TeamPage() {
                   onClick={() => closeEdit()}
                   disabled={savingMember}
                   className={`rounded-lg p-1.5 shrink-0 ${
-                    "text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
+                    "text-muted-foreground/70 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
                   }`}
                   aria-label="Close"
                 >
@@ -907,7 +907,7 @@ export default function TeamPage() {
                 {editClientIds.length === 0 ? (
                   <p
                     className={`text-sm rounded-xl border px-3 py-2.5 ${
-                      "border-gray-200 text-gray-500 dark:border-slate-600 dark:text-slate-400"
+                      "border-border text-muted-foreground dark:border-slate-600 dark:text-slate-400"
                     }`}
                   >
                     Select clients above to assign tasks.
@@ -922,7 +922,7 @@ export default function TeamPage() {
                 ) : (
                   <div
                     className={`max-h-44 overflow-y-auto rounded-xl border divide-y ${
-                      "border-gray-200 divide-gray-100 dark:border-slate-600 dark:divide-slate-600"
+                      "border-border divide-gray-100 dark:border-slate-600 dark:divide-slate-600"
                     }`}
                   >
                     {editOpenTasks.length === 0 ? (
@@ -950,12 +950,12 @@ export default function TeamPage() {
                               onChange={() =>
                                 setAssignTaskIds(toggleId(assignTaskIds, task.id))
                               }
-                              className="mt-0.5 rounded border-gray-300"
+                              className="mt-0.5 rounded border-border"
                             />
                             <span className="min-w-0 flex-1">
                               <span
                                 className={`block text-sm font-medium ${
-                                  "text-gray-900 dark:text-slate-100"
+                                  "text-foreground dark:text-slate-100"
                                 }`}
                               >
                                 {typeLabel}
@@ -989,7 +989,7 @@ export default function TeamPage() {
 
                 <div
                   className={`rounded-xl border p-3 space-y-2.5 ${
-                    "border-gray-200 bg-gray-50/80 dark:border-slate-600 dark:bg-slate-900/40"
+                    "border-border bg-muted/80 dark:border-slate-600 dark:bg-slate-900/40"
                   }`}
                 >
                   <p

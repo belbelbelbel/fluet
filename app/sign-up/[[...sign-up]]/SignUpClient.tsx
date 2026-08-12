@@ -28,7 +28,7 @@ export function SignUpClient() {
       fallback={
         <AuthPageShell title="Create your account" subtitle="Getting started...">
           <div className="py-12 flex justify-center">
-            <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-800 dark:border-slate-600 dark:border-t-slate-200 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-border border-t-gray-800 dark:border-slate-600 dark:border-t-slate-200 rounded-full animate-spin" />
           </div>
         </AuthPageShell>
       }

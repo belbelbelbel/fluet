@@ -44,7 +44,7 @@ export function Hero() {
             id="hero-heading"
             className="font-bold leading-[1.1] tracking-tight max-w-5xl
               text-[2.25rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl
-              text-gray-950"
+              text-foreground"
           >
             Built for{" "}
             <span className="relative inline-block">
@@ -63,7 +63,7 @@ export function Hero() {
           <p
             className="leading-relaxed max-w-3xl font-normal
               text-base sm:text-lg md:text-xl lg:text-2xl
-              text-gray-600"
+              text-muted-foreground"
           >
             Manage, generate and schedule content for all your client accounts in
             one place. Perfect for agencies managing multiple pages.
@@ -78,7 +78,7 @@ export function Hero() {
                 className="flex-1 min-w-0 w-full px-4 py-3.5 sm:px-5 sm:py-4 rounded-xl sm:rounded-2xl border text-base
                   focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
                   transition-colors duration-200
-                  bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-gray-400 shadow-sm"
+                  bg-white border-border text-foreground placeholder-gray-500 hover:border-gray-400 shadow-sm"
                 aria-label="Email address"
               />
               <Button
@@ -106,7 +106,7 @@ export function Hero() {
               className="absolute -inset-1 sm:-inset-2 rounded-2xl sm:rounded-3xl -z-10 blur-xl opacity-40 bg-purple-400/30"
               aria-hidden
             />
-            <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl ring-1 bg-gray-100 ring-gray-200/50">
+            <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl ring-1 bg-accent ring-gray-200/50">
               <Image
                 src="/images/fluetdashboardimg.png"
                 alt="Fluet Dashboard - Manage social media for multiple clients"

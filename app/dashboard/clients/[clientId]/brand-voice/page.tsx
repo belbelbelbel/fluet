@@ -174,13 +174,13 @@ export default function BrandVoicePage() {
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <h1 className="text-2xl font-bold text-gray-900">Brand Voice & Content Bank</h1>
+        <h1 className="text-2xl font-bold text-foreground">Brand Voice & Content Bank</h1>
       </div>
 
-      <Card className="border-gray-200 shadow-sm">
-        <CardHeader className="border-b border-gray-200 bg-gray-50">
-          <CardTitle className="text-lg font-semibold text-gray-900">Brand Voice Settings</CardTitle>
-          <p className="text-sm text-gray-600 mt-1">
+      <Card className="border-border shadow-sm">
+        <CardHeader className="border-b border-border bg-muted">
+          <CardTitle className="text-lg font-semibold text-foreground">Brand Voice Settings</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">
             Teach DeepSeek how this brand speaks — identity, tone contrasts, dos/don’ts, and example posts
           </p>
         </CardHeader>
@@ -199,7 +199,7 @@ export default function BrandVoicePage() {
               placeholder="e.g. Lagos-based student wellness brand. Honest about burnout. Practical tips, never hustle-culture. Sounds like a trusted senior friend."
               rows={3}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Personality + positioning + what you stand for (and against)
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function BrandVoicePage() {
           {/* Primary Industry + Specific Niche (for Content Ideas) */}
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground/80 mb-2">
                 Primary Industry
               </label>
               <select
@@ -233,7 +233,7 @@ export default function BrandVoicePage() {
                     nicheDescription: mapped === "custom" ? (brandVoice.nicheDescription || "") : "",
                   });
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none bg-white"
+                className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none bg-white"
               >
                 <option value="">Select industry</option>
                 {PRIMARY_INDUSTRY_OPTIONS.map((opt) => (
@@ -249,7 +249,7 @@ export default function BrandVoicePage() {
               brandVoice.primaryIndustry === "creative_services" ||
               brandVoice.primaryIndustry === "tech_startups") && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground/80 mb-2">
                   Specific Niche (describe your client&apos;s business)
                 </label>
                 <input
@@ -263,9 +263,9 @@ export default function BrandVoicePage() {
                     })
                   }
                   placeholder="e.g. Online Fitness Coach for Women, Real Estate Agent in Lagos"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
+                  className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   AI will generate tailored content ideas for this niche
                 </p>
               </div>
@@ -275,7 +275,7 @@ export default function BrandVoicePage() {
                 brandVoice.primaryIndustry
               ) && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground/80 mb-2">
                   Specific Niche (optional – e.g. Jollof specialist, Wedding cakes)
                 </label>
                 <input
@@ -285,24 +285,24 @@ export default function BrandVoicePage() {
                     setBrandVoice({ ...brandVoice, nicheDescription: e.target.value })
                   }
                   placeholder="Optional: narrow down for better ideas"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
+                  className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
                 />
               </div>
             )}
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Powers content ideas for this client. Custom niches get AI-generated ideas.
             </p>
           </div>
 
           {/* Tone */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Voice archetype
             </label>
             <select
               value={brandVoice.tone || ""}
               onChange={(e) => setBrandVoice({ ...brandVoice, tone: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none bg-white"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none bg-white"
             >
               <option value="">Select tone</option>
               {BRAND_TONE_OPTIONS.map((opt) => (
@@ -312,11 +312,11 @@ export default function BrandVoicePage() {
               ))}
             </select>
             {brandVoice.tone ? (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {BRAND_TONE_OPTIONS.find((o) => o.id === brandVoice.tone)?.description}
               </p>
             ) : (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Archetypes encode write-rules (e.g. “confident, not arrogant”) — not vague vibes
               </p>
             )}
@@ -324,27 +324,27 @@ export default function BrandVoicePage() {
 
           {/* Slang Level */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Nigerian Slang Level
             </label>
             <select
               value={brandVoice.slangLevel || "none"}
               onChange={(e) => setBrandVoice({ ...brandVoice, slangLevel: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none bg-white"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none bg-white"
             >
               <option value="none">None</option>
               <option value="light">Light</option>
               <option value="moderate">Moderate</option>
               <option value="heavy">Heavy</option>
             </select>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               How much Nigerian slang/Pidgin to use in content
             </p>
           </div>
 
           {/* Industry */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Industry
             </label>
             <input
@@ -352,13 +352,13 @@ export default function BrandVoicePage() {
               value={brandVoice.industry || ""}
               onChange={(e) => setBrandVoice({ ...brandVoice, industry: e.target.value })}
               placeholder="e.g., Food & Beverage, Fashion, Tech"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
             />
           </div>
 
           {/* Do's */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Do&apos;s (What to include)
             </label>
             <div className="space-y-2">
@@ -369,7 +369,7 @@ export default function BrandVoicePage() {
                   onChange={(e) => setNewDo(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("do")}
                   placeholder="Add a do..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
+                  className="flex-1 px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
                 />
                 <Button
                   type="button"
@@ -401,7 +401,7 @@ export default function BrandVoicePage() {
 
           {/* Don'ts */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Don&apos;ts (What to avoid)
             </label>
             <div className="space-y-2">
@@ -412,7 +412,7 @@ export default function BrandVoicePage() {
                   onChange={(e) => setNewDont(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("dont")}
                   placeholder="Add a don't..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
+                  className="flex-1 px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
                 />
                 <Button
                   type="button"
@@ -445,7 +445,7 @@ export default function BrandVoicePage() {
           {/* Example posts — few-shot voice matching */}
           <div>
             <Label className="mb-2 block">Example posts (match this voice)</Label>
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-muted-foreground mb-2">
               Paste 2–3 real captions that sound like the brand. This is the #1 lever for DeepSeek accuracy.
             </p>
             <div className="space-y-2">
@@ -476,7 +476,7 @@ export default function BrandVoicePage() {
 
           {/* Preferred Hashtags */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Preferred Hashtags
             </label>
             <div className="space-y-2">
@@ -487,7 +487,7 @@ export default function BrandVoicePage() {
                   onChange={(e) => setNewHashtag(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("hashtag")}
                   placeholder="Add hashtag (without #)"
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
+                  className="flex-1 px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
                 />
                 <Button
                   type="button"
@@ -519,7 +519,7 @@ export default function BrandVoicePage() {
 
           {/* Banned Words */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Banned Words
             </label>
             <div className="space-y-2">
@@ -530,7 +530,7 @@ export default function BrandVoicePage() {
                   onChange={(e) => setNewBannedWord(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addItem("bannedWord")}
                   placeholder="Add banned word..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
+                  className="flex-1 px-4 py-2 border border-border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none"
                 />
                 <Button
                   type="button"
@@ -545,7 +545,7 @@ export default function BrandVoicePage() {
                 {(brandVoice.bannedWords || []).map((word, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm border border-gray-300"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-accent text-foreground/80 rounded-full text-sm border border-border"
                   >
                     {word}
                     <button
@@ -560,7 +560,7 @@ export default function BrandVoicePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+          <div className="flex items-center gap-3 pt-4 border-t border-border">
             <Button
               variant="outline"
               onClick={() => router.back()}

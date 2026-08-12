@@ -250,7 +250,7 @@ export default function ClientDashboardPage() {
               fetchPriority="high"
             />
           ) : (
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center border ${"bg-purple-100 border-gray-200 dark:bg-purple-900/50 dark:border-slate-700"}`}>
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center border ${"bg-purple-100 border-border dark:bg-purple-900/50 dark:border-slate-700"}`}>
               <Building2 className={`w-6 h-6 ${"text-foreground dark:text-purple-400"}`} />
             </div>
           )}
@@ -261,7 +261,7 @@ export default function ClientDashboardPage() {
                 variant="ghost"
                 size="icon"
                 onClick={openEditModal}
-                className={`h-8 w-8 shrink-0 ${"text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"}`}
+                className={`h-8 w-8 shrink-0 ${"text-muted-foreground hover:text-gray-900 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"}`}
                 aria-label="Edit client"
               >
                 <Pencil className="w-4 h-4" />
@@ -337,7 +337,7 @@ export default function ClientDashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
+        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-border hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Posts This Month
@@ -364,7 +364,7 @@ export default function ClientDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
+        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-border hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Pending Approvals
@@ -382,7 +382,7 @@ export default function ClientDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
+        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-border hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Scheduled Posts
@@ -400,7 +400,7 @@ export default function ClientDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
+        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-border hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Engagement Rate
@@ -436,12 +436,12 @@ export default function ClientDashboardPage() {
       {/* Tabs */}
       <Tabs defaultValue="calendar" className="space-y-4">
         <TabsList className={`p-1 ${
-          "bg-gray-100 dark:bg-slate-800"
+          "bg-accent dark:bg-slate-800"
         }`}>
           <TabsTrigger 
             value="calendar" 
             className={cn(
-              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
+              "text-muted-foreground data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <Calendar className="w-4 h-4 mr-2" />
@@ -450,7 +450,7 @@ export default function ClientDashboardPage() {
           <TabsTrigger 
             value="approvals" 
             className={cn(
-              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
+              "text-muted-foreground data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <CheckCircle2 className="w-4 h-4 mr-2" />
@@ -464,7 +464,7 @@ export default function ClientDashboardPage() {
           <TabsTrigger 
             value="tasks" 
             className={cn(
-              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
+              "text-muted-foreground data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <FileText className="w-4 h-4 mr-2" />
@@ -473,7 +473,7 @@ export default function ClientDashboardPage() {
           <TabsTrigger
             value="history"
             className={cn(
-              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
+              "text-muted-foreground data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <HistoryIcon className="w-4 h-4 mr-2" />
@@ -487,7 +487,7 @@ export default function ClientDashboardPage() {
           <TabsTrigger
             value="analytics"
             className={cn(
-              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
+              "text-muted-foreground data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
@@ -511,7 +511,7 @@ export default function ClientDashboardPage() {
               {publishedPosts.length === 0 ? (
                 <div className="text-center py-10">
                   <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${
-                    "bg-slate-100 text-slate-400 dark:bg-slate-700/60 dark:text-slate-400"
+                    "bg-slate-100 text-muted-foreground dark:bg-slate-700/60 dark:text-slate-400"
                   }`}>
                     <HistoryIcon className="h-5 w-5" />
                   </div>
@@ -567,7 +567,7 @@ export default function ClientDashboardPage() {
               {upcomingPosts.length === 0 ? (
                 <div className="text-center py-10">
                   <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${
-                    "bg-slate-100 text-slate-400 dark:bg-slate-700/60 dark:text-slate-400"
+                    "bg-slate-100 text-muted-foreground dark:bg-slate-700/60 dark:text-slate-400"
                   }`}>
                     <Calendar className="h-5 w-5" />
                   </div>
@@ -764,7 +764,7 @@ export default function ClientDashboardPage() {
               <CardTitle className={`text-lg text-foreground`}>Edit Client</CardTitle>
               <button
                 onClick={() => !editSaving && setEditModalOpen(false)}
-                className={`p-2 rounded-lg transition-colors ${"text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"}`}
+                className={`p-2 rounded-lg transition-colors ${"text-muted-foreground/70 hover:text-gray-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"}`}
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
@@ -779,7 +779,7 @@ export default function ClientDashboardPage() {
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-gray-300 text-gray-900 dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-border text-foreground dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
                   placeholder="Client name"
                 />
               </div>
@@ -791,7 +791,7 @@ export default function ClientDashboardPage() {
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-gray-300 text-gray-900 dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-border text-foreground dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
                   placeholder="client@example.com"
                 />
                 <p className={`text-xs mt-1 text-muted-foreground`}>
@@ -806,7 +806,7 @@ export default function ClientDashboardPage() {
                   type="url"
                   value={editForm.logoUrl}
                   onChange={(e) => setEditForm({ ...editForm, logoUrl: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-gray-300 text-gray-900 dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-border text-foreground dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
                   placeholder="https://example.com/logo.png"
                 />
               </div>

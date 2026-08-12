@@ -263,7 +263,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
         onClick={() => setOpen(!open)}
         className={cn(
           "h-10 min-w-[200px] justify-between text-sm font-medium transition-all duration-200",
-          "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-gray-900 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:text-slate-200"
+          "border-border bg-white hover:bg-gray-50 hover:border-gray-300 text-foreground dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:text-slate-200"
         )}
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -299,7 +299,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
             className="fixed inset-0 z-40"
             onClick={() => setOpen(false)}
           />
-          <div className={`absolute z-50 mt-2 w-[320px] rounded-lg border border-gray-200 dark:border-slate-600 bg-card`}>
+          <div className={`absolute z-50 mt-2 w-[320px] rounded-lg border border-border dark:border-slate-600 bg-card`}>
             <div className="p-2">
               <div className="flex items-center justify-between px-2 py-1.5">
                 <span className={`text-xs font-semibold uppercase tracking-wider text-muted-foreground`}>
@@ -320,7 +320,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.stopPropagation()}
                       className={`w-full pl-9 pr-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-slate-600 ${
-                        "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 dark:bg-slate-900 dark:border-slate-600 dark:text-white dark:placeholder-slate-500"
+                        "bg-muted border-border text-foreground placeholder-gray-400 dark:bg-slate-900 dark:border-slate-600 dark:text-white dark:placeholder-slate-500"
                       }`}
                       aria-label="Search clients"
                     />
@@ -335,7 +335,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                           "shrink-0 px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
                           statusFilter === f
                             ? "bg-gray-950 text-white dark:bg-white dark:text-gray-950"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-400 dark:hover:bg-slate-600"
+                            : "bg-accent text-muted-foreground hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-400 dark:hover:bg-slate-600"
                         )}
                       >
                         {f === "all" ? "All" : f === "active" ? "Active" : f === "payment_due" ? "Payment Due" : "On Hold"}
@@ -374,7 +374,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                             ? "bg-slate-700/80 hover:bg-slate-700"
                             : "hover:bg-slate-700 focus:bg-slate-700"
                           : !selectedClient
-                            ? "bg-gray-100 hover:bg-gray-100"
+                            ? "bg-accent hover:bg-gray-100"
                             : "hover:bg-gray-50 focus:bg-gray-50"
                       )}
                     >
@@ -404,7 +404,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                             ? "bg-slate-700/80 hover:bg-slate-700"
                             : "hover:bg-slate-700 focus:bg-slate-700"
                           : selectedClient?.id === client.id
-                            ? "bg-gray-100 hover:bg-gray-100"
+                            ? "bg-accent hover:bg-gray-100"
                             : "hover:bg-gray-50 focus:bg-gray-50"
                       )}
                     >
@@ -434,7 +434,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                   <button
                     onClick={handleCreateClient}
                     className={`w-full px-3 py-2.5 rounded-lg text-left transition-all duration-200 focus:outline-none ${
-                      "hover:bg-gray-50 focus:bg-gray-50 text-gray-700 hover:text-gray-900 dark:hover:bg-slate-700 dark:focus:bg-slate-700 dark:text-slate-300 dark:hover:text-white"
+                      "hover:bg-gray-50 focus:bg-gray-50 text-foreground/80 hover:text-gray-900 dark:hover:bg-slate-700 dark:focus:bg-slate-700 dark:text-slate-300 dark:hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-2">

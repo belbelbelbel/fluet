@@ -130,7 +130,7 @@ export function CalendarView({ events, onEventClick }: CalendarViewProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-xl border border-border overflow-hidden">
       {/* Header Bar - Dark gradient like reference */}
       <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 flex items-center justify-between">
         <h2 className="text-white font-semibold text-lg">Revvy Schedule</h2>
@@ -165,7 +165,7 @@ export function CalendarView({ events, onEventClick }: CalendarViewProps) {
       {/* Calendar Content */}
       <div className="p-6">
         {/* Month/Year Header */}
-        <h3 className="text-2xl font-bold text-gray-900 mb-6">
+        <h3 className="text-2xl font-bold text-foreground mb-6">
           {monthNames[month]} {year}
         </h3>
 
@@ -191,18 +191,18 @@ export function CalendarView({ events, onEventClick }: CalendarViewProps) {
             return (
               <div
                 key={index}
-                className={`min-h-[100px] border border-gray-200 rounded p-2 ${
-                  !day.isCurrentMonth ? "bg-gray-50" : "bg-white"
+                className={`min-h-[100px] border border-border rounded p-2 ${
+                  !day.isCurrentMonth ? "bg-muted" : "bg-white"
                 } ${today ? "ring-2 ring-blue-500 ring-inset" : ""}`}
               >
                 {/* Date Number */}
                 <div
                   className={`text-sm font-medium mb-1 ${
                     !day.isCurrentMonth
-                      ? "text-gray-400"
+                      ? "text-muted-foreground/70"
                       : today
                       ? "text-blue-600 font-bold"
-                      : "text-gray-900"
+                      : "text-foreground"
                   }`}
                 >
                   {day.date}
@@ -221,7 +221,7 @@ export function CalendarView({ events, onEventClick }: CalendarViewProps) {
                     </div>
                   ))}
                   {dayEvents.length > 3 && (
-                    <div className="text-xs text-gray-500 font-medium">
+                    <div className="text-xs text-muted-foreground font-medium">
                       +{dayEvents.length - 3} more
                     </div>
                   )}

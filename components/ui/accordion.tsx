@@ -13,7 +13,7 @@ interface AccordionItemProps {
 function AccordionItem({ question, answer, isOpen, onToggle }: AccordionItemProps) {
   return (
     <div className={`border rounded-lg transition-all duration-200 ${
-      "bg-white border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
+      "bg-white border-border dark:bg-gray-800/50 dark:border-gray-700"
     }`}>
       <button
         onClick={onToggle}

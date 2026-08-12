@@ -23,11 +23,11 @@ export function ClerkSignUpPanel({ redirectUrl }: ClerkSignUpPanelProps) {
           appearance={clerkAuthAppearance}
         />
       </div>
-      <p className="mt-4 text-center text-xs text-gray-500 dark:text-slate-400">
+      <p className="mt-4 text-center text-xs text-muted-foreground dark:text-slate-400">
         Stuck after Google sign-in?{" "}
         <Link
           href={`/clear-session?redirect_url=${encodeURIComponent(safeRedirect)}`}
-          className="text-gray-900 dark:text-white underline underline-offset-2"
+          className="text-foreground dark:text-white underline underline-offset-2"
         >
           Clear session and try again
         </Link>

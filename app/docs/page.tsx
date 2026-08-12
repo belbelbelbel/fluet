@@ -273,7 +273,7 @@ export default function DocsPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${
-      "bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100"
+      "bg-white text-foreground dark:bg-gray-950 dark:text-gray-100"
     }`}>
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
@@ -281,13 +281,13 @@ export default function DocsPage() {
           {/* Header */}
           <div className="text-center mb-16">
             <div className={`inline-flex items-center gap-2 px-4 py-1.5 border rounded-full mb-6 ${
-              "bg-gray-100 border-gray-200 dark:bg-purple-500/10 dark:border-purple-500/20"
+              "bg-accent border-border dark:bg-purple-500/10 dark:border-purple-500/20"
             }`}>
               <BookOpenIcon className={`w-4 h-4 ${
-                "text-gray-700 dark:text-purple-300"
+                "text-foreground/80 dark:text-purple-300"
               }`} />
               <span className={`text-sm font-medium ${
-                "text-gray-700 dark:text-purple-300"
+                "text-foreground/80 dark:text-purple-300"
               }`}>Complete Guide</span>
             </div>
             <h1 className={`text-3xl sm:text-4xl font-bold mb-4 text-foreground`}>
@@ -307,11 +307,11 @@ export default function DocsPage() {
                   key={link.title}
                   href={link.href}
                   className={`p-4 border rounded-xl hover:border-gray-300 transition-colors text-center ${
-                    "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600"
+                    "bg-white border-border dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600"
                   }`}
                 >
                   <Icon className={`w-5 h-5 mx-auto mb-2 ${
-                    "text-gray-700 dark:text-purple-400"
+                    "text-foreground/80 dark:text-purple-400"
                   }`} />
                   <div className={`text-xs text-muted-foreground`}>{link.title}</div>
                 </Link>
@@ -321,11 +321,11 @@ export default function DocsPage() {
 
           {/* Quick Start */}
           <div className={`mb-16 p-8 border rounded-xl ${
-            "bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
+            "bg-muted border-border dark:bg-gray-800/50 dark:border-gray-700"
           }`}>
             <div className="flex items-start gap-4">
               <RocketIcon className={`w-6 h-6 mt-1 flex-shrink-0 ${
-                "text-gray-700 dark:text-purple-400"
+                "text-foreground/80 dark:text-purple-400"
               }`} />
               <div>
                 <h2 className={`text-xl font-semibold mb-3 text-foreground`}>
@@ -370,7 +370,7 @@ export default function DocsPage() {
               <div key={sectionIndex}>
                 <h2 className={`text-2xl font-semibold mb-6 flex items-center gap-3 text-foreground`}>
                   <CodeIcon className={`w-6 h-6 ${
-                    "text-gray-700 dark:text-purple-400"
+                    "text-foreground/80 dark:text-purple-400"
                   }`} />
                   {section.title}
                 </h2>
@@ -385,10 +385,10 @@ export default function DocsPage() {
           {/* Feature Highlights */}
           <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             <div className={`p-5 rounded-xl border ${
-              "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+              "bg-white border-border dark:bg-gray-800 dark:border-gray-700"
             }`}>
               <Lightbulb className={`w-6 h-6 mb-3 ${
-                "text-gray-700 dark:text-purple-400"
+                "text-foreground/80 dark:text-purple-400"
               }`} />
               <h3 className={`font-semibold mb-2 text-foreground`}>Content Ideas</h3>
               <p className={`text-sm text-muted-foreground`}>
@@ -396,10 +396,10 @@ export default function DocsPage() {
               </p>
             </div>
             <div className={`p-5 rounded-xl border ${
-              "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+              "bg-white border-border dark:bg-gray-800 dark:border-gray-700"
             }`}>
               <Youtube className={`w-6 h-6 mb-3 ${
-                "text-gray-700 dark:text-purple-400"
+                "text-foreground/80 dark:text-purple-400"
               }`} />
               <h3 className={`font-semibold mb-2 text-foreground`}>YouTube Automation</h3>
               <p className={`text-sm text-muted-foreground`}>
@@ -407,10 +407,10 @@ export default function DocsPage() {
               </p>
             </div>
             <div className={`p-5 rounded-xl border ${
-              "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+              "bg-white border-border dark:bg-gray-800 dark:border-gray-700"
             }`}>
               <Palette className={`w-6 h-6 mb-3 ${
-                "text-gray-700 dark:text-purple-400"
+                "text-foreground/80 dark:text-purple-400"
               }`} />
               <h3 className={`font-semibold mb-2 text-foreground`}>Theme Customization</h3>
               <p className={`text-sm text-muted-foreground`}>
@@ -418,10 +418,10 @@ export default function DocsPage() {
               </p>
             </div>
             <div className={`p-5 rounded-xl border ${
-              "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+              "bg-white border-border dark:bg-gray-800 dark:border-gray-700"
             }`}>
               <Bot className={`w-6 h-6 mb-3 ${
-                "text-gray-700 dark:text-purple-400"
+                "text-foreground/80 dark:text-purple-400"
               }`} />
               <h3 className={`font-semibold mb-2 text-foreground`}>AI Model Selection</h3>
               <p className={`text-sm text-muted-foreground`}>
@@ -429,10 +429,10 @@ export default function DocsPage() {
               </p>
             </div>
             <div className={`p-5 rounded-xl border ${
-              "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+              "bg-white border-border dark:bg-gray-800 dark:border-gray-700"
             }`}>
               <Users className={`w-6 h-6 mb-3 ${
-                "text-gray-700 dark:text-purple-400"
+                "text-foreground/80 dark:text-purple-400"
               }`} />
               <h3 className={`font-semibold mb-2 text-foreground`}>Team Collaboration</h3>
               <p className={`text-sm text-muted-foreground`}>
@@ -440,10 +440,10 @@ export default function DocsPage() {
               </p>
             </div>
             <div className={`p-5 rounded-xl border ${
-              "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+              "bg-white border-border dark:bg-gray-800 dark:border-gray-700"
             }`}>
               <KeyboardIcon className={`w-6 h-6 mb-3 ${
-                "text-gray-700 dark:text-purple-400"
+                "text-foreground/80 dark:text-purple-400"
               }`} />
               <h3 className={`font-semibold mb-2 text-foreground`}>Keyboard Shortcuts</h3>
               <p className={`text-sm text-muted-foreground`}>
@@ -454,7 +454,7 @@ export default function DocsPage() {
 
           {/* Support CTA */}
           <div className={`mt-20 text-center p-10 rounded-xl border ${
-            "bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
+            "bg-muted border-border dark:bg-gray-800/50 dark:border-gray-700"
           }`}>
             <h2 className={`text-2xl font-bold mb-4 text-foreground`}>
               Still have questions?
@@ -475,7 +475,7 @@ export default function DocsPage() {
                 asChild
                 variant="outline"
                 className={`rounded-xl ${
-                  "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                  "border-border text-foreground/80 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                 }`}
               >
                 <Link href="/dashboard/generate">Try It Now</Link>

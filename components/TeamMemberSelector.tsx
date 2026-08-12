@@ -64,8 +64,8 @@ export function TeamMemberSelector({
   if (loading) {
     return (
       <div className={cn("flex items-center gap-2", className)}>
-        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-        <span className="text-sm text-gray-500">Loading team members...</span>
+        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground/70" />
+        <span className="text-sm text-muted-foreground">Loading team members...</span>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export function TeamMemberSelector({
         className="w-full justify-between"
       >
         <div className="flex items-center gap-2">
-          <User className="w-4 h-4 text-gray-400" />
+          <User className="w-4 h-4 text-muted-foreground/70" />
           <span className="text-sm">
             {selectedMember
               ? `${selectedMember.name}${selectedMember.role ? ` (${selectedMember.role})` : ""}`
@@ -93,7 +93,7 @@ export function TeamMemberSelector({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute z-50 mt-2 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
+          <div className="absolute z-50 mt-2 w-full rounded-lg border border-border bg-white shadow-lg">
             <div className="p-2 max-h-60 overflow-y-auto">
               {allowUnassign && (
                 <button
@@ -105,7 +105,7 @@ export function TeamMemberSelector({
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                     !selectedMemberId
                       ? "bg-muted text-foreground font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
+                      : "text-foreground/80 hover:bg-gray-50"
                   )}
                 >
                   <div className="flex items-center justify-between">
@@ -127,15 +127,15 @@ export function TeamMemberSelector({
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                     selectedMemberId === member.id
                       ? "bg-muted text-foreground font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
+                      : "text-foreground/80 hover:bg-gray-50"
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">{member.name}</div>
-                      <div className="text-xs text-gray-500">{member.email}</div>
+                      <div className="text-xs text-muted-foreground">{member.email}</div>
                       {member.role && (
-                        <div className="text-xs text-gray-400 mt-0.5">
+                        <div className="text-xs text-muted-foreground/70 mt-0.5">
                           {member.role}
                         </div>
                       )}
@@ -147,7 +147,7 @@ export function TeamMemberSelector({
                 </button>
               ))}
               {members.length === 0 && (
-                <div className="px-3 py-4 text-center text-sm text-gray-500">
+                <div className="px-3 py-4 text-center text-sm text-muted-foreground">
                   No team members found
                 </div>
               )}

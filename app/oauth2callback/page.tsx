@@ -95,15 +95,15 @@ function OAuthCallbackContent() {
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <Card className="max-w-md w-full border border-gray-200 rounded-2xl">
+      <Card className="max-w-md w-full border border-border rounded-2xl">
         <CardContent className="p-8 text-center">
           {status === "loading" && (
             <>
-              <Loader2 className="w-12 h-12 text-gray-950 animate-spin mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-950 mb-2">
+              <Loader2 className="w-12 h-12 text-foreground animate-spin mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-foreground mb-2">
                 Connecting {platform === "twitter" ? "Twitter" : platform === "instagram" ? "Instagram" : "YouTube"}...
               </h2>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Please wait while we connect your {platform === "twitter" ? "Twitter" : platform === "instagram" ? "Instagram" : "YouTube"} account
               </p>
             </>
@@ -112,11 +112,11 @@ function OAuthCallbackContent() {
           {status === "success" && (
             <>
               <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-950 mb-2">
+              <h2 className="text-xl font-bold text-foreground mb-2">
                 {platform === "twitter" ? "Twitter" : platform === "instagram" ? "Instagram" : "YouTube"} Connected!
               </h2>
-              <p className="text-gray-600 mb-4">{message}</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-muted-foreground mb-4">{message}</p>
+              <p className="text-sm text-muted-foreground">
                 Redirecting to settings...
               </p>
             </>
@@ -125,10 +125,10 @@ function OAuthCallbackContent() {
           {status === "error" && (
             <>
               <XCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-950 mb-2">
+              <h2 className="text-xl font-bold text-foreground mb-2">
                 Connection Failed
               </h2>
-              <p className="text-gray-600 mb-6">{message}</p>
+              <p className="text-muted-foreground mb-6">{message}</p>
               <Button
                 onClick={() => router.push("/dashboard/settings")}
                 className="bg-gray-950 hover:bg-gray-900 text-white"
@@ -147,10 +147,10 @@ export default function OAuthCallbackPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <Card className="max-w-md w-full border border-gray-200 rounded-2xl">
+        <Card className="max-w-md w-full border border-border rounded-2xl">
           <CardContent className="p-8 text-center">
-            <Loader2 className="w-12 h-12 text-gray-950 animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-950 mb-2">
+            <Loader2 className="w-12 h-12 text-foreground animate-spin mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-foreground mb-2">
               Loading...
             </h2>
           </CardContent>

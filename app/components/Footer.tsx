@@ -42,7 +42,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-white border-t border-gray-200">
+    <footer className="bg-white border-t border-border">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="py-12 lg:py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
@@ -50,9 +50,9 @@ export function Footer() {
             <div className="lg:col-span-2">
               <Link href="/" className="flex items-center space-x-2 mb-4">
                 <Logo size="lg" variant="icon" priority />
-                <span className="text-xl font-bold text-gray-900">Revvy</span>
+                <span className="text-xl font-bold text-foreground">Revvy</span>
               </Link>
-              <p className="text-sm text-gray-600 mb-6 max-w-sm">
+              <p className="text-sm text-muted-foreground mb-6 max-w-sm">
                 Social media management for Nigerian agencies. Generate, schedule, and manage content across all your clients and platforms.
               </p>
               {/* Social Links */}
@@ -65,7 +65,7 @@ export function Footer() {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                      className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-gray-900 hover:bg-gray-100 transition-colors"
                       aria-label={social.name}
                     >
                       <Icon className="w-5 h-5" />
@@ -77,13 +77,13 @@ export function Footer() {
 
             {/* Product Links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Product</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">Product</h3>
               <ul className="space-y-3">
                 {footerLinks.product.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                      className="text-sm text-muted-foreground hover:text-gray-900 transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -94,13 +94,13 @@ export function Footer() {
 
             {/* Company Links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Company</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">Company</h3>
               <ul className="space-y-3">
                 {footerLinks.company.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                      className="text-sm text-muted-foreground hover:text-gray-900 transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -111,13 +111,13 @@ export function Footer() {
 
             {/* Resources Links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Resources</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">Resources</h3>
               <ul className="space-y-3">
                 {footerLinks.resources.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                      className="text-sm text-muted-foreground hover:text-gray-900 transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -128,13 +128,13 @@ export function Footer() {
 
             {/* Legal Links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Legal</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">Legal</h3>
               <ul className="space-y-3">
                 {footerLinks.legal.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                      className="text-sm text-muted-foreground hover:text-gray-900 transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -146,12 +146,12 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="py-6 border-t border-gray-200">
+        <div className="py-6 border-t border-border">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               © {currentYear} Revvy. All rights reserved.
             </p>
-            <div className="flex items-center gap-6 text-sm text-gray-600">
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 Made with
                 <Heart className="h-4 w-4 fill-current text-red-500" aria-label="love" />

@@ -144,7 +144,7 @@ export default function PostStackPage() {
                 <Card
                   key={index}
                   className={`border rounded-xl hover:border-gray-300 transition-all ${
-                    "bg-white border-gray-200 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
+                    "bg-white border-border dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
                   }`}
                 >
                   <CardContent className="p-5">
@@ -167,7 +167,7 @@ export default function PostStackPage() {
                       <div className="mb-4">
                         <p className={`text-xs font-semibold uppercase tracking-wide mb-2 text-muted-foreground`}>Caption</p>
                         <div className={`border rounded-lg p-3 ${
-                          "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
+                          "bg-muted border-border dark:bg-slate-900/50 dark:border-slate-700"
                         }`}>
                           <p className={`text-sm leading-relaxed text-foreground`}>
                             {item.caption}
@@ -178,7 +178,7 @@ export default function PostStackPage() {
                       <div className="mb-4">
                         <p className={`text-xs font-semibold uppercase tracking-wide mb-2 text-muted-foreground`}>Hook Example</p>
                         <div className={`border rounded-lg p-3 ${
-                          "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
+                          "bg-muted border-border dark:bg-slate-900/50 dark:border-slate-700"
                         }`}>
                           <p className={`text-sm leading-relaxed text-foreground`}>
                             &ldquo;{item.hookExample}&rdquo;
@@ -219,7 +219,7 @@ export default function PostStackPage() {
                           onClick={() => handleEdit(item)}
                           variant="outline"
                           className={`flex-1 sm:flex-none rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium transition-all duration-200 ${
-                            "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 active:bg-gray-200 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white dark:active:bg-slate-600"
+                            "border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 active:bg-gray-200 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white dark:active:bg-slate-600"
                           }`}
                         >
                           Edit
@@ -228,7 +228,7 @@ export default function PostStackPage() {
                           onClick={() => handleDelete(index)}
                           variant="outline"
                           className={`rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium transition-all duration-200 ${
-                            "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-400 hover:text-red-700 active:bg-red-100 dark:border-slate-600 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-500 dark:hover:text-red-300 dark:active:bg-red-950/50"
+                            "border-border text-red-600 hover:bg-red-50 hover:border-red-400 hover:text-red-700 active:bg-red-100 dark:border-slate-600 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-500 dark:hover:text-red-300 dark:active:bg-red-950/50"
                           }`}
                         >
                           <Trash2 className="w-4 h-4" />

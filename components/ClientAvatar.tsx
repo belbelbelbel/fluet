@@ -52,7 +52,7 @@ export function ClientAvatar({
         alt={name}
         className={cn(
           sizes.img,
-          "rounded-lg object-cover border border-gray-200 dark:border-slate-600 shrink-0",
+          "rounded-lg object-cover border border-border dark:border-slate-600 shrink-0",
           className
         )}
       />

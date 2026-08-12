@@ -125,7 +125,7 @@ export default function NewTaskPage() {
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className={`p-2 transition-all duration-200 ${"text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800"}`}
+            className={`p-2 transition-all duration-200 ${"text-foreground/80 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800"}`}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -158,7 +158,7 @@ export default function NewTaskPage() {
                       className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200 ${
                         formData.type === taskType.value
                           ? "border-primary bg-muted text-purple-900 dark:border-purple-500 dark:bg-purple-900/50 dark:text-purple-300"
-                          : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+                          : "border-border bg-white text-foreground/80 hover:border-gray-300 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-700"
                       }`}
                     >
                       <taskType.icon className="h-6 w-6" />
@@ -179,7 +179,7 @@ export default function NewTaskPage() {
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${"bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-slate-400 dark:hover:border-slate-500"}`}
+                  className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${"bg-white border-border text-foreground placeholder-gray-400 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-slate-400 dark:hover:border-slate-500"}`}
                   rows={4}
                   placeholder="Describe what needs to be done..."
                 />
@@ -198,7 +198,7 @@ export default function NewTaskPage() {
                     id="assignedTo"
                     value={formData.assignedTo}
                     onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-                    className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${"bg-white border-gray-300 text-gray-900 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:border-slate-500"}`}
+                    className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${"bg-white border-border text-foreground hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:border-slate-500"}`}
                   >
                     <option value="">Unassigned</option>
                     {teamMembers.map((member) => (
@@ -224,7 +224,7 @@ export default function NewTaskPage() {
                     id="dueDate"
                     value={formData.dueDate}
                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                    className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${"bg-white border-gray-300 text-gray-900 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:border-slate-500"}`}
+                    className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${"bg-white border-border text-foreground hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:border-slate-500"}`}
                   />
                 </div>
               </div>
@@ -235,7 +235,7 @@ export default function NewTaskPage() {
                   variant="outline"
                   onClick={() => router.back()}
                   disabled={loading}
-                  className={`flex-1 sm:flex-none transition-all duration-200 py-2.5 sm:py-2 ${"border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"}`}
+                  className={`flex-1 sm:flex-none transition-all duration-200 py-2.5 sm:py-2 ${"border-border text-foreground/80 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"}`}
                 >
                   Cancel
                 </Button>

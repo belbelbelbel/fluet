@@ -46,7 +46,7 @@ export function KeyboardShortcuts() {
           </h2>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
+            className="text-muted-foreground/70 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
           >
             <XIcon className="w-5 h-5" />
           </button>
@@ -85,7 +85,7 @@ function ShortcutItem({ keys, description }: { keys: string[]; description: stri
             <kbd className="px-2 py-1 bg-gray-700 text-gray-200 text-xs rounded border border-gray-600">
               {key}
             </kbd>
-            {i < keys.length - 1 && <span className="mx-1 text-gray-500">+</span>}
+            {i < keys.length - 1 && <span className="mx-1 text-muted-foreground">+</span>}
           </span>
         ))}
       </div>

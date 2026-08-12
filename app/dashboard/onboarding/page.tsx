@@ -90,7 +90,7 @@ export default function OnboardingPage() {
   if (hasClients === null) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-pulse text-gray-500">Loading...</div>
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     );
   }
@@ -110,10 +110,10 @@ export default function OnboardingPage() {
                   <Sparkles className="w-7 h-7 text-white" />
                 </div>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
+              <h1 className="text-2xl font-bold text-foreground text-center mb-2">
                 Welcome to Revvy
               </h1>
-              <p className="text-gray-600 text-center mb-8">
+              <p className="text-muted-foreground text-center mb-8">
                 Get started by adding your first client. You can always add more later.
               </p>
               <Button
@@ -131,12 +131,12 @@ export default function OnboardingPage() {
           <Card className="border-2 shadow-lg">
             <CardContent className="pt-8 pb-8 px-8">
               <div className="flex justify-center mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
-                  <Building2 className="w-7 h-7 text-gray-700" />
+                <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center">
+                  <Building2 className="w-7 h-7 text-foreground/80" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Create your first client</h2>
-              <p className="text-gray-600 text-sm mb-6">
+              <h2 className="text-xl font-bold text-foreground mb-1">Create your first client</h2>
+              <p className="text-muted-foreground text-sm mb-6">
                 Add a name and optional email (for approval notifications).
               </p>
               <div className="space-y-4 mb-6">
@@ -191,8 +191,8 @@ export default function OnboardingPage() {
                   <Sparkles className="w-7 h-7 text-foreground" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Content niche for {clientName || "your client"}</h2>
-              <p className="text-gray-600 text-sm mb-6">
+              <h2 className="text-xl font-bold text-foreground mb-1">Content niche for {clientName || "your client"}</h2>
+              <p className="text-muted-foreground text-sm mb-6">
                 This helps us show relevant content ideas. You can change it later in Brand Voice.
               </p>
               <div className="space-y-4 mb-6">
@@ -201,7 +201,7 @@ export default function OnboardingPage() {
                   <select
                     value={primaryIndustry}
                     onChange={(e) => setPrimaryIndustry(e.target.value)}
-                    className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"
+                    className="mt-1 w-full px-4 py-2 border border-border rounded-lg bg-white"
                   >
                     <option value="">Select industry</option>
                     <option value="food_beverage">Food & Beverage</option>
@@ -296,7 +296,7 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setStep("plan")}
-                  className="text-sm text-gray-500 hover:text-gray-700 self-center"
+                  className="text-sm text-muted-foreground hover:text-gray-700 self-center"
                 >
                   Skip for now
                 </button>
@@ -309,12 +309,12 @@ export default function OnboardingPage() {
           <Card className="border-2 shadow-lg">
             <CardContent className="pt-8 pb-8 px-8">
               <div className="flex justify-center mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
-                  <CreditCard className="w-7 h-7 text-gray-700" />
+                <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center">
+                  <CreditCard className="w-7 h-7 text-foreground/80" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Pick a plan (optional)</h2>
-              <p className="text-gray-600 text-sm mb-6">
+              <h2 className="text-xl font-bold text-foreground mb-1">Pick a plan (optional)</h2>
+              <p className="text-muted-foreground text-sm mb-6">
                 Choose a plan that fits your team. You can start with the dashboard and upgrade anytime.
               </p>
               <div className="flex flex-col gap-3">

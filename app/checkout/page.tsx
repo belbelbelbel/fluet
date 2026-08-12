@@ -221,12 +221,12 @@ function CheckoutContent() {
   // Same as dashboard: only wait for Clerk to load, never auto-redirect (prevents loop)
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-muted">
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading checkout...</p>
+            <p className="text-muted-foreground">Loading checkout...</p>
           </div>
         </div>
       </div>
@@ -236,12 +236,12 @@ function CheckoutContent() {
   if (!isSignedIn) {
     const signInUrl = `/sign-in?redirect_url=${encodeURIComponent(`/checkout?plan=${planId}&billing=${billingCycle}`)}`;
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-muted">
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh] px-4">
           <div className="text-center max-w-md">
-            <h1 className="text-xl font-semibold text-gray-900 mb-2">Sign in to continue</h1>
-            <p className="text-gray-600 mb-6">You need to sign in to complete your purchase.</p>
+            <h1 className="text-xl font-semibold text-foreground mb-2">Sign in to continue</h1>
+            <p className="text-muted-foreground mb-6">You need to sign in to complete your purchase.</p>
             <Button
               onClick={() => router.push(signInUrl)}
               className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium"
@@ -255,7 +255,7 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
         <div className="max-w-6xl mx-auto">
@@ -263,45 +263,45 @@ function CheckoutContent() {
           <div className="mb-8">
             <button
               onClick={() => router.push("/pricing")}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+              className="flex items-center gap-2 text-muted-foreground hover:text-gray-900 mb-4"
             >
               <ArrowLeftIcon className="w-4 h-4" />
               <span className="text-sm">Back to pricing</span>
             </button>
-            <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
-            <p className="text-gray-600 mt-1">Review your plan and complete payment securely.</p>
+            <h1 className="text-3xl font-bold text-foreground">Checkout</h1>
+            <p className="text-muted-foreground mt-1">Review your plan and complete payment securely.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Order Summary (details & description) */}
             <div className="lg:col-span-1 order-2 lg:order-1">
-              <Card className="border border-gray-200 sticky top-24">
+              <Card className="border border-border sticky top-24">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-1">Subscribe to {selectedPlan.name}</h2>
+                  <h2 className="text-lg font-semibold text-foreground mb-1">Subscribe to {selectedPlan.name}</h2>
                   {"description" in selectedPlan && selectedPlan.description && (
-                    <p className="text-sm text-gray-600 mb-4">{selectedPlan.description}</p>
+                    <p className="text-sm text-muted-foreground mb-4">{selectedPlan.description}</p>
                   )}
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">{selectedPlan.name}</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="text-muted-foreground">{selectedPlan.name}</span>
+                      <span className="font-medium text-foreground">
                         {selectedPlan.price === "Custom"
                           ? "Contact Sales"
                           : `₦${parseInt(displayPrice).toLocaleString("en-NG")}`}
                       </span>
                     </div>
                     {selectedPlan.price !== "Custom" && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {billingCycle === "yearly"
                           ? "Billed annually. Then ₦" + parseInt(displayPrice).toLocaleString("en-NG") + "/year."
                           : "Then ₦" + parseInt(displayPrice).toLocaleString("en-NG") + "/month."}
                       </p>
                     )}
                   </div>
-                  <div className="py-3 border-t border-gray-200">
+                  <div className="py-3 border-t border-border">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold text-gray-900">Total due today</span>
-                      <span className="text-xl font-bold text-gray-900">
+                      <span className="font-semibold text-foreground">Total due today</span>
+                      <span className="text-xl font-bold text-foreground">
                         {selectedPlan.price === "Custom"
                           ? "Contact Sales"
                           : `₦${parseInt(displayPrice).toLocaleString("en-NG")}`}
@@ -316,15 +316,15 @@ function CheckoutContent() {
                     Change plan
                   </button>
                   <div className="mt-6 space-y-3">
-                    <div className="rounded-lg bg-gray-50 border border-gray-100 px-3 py-2.5">
+                    <div className="rounded-lg bg-muted border border-gray-100 px-3 py-2.5">
                       <p className="text-xs font-medium text-gray-800">What happens next</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         You’ll finish checkout with Stripe or Kora. Your plan activates when payment succeeds.
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <ShieldIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                      <span className="text-xs text-gray-500">
+                      <ShieldIcon className="w-5 h-5 text-muted-foreground/70 flex-shrink-0" />
+                      <span className="text-xs text-muted-foreground">
                         Secure payment — card details never touch Revvy servers.
                       </span>
                     </div>
@@ -335,31 +335,31 @@ function CheckoutContent() {
 
             {/* Right Column - Payment method (Stripe / Kora) and form */}
             <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
-              <Card className="border border-gray-200">
+              <Card className="border border-border">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment method</h2>
+                  <h2 className="text-lg font-semibold text-foreground mb-4">Payment method</h2>
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <button
                       onClick={() => setSelectedProvider("stripe")}
                       className={`p-4 rounded-lg border transition-all ${
                         selectedProvider === "stripe"
                           ? "border-purple-600 bg-purple-50"
-                          : "border-gray-200 hover:border-gray-300 bg-white"
+                          : "border-border hover:border-gray-300 bg-white"
                       }`}
                     >
-                      <div className="font-medium text-gray-900 mb-1">Stripe</div>
-                      <div className="text-xs text-gray-600">Credit & Debit Cards</div>
+                      <div className="font-medium text-foreground mb-1">Stripe</div>
+                      <div className="text-xs text-muted-foreground">Credit & Debit Cards</div>
                     </button>
                     <button
                       onClick={() => setSelectedProvider("kora")}
                       className={`p-4 rounded-lg border transition-all ${
                         selectedProvider === "kora"
                           ? "border-purple-600 bg-purple-50"
-                          : "border-gray-200 hover:border-gray-300 bg-white"
+                          : "border-border hover:border-gray-300 bg-white"
                       }`}
                     >
-                      <div className="font-medium text-gray-900 mb-1">Kora</div>
-                      <div className="text-xs text-gray-600">Local Payment Methods</div>
+                      <div className="font-medium text-foreground mb-1">Kora</div>
+                      <div className="text-xs text-muted-foreground">Local Payment Methods</div>
                     </button>
                   </div>
 
@@ -367,7 +367,7 @@ function CheckoutContent() {
                   {selectedProvider === "stripe" && (
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-foreground/80 mb-2">
                           Card number
                         </label>
                         <div className="relative">
@@ -377,18 +377,18 @@ function CheckoutContent() {
                             onChange={handleCardNumberChange}
                             placeholder="1234 1234 1234 1234"
                             maxLength={19}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                             required
                           />
                           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
-                            <CreditCardIcon className="w-5 h-5 text-gray-400" />
+                            <CreditCardIcon className="w-5 h-5 text-muted-foreground/70" />
                           </div>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-foreground/80 mb-2">
                             Expiry
                           </label>
                           <input
@@ -397,12 +397,12 @@ function CheckoutContent() {
                             onChange={handleExpiryChange}
                             placeholder="MM/YY"
                             maxLength={5}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                             required
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-foreground/80 mb-2">
                             CVC
                           </label>
                           <input
@@ -411,20 +411,20 @@ function CheckoutContent() {
                             onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
                             placeholder="CVC"
                             maxLength={4}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                             required
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-foreground/80 mb-2">
                           Country
                         </label>
                         <select
                           value={country}
                           onChange={(e) => setCountry(e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                          className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                         >
                           <option value="NG">Nigeria</option>
                           <option value="US">United States</option>
@@ -475,13 +475,13 @@ function CheckoutContent() {
                   )}
 
                   {!selectedProvider && (
-                    <p className="text-sm text-gray-500 text-center py-4">
+                    <p className="text-sm text-muted-foreground text-center py-4">
                       Please select a payment method above
                     </p>
                   )}
 
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 text-center">
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <p className="text-xs text-muted-foreground text-center">
                       By providing your card information, you allow Revvy to charge your card for future payments in accordance with our terms.
                     </p>
                   </div>
@@ -498,10 +498,10 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading checkout...</p>
+          <p className="text-muted-foreground">Loading checkout...</p>
         </div>
       </div>
     }>

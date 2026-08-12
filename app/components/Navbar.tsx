@@ -68,8 +68,8 @@ export function Navbar({}: NavbarProps = {}) {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b backdrop-blur-sm ${
           isScrolled
-            ? "bg-white/80 border-gray-200 shadow-sm"
-            : "bg-white/95 border-gray-200/50"
+            ? "bg-white/80 border-border shadow-sm"
+            : "bg-white/95 border-border/50"
         }`}
       >
         <nav className="container mx-auto px-4 sm:px-8 py-4">
@@ -78,7 +78,7 @@ export function Navbar({}: NavbarProps = {}) {
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
                 <Logo size="lg" variant="icon" priority forceLight />
-                <span className="text-lg font-bold text-gray-950">Revvy</span>
+                <span className="text-lg font-bold text-foreground">Revvy</span>
               </Link>
             </div>
 
@@ -107,8 +107,8 @@ export function Navbar({}: NavbarProps = {}) {
                     onClick={handleClick}
                     className={`${
                       active
-                        ? "text-gray-900 font-semibold"
-                        : "text-gray-600"
+                        ? "text-foreground font-semibold"
+                        : "text-muted-foreground"
                     } hover:text-gray-900 transition-colors text-sm font-medium cursor-pointer`}
                   >
                     {item.name}
@@ -120,7 +120,7 @@ export function Navbar({}: NavbarProps = {}) {
             {/* User Actions - Right */}
             <div className="flex items-center space-x-4">
               <button
-                className="md:hidden text-gray-900 focus:outline-none"
+                className="md:hidden text-foreground focus:outline-none"
                 onClick={toggleMenu}
                 aria-label="Toggle menu"
               >
@@ -134,7 +134,7 @@ export function Navbar({}: NavbarProps = {}) {
               <div className="hidden md:flex items-center space-x-4">
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <button className="text-gray-700 hover:text-gray-900 bg-white border border-gray-200 transition-colors text-sm font-medium px-4 py-2 rounded-lg">
+                    <button className="text-foreground/80 hover:text-gray-900 bg-white border border-border transition-colors text-sm font-medium px-4 py-2 rounded-lg">
                       Log in
                     </button>
                   </SignInButton>
@@ -149,8 +149,8 @@ export function Navbar({}: NavbarProps = {}) {
                     href="/dashboard"
                     className={`${
                       isActive("/dashboard")
-                        ? "text-gray-900 font-semibold"
-                        : "text-gray-600"
+                        ? "text-foreground font-semibold"
+                        : "text-muted-foreground"
                     } hover:text-gray-900 transition-colors text-sm font-medium mr-2`}
                   >
                     Dashboard
@@ -159,11 +159,11 @@ export function Navbar({}: NavbarProps = {}) {
                     appearance={{
                       elements: {
                         avatarBox: "w-10 h-10",
-                        card: "bg-white shadow-lg border border-gray-200",
+                        card: "bg-white shadow-lg border border-border",
                         modalContent: "bg-white",
                         formButtonPrimary: "bg-gray-950 hover:bg-gray-900 text-white",
                         formButtonSecondary:
-                          "bg-white hover:bg-gray-50 text-gray-950 border border-gray-200",
+                          "bg-white hover:bg-gray-50 text-foreground border border-border",
                       },
                       variables: {
                         colorBackground: "#ffffff",
@@ -193,20 +193,20 @@ export function Navbar({}: NavbarProps = {}) {
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white border-gray-200 border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out sm:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white border-border border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out sm:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Mobile Menu Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between p-6 border-b border-border">
             <div className="flex items-center space-x-2">
               <Logo size="lg" variant="icon" priority forceLight />
-              <span className="text-lg font-bold text-gray-900">Revvy</span>
+              <span className="text-lg font-bold text-foreground">Revvy</span>
             </div>
             <button
               onClick={() => setIsMenuOpen(false)}
-              className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors p-2 rounded-lg"
+              className="text-muted-foreground hover:text-gray-900 hover:bg-gray-100 transition-colors p-2 rounded-lg"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -217,7 +217,7 @@ export function Navbar({}: NavbarProps = {}) {
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Public Navigation - Mobile */}
             <div className="space-y-1">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                 Navigation
               </p>
               {navItems.map((item) => {
@@ -247,7 +247,7 @@ export function Navbar({}: NavbarProps = {}) {
                     className={`block px-4 py-3 rounded-lg transition-colors ${
                       active
                         ? "bg-blue-50 text-blue-600 border border-blue-200 font-semibold"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        : "text-muted-foreground hover:bg-gray-50 hover:text-gray-900"
                     }`}
                   >
                     {item.name}
@@ -259,7 +259,7 @@ export function Navbar({}: NavbarProps = {}) {
             {/* User Navigation - Mobile */}
             {userId && (
               <div className="space-y-1">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                   Account
                 </p>
                 <Link
@@ -268,7 +268,7 @@ export function Navbar({}: NavbarProps = {}) {
                   className={`block px-4 py-3 rounded-lg transition-colors ${
                     isActive("/dashboard")
                       ? "bg-blue-50 text-blue-600 border border-blue-200 font-semibold"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      : "text-muted-foreground hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   Dashboard
@@ -277,12 +277,12 @@ export function Navbar({}: NavbarProps = {}) {
             )}
 
             {/* Auth Buttons - Mobile */}
-            <div className="pt-4 border-t border-gray-200 space-y-3">
+            <div className="pt-4 border-t border-border space-y-3">
               <SignedOut>
                 <SignInButton mode="modal">
                   <button
                     onClick={() => setIsMenuOpen(false)}
-                    className="w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors font-medium"
+                    className="w-full text-left px-4 py-3 rounded-lg text-muted-foreground hover:bg-gray-50 hover:text-gray-900 transition-colors font-medium"
                   >
                     Log in
                   </button>
@@ -302,11 +302,11 @@ export function Navbar({}: NavbarProps = {}) {
                     appearance={{
                       elements: {
                         avatarBox: "w-10 h-10",
-                        card: "bg-white shadow-lg border border-gray-200",
+                        card: "bg-white shadow-lg border border-border",
                         modalContent: "bg-white",
                         formButtonPrimary: "bg-gray-950 hover:bg-gray-900 text-white",
                         formButtonSecondary:
-                          "bg-white hover:bg-gray-50 text-gray-950 border border-gray-200",
+                          "bg-white hover:bg-gray-50 text-foreground border border-border",
                       },
                       variables: {
                         colorBackground: "#ffffff",

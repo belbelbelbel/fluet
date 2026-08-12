@@ -193,7 +193,7 @@ export function AttentionToast({
             aria-label="Dismiss"
             className={cn(
               "shrink-0 rounded-lg p-1 transition-colors",
-              "text-slate-400 hover:bg-black/5 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-slate-200"
+              "text-muted-foreground hover:bg-black/5 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-slate-200"
             )}
           >
             <X className="h-3.5 w-3.5" />
