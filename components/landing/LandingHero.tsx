@@ -94,7 +94,7 @@ export function LandingHero() {
           </Reveal>
         </div>
 
-        {/* ---- Photograph, with the product overlaid ---- */}
+        {/* ---- Photograph, with the approval trail beneath it ---- */}
         <Reveal delay={180}>
           <div className="relative">
             {/* Offset accent shape so the photo has something to sit against */}
@@ -114,11 +114,14 @@ export function LandingHero() {
               />
             </div>
 
-            {/* Product card sits in the photo's own negative space (the warm
-                out-of-focus right side) rather than over the subject. */}
-            <div className="absolute -bottom-12 -right-3 w-[80%] max-w-[22rem] sm:-right-8 sm:w-[68%] lg:-right-12">
-              <ApprovalMock />
-            </div>
+          </div>
+
+          {/* The trail sits UNDER the photograph on the canvas, not over it.
+              As bare type it has no opaque ground, so overlaying it on the image
+              made it unreadable — and giving it one would just be the panel this
+              is deliberately not. */}
+          <div className="mt-9 sm:mt-11">
+            <ApprovalMock />
           </div>
         </Reveal>
       </div>
