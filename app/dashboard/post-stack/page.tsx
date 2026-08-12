@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,8 +37,6 @@ interface StackItem {
 
 export default function PostStackPage() {
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const [stack, setStack] = useState<StackItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -105,9 +102,9 @@ export default function PostStackPage() {
       <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
         <div className="text-center">
           <Clock className={`w-8 h-8 animate-pulse mx-auto mb-4 ${
-            isDark ? "text-purple-400" : "text-foreground"
+            "text-foreground dark:text-purple-400"
           }`} />
-          <p className={isDark ? "text-slate-300" : "text-gray-600"}>Loading your stack...</p>
+          <p className={"text-muted-foreground"}>Loading your stack...</p>
         </div>
       </div>
     );
@@ -123,7 +120,7 @@ export default function PostStackPage() {
               <h1 className={`text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 text-foreground`}>
                 Post Stack
               </h1>
-              <p className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <p className={"text-muted-foreground"}>
                 {stack.length} {stack.length === 1 ? "post" : "posts"} ready to schedule
               </p>
             </div>
@@ -147,17 +144,17 @@ export default function PostStackPage() {
                 <Card
                   key={index}
                   className={`border rounded-xl hover:border-gray-300 transition-all ${
-                    isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200"
+                    "bg-white border-gray-200 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
                   }`}
                 >
                   <CardContent className="p-5">
                     {/* Topic Header */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                        isDark ? "bg-muted0/20" : "bg-purple-100"
+                        "bg-purple-100 dark:bg-purple-900/20"
                       }`}>
                         <FormatIcon className={`w-5 h-5 ${
-                          isDark ? "text-purple-400" : "text-foreground"
+                          "text-foreground dark:text-purple-400"
                         }`} />
                       </div>
                       <h3 className={`text-lg font-semibold flex-1 text-foreground`}>
@@ -170,7 +167,7 @@ export default function PostStackPage() {
                       <div className="mb-4">
                         <p className={`text-xs font-semibold uppercase tracking-wide mb-2 text-muted-foreground`}>Caption</p>
                         <div className={`border rounded-lg p-3 ${
-                          isDark ? "bg-slate-900/50 border-slate-700" : "bg-gray-50 border-gray-200"
+                          "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
                         }`}>
                           <p className={`text-sm leading-relaxed text-foreground`}>
                             {item.caption}
@@ -181,7 +178,7 @@ export default function PostStackPage() {
                       <div className="mb-4">
                         <p className={`text-xs font-semibold uppercase tracking-wide mb-2 text-muted-foreground`}>Hook Example</p>
                         <div className={`border rounded-lg p-3 ${
-                          isDark ? "bg-slate-900/50 border-slate-700" : "bg-gray-50 border-gray-200"
+                          "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
                         }`}>
                           <p className={`text-sm leading-relaxed text-foreground`}>
                             &ldquo;{item.hookExample}&rdquo;
@@ -193,17 +190,13 @@ export default function PostStackPage() {
                     {/* Badges */}
                     <div className="flex flex-wrap items-center gap-2 mb-4">
                       <Badge className={`rounded-lg px-3 py-1 text-xs font-medium ${
-                        isDark 
-                          ? "bg-slate-700 text-slate-200" 
-                          : "bg-gray-200 text-gray-800"
+                        "bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-slate-200"
                       }`}>
                         {item.format.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                       </Badge>
                       {item.tone && (
                         <Badge className={`rounded-lg px-3 py-1 text-xs font-medium capitalize ${
-                          isDark 
-                            ? "bg-slate-700 text-slate-200" 
-                            : "bg-gray-200 text-gray-800"
+                          "bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-slate-200"
                         }`}>
                           {item.tone} tone
                         </Badge>
@@ -215,9 +208,7 @@ export default function PostStackPage() {
                       <Button
                         onClick={() => handleSchedule(item)}
                         className={`flex-1 rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md ${
-                          isDark
-                            ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                            : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                          "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
                         }`}
                       >
                         <Calendar className="w-4 h-4" />
@@ -228,9 +219,7 @@ export default function PostStackPage() {
                           onClick={() => handleEdit(item)}
                           variant="outline"
                           className={`flex-1 sm:flex-none rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium transition-all duration-200 ${
-                            isDark
-                              ? "border-slate-600 text-slate-200 hover:bg-slate-700 hover:border-slate-500 hover:text-white active:bg-slate-600"
-                              : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 active:bg-gray-200"
+                            "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 active:bg-gray-200 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white dark:active:bg-slate-600"
                           }`}
                         >
                           Edit
@@ -239,9 +228,7 @@ export default function PostStackPage() {
                           onClick={() => handleDelete(index)}
                           variant="outline"
                           className={`rounded-lg px-4 py-2.5 sm:py-2 text-sm font-medium transition-all duration-200 ${
-                            isDark
-                              ? "border-slate-600 text-red-400 hover:bg-red-950/30 hover:border-red-500 hover:text-red-300 active:bg-red-950/50"
-                              : "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-400 hover:text-red-700 active:bg-red-100"
+                            "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-400 hover:text-red-700 active:bg-red-100 dark:border-slate-600 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-500 dark:hover:text-red-300 dark:active:bg-red-950/50"
                           }`}
                         >
                           <Trash2 className="w-4 h-4" />

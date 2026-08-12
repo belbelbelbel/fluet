@@ -16,7 +16,6 @@ import {
   ChevronRight,
   Users,
 } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import {
   Select,
@@ -39,8 +38,6 @@ interface Client {
 export default function ClientsPage() {
   const router = useRouter();
   const { userId } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,9 +134,7 @@ export default function ClientsPage() {
       return (
         <span
           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border ${
-            isDark
-              ? "border-red-900/50 text-red-400 bg-red-950/20"
-              : "border-red-200 text-red-700 bg-red-50/50"
+            "border-red-200 text-red-700 bg-red-50/50 dark:border-red-900/50 dark:text-red-400 dark:bg-red-950/20"
           }`}
         >
           <AlertCircle className="w-3 h-3" strokeWidth={2} />
@@ -151,9 +146,7 @@ export default function ClientsPage() {
       return (
         <span
           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border ${
-            isDark
-              ? "border-amber-900/50 text-amber-400 bg-amber-950/20"
-              : "border-amber-200 text-amber-700 bg-amber-50/50"
+            "border-amber-200 text-amber-700 bg-amber-50/50 dark:border-amber-900/50 dark:text-amber-400 dark:bg-amber-950/20"
           }`}
         >
           <Clock className="w-3 h-3" strokeWidth={2} />
@@ -164,9 +157,7 @@ export default function ClientsPage() {
     return (
       <span
         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium border ${
-          isDark
-            ? "border-emerald-900/50 text-emerald-400 bg-emerald-950/20"
-            : "border-emerald-200 text-emerald-700 bg-emerald-50/50"
+          "border-emerald-200 text-emerald-700 bg-emerald-50/50 dark:border-emerald-900/50 dark:text-emerald-400 dark:bg-emerald-950/20"
         }`}
       >
         <CheckCircle2 className="w-3 h-3" strokeWidth={2} />
@@ -204,9 +195,7 @@ export default function ClientsPage() {
         <Button
           onClick={() => router.push("/dashboard/clients/new")}
           className={`shrink-0 ${
-            isDark
-              ? "bg-white hover:bg-gray-100 text-gray-950"
-              : "bg-gray-950 hover:bg-gray-900 text-white"
+            "bg-gray-950 hover:bg-gray-900 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-950"
           }`}
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -217,7 +206,7 @@ export default function ClientsPage() {
       {/* Search, filters, sort */}
       {clients.length > 0 && (
         <div className={`rounded-xl border p-4 ${
-          isDark ? "bg-slate-800/50 border-slate-600" : "bg-white border-gray-200"
+          "bg-white border-gray-200 dark:bg-slate-800/50 dark:border-slate-600"
         }`}>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
@@ -228,9 +217,7 @@ export default function ClientsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-slate-600 ${
-                  isDark
-                    ? "bg-slate-900 border-slate-600 text-white placeholder-slate-500"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"
+                  "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 dark:bg-slate-900 dark:border-slate-600 dark:text-white dark:placeholder-slate-500"
                 }`}
                 aria-label="Search clients"
               />
@@ -244,12 +231,8 @@ export default function ClientsPage() {
                     onClick={() => setStatusFilter(f)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       statusFilter === f
-                        ? isDark
-                          ? "bg-white text-gray-950"
-                          : "bg-gray-950 text-white"
-                        : isDark
-                          ? "bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        ? "bg-gray-950 text-white dark:bg-white dark:text-gray-950"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-700/50 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
                     }`}
                   >
                     {f === "all" ? "All" : f === "active" ? "Active" : f === "payment_due" ? "Payment Due" : "On Hold"}
@@ -285,9 +268,7 @@ export default function ClientsPage() {
       {clients.length === 0 ? (
         <Card
           className={`${
-            isDark
-              ? "bg-slate-800 border-slate-600"
-              : "bg-white border-gray-200"
+            "bg-white border-gray-200 dark:bg-slate-800 dark:border-slate-600"
           }`}
         >
           <CardContent className="pt-12 pb-12">
@@ -311,9 +292,7 @@ export default function ClientsPage() {
               <Button
                 onClick={() => router.push("/dashboard/clients/new")}
                 className={
-                  isDark
-                    ? "bg-white hover:bg-gray-100 text-gray-950"
-                    : "bg-gray-950 hover:bg-gray-900 text-white"
+                  "bg-gray-950 hover:bg-gray-900 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-950"
                 }
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -323,7 +302,7 @@ export default function ClientsPage() {
           </CardContent>
         </Card>
       ) : totalFiltered === 0 ? (
-        <Card className={isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}>
+        <Card className={"bg-card border-border"}>
           <CardContent className="pt-12 pb-12">
             <div className="text-center">
               <Search className={`w-12 h-12 mx-auto mb-4 text-muted-foreground/70`} />
@@ -352,9 +331,7 @@ export default function ClientsPage() {
             <Card
               key={client.id}
               className={`cursor-pointer transition-colors ${
-                isDark
-                  ? "hover:border-slate-600"
-                  : "hover:border-gray-300"
+                "hover:border-gray-300 dark:hover:border-slate-600"
               }`}
               onClick={() => router.push(`/dashboard/clients/${client.id}`)}
             >
@@ -388,7 +365,7 @@ export default function ClientsPage() {
                 </div>
                 <div
                   className={`flex items-center justify-between mt-3 pt-3 border-t ${
-                    isDark ? "border-slate-600" : "border-gray-200"
+                    "border-gray-200 dark:border-slate-600"
                   }`}
                 >
                   {getStatusBadge(client)}
@@ -414,7 +391,7 @@ export default function ClientsPage() {
                 size="sm"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className={isDark ? "border-slate-600" : ""}
+                className={"dark:border-slate-600"}
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Previous
@@ -424,7 +401,7 @@ export default function ClientsPage() {
                 size="sm"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className={isDark ? "border-slate-600" : ""}
+                className={"dark:border-slate-600"}
               >
                 Next
                 <ChevronRight className="w-4 h-4 ml-1" />

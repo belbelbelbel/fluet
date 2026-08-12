@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { LoadingScreen } from "@/components/LoadingScreen";
 // import { Card, CardContent } from "@/components/ui/card";
@@ -22,8 +21,6 @@ function GenerateCaptionPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userId } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const ideaId = searchParams.get("id");
   const clientIdFromQuery = searchParams?.get("clientId") ?? null;
 
@@ -177,7 +174,7 @@ function GenerateCaptionPageInner() {
     return (
       <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
         <RefreshCw className={`w-8 h-8 animate-spin ${
-          isDark ? "text-purple-400" : "text-blue-600"
+          "text-blue-600 dark:text-purple-400"
         }`} />
       </div>
     );
@@ -191,9 +188,7 @@ function GenerateCaptionPageInner() {
           <button
             onClick={() => router.back()}
             className={`inline-flex items-center text-sm mb-4 sm:mb-6 transition-all duration-200 ${
-              isDark
-                ? "text-slate-400 hover:text-white"
-                : "text-gray-600 hover:text-gray-950"
+              "text-gray-600 hover:text-gray-950 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -230,7 +225,7 @@ function GenerateCaptionPageInner() {
                     </h2>
                   </div>
                   <div className={`border-l-4 pl-3 sm:pl-4 py-2 ${
-                    isDark ? "border-purple-500" : "border-primary"
+                    "border-primary dark:border-purple-500"
                   }`}>
                     <p className={`text-xs sm:text-sm mb-1 text-muted-foreground`}>Hook</p>
                     <p className={`text-sm sm:text-base italic leading-relaxed text-foreground`}>
@@ -254,30 +249,26 @@ function GenerateCaptionPageInner() {
                     disabled={isGenerating}
                     className={`relative p-4 sm:p-5 rounded-xl border transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed ${
                       selectedTone === tone
-                        ? isDark
-                          ? "border-purple-500 bg-purple-900/50"
-                          : "border-primary bg-muted"
-                        : isDark
-                        ? "border-slate-700 bg-slate-800 hover:border-purple-500 hover:bg-purple-900/30"
-                        : "border-gray-200 bg-white hover:border-purple-200 hover:bg-muted/30"
+                        ? "border-primary bg-muted dark:border-purple-500 dark:bg-purple-900/50"
+                        : "border-gray-200 bg-white hover:border-purple-200 hover:bg-muted/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-purple-500 dark:hover:bg-purple-900/30"
                     }`}
                   >
                     {selectedTone === tone && (
                       <div className={`absolute top-3 right-3 w-2 h-2 rounded-full ${
-                        isDark ? "bg-purple-400" : "bg-primary"
+                        "bg-primary dark:bg-purple-400"
                       }`} />
                     )}
                     <div className={`font-bold text-base mb-2 capitalize ${
                       selectedTone === tone 
-                        ? isDark ? "text-purple-300" : "text-foreground"
-                        : isDark ? "text-white" : "text-gray-950"
+                        ? "text-foreground dark:text-purple-300"
+                        : "text-foreground"
                     }`}>
                       {tone}
                     </div>
                     <div className={`text-xs leading-relaxed ${
                       selectedTone === tone 
-                        ? isDark ? "text-purple-400" : "text-foreground"
-                        : isDark ? "text-slate-400" : "text-gray-600"
+                        ? "text-foreground dark:text-purple-400"
+                        : "text-muted-foreground"
                     }`}>
                       {tone === "mild" && "Professional with local phrases"}
                       {tone === "moderate" && "Mix of English & Pidgin"}
@@ -295,9 +286,7 @@ function GenerateCaptionPageInner() {
                   onClick={handleGenerate}
                   disabled={isGenerating}
                   className={`w-full rounded-xl py-3 sm:py-4 text-sm sm:text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md ${
-                    isDark
-                      ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                      : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                    "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
                   }`}
                 >
                   {isGenerating ? (
@@ -318,9 +307,7 @@ function GenerateCaptionPageInner() {
             <div className="sticky top-8">
               {!hasGenerated ? (
                 <div className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors duration-300 ${
-                  isDark 
-                    ? "border-slate-700 bg-slate-800/50" 
-                    : "border-gray-200 bg-white"
+                  "border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-800/50"
                 }`}>
                   <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-accent`}>
                     <Lightbulb className={`w-8 h-8 text-muted-foreground/70`} />
@@ -400,9 +387,7 @@ function GenerateCaptionPageInner() {
                             variant="outline"
                             size="sm"
                             className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all duration-200 ${
-                              isDark
-                                ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                                : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                              "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                             }`}
                           >
                             Another

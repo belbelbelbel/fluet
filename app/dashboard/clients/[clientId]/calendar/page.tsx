@@ -154,9 +154,7 @@ export default function CalendarPage() {
             variant="ghost"
             onClick={() => router.back()}
             className={`p-2 transition-colors duration-200 ${
-              isDark 
-                ? "text-slate-300 hover:text-white hover:bg-slate-800" 
-                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              "text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800"
             }`}
           >
             <ArrowLeft className="w-5 h-5" />
@@ -176,7 +174,7 @@ export default function CalendarPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <CardTitle className={`text-base sm:text-lg font-semibold flex items-center gap-2 text-foreground`}>
               <CalendarIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                isDark ? "text-purple-400" : "text-foreground"
+                "text-foreground dark:text-purple-400"
               }`} />
               {monthName}
             </CardTitle>
@@ -186,9 +184,7 @@ export default function CalendarPage() {
                 size="sm"
                 onClick={() => navigateMonth("prev")}
                 className={`p-2 transition-all duration-200 ${
-                  isDark
-                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"
+                  "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -198,9 +194,7 @@ export default function CalendarPage() {
                 size="sm"
                 onClick={() => setCurrentDate(new Date())}
                 className={`px-3 transition-all duration-200 ${
-                  isDark
-                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"
+                  "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 Today
@@ -210,9 +204,7 @@ export default function CalendarPage() {
                 size="sm"
                 onClick={() => navigateMonth("next")}
                 className={`p-2 transition-all duration-200 ${
-                  isDark
-                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"
+                  "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 <ChevronRight className="w-4 h-4" />
@@ -244,12 +236,8 @@ export default function CalendarPage() {
                   className={cn(
                     "min-h-[60px] sm:min-h-[80px] lg:min-h-[100px] border rounded-lg p-1 sm:p-2 transition-all duration-200",
                     date
-                      ? isDark
-                        ? "bg-slate-800 border-slate-700 hover:bg-slate-700 hover:border-slate-600 cursor-pointer"
-                        : "bg-white border-gray-200 hover:bg-gray-50 cursor-pointer"
-                      : isDark
-                        ? "bg-slate-900 border-slate-800"
-                        : "bg-gray-50 border-gray-200",
+                      ? "bg-white border-gray-200 hover:bg-gray-50 cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600 dark:cursor-pointer"
+                      : "bg-gray-50 border-gray-200 dark:bg-slate-900 dark:border-slate-800",
                     isCurrentDay && isDark
                       ? "border-primary border bg-purple-950/50"
                       : isCurrentDay
@@ -268,12 +256,8 @@ export default function CalendarPage() {
                         className={cn(
                           "text-xs sm:text-sm font-medium mb-0.5 sm:mb-1",
                           isCurrentDay
-                            ? isDark
-                              ? "text-purple-400"
-                              : "text-foreground"
-                            : isDark
-                            ? "text-slate-200"
-                            : "text-gray-900"
+                            ? "text-foreground dark:text-purple-400"
+                            : "text-foreground"
                         )}
                       >
                         {date.getDate()}
@@ -285,16 +269,10 @@ export default function CalendarPage() {
                             className={cn(
                               "text-[10px] sm:text-xs p-1 sm:p-1.5 rounded truncate flex items-center gap-1",
                               post.posted
-                                ? isDark
-                                  ? "bg-green-950/50 text-green-400 border border-green-800"
-                                  : "bg-green-100 text-green-700"
+                                ? "bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400 dark:border dark:border-green-800"
                                 : post.approvalStatus === "pending"
-                                ? isDark
-                                  ? "bg-yellow-950/50 text-yellow-400 border border-yellow-800"
-                                  : "bg-yellow-100 text-yellow-700"
-                                : isDark
-                                ? "bg-purple-950/50 text-purple-400 border border-purple-800"
-                                : "bg-purple-100 text-foreground"
+                                ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-950/50 dark:text-yellow-400 dark:border dark:border-yellow-800"
+                                : "bg-purple-100 text-foreground dark:bg-purple-950/50 dark:text-purple-400 dark:border dark:border-purple-800"
                             )}
                             title={post.content}
                           >
@@ -334,19 +312,19 @@ export default function CalendarPage() {
           <div className="flex items-center gap-6 flex-wrap">
             <div className="flex items-center gap-2">
               <div className={`w-4 h-4 rounded border ${
-                isDark ? "bg-purple-950/50 border-purple-800" : "bg-purple-100 border-purple-200"
+                "bg-purple-100 border-purple-200 dark:bg-purple-950/50 dark:border-purple-800"
               }`} />
               <span className={`text-sm text-foreground/80`}>Scheduled</span>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-4 h-4 rounded border ${
-                isDark ? "bg-yellow-950/50 border-yellow-800" : "bg-yellow-100 border-yellow-200"
+                "bg-yellow-100 border-yellow-200 dark:bg-yellow-950/50 dark:border-yellow-800"
               }`} />
               <span className={`text-sm text-foreground/80`}>Pending Approval</span>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-4 h-4 rounded border ${
-                isDark ? "bg-green-950/50 border-green-800" : "bg-green-100 border-green-200"
+                "bg-green-100 border-green-200 dark:bg-green-950/50 dark:border-green-800"
               }`} />
               <span className={`text-sm text-foreground/80`}>Posted</span>
             </div>

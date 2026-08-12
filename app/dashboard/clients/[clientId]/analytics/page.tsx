@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FeatureComingSoon } from "@/components/FeatureComingSoon";
@@ -46,8 +45,6 @@ interface AnalyticsData {
 export default function AnalyticsPage() {
   const params = useParams();
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const clientId = params?.clientId ? parseInt(params.clientId as string) : null;
 
   const [loading, setLoading] = useState(true);
@@ -88,7 +85,7 @@ export default function AnalyticsPage() {
       <div className="text-center py-12">
         <BarChart3 className={`w-12 h-12 mx-auto mb-4 text-muted-foreground/70`} />
         <h2 className={`text-xl font-semibold mb-2 text-foreground`}>No activity yet</h2>
-        <p className={isDark ? "text-slate-400" : "text-gray-600"}>
+        <p className={"text-muted-foreground"}>
           Post counts will appear here once you schedule content for this client.
         </p>
       </div>
@@ -129,7 +126,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
+        <Card className={"border-border bg-card"}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Total Posts
@@ -157,7 +154,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
+        <Card className={"border-border bg-card"}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Published
@@ -165,7 +162,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className={`w-5 h-5 ${isDark ? "text-green-400" : "text-green-600"}`} />
+              <CheckCircle2 className={`w-5 h-5 ${"text-green-600 dark:text-green-400"}`} />
               <span className={`text-2xl font-bold text-foreground`}>
                 {analytics.postedPosts}
               </span>
@@ -176,7 +173,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
+        <Card className={"border-border bg-card"}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Top Platform
@@ -184,7 +181,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <FileText className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-foreground"}`} />
+              <FileText className={`w-5 h-5 ${"text-foreground dark:text-purple-400"}`} />
               <span className={`text-2xl font-bold capitalize text-foreground`}>
                 {analytics.topPlatform ?? "—"}
               </span>
@@ -195,7 +192,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
+        <Card className={"border-border bg-card"}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Engagement
@@ -226,8 +223,8 @@ export default function AnalyticsPage() {
       </div>
 
       {analytics.platformBreakdown.length > 0 && (
-        <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
-          <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+        <Card className={"border-border bg-card"}>
+          <CardHeader className={"border-b border-border bg-muted/50"}>
             <CardTitle className={`text-lg font-semibold text-foreground`}>
               Posts by Platform
             </CardTitle>
@@ -255,8 +252,8 @@ export default function AnalyticsPage() {
         </Card>
       )}
 
-      <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
-        <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+      <Card className={"border-border bg-card"}>
+        <CardHeader className={"border-b border-border bg-muted/50"}>
           <CardTitle className={`text-lg font-semibold text-foreground`}>
             Engagement & Performance
           </CardTitle>
@@ -273,7 +270,7 @@ export default function AnalyticsPage() {
                 ].map((m) => (
                   <div
                     key={m.label}
-                    className={`rounded-lg p-3 ${isDark ? "bg-slate-700/50" : "bg-gray-50"}`}
+                    className={`rounded-lg p-3 ${"bg-gray-50 dark:bg-slate-700/50"}`}
                   >
                     <p className={`text-xs text-muted-foreground`}>{m.label}</p>
                     <p className={`text-lg font-semibold tabular-nums text-foreground`}>
@@ -284,7 +281,7 @@ export default function AnalyticsPage() {
               </div>
               {analytics.topPerformingPost && (
                 <div
-                  className={`rounded-lg p-4 ${isDark ? "bg-slate-700/40" : "bg-gray-50"}`}
+                  className={`rounded-lg p-4 ${"bg-gray-50 dark:bg-slate-700/40"}`}
                 >
                   <p className={`text-xs font-medium uppercase tracking-wide mb-1 text-muted-foreground`}>
                     Top performing · {analytics.topPerformingPost.platform} ·{" "}
@@ -299,7 +296,6 @@ export default function AnalyticsPage() {
             </div>
           ) : (
             <FeatureComingSoon
-              isDark={isDark}
               icon={BarChart3}
               title="No engagement synced yet"
               description="Connect Twitter or Instagram, auto-post for this client, then metrics appear here on each cron run."

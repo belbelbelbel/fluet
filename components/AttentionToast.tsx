@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, X } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 
 export type AttentionSeverity = "critical" | "warning" | "info";
@@ -44,8 +43,6 @@ export function AttentionToast({
   storageKey?: string;
 }) {
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   const [open, setOpen] = useState(false);
   const [dismissed, setDismissed] = useState(true); // start hidden; decided on mount
@@ -154,9 +151,7 @@ export function AttentionToast({
           "pointer-events-auto w-full max-w-[34rem] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-xl",
           "transition-all duration-300 ease-out motion-reduce:transition-none",
           entered ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0",
-          isDark
-            ? "border-white/10 bg-slate-900/85 shadow-black/40"
-            : "border-black/[0.07] bg-white/90 shadow-slate-900/10"
+          "border-black/[0.07] bg-white/90 shadow-slate-900/10 dark:border-white/10 dark:bg-slate-900/85 dark:shadow-black/40"
         )}
       >
         {/* Collapsed row — always visible */}
@@ -179,7 +174,7 @@ export function AttentionToast({
             aria-expanded={open}
             className={cn(
               "flex min-w-0 flex-1 items-center gap-2 text-left text-sm font-medium",
-              isDark ? "text-slate-100" : "text-slate-800"
+              "text-slate-800 dark:text-slate-100"
             )}
           >
             <span className="truncate">{summary}</span>
@@ -187,7 +182,7 @@ export function AttentionToast({
               className={cn(
                 "h-4 w-4 shrink-0 transition-transform duration-300 motion-reduce:transition-none",
                 open && "rotate-180",
-                isDark ? "text-slate-500" : "text-slate-400"
+                "text-muted-foreground"
               )}
             />
           </button>
@@ -198,9 +193,7 @@ export function AttentionToast({
             aria-label="Dismiss"
             className={cn(
               "shrink-0 rounded-lg p-1 transition-colors",
-              isDark
-                ? "text-slate-500 hover:bg-white/10 hover:text-slate-200"
-                : "text-slate-400 hover:bg-black/5 hover:text-slate-700"
+              "text-slate-400 hover:bg-black/5 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-slate-200"
             )}
           >
             <X className="h-3.5 w-3.5" />
@@ -218,7 +211,7 @@ export function AttentionToast({
             <div
               className={cn(
                 "space-y-3 border-t px-3.5 pb-3 pt-3",
-                isDark ? "border-white/[0.07]" : "border-black/[0.06]"
+                "border-black/[0.06] dark:border-white/[0.07]"
               )}
             >
               {groups.map(([group, groupItems]) => (
@@ -226,7 +219,7 @@ export function AttentionToast({
                   <p
                     className={cn(
                       "mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
-                      isDark ? "text-slate-500" : "text-slate-400"
+                      "text-muted-foreground"
                     )}
                   >
                     {group}
@@ -242,7 +235,7 @@ export function AttentionToast({
                         }}
                         className={cn(
                           "flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors",
-                          isDark ? "hover:bg-white/[0.06]" : "hover:bg-black/[0.04]"
+                          "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                         )}
                       >
                         <span
@@ -258,7 +251,7 @@ export function AttentionToast({
                         <span
                           className={cn(
                             "min-w-0 flex-1 truncate text-sm",
-                            isDark ? "text-slate-200" : "text-slate-700"
+                            "text-slate-700 dark:text-slate-200"
                           )}
                         >
                           {item.label}
@@ -267,7 +260,7 @@ export function AttentionToast({
                           <span
                             className={cn(
                               "shrink-0 text-xs tabular-nums",
-                              isDark ? "text-slate-500" : "text-slate-400"
+                              "text-muted-foreground"
                             )}
                           >
                             {item.meta}
@@ -283,7 +276,7 @@ export function AttentionToast({
                 <p
                   className={cn(
                     "pt-0.5 text-xs",
-                    isDark ? "text-rose-300/80" : "text-rose-600/90"
+                    "text-rose-600/90 dark:text-rose-300/80"
                   )}
                 >
                   Some actions stay blocked until this is resolved.

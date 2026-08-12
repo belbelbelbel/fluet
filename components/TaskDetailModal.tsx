@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { X, Save, Calendar, FileText, Loader2 } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TeamMemberSelector } from "@/components/TeamMemberSelector";
@@ -50,8 +49,6 @@ export function TaskDetailModal({
   onSave,
   teamMembers = [],
 }: TaskDetailModalProps) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const [formData, setFormData] = useState<Task | null>(null);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -68,10 +65,10 @@ export function TaskDetailModal({
   if (task && !formData) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <Card className={`w-full max-w-2xl shadow-xl ${isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}`}>
+        <Card className={`w-full max-w-2xl shadow-xl border-border bg-card`}>
           <CardContent className="flex items-center justify-center py-16">
-            <Loader2 className={`w-10 h-10 animate-spin ${isDark ? "text-purple-400" : "text-foreground"}`} />
-            <span className={`ml-3 ${isDark ? "text-slate-400" : "text-gray-600"}`}>Loading task...</span>
+            <Loader2 className={`w-10 h-10 animate-spin ${"text-foreground dark:text-purple-400"}`} />
+            <span className={`ml-3 text-muted-foreground`}>Loading task...</span>
           </CardContent>
         </Card>
       </div>
@@ -109,28 +106,28 @@ export function TaskDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <Card className={`w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-xl ${isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}`}>
-        <CardHeader className={`border-b flex flex-row items-center justify-between ${isDark ? "border-slate-700 bg-slate-800/80" : "border-gray-200 bg-gray-50"}`}>
-          <CardTitle className={`text-xl font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Edit Task</CardTitle>
+      <Card className={`w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-xl border-border bg-card`}>
+        <CardHeader className={`border-b flex flex-row items-center justify-between ${"border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/80"}`}>
+          <CardTitle className={`text-xl font-semibold text-foreground`}>Edit Task</CardTitle>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg transition-colors ${isDark ? "hover:bg-slate-700" : "hover:bg-gray-100"}`}
+            className={`p-2 rounded-lg transition-colors ${"hover:bg-gray-100 dark:hover:bg-slate-700"}`}
           >
-            <X className={`w-5 h-5 ${isDark ? "text-slate-400" : "text-gray-500"}`} />
+            <X className={`w-5 h-5 text-muted-foreground`} />
           </button>
         </CardHeader>
         <CardContent className="pt-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
             {/* Task Type */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+              <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                 Task Type <span className="text-red-500">*</span>
               </label>
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${
-                  errors.type ? "border-red-300" : isDark ? "border-slate-600 bg-slate-700 text-white" : "border-gray-300 bg-white"
+                  errors.type ? "border-red-300" : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 }`}
               >
                 <option value="">Select type</option>
@@ -147,14 +144,14 @@ export function TaskDetailModal({
 
             {/* Status */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+              <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                 Status <span className="text-red-500">*</span>
               </label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${
-                  errors.status ? "border-red-300" : isDark ? "border-slate-600 bg-slate-700 text-white" : "border-gray-300 bg-white"
+                  errors.status ? "border-red-300" : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 }`}
               >
                 {TASK_STATUSES.map((status) => (
@@ -170,21 +167,21 @@ export function TaskDetailModal({
 
             {/* Description */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+              <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                 Description
               </label>
               <textarea
                 value={formData.description || ""}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none resize-none ${isDark ? "border-slate-600 bg-slate-700 text-white placeholder-slate-500" : "border-gray-300 bg-white"}`}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none resize-none ${"border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-500"}`}
                 placeholder="Add task description..."
               />
             </div>
 
             {/* Assigned To */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+              <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                 Assign To
               </label>
               <TeamMemberSelector
@@ -202,11 +199,11 @@ export function TaskDetailModal({
 
             {/* Due Date */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-gray-700"}`}>
+              <label className={`block text-sm font-medium mb-2 text-foreground/80`}>
                 Due Date
               </label>
               <div className="relative">
-                <Calendar className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDark ? "text-slate-500" : "text-gray-400"}`} />
+                <Calendar className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground/70`} />
                 <input
                   type="datetime-local"
                   value={
@@ -220,19 +217,19 @@ export function TaskDetailModal({
                       dueDate: e.target.value ? new Date(e.target.value).toISOString() : undefined,
                     })
                   }
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${isDark ? "border-slate-600 bg-slate-700 text-white" : "border-gray-300 bg-white"}`}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring focus-visible:border-ring outline-none ${"border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-white"}`}
                 />
               </div>
             </div>
 
             {/* Task Info */}
             {formData.scheduledPostId && (
-              <div className={`p-3 border rounded-lg ${isDark ? "bg-blue-900/30 border-blue-800" : "bg-blue-50 border-blue-200"}`}>
+              <div className={`p-3 border rounded-lg ${"bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800"}`}>
                 <div className="flex items-start gap-2">
-                  <FileText className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
+                  <FileText className={`w-5 h-5 flex-shrink-0 mt-0.5 ${"text-blue-600 dark:text-blue-400"}`} />
                   <div>
-                    <p className={`text-sm font-medium ${isDark ? "text-blue-300" : "text-blue-900"}`}>Linked to Scheduled Post</p>
-                    <p className={`text-xs mt-1 ${isDark ? "text-blue-400" : "text-blue-700"}`}>
+                    <p className={`text-sm font-medium ${"text-blue-900 dark:text-blue-300"}`}>Linked to Scheduled Post</p>
+                    <p className={`text-xs mt-1 ${"text-blue-700 dark:text-blue-400"}`}>
                       Post ID: {formData.scheduledPostId}
                     </p>
                   </div>
@@ -241,7 +238,7 @@ export function TaskDetailModal({
             )}
           </div>
         </CardContent>
-        <div className={`border-t px-6 py-4 flex items-center justify-end gap-3 ${isDark ? "border-slate-700 bg-slate-800/80" : "border-gray-200 bg-gray-50"}`}>
+        <div className={`border-t px-6 py-4 flex items-center justify-end gap-3 ${"border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800/80"}`}>
           <Button variant="outline" onClick={onClose} disabled={saving}>
             Cancel
           </Button>

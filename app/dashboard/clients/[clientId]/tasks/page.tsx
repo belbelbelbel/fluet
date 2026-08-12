@@ -247,21 +247,13 @@ export default function TasksPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return isDark
-          ? "bg-green-950/50 text-green-300 border-green-800"
-          : "bg-green-100 text-green-700 border-green-200";
+        return "bg-green-100 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-300 dark:border-green-800";
       case "in_progress":
-        return isDark
-          ? "bg-blue-950/50 text-blue-300 border-blue-800"
-          : "bg-blue-100 text-blue-700 border-blue-200";
+        return "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800";
       case "assigned":
-        return isDark
-          ? "bg-yellow-950/50 text-yellow-300 border-yellow-800"
-          : "bg-yellow-100 text-yellow-700 border-yellow-200";
+        return "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800";
       default:
-        return isDark
-          ? "bg-slate-800 text-slate-300 border-slate-700"
-          : "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
     }
   };
 
@@ -269,12 +261,8 @@ export default function TasksPage() {
     cn(
       "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
       active
-        ? isDark
-          ? "bg-slate-700 text-white"
-          : "bg-slate-900 text-white"
-        : isDark
-          ? "text-slate-400 hover:text-white hover:bg-slate-800"
-          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+        ? "bg-slate-900 text-white dark:bg-slate-700 dark:text-white"
+        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800"
     );
 
   if (loading) {
@@ -292,7 +280,7 @@ export default function TasksPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className={cn("text-2xl font-bold", isDark ? "text-white" : "text-gray-900")}>
+          <h1 className={cn("text-2xl font-bold", "text-foreground")}>
             Tasks
           </h1>
         </div>
@@ -308,10 +296,10 @@ export default function TasksPage() {
       <div
         className={cn(
           "flex items-center gap-2 border-b pb-2",
-          isDark ? "border-slate-700" : "border-gray-200"
+          "border-border"
         )}
       >
-        <Filter className={cn("w-4 h-4", isDark ? "text-slate-500" : "text-gray-400")} />
+        <Filter className={cn("w-4 h-4", "text-muted-foreground/70")} />
         <button onClick={() => setFilter("all")} className={filterTabClass(filter === "all")}>
           All ({tasks.length})
         </button>
@@ -337,23 +325,23 @@ export default function TasksPage() {
 
       {/* Tasks List */}
       {filteredTasks.length === 0 ? (
-        <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200"}>
+        <Card className={"border-gray-200 dark:border-slate-700 dark:bg-slate-800"}>
           <CardContent className="pt-12 pb-12 text-center">
             <Clock
               className={cn(
                 "w-12 h-12 mx-auto mb-4",
-                isDark ? "text-slate-600" : "text-gray-300"
+                "text-gray-300 dark:text-slate-600"
               )}
             />
             <h3
               className={cn(
                 "text-lg font-semibold mb-2",
-                isDark ? "text-white" : "text-gray-900"
+                "text-foreground"
               )}
             >
               No tasks found
             </h3>
-            <p className={cn("mb-6", isDark ? "text-slate-400" : "text-gray-600")}>
+            <p className={cn("mb-6", "text-muted-foreground")}>
               {filter === "all"
                 ? "Create and assign tasks from the Create Task page to see them here."
                 : `No tasks with status "${filter.replace("_", " ")}" yet.`}
@@ -375,7 +363,7 @@ export default function TasksPage() {
               key={task.id}
               className={cn(
                 "shadow-sm hover:shadow-md transition-shadow",
-                isDark ? "border-slate-700 bg-slate-800" : "border-gray-200"
+                "border-gray-200 dark:border-slate-700 dark:bg-slate-800"
               )}
             >
               <CardContent className="pt-4">
@@ -385,9 +373,7 @@ export default function TasksPage() {
                       <span
                         className={cn(
                           "px-2 py-1 rounded text-xs font-medium",
-                          isDark
-                            ? "bg-slate-700 text-slate-200"
-                            : "bg-muted text-foreground"
+                          "bg-muted text-foreground dark:bg-slate-700 dark:text-slate-200"
                         )}
                       >
                         {getTaskTypeLabel(task.type)}
@@ -404,9 +390,7 @@ export default function TasksPage() {
                         <span
                           className={cn(
                             "px-2 py-1 rounded text-xs font-medium border",
-                            isDark
-                              ? "bg-red-950/50 text-red-300 border-red-800"
-                              : "bg-red-50 text-red-700 border-red-200"
+                            "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-800"
                           )}
                         >
                           OVERDUE
@@ -417,7 +401,7 @@ export default function TasksPage() {
                       <p
                         className={cn(
                           "text-sm mb-3",
-                          isDark ? "text-slate-300" : "text-gray-700"
+                          "text-foreground/80"
                         )}
                       >
                         {task.description}
@@ -426,7 +410,7 @@ export default function TasksPage() {
                     <div
                       className={cn(
                         "flex items-center gap-4 text-xs",
-                        isDark ? "text-slate-400" : "text-gray-500"
+                        "text-muted-foreground"
                       )}
                     >
                       {task.assignedToName ? (
@@ -438,7 +422,7 @@ export default function TasksPage() {
                         <div
                           className={cn(
                             "flex items-center gap-1",
-                            isDark ? "text-slate-500" : "text-gray-400"
+                            "text-muted-foreground/70"
                           )}
                         >
                           <User className="w-3 h-3" />
@@ -449,7 +433,7 @@ export default function TasksPage() {
                         className={cn(
                           "flex items-center gap-1",
                           getDueOrCompletedLabel(task).isOverdue &&
-                            (isDark ? "text-red-400 font-medium" : "text-red-600 font-medium")
+                            ("text-red-600 font-medium dark:text-red-400 dark:font-medium")
                         )}
                       >
                         <Clock className="w-3 h-3" />
@@ -471,7 +455,7 @@ export default function TasksPage() {
                       <CheckCircle2
                         className={cn(
                           "w-5 h-5",
-                          isDark ? "text-green-400" : "text-green-600"
+                          "text-green-600 dark:text-green-400"
                         )}
                       />
                     )}

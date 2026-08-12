@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { showToast } from "@/lib/toast";
@@ -42,8 +41,6 @@ export default function DashboardHistoryPage() {
   const { userId } = useAuth();
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const [content, setContent] = useState<GeneratedContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<ContentType | "all">("all");
@@ -198,16 +195,14 @@ export default function DashboardHistoryPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-foreground`}>Content History</h1>
-          <p className={isDark ? "text-slate-400" : "text-gray-600"}>Your generated content</p>
+          <p className={"text-muted-foreground"}>Your generated content</p>
         </div>
         <Button
           onClick={fetchContent}
           size="sm"
           variant="outline"
           className={`rounded-xl transition-all duration-200 ${
-            isDark
-              ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-              : "border-gray-300 text-gray-700 hover:bg-gray-100"
+            "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
           }`}
           title="Refresh"
         >
@@ -223,9 +218,7 @@ export default function DashboardHistoryPage() {
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               filter === "all"
                 ? "bg-primary text-primary-foreground"
-                : isDark
-                ? "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
-                : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-600"
             }`}
           >
             All
@@ -237,9 +230,7 @@ export default function DashboardHistoryPage() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                 filter === type
                   ? "bg-primary text-primary-foreground"
-                  : isDark
-                  ? "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-600"
               }`}
             >
               {getContentTypeIcon(type)}
@@ -291,9 +282,7 @@ export default function DashboardHistoryPage() {
             <Card
               key={item.id}
               className={`border rounded-xl transition-all duration-200 ${
-                isDark
-                  ? "bg-slate-800 border-slate-700 hover:border-slate-600"
-                  : "bg-white border-gray-200 hover:border-gray-300"
+                "bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
               }`}
             >
               <CardContent className="p-4 sm:p-6">
@@ -309,9 +298,7 @@ export default function DashboardHistoryPage() {
                         </span>
                         {item.posted === true && (
                           <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors duration-300 ${
-                            isDark
-                              ? "bg-green-950/50 text-green-400 border-green-800"
-                              : "bg-green-50 text-green-700 border-green-200"
+                            "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border-green-800"
                           }`}>
                             <CheckIcon className="h-3 w-3" />
                             Posted
@@ -327,9 +314,7 @@ export default function DashboardHistoryPage() {
                           <>
                             <span>•</span>
                             <span className={`capitalize px-2 py-0.5 rounded-lg ${
-                              isDark
-                                ? "bg-slate-700 text-slate-300"
-                                : "bg-gray-100 text-gray-700"
+                              "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
                             }`}>
                               {item.tone}
                             </span>
@@ -339,9 +324,7 @@ export default function DashboardHistoryPage() {
                           <>
                             <span>•</span>
                             <span className={`capitalize px-2 py-0.5 rounded-lg ${
-                              isDark
-                                ? "bg-slate-700 text-slate-300"
-                                : "bg-gray-100 text-gray-700"
+                              "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
                             }`}>
                               {item.style}
                             </span>
@@ -356,9 +339,7 @@ export default function DashboardHistoryPage() {
                       size="sm"
                       variant="outline"
                       className={`h-8 w-8 p-0 rounded-xl transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                       title="Copy"
                     >
@@ -373,9 +354,7 @@ export default function DashboardHistoryPage() {
                       size="sm"
                       variant="outline"
                       className={`rounded-xl transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       View
@@ -385,9 +364,7 @@ export default function DashboardHistoryPage() {
                       size="sm"
                       variant="outline"
                       className={`rounded-xl transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-red-400 hover:bg-red-950/30 hover:border-red-500 hover:text-red-300"
-                          : "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300"
+                        "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-slate-600 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-500 dark:hover:text-red-300"
                       }`}
                       title="Delete"
                     >
@@ -398,15 +375,11 @@ export default function DashboardHistoryPage() {
               <div className="mb-4">
                 <p className={`text-xs mb-1.5 font-medium text-muted-foreground`}>Prompt</p>
                 <p className={`text-sm px-3 py-2 rounded-xl border transition-colors duration-300 ${
-                  isDark
-                    ? "text-slate-200 bg-slate-900/50 border-slate-700"
-                    : "text-gray-700 bg-gray-50 border-gray-200"
+                  "text-gray-700 bg-gray-50 border-gray-200 dark:text-slate-200 dark:bg-slate-900/50 dark:border-slate-700"
                 }`}>{item.prompt}</p>
               </div>
               <div className={`p-4 rounded-xl border transition-colors duration-300 ${
-                isDark
-                  ? "bg-slate-900/50 border-slate-700"
-                  : "bg-gray-50 border-gray-200"
+                "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
               }`}>
                 <div className="flex items-center justify-between mb-2">
                   <p className={`text-xs font-medium text-muted-foreground`}>Content</p>
@@ -439,9 +412,7 @@ export default function DashboardHistoryPage() {
               <button
                 onClick={() => setViewingContent(null)}
                 className={`transition-all duration-200 p-1.5 rounded-xl ${
-                  isDark
-                    ? "text-slate-400 hover:text-white hover:bg-slate-700"
-                    : "text-gray-600 hover:text-gray-950 hover:bg-gray-100"
+                  "text-gray-600 hover:text-gray-950 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"
                 }`}
               >
                 <XIcon className="w-4 h-4" />
@@ -452,30 +423,24 @@ export default function DashboardHistoryPage() {
               <div>
                 <p className={`text-xs mb-1.5 font-medium text-muted-foreground`}>Prompt</p>
                 <p className={`text-sm px-3 py-2 rounded-xl border transition-colors duration-300 ${
-                  isDark
-                    ? "text-slate-200 bg-slate-900/50 border-slate-700"
-                    : "text-gray-700 bg-gray-50 border-gray-200"
+                  "text-gray-700 bg-gray-50 border-gray-200 dark:text-slate-200 dark:bg-slate-900/50 dark:border-slate-700"
                 }`}>
                   {viewingContent.prompt}
                 </p>
               </div>
               {viewingContent.tone && (
                 <div className="flex items-center gap-2 text-xs">
-                  <span className={isDark ? "text-slate-400" : "text-gray-600"}>Tone:</span>
+                  <span className={"text-muted-foreground"}>Tone:</span>
                   <span className={`px-2 py-0.5 rounded-lg capitalize ${
-                    isDark
-                      ? "bg-slate-700 text-slate-300"
-                      : "bg-gray-100 text-gray-700"
+                    "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
                   }`}>
                     {viewingContent.tone}
                   </span>
                   {viewingContent.style && (
                     <>
-                      <span className={isDark ? "text-slate-400" : "text-gray-600"}>Style:</span>
+                      <span className={"text-muted-foreground"}>Style:</span>
                       <span className={`px-2 py-0.5 rounded-lg capitalize ${
-                        isDark
-                          ? "bg-slate-700 text-slate-300"
-                          : "bg-gray-100 text-gray-700"
+                        "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
                       }`}>
                         {viewingContent.style}
                       </span>
@@ -489,9 +454,7 @@ export default function DashboardHistoryPage() {
                   <span className={`text-xs text-muted-foreground`}>{viewingContent.content.length} chars</span>
                 </div>
                 <div className={`rounded-xl p-4 border transition-colors duration-300 ${
-                  isDark
-                    ? "bg-slate-900/50 border-slate-700"
-                    : "bg-gray-50 border-gray-200"
+                  "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
                 }`}>
                   <pre className={`whitespace-pre-wrap text-sm leading-relaxed text-foreground`}>
                     {viewingContent.content}
@@ -508,9 +471,7 @@ export default function DashboardHistoryPage() {
                 size="sm"
                 variant="outline"
                 className={`rounded-xl transition-all duration-200 ${
-                  isDark
-                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                  "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 {copiedId === viewingContent.id ? (
@@ -526,9 +487,7 @@ export default function DashboardHistoryPage() {
                 }}
                 size="sm"
                 className={`transition-all duration-200 ${
-                  isDark
-                    ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                    : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white"
+                  "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
                 }`}
               >
                 <CalendarPlusIcon className="w-4 h-4 mr-2" />
@@ -539,9 +498,7 @@ export default function DashboardHistoryPage() {
                 size="sm"
                 variant="ghost"
                 className={`transition-all duration-200 ${
-                  isDark
-                    ? "text-slate-400 hover:text-white hover:bg-slate-700"
-                    : "text-gray-400 hover:text-gray-950 hover:bg-gray-200"
+                  "text-gray-400 hover:text-gray-950 hover:bg-gray-200 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"
                 }`}
               >
                 Close

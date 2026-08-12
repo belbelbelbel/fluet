@@ -3,7 +3,6 @@
 import { useAuth } from "@clerk/nextjs";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -70,8 +69,6 @@ function activityIcon(type?: ActivityType | string) {
 
 export default function InboxPage() {
   const { userId } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const [items, setItems] = useState<InboxItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unread">("all");
@@ -183,7 +180,7 @@ export default function InboxPage() {
     <div
       className={cn(
         "space-y-6 pt-4 sm:pt-6 lg:pt-8 pb-8 max-w-3xl mx-auto px-4 sm:px-6",
-        isDark ? "bg-slate-900" : "bg-white"
+        "bg-background"
       )}
     >
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -191,12 +188,12 @@ export default function InboxPage() {
           <h1
             className={cn(
               "text-2xl sm:text-3xl font-bold tracking-tight",
-              isDark ? "text-white" : "text-gray-950"
+              "text-foreground"
             )}
           >
             Inbox
           </h1>
-          <p className={cn("text-sm mt-1", isDark ? "text-slate-400" : "text-gray-600")}>
+          <p className={cn("text-sm mt-1", "text-muted-foreground")}>
             Approvals, tasks, and workspace updates — social comments connect later.
           </p>
         </div>
@@ -234,9 +231,7 @@ export default function InboxPage() {
               "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
               filter === f
                 ? "bg-primary text-primary-foreground"
-                : isDark
-                  ? "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             )}
           >
             {f === "all" ? "All" : `Unread${unreadCount ? ` (${unreadCount})` : ""}`}
@@ -247,7 +242,7 @@ export default function InboxPage() {
       <Card
         className={cn(
           "border rounded-2xl overflow-hidden",
-          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+          "bg-card border-border"
         )}
       >
         <CardContent className="p-0">
@@ -260,13 +255,13 @@ export default function InboxPage() {
               <Inbox
                 className={cn(
                   "w-10 h-10 mx-auto mb-3",
-                  isDark ? "text-slate-500" : "text-gray-400"
+                  "text-muted-foreground/70"
                 )}
               />
               <p
                 className={cn(
                   "font-medium",
-                  isDark ? "text-white" : "text-gray-900"
+                  "text-foreground"
                 )}
               >
                 {filter === "unread" ? "You’re caught up" : "Inbox is empty"}
@@ -274,7 +269,7 @@ export default function InboxPage() {
               <p
                 className={cn(
                   "text-sm mt-1",
-                  isDark ? "text-slate-400" : "text-gray-500"
+                  "text-muted-foreground"
                 )}
               >
                 Approvals, task assignments, and client updates show up here.
@@ -284,7 +279,7 @@ export default function InboxPage() {
             <ul
               className={cn(
                 "divide-y",
-                isDark ? "divide-slate-700" : "divide-gray-100"
+                "divide-gray-100 dark:divide-slate-700"
               )}
             >
               {visible.map((item) => {
@@ -292,8 +287,8 @@ export default function InboxPage() {
                   <div
                     className={cn(
                       "flex items-start gap-3 px-4 sm:px-5 py-4 transition-colors",
-                      isDark ? "hover:bg-slate-700/40" : "hover:bg-gray-50",
-                      item.unread && (isDark ? "bg-slate-700/20" : "bg-sky-50/60")
+                      "hover:bg-gray-50 dark:hover:bg-slate-700/40",
+                      item.unread && ("bg-sky-50/60 dark:bg-slate-700/20")
                     )}
                   >
                     <div className="mt-0.5 shrink-0">{activityIcon(item.type)}</div>
@@ -303,7 +298,7 @@ export default function InboxPage() {
                           className={cn(
                             "text-sm",
                             item.unread ? "font-semibold" : "font-medium",
-                            isDark ? "text-white" : "text-gray-950"
+                            "text-foreground"
                           )}
                         >
                           {item.title}
@@ -311,7 +306,7 @@ export default function InboxPage() {
                         <span
                           className={cn(
                             "text-xs shrink-0",
-                            isDark ? "text-slate-500" : "text-gray-400"
+                            "text-muted-foreground/70"
                           )}
                         >
                           {formatRelative(item.timestamp)}
@@ -321,7 +316,7 @@ export default function InboxPage() {
                         <p
                           className={cn(
                             "text-sm mt-0.5 line-clamp-2",
-                            isDark ? "text-slate-400" : "text-gray-600"
+                            "text-muted-foreground"
                           )}
                         >
                           {item.body}

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CreditCard, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -20,8 +19,6 @@ interface Credits {
 export default function CreditsPage() {
   const params = useParams();
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const clientId = params?.clientId ? parseInt(params.clientId as string) : null;
 
   const [loading, setLoading] = useState(true);
@@ -60,7 +57,7 @@ export default function CreditsPage() {
       <div className="text-center py-12">
         <AlertCircle className={`w-12 h-12 mx-auto mb-4 text-muted-foreground/70`} />
         <h2 className={`text-xl font-semibold mb-2 text-foreground`}>Credits not found</h2>
-        <p className={isDark ? "text-slate-400" : "text-gray-600"}>Credits information is not available for this client.</p>
+        <p className={"text-muted-foreground"}>Credits information is not available for this client.</p>
       </div>
     );
   }
@@ -89,13 +86,13 @@ export default function CreditsPage() {
         ? "border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/40"
         : isNearLimit
         ? "border-yellow-300 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/40"
-        : isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"
+        : "border-border bg-card"
       }`}>
         <CardHeader className={`border-b border-border bg-muted/50`}>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className={`text-lg font-semibold flex items-center gap-2 text-foreground`}>
-                <CreditCard className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-foreground"}`} />
+                <CreditCard className={`w-5 h-5 ${"text-foreground dark:text-purple-400"}`} />
                 Monthly Posts
               </CardTitle>
               <p className={`text-sm mt-1 text-muted-foreground`}>
@@ -149,12 +146,12 @@ export default function CreditsPage() {
             </div>
 
             {isAtLimit && (
-              <div className={`p-3 rounded-lg ${isDark ? "bg-red-900/30 border border-red-800" : "bg-red-100 border border-red-200"}`}>
+              <div className={`p-3 rounded-lg ${"bg-red-100 border border-red-200 dark:bg-red-900/30 dark:border dark:border-red-800"}`}>
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className={`text-sm font-medium ${isDark ? "text-red-300" : "text-red-900"}`}>Credit limit reached</p>
-                    <p className={`text-xs mt-1 ${isDark ? "text-red-400" : "text-red-700"}`}>
+                    <p className={`text-sm font-medium ${"text-red-900 dark:text-red-300"}`}>Credit limit reached</p>
+                    <p className={`text-xs mt-1 ${"text-red-700 dark:text-red-400"}`}>
                       New posts are paused. Contact the client to upgrade their plan or wait for the next billing cycle.
                     </p>
                   </div>
@@ -163,12 +160,12 @@ export default function CreditsPage() {
             )}
 
             {isNearLimit && !isAtLimit && (
-              <div className={`p-3 rounded-lg ${isDark ? "bg-yellow-900/30 border border-yellow-800" : "bg-yellow-100 border border-yellow-200"}`}>
+              <div className={`p-3 rounded-lg ${"bg-yellow-100 border border-yellow-200 dark:bg-yellow-900/30 dark:border dark:border-yellow-800"}`}>
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className={`text-sm font-medium ${isDark ? "text-yellow-300" : "text-yellow-900"}`}>Low credits warning</p>
-                    <p className={`text-xs mt-1 ${isDark ? "text-yellow-400" : "text-yellow-700"}`}>
+                    <p className={`text-sm font-medium ${"text-yellow-900 dark:text-yellow-300"}`}>Low credits warning</p>
+                    <p className={`text-xs mt-1 ${"text-yellow-700 dark:text-yellow-400"}`}>
                       Only {postsRemaining} posts remaining this month. Consider reaching out to the client.
                     </p>
                   </div>
@@ -181,8 +178,8 @@ export default function CreditsPage() {
 
       {/* Other Credits */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
-          <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+        <Card className={"border-border bg-card"}>
+          <CardHeader className={"border-b border-border bg-muted/50"}>
             <CardTitle className={`text-base font-semibold text-foreground`}>
               Revisions Per Post
             </CardTitle>
@@ -200,8 +197,8 @@ export default function CreditsPage() {
           </CardContent>
         </Card>
 
-        <Card className={isDark ? "border-slate-700 bg-slate-800" : "border-gray-200 bg-white"}>
-          <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+        <Card className={"border-border bg-card"}>
+          <CardHeader className={"border-b border-border bg-muted/50"}>
             <CardTitle className={`text-base font-semibold text-foreground`}>
               Rush Requests
             </CardTitle>

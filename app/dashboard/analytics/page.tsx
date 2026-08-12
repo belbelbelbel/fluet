@@ -2,7 +2,6 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState, useCallback } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FeatureComingSoon } from "@/components/FeatureComingSoon";
 import {
@@ -66,8 +65,6 @@ const defaultData: AnalyticsData = {
 
 export default function AnalyticsPage() {
   const { userId } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const [data, setData] = useState<AnalyticsData>(defaultData);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d">("30d");
@@ -156,7 +153,7 @@ export default function AnalyticsPage() {
       <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 sm:pb-8 border-b-2 transition-colors duration-300 border-border`}>
         <div className="flex-1">
           <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-3 text-foreground`}>Analytics Dashboard</h1>
-          <p className={isDark ? "text-slate-400" : "text-gray-600"}>
+          <p className={"text-muted-foreground"}>
             Live activity from your workspace — social engagement connects next
           </p>
         </div>
@@ -168,9 +165,7 @@ export default function AnalyticsPage() {
               className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 timeRange === range
                   ? "bg-primary text-primary-foreground shadow-md"
-                  : isDark
-                  ? "bg-slate-800 border-[0.5px] border-slate-700 text-slate-300 hover:bg-slate-700"
-                  : "bg-white border-[0.5px] border-border text-gray-700 hover:bg-accent/50"
+                  : "bg-white border-[0.5px] border-border text-gray-700 hover:bg-accent/50 dark:bg-slate-800 dark:border-[0.5px] dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
             >
               {range === "7d" ? "7 Days" : range === "30d" ? "30 Days" : "90 Days"}
@@ -196,7 +191,7 @@ export default function AnalyticsPage() {
                     {metric.title}
                   </CardTitle>
                   <div className={`p-3 rounded-xl ${
-                    isDark ? "text-slate-300 bg-slate-700" : "text-gray-700 bg-gray-100"
+                    "text-gray-700 bg-gray-100 dark:text-slate-300 dark:bg-slate-700"
                   }`}>
                     <Icon className="h-6 w-6" />
                   </div>
@@ -235,7 +230,7 @@ export default function AnalyticsPage() {
                         {metric.title}
                       </CardTitle>
                       <div className={`p-3 rounded-xl ${
-                        isDark ? "text-slate-300 bg-slate-700" : "text-gray-700 bg-gray-100"
+                        "text-gray-700 bg-gray-100 dark:text-slate-300 dark:bg-slate-700"
                       }`}>
                         <Icon className="h-6 w-6" />
                       </div>
@@ -256,10 +251,10 @@ export default function AnalyticsPage() {
 
             <Card className={`border-2 rounded-xl transition-colors duration-300 bg-card border-border`}>
               <CardHeader className="pb-4">
-                <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+                <CardTitle className={"text-foreground"}>
                   Engagement Rate
                 </CardTitle>
-                <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+                <CardDescription className={"text-muted-foreground"}>
                   From connected platform analytics
                 </CardDescription>
               </CardHeader>
@@ -272,7 +267,6 @@ export default function AnalyticsPage() {
           </>
         ) : (
           <FeatureComingSoon
-            isDark={isDark}
             icon={BarChart3}
             title="No engagement synced yet"
             description="Connect Twitter in Settings and let scheduled posts auto-publish. Tweet metrics sync into analytics on each cron run."
@@ -287,7 +281,7 @@ export default function AnalyticsPage() {
           </h2>
           <Card className={`border-2 rounded-xl transition-colors duration-300 bg-card border-border`}>
             <CardHeader className="pb-4">
-              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+              <CardTitle className={"text-foreground"}>
                 Performance by Platform
               </CardTitle>
             </CardHeader>
@@ -297,16 +291,12 @@ export default function AnalyticsPage() {
                   <div
                     key={index}
                     className={`flex items-center justify-between p-4 sm:p-6 rounded-xl border ${
-                      isDark
-                        ? "bg-slate-700/50 border-slate-700"
-                        : "bg-gray-50 border-gray-200"
+                      "bg-gray-50 border-gray-200 dark:bg-slate-700/50 dark:border-slate-700"
                     }`}
                   >
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 ${
-                        isDark
-                          ? "bg-slate-800 border-slate-600 text-slate-300"
-                          : "bg-white border-gray-200 text-gray-700"
+                        "bg-white border-gray-200 text-gray-700 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300"
                       }`}>
                         {getPlatformIcon(platform.platform)}
                       </div>
@@ -354,7 +344,7 @@ export default function AnalyticsPage() {
                         {getPlatformIcon(platform.platform)}
                         {platform.platform}
                       </span>
-                      <span className={isDark ? "text-slate-400" : "text-gray-500"}>
+                      <span className={"text-muted-foreground"}>
                         {platform.posts}
                       </span>
                     </div>
@@ -383,10 +373,10 @@ export default function AnalyticsPage() {
             className={`border-2 rounded-xl bg-card border-border`}
           >
             <CardHeader className="pb-4">
-              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+              <CardTitle className={"text-foreground"}>
                 Content volume
               </CardTitle>
-              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Generated vs scheduled in this range
               </CardDescription>
             </CardHeader>
@@ -396,7 +386,7 @@ export default function AnalyticsPage() {
                   className={`h-40 rounded-xl animate-pulse bg-accent`}
                 />
               ) : (
-                <VolumeChart series={data.contentVolume} isDark={isDark} />
+                <VolumeChart series={data.contentVolume} />
               )}
             </CardContent>
           </Card>
@@ -405,10 +395,10 @@ export default function AnalyticsPage() {
             className={`border-2 rounded-xl bg-card border-border`}
           >
             <CardHeader className="pb-4">
-              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+              <CardTitle className={"text-foreground"}>
                 Engagement trends
               </CardTitle>
-              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 From connected social analytics
               </CardDescription>
             </CardHeader>
@@ -440,7 +430,6 @@ export default function AnalyticsPage() {
               ) : (
                 <FeatureComingSoon
                   compact
-                  isDark={isDark}
                   icon={BarChart3}
                   title="Twitter engagement sync ready"
                   description="Connect Twitter, auto-post scheduled tweets, then metrics appear here on each cron run."
@@ -456,10 +445,8 @@ export default function AnalyticsPage() {
 
 function VolumeChart({
   series,
-  isDark,
 }: {
   series: { date: string; generated: number; scheduled: number }[];
-  isDark: boolean;
 }) {
   if (!series.length) {
     return (
@@ -496,7 +483,7 @@ function VolumeChart({
                   style={{ height: `${genShare}%`, minHeight: day.generated ? 2 : 0 }}
                 />
                 <div
-                  className={`w-full ${isDark ? "bg-slate-500" : "bg-gray-400"}`}
+                  className={`w-full ${"bg-gray-400 dark:bg-slate-500"}`}
                   style={{
                     height: `${100 - genShare}%`,
                     minHeight: day.scheduled ? 2 : 0,
@@ -510,13 +497,13 @@ function VolumeChart({
       <div className="flex items-center gap-4 text-xs">
         <span className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-sm bg-primary/80" />
-          <span className={isDark ? "text-slate-400" : "text-gray-500"}>Generated</span>
+          <span className={"text-muted-foreground"}>Generated</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span
-            className={`w-2.5 h-2.5 rounded-sm ${isDark ? "bg-slate-500" : "bg-gray-400"}`}
+            className={`w-2.5 h-2.5 rounded-sm ${"bg-gray-400 dark:bg-slate-500"}`}
           />
-          <span className={isDark ? "text-slate-400" : "text-gray-500"}>Scheduled</span>
+          <span className={"text-muted-foreground"}>Scheduled</span>
         </span>
         <span className={`ml-auto text-muted-foreground/70`}>
           <Calendar className="w-3 h-3 inline mr-1" />

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -62,8 +61,6 @@ interface ScheduledPost {
 
 export default function DashboardSchedulePage() {
   const { userId } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -702,7 +699,7 @@ export default function DashboardSchedulePage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div>
           <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-foreground`}>Schedule Posts</h1>
-          <p className={isDark ? "text-slate-400" : "text-gray-600"}>We post for you automatically</p>
+          <p className={"text-muted-foreground"}>We post for you automatically</p>
         </div>
         <Button
           onClick={() => {
@@ -736,19 +733,15 @@ export default function DashboardSchedulePage() {
 
       {/* View Tabs */}
       <div className={`rounded-xl p-1 border transition-colors duration-300 ${
-        isDark ? "bg-slate-800 border-slate-700" : "bg-gray-100 border-gray-200"
+        "bg-gray-100 border-gray-200 dark:bg-slate-800 dark:border-slate-700"
       }`}>
         <div className="flex gap-1">
           <button
             onClick={() => setViewMode("calendar")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
               viewMode === "calendar"
-                ? isDark
-                  ? "bg-slate-700 text-white shadow-sm"
-                  : "bg-white text-gray-900 shadow-sm"
-                : isDark
-                ? "text-slate-400 hover:text-white"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-gray-900 shadow-sm dark:bg-slate-700 dark:text-white dark:shadow-sm"
+                : "text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
             <BriefcaseIcon className="w-4 h-4" />
@@ -758,12 +751,8 @@ export default function DashboardSchedulePage() {
             onClick={() => setViewMode("list")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
               viewMode === "list"
-                ? isDark
-                  ? "bg-slate-700 text-white shadow-sm"
-                  : "bg-white text-gray-900 shadow-sm"
-                : isDark
-                ? "text-slate-400 hover:text-white"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-gray-900 shadow-sm dark:bg-slate-700 dark:text-white dark:shadow-sm"
+                : "text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
             <CalendarIcon className="w-4 h-4" />
@@ -797,9 +786,9 @@ export default function DashboardSchedulePage() {
       {loading ? (
         <div className="text-center py-12">
           <Loader2Icon className={`w-8 h-8 animate-spin mx-auto mb-4 ${
-            isDark ? "text-purple-400" : "text-gray-700"
+            "text-gray-700 dark:text-purple-400"
           }`} />
-          <p className={isDark ? "text-slate-400" : "text-gray-600"}>Loading scheduled posts...</p>
+          <p className={"text-muted-foreground"}>Loading scheduled posts...</p>
         </div>
       ) : viewMode === "calendar" ? (
         /* Calendar View */
@@ -813,9 +802,7 @@ export default function DashboardSchedulePage() {
             <Button
               onClick={() => setShowScheduleModal(true)}
               className={`rounded-xl transition-all duration-200 ${
-                isDark
-                  ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                  : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
               }`}
             >
               <PlusIcon className="w-4 h-4 mr-2" />
@@ -848,9 +835,7 @@ export default function DashboardSchedulePage() {
                   <Card
                     key={post.id}
                     className={`border rounded-xl transition-all duration-200 ${
-                      isDark
-                        ? "bg-slate-800 border-slate-700 hover:border-slate-600"
-                        : "bg-white border-gray-200 hover:border-gray-300"
+                      "bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
                     }`}
                   >
                     <CardContent className="p-4 sm:p-6">
@@ -869,12 +854,8 @@ export default function DashboardSchedulePage() {
                               <span
                                 className={`px-2 py-0.5 text-xs rounded-lg border transition-colors duration-300 ${
                                   status.type === "auto"
-                                    ? isDark
-                                      ? "bg-green-950/50 text-green-400 border-green-800"
-                                      : "bg-green-50 text-green-700 border-green-200"
-                                    : isDark
-                                    ? "bg-orange-950/50 text-orange-400 border-orange-800"
-                                    : "bg-orange-50 text-orange-700 border-orange-200"
+                                    ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border-green-800"
+                                    : "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/50 dark:text-orange-400 dark:border-orange-800"
                                 }`}
                                 title={status.message}
                               >
@@ -893,9 +874,7 @@ export default function DashboardSchedulePage() {
                             );
                           })()}
                           <span className={`px-2 py-0.5 text-xs rounded-lg border transition-colors duration-300 ${
-                            isDark
-                              ? "bg-slate-700 text-slate-300 border-slate-600"
-                              : "bg-gray-100 text-gray-700 border-gray-200"
+                            "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600"
                           }`}>
                             {getTimeUntil(post.scheduledFor)}
                           </span>
@@ -910,9 +889,7 @@ export default function DashboardSchedulePage() {
                           size="sm"
                           variant="outline"
                           className={`h-8 w-8 p-0 rounded-xl transition-all duration-200 ${
-                            isDark
-                              ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                              : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                            "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                           }`}
                           title="Edit"
                         >
@@ -923,9 +900,7 @@ export default function DashboardSchedulePage() {
                           size="sm"
                           variant="outline"
                           className={`h-8 w-8 p-0 rounded-xl transition-all duration-200 ${
-                            isDark
-                              ? "border-slate-600 text-red-400 hover:bg-red-950/30 hover:border-red-500 hover:text-red-300"
-                              : "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300"
+                            "border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-slate-600 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-500 dark:hover:text-red-300"
                           }`}
                           title="Delete"
                         >
@@ -934,9 +909,7 @@ export default function DashboardSchedulePage() {
                       </div>
                     </div>
                       <div className={`rounded-xl p-4 border transition-colors duration-300 ${
-                        isDark
-                          ? "bg-slate-900/50 border-slate-700"
-                          : "bg-gray-50 border-gray-200"
+                        "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
                       }`}>
                         {post.platform === "youtube" ? (
                           <p className={`flex items-center gap-2 text-sm leading-relaxed text-foreground`}>
@@ -975,17 +948,13 @@ export default function DashboardSchedulePage() {
                         </span>
                         {post.posted ? (
                             <span className={`px-2 py-0.5 text-xs rounded-lg border transition-colors duration-300 ${
-                              isDark
-                                ? "bg-green-950/50 text-green-400 border-green-800"
-                                : "bg-green-50 text-green-700 border-green-200"
+                              "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border-green-800"
                             }`}>
                             Posted
                           </span>
                         ) : (
                           <span className={`px-2 py-0.5 text-xs rounded-lg border ${
-                            isDark
-                              ? "bg-amber-950/40 text-amber-300 border-amber-800"
-                              : "bg-amber-50 text-amber-800 border-amber-200"
+                            "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800"
                           }`}>
                             Due
                           </span>
@@ -1033,9 +1002,7 @@ export default function DashboardSchedulePage() {
               <Button
                 onClick={() => setShowScheduleModal(true)}
                 className={`rounded-xl transition-all duration-200 ${
-                  isDark
-                    ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                    : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                  "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
                 }`}
               >
                 <PlusIcon className="w-4 h-4 mr-2" />
@@ -1071,12 +1038,8 @@ export default function DashboardSchedulePage() {
                       onClick={() => setSelectedPlatform(type)}
                       className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-xl border transition-all duration-200 ${
                         selectedPlatform === type
-                          ? isDark
-                            ? "border-purple-500 bg-purple-900/50 text-purple-300"
-                            : "border-gray-900 bg-gray-50 text-gray-900"
-                          : isDark
-                          ? "border-slate-700 bg-slate-700/50 text-slate-400 hover:border-slate-600 hover:bg-slate-700 hover:text-slate-300"
-                          : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                          ? "border-gray-900 bg-gray-50 text-gray-900 dark:border-purple-500 dark:bg-purple-900/50 dark:text-purple-300"
+                          : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
                       }`}
                     >
                       {getPlatformIcon(type)}
@@ -1106,12 +1069,10 @@ export default function DashboardSchedulePage() {
               {/* YouTube Connection Warning */}
               {selectedPlatform === "youtube" && !youtubeConnected && (
                 <div className={`p-3 border rounded-xl transition-colors duration-300 ${
-                  isDark
-                    ? "bg-yellow-950/30 border-yellow-800"
-                    : "bg-yellow-50 border-yellow-200"
+                  "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800"
                 }`}>
                   <p className={`flex items-start gap-2 text-sm ${
-                    isDark ? "text-yellow-300" : "text-yellow-800"
+                    "text-yellow-800 dark:text-yellow-300"
                   }`}>
                     <AlertTriangleIcon className="h-4 w-4 shrink-0 mt-0.5" />
                     <span>YouTube account not connected. Please connect your YouTube account in Settings first.</span>
@@ -1130,9 +1091,7 @@ export default function DashboardSchedulePage() {
                       onChange={(e) => setYoutubeVideoTitle(e.target.value)}
                       placeholder="Enter video title..."
                       className={`w-full px-4 py-3 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
-                        isDark
-                          ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
-                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
+                        "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-slate-400 dark:hover:border-slate-500"
                       }`}
                     />
                   </div>
@@ -1144,9 +1103,7 @@ export default function DashboardSchedulePage() {
                       onChange={(e) => setYoutubeDescription(e.target.value)}
                       placeholder="Enter video description (optional)..."
                       className={`w-full px-4 py-3 border rounded-xl resize-none text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
-                        isDark
-                          ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
-                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
+                        "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-slate-400 dark:hover:border-slate-500"
                       }`}
                       rows={4}
                     />
@@ -1184,9 +1141,7 @@ export default function DashboardSchedulePage() {
                         min={1}
                         max={480}
                         className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
-                          isDark
-                            ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
-                            : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                          "bg-white border-gray-300 text-gray-900 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:border-slate-500"
                         }`}
                       />
                     </div>
@@ -1242,9 +1197,7 @@ export default function DashboardSchedulePage() {
                   onChange={(e) => setSelectedContent(e.target.value)}
                   placeholder="Paste or type your content here..."
                       className={`w-full px-4 py-3 border rounded-xl resize-none text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
-                        isDark
-                          ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400 hover:border-slate-500"
-                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400"
+                        "bg-white border-gray-300 text-gray-900 placeholder-gray-400 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-slate-400 dark:hover:border-slate-500"
                       }`}
                   rows={6}
                 />
@@ -1264,9 +1217,7 @@ export default function DashboardSchedulePage() {
                     onChange={(e) => setScheduledDate(e.target.value)}
                     min={getTodayDate()}
                     className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
-                      isDark
-                        ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
-                        : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                      "bg-white border-gray-300 text-gray-900 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:border-slate-500"
                     }`}
                   />
                 </div>
@@ -1297,9 +1248,7 @@ export default function DashboardSchedulePage() {
                       return getMinTimeForToday();
                     })() : undefined}
                     className={`w-full px-3 py-2 border rounded-xl text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
-                      isDark
-                        ? "bg-slate-700 border-slate-600 text-white hover:border-slate-500"
-                        : "bg-white border-gray-300 text-gray-900 hover:border-gray-400"
+                      "bg-white border-gray-300 text-gray-900 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:border-slate-500"
                     }`}
                   />
                   {selectedPlatform === "youtube" && scheduledDate === getTodayDate() && (
@@ -1314,15 +1263,13 @@ export default function DashboardSchedulePage() {
             {/* Progress Display */}
             {progress && currentJobId && (
               <div className={`px-4 sm:px-6 pb-4 border-t transition-colors duration-300 ${
-                isDark
-                  ? "border-slate-700 bg-purple-950/30"
-                  : "border-gray-200 bg-muted/50"
+                "border-gray-200 bg-muted/50 dark:border-slate-700 dark:bg-purple-950/30"
               }`}>
                 <div className="space-y-3 pt-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Loader2Icon className={`w-4 h-4 animate-spin ${
-                        isDark ? "text-purple-400" : "text-foreground"
+                        "text-foreground dark:text-purple-400"
                       }`} />
                       <span className={`text-sm font-semibold text-foreground`}>
                         {progress.status === "generating" ? "Generating Video..." : 
@@ -1393,9 +1340,7 @@ export default function DashboardSchedulePage() {
                 }
                 size="sm"
                 className={`w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed px-4 rounded-xl transition-all duration-200 ${
-                  isDark
-                    ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                    : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                  "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
                 }`}
               >
                 {isSubmitting ? (

@@ -415,13 +415,9 @@ function DashboardGeneratePageInner() {
 
   const previewStyles = useMemo<Record<ContentType, string>>(
     () => ({
-      twitter: isDark
-        ? "bg-slate-100 text-slate-900 p-4 rounded-xl max-w-md mx-auto"
-        : "bg-white text-black p-4 rounded-xl max-w-md mx-auto border border-gray-200",
+      twitter: "bg-white text-black p-4 rounded-xl max-w-md mx-auto border border-gray-200 dark:bg-slate-100 dark:text-slate-900 dark:p-4 dark:rounded-xl dark:max-w-md dark:mx-auto",
       instagram: "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 text-white p-6 rounded-xl max-w-md mx-auto",
-      linkedin: isDark
-        ? "bg-slate-700 text-slate-100 p-6 rounded-xl max-w-2xl mx-auto border border-slate-600"
-        : "bg-blue-50 text-gray-900 p-6 rounded-xl max-w-2xl mx-auto border border-blue-100",
+      linkedin: "bg-blue-50 text-gray-900 p-6 rounded-xl max-w-2xl mx-auto border border-blue-100 dark:bg-slate-700 dark:text-slate-100 dark:p-6 dark:rounded-xl dark:max-w-2xl dark:mx-auto dark:border dark:border-slate-600",
       tiktok: "bg-black text-white p-4 rounded-xl max-w-sm mx-auto",
       youtube: "bg-gradient-to-br from-red-600 to-red-800 text-white p-6 rounded-xl max-w-lg mx-auto",
     }),
@@ -559,9 +555,7 @@ function DashboardGeneratePageInner() {
     []
   );
 
-  const containerClassName = isDark 
-    ? "min-h-screen transition-colors duration-300 bg-slate-900"
-    : "min-h-screen transition-colors duration-300 bg-white";
+  const containerClassName = "min-h-screen transition-colors duration-300 bg-white dark:min-h-screen dark:transition-colors dark:duration-300 dark:bg-slate-900";
 
   return (
     <div className={containerClassName}>
@@ -578,9 +572,9 @@ function DashboardGeneratePageInner() {
             <span>Create engaging content for your social media platforms</span>
             {clientIdFromQuery && (
               <>
-                <span className={isDark ? "text-slate-500" : "text-gray-400"}>·</span>
+                <span className={"text-muted-foreground/70"}>·</span>
                 {brandVoice ? (
-                  <span className={isDark ? "text-teal-300" : "text-teal-700"}>
+                  <span className={"text-teal-700 dark:text-teal-300"}>
                     Brand voice on
                     {brandVoice.brandDescription
                       ? ` · ${brandVoice.brandDescription.slice(0, 48)}${
@@ -619,12 +613,8 @@ function DashboardGeneratePageInner() {
                         onClick={() => setContentType(type)}
                         className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-[0.5px] transition-all duration-200 ${
                           contentType === type
-                            ? isDark
-                              ? "border-foreground/40 bg-accent text-foreground"
-                              : "border-foreground/30 bg-muted text-foreground"
-                            : isDark
-                            ? "border-border bg-muted/30 text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                            : "border-border bg-background text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                            ? "border-foreground/30 bg-muted text-foreground dark:border-foreground/40 dark:bg-accent dark:text-foreground"
+                            : "border-border bg-background text-muted-foreground hover:bg-accent/50 hover:text-foreground dark:border-border dark:bg-muted/30 dark:text-muted-foreground dark:hover:bg-accent/50 dark:hover:text-foreground"
                         }`}
                       >
                         {getContentTypeIcon(type)}
@@ -679,7 +669,7 @@ function DashboardGeneratePageInner() {
                     <label className={`block text-sm font-semibold text-foreground`}>
                       Options
                     </label>
-                    <span className={`text-xs transition-colors duration-200 ${isDark ? "text-slate-400 hover:text-white" : "text-gray-600 hover:text-gray-950"}`}>
+                    <span className={`text-xs transition-colors duration-200 ${"text-gray-600 hover:text-gray-950 dark:text-slate-400 dark:hover:text-white"}`}>
                       {showOptions ? "Hide" : "Show"}
                     </span>
                   </button>
@@ -719,7 +709,7 @@ function DashboardGeneratePageInner() {
                           value={generationMode}
                           onChange={(e) => setGenerationMode(e.target.value as GenerationMode)}
                           className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                            isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-200 text-gray-900"
+                            "bg-white border-gray-200 text-gray-900 dark:bg-slate-700 dark:border-slate-600 dark:text-white"
                           }`}
                         >
                           {(Object.entries(GENERATION_MODE_LABELS) as [GenerationMode, string][]).map(([mode, label]) => (
@@ -738,7 +728,7 @@ function DashboardGeneratePageInner() {
                           </label>
                           <button
                             onClick={() => setShowTemplates(!showTemplates)}
-                            className={`text-xs ${isDark ? "text-slate-400 hover:text-white" : "text-gray-600 hover:text-gray-950"}`}
+                            className={`text-xs ${"text-gray-600 hover:text-gray-950 dark:text-slate-400 dark:hover:text-white"}`}
                           >
                             {showTemplates ? "Hide" : "Show"}
                           </button>
@@ -752,7 +742,7 @@ function DashboardGeneratePageInner() {
                                   key={template.id}
                                   onClick={() => handleUseTemplate(template)}
                                   className={`text-left p-2.5 rounded-lg border text-sm ${
-                                    isDark ? "border-slate-700 bg-slate-700/50 hover:border-slate-600" : "border-gray-200 hover:border-gray-300"
+                                    "border-gray-200 hover:border-gray-300 dark:border-slate-700 dark:bg-slate-700/50 dark:hover:border-slate-600"
                                   }`}
                                 >
                                   <div className={`font-medium text-foreground`}>{template.name}</div>
@@ -771,7 +761,7 @@ function DashboardGeneratePageInner() {
                             <button
                               key={t}
                               onClick={() => setTone(t)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${tone === t ? "bg-primary text-primary-foreground" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${tone === t ? "bg-primary text-primary-foreground" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"}`}
                             >
                               {t}
                             </button>
@@ -787,7 +777,7 @@ function DashboardGeneratePageInner() {
                             <button
                               key={s}
                               onClick={() => setStyle(s)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${style === s ? "bg-primary text-primary-foreground" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium ${style === s ? "bg-primary text-primary-foreground" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"}`}
                             >
                               {s}
                             </button>
@@ -804,7 +794,7 @@ function DashboardGeneratePageInner() {
                               key={l}
                               onClick={() => setLength(l)}
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                                length === l ? "bg-primary text-primary-foreground" : isDark ? "bg-slate-700 text-slate-300 hover:bg-slate-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                length === l ? "bg-primary text-primary-foreground" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
                               }`}
                             >
                               {l}
@@ -821,9 +811,9 @@ function DashboardGeneratePageInner() {
 
               {/* Error Message */}
               {error && (
-                <Card className={`border rounded-xl transition-colors duration-300 ${isDark ? "bg-red-950/30 border-red-800" : "bg-red-50 border-red-200"}`}>
+                <Card className={`border rounded-xl transition-colors duration-300 ${"bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800"}`}>
                   <CardContent className="p-4">
-                    <p className={`text-sm ${isDark ? "text-red-300" : "text-red-700"}`}>{error}</p>
+                    <p className={`text-sm ${"text-red-700 dark:text-red-300"}`}>{error}</p>
                   </CardContent>
                 </Card>
               )}
@@ -838,7 +828,7 @@ function DashboardGeneratePageInner() {
                     <button
                       onClick={() => fetchRecentContent()}
                       disabled={loadingRecent}
-                      className={`p-2 rounded-lg transition-all duration-200 disabled:opacity-50 ${isDark ? "hover:bg-slate-700 text-slate-300" : "hover:bg-gray-100 text-gray-600"}`}
+                      className={`p-2 rounded-lg transition-all duration-200 disabled:opacity-50 ${"hover:bg-gray-100 text-gray-600 dark:hover:bg-slate-700 dark:text-slate-300"}`}
                       title="Refresh"
                     >
                       <RefreshCwIcon className={`w-4 h-4 ${loadingRecent ? 'animate-spin' : ''}`} />
@@ -854,7 +844,7 @@ function DashboardGeneratePageInner() {
                       {recentContent.map((item) => (
                         <div
                           key={item.id}
-                          className={`border rounded-lg p-4 transition-all cursor-pointer group ${isDark ? "bg-slate-700/50 border-slate-600 hover:border-slate-500" : "bg-white border-gray-200 hover:border-gray-300"}`}
+                          className={`border rounded-lg p-4 transition-all cursor-pointer group ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-700/50 dark:border-slate-600 dark:hover:border-slate-500"}`}
                           onClick={() => {
                             setGeneratedContent(item.content);
                             setEditedContent(item.content);
@@ -881,7 +871,7 @@ function DashboardGeneratePageInner() {
                                   </div>
                                 </div>
                                 {/* Status Badge */}
-                                <Badge className={`text-xs px-2.5 py-1 font-medium rounded-full ${isDark ? "bg-green-950/50 text-green-400 border border-green-800" : "bg-green-50 text-green-700 border border-green-200"}`}>
+                                <Badge className={`text-xs px-2.5 py-1 font-medium rounded-full ${"bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border dark:border-green-800"}`}>
                                   {item.status}
                                 </Badge>
                               </div>
@@ -922,7 +912,7 @@ function DashboardGeneratePageInner() {
           >
             <Loader2Icon
               className={`w-12 h-12 animate-spin mx-auto mb-4 ${
-                isDark ? "text-purple-400" : "text-foreground"
+                "text-foreground dark:text-purple-400"
               }`}
             />
             <h3 className={`text-lg font-semibold mb-2 text-foreground`}>
@@ -938,13 +928,13 @@ function DashboardGeneratePageInner() {
       {/* Generated Content Modal */}
       {showContentModal && generatedContent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowContentModal(false)}>
-          <div className={`rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col transition-colors duration-300 ${isDark ? "bg-slate-800 border border-slate-700" : "bg-white"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col transition-colors duration-300 ${"bg-white dark:bg-slate-800 dark:border dark:border-slate-700"}`} onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div className={`flex items-center justify-between p-6 border-b transition-colors duration-300 border-border`}>
               <h3 className={`text-lg font-bold text-foreground`}>Generated Content</h3>
               <button
                 onClick={() => setShowContentModal(false)}
-                className={`p-2 rounded-lg transition-all duration-200 ${isDark ? "hover:bg-slate-700 text-slate-300" : "hover:bg-gray-100 text-gray-600"}`}
+                className={`p-2 rounded-lg transition-all duration-200 ${"hover:bg-gray-100 text-gray-600 dark:hover:bg-slate-700 dark:text-slate-300"}`}
               >
                 <XIcon className="w-5 h-5" />
               </button>
@@ -956,7 +946,7 @@ function DashboardGeneratePageInner() {
                 <div className="space-y-3">
                   <p
                     className={`text-xs rounded-lg px-3 py-2 ${
-                      isDark ? "bg-purple-950/40 text-purple-300" : "bg-muted text-purple-800"
+                      "bg-muted text-purple-800 dark:bg-purple-950/40 dark:text-purple-300"
                     }`}
                   >
                     Press Ctrl/Cmd + S to save, Esc to cancel
@@ -965,9 +955,7 @@ function DashboardGeneratePageInner() {
                     value={editedContent}
                     onChange={(e) => setEditedContent(e.target.value)}
                     className={`w-full px-4 py-3 border rounded-xl resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-ring ${
-                      isDark
-                        ? "bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                        : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
+                      "bg-white border-gray-200 text-gray-900 placeholder-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-slate-400"
                     }`}
                     rows={12}
                   />
@@ -978,9 +966,7 @@ function DashboardGeneratePageInner() {
                     <div className="mb-4">{renderPreview}</div>
                   )}
                   <div className={`border rounded-xl p-6 transition-colors duration-300 ${
-                    isDark
-                      ? "bg-slate-900/50 border-slate-700"
-                      : "bg-gray-50 border-gray-200"
+                    "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
                   }`}>
                     <pre className={`whitespace-pre-wrap text-sm leading-relaxed text-foreground`}>
                       {generatedContent}
@@ -1000,9 +986,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       variant="outline"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       <CopyIcon className="w-4 h-4 mr-1" />
@@ -1013,9 +997,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       variant="outline"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       <EyeIcon className="w-4 h-4 mr-1" />
@@ -1026,9 +1008,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       variant="outline"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       <EditIcon className="w-4 h-4 mr-1" />
@@ -1039,9 +1019,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       variant="outline"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       <DownloadIcon className="w-4 h-4 mr-1" />
@@ -1052,9 +1030,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       variant="outline"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       <FileTextIcon className="w-4 h-4 mr-1" />
@@ -1066,9 +1042,7 @@ function DashboardGeneratePageInner() {
                       variant="outline"
                       disabled={isGenerating}
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       <RefreshCwIcon className="w-4 h-4 mr-1" />
@@ -1078,9 +1052,7 @@ function DashboardGeneratePageInner() {
                       onClick={handleSchedule}
                       size="sm"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                          : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                        "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
                       }`}
                     >
                       <CalendarIcon className="w-4 h-4 mr-1" />
@@ -1094,9 +1066,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       variant="outline"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       History
@@ -1109,9 +1079,7 @@ function DashboardGeneratePageInner() {
                       onClick={handleSaveEdit}
                       size="sm"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                          : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                        "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
                       }`}
                     >
                       Save
@@ -1121,9 +1089,7 @@ function DashboardGeneratePageInner() {
                       size="sm"
                       variant="outline"
                       className={`rounded-lg transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       Cancel
@@ -1139,9 +1105,7 @@ function DashboardGeneratePageInner() {
                 }}
                 variant="outline"
                 className={`rounded-lg transition-all duration-200 ${
-                  isDark
-                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                  "border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 Close

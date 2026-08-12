@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -73,8 +72,6 @@ const formatLabels: Record<Format, { label: string; icon: LucideIcon }> = {
 function ContentIdeasPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const clientIdFromQuery = searchParams?.get("clientId") ?? null;
 
   const [clientName, setClientName] = useState<string | null>(null);
@@ -336,9 +333,9 @@ function ContentIdeasPageInner() {
       <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 bg-background`}>
         <div className="text-center">
           <RefreshCw className={`w-8 h-8 animate-spin mx-auto mb-4 ${
-            isDark ? "text-purple-400" : "text-blue-600"
+            "text-blue-600 dark:text-purple-400"
           }`} />
-          <p className={isDark ? "text-slate-300" : "text-gray-600"}>Loading content ideas...</p>
+          <p className={"text-muted-foreground"}>Loading content ideas...</p>
         </div>
       </div>
     );
@@ -354,7 +351,7 @@ function ContentIdeasPageInner() {
             <h1 className={`text-2xl font-bold mb-2 text-foreground`}>
               {clientIdFromQuery ? "Pick industry for this client" : "Pick your industry"}
             </h1>
-            <p className={isDark ? "text-slate-400" : "text-gray-600"}>
+            <p className={"text-muted-foreground"}>
               {clientIdFromQuery
                 ? `Select the primary industry for ${clientName || "this client"} to get tailored ideas`
                 : "Choose who you create content for to get personalized ideas"}
@@ -379,14 +376,12 @@ function ContentIdeasPageInner() {
                     handleSelectNiche(mapped === "custom" ? "custom" : (mapped as Niche), undefined);
                   }}
                   className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
-                    isDark
-                      ? "border-slate-700 bg-slate-800 hover:border-slate-500 hover:bg-slate-700/50"
-                      : "border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50"
+                    "border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-500 dark:hover:bg-slate-700/50"
                   }`}
                 >
                   <span
                     className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                      isDark ? "bg-slate-700 text-slate-100" : "bg-gray-100 text-gray-800"
+                      "bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-100"
                     }`}
                   >
                     <Icon className="h-5 w-5" strokeWidth={1.75} />
@@ -399,7 +394,7 @@ function ContentIdeasPageInner() {
             })}
           </div>
           <div className={`p-4 rounded-xl border border-border bg-muted`}>
-            <p className={`text-sm font-medium mb-2 ${isDark ? "text-slate-200" : "text-gray-700"}`}>
+            <p className={`text-sm font-medium mb-2 ${"text-gray-700 dark:text-slate-200"}`}>
               Health & Fitness, Real Estate, Tech, Creative, or Other?
             </p>
             <div className="flex gap-2">
@@ -410,7 +405,7 @@ function ContentIdeasPageInner() {
                 onChange={(e) => setCustomNicheInput(e.target.value)}
                 placeholder="e.g. Online Fitness Coach for Women"
                 className={`flex-1 px-4 py-2 rounded-lg border ${
-                  isDark ? "bg-slate-900 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"
+                  "bg-white border-gray-300 text-gray-900 dark:bg-slate-900 dark:border-slate-600 dark:text-white"
                 }`}
               />
               <Button
@@ -449,9 +444,7 @@ function ContentIdeasPageInner() {
             value={strategyFilter}
             onChange={(e) => handleStrategyChange(e.target.value as ContentStrategy | "all")}
             className={`rounded-xl border text-sm px-3 py-2 ${
-              isDark
-                ? "bg-slate-800 border-slate-600 text-white"
-                : "bg-white border-gray-300 text-gray-900"
+              "bg-white border-gray-300 text-gray-900 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
             }`}
           >
             <option value="all">All strategies</option>
@@ -469,9 +462,7 @@ function ContentIdeasPageInner() {
             }
             variant="outline"
             className={`flex-1 sm:flex-none rounded-xl text-xs sm:text-sm transition-all duration-200 ${
-              isDark
-                ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+              "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
             }`}
           >
             {clientIdFromQuery ? "Edit in Brand Voice" : "Change Niche"}
@@ -480,9 +471,7 @@ function ContentIdeasPageInner() {
             onClick={handleRefresh}
             variant="outline"
             className={`flex-1 sm:flex-none rounded-xl text-xs sm:text-sm transition-all duration-200 ${
-              isDark
-                ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+              "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
             }`}
           >
             <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
@@ -499,18 +488,16 @@ function ContentIdeasPageInner() {
             
             return (
               <Card key={idea.id} className={`border rounded-xl transition-all duration-200 ${
-                isDark 
-                  ? "bg-slate-800 border-slate-700 hover:border-slate-600" 
-                  : "bg-white border-gray-200 hover:border-gray-300"
+                "bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"
               }`}>
                 <CardContent className="p-4 sm:p-5">
                   {/* Topic Header */}
                   <div className="flex items-start sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isDark ? "bg-muted0/20" : "bg-purple-100"
+                      "bg-purple-100 dark:bg-purple-900/20"
                     }`}>
                       <Lightbulb className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                        isDark ? "text-purple-400" : "text-foreground"
+                        "text-foreground dark:text-purple-400"
                       }`} />
                     </div>
                     <h3 className={`text-base sm:text-lg font-semibold flex-1 leading-tight text-foreground`}>
@@ -522,16 +509,14 @@ function ContentIdeasPageInner() {
                     <div className="mb-3 sm:mb-4">
                       <p className={`text-xs font-semibold uppercase tracking-wide mb-1.5 sm:mb-2 text-muted-foreground`}>Hook Example</p>
                       <div className={`border rounded-lg p-2.5 sm:p-3 ${
-                        isDark 
-                          ? "bg-slate-900/50 border-slate-700" 
-                          : "bg-gray-50 border-gray-200"
+                        "bg-gray-50 border-gray-200 dark:bg-slate-900/50 dark:border-slate-700"
                       }`}>
                         <p className={`text-xs sm:text-sm leading-relaxed text-foreground`}>
                           &ldquo;{idea.hookExample}&rdquo;
                         </p>
                         {idea.strategyTip && (
                           <p className={`text-xs mt-2 pt-2 border-t ${
-                            isDark ? "border-slate-700 text-slate-400" : "border-gray-200 text-gray-500"
+                            "border-gray-200 text-gray-500 dark:border-slate-700 dark:text-slate-400"
                           }`}>
                             Why it works: {idea.strategyTip}
                           </p>
@@ -543,24 +528,18 @@ function ContentIdeasPageInner() {
                   <div className="flex flex-wrap items-center gap-2 mb-4">
                     {idea.strategy && (
                       <Badge className={`${
-                        isDark 
-                          ? "bg-purple-900/50 text-purple-300 border-purple-700" 
-                          : "bg-muted text-foreground border-purple-200"
+                        "bg-muted text-foreground border-purple-200 dark:bg-purple-900/50 dark:text-purple-300 dark:border-purple-700"
                       }`}>
                         {CONTENT_STRATEGIES.find((s) => s.id === idea.strategy)?.name ?? idea.strategy}
                       </Badge>
                     )}
                     <Badge className={`${
-                      isDark 
-                        ? "bg-slate-700 text-slate-200 border-slate-600" 
-                        : "bg-gray-100 text-gray-700 border-gray-200"
+                      "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
                     }`}>
                       {hookStyleLabels[idea.hookStyle]} Hook
                     </Badge>
                     <Badge className={`flex items-center gap-1.5 ${
-                      isDark 
-                        ? "bg-slate-700 text-slate-200 border-slate-600" 
-                        : "bg-gray-100 text-gray-700 border-gray-200"
+                      "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
                     }`}>
                       <FormatIcon className="w-3.5 h-3.5" />
                       {formatLabels[idea.format].label}
@@ -577,9 +556,7 @@ function ContentIdeasPageInner() {
                     <Button
                       onClick={() => handleGenerateCaption(idea)}
                       className={`flex-1 rounded-xl py-2.5 sm:py-2 text-sm transition-all duration-200 shadow-sm hover:shadow-md ${
-                        isDark
-                          ? "bg-primary hover:bg-primary/90 active:bg-purple-800 text-primary-foreground"
-                          : "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white"
+                        "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
                       }`}
                     >
                       Generate Caption
@@ -588,9 +565,7 @@ function ContentIdeasPageInner() {
                       onClick={() => handleSaveToStack(idea)}
                       variant="outline"
                       className={`flex-1 rounded-xl flex items-center justify-center gap-2 py-2.5 sm:py-2 text-sm transition-all duration-200 ${
-                        isDark
-                          ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                        "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                       }`}
                     >
                       <Calendar className="w-4 h-4" />
@@ -605,7 +580,7 @@ function ContentIdeasPageInner() {
           <Card className={`border rounded-xl transition-colors duration-300 bg-card border-border`}>
             <CardContent className="p-12 text-center">
               <Lightbulb className={`w-12 h-12 mx-auto mb-4 ${
-                isDark ? "text-purple-400" : "text-foreground"
+                "text-foreground dark:text-purple-400"
               }`} />
               <h3 className={`text-lg font-semibold mb-2 text-foreground`}>
                 Generate ideas for your niche
@@ -614,7 +589,7 @@ function ContentIdeasPageInner() {
                 AI will create 10 tailored content ideas for &ldquo;{nicheDescription || "your niche"}&rdquo;. Strategic, scroll-stopping, ready to use.
               </p>
               {refreshLimits && !refreshLimits.canRefresh && (
-                <p className={`text-sm mb-4 ${isDark ? "text-amber-400" : "text-amber-700"}`}>
+                <p className={`text-sm mb-4 ${"text-amber-700 dark:text-amber-400"}`}>
                   Refresh limit reached ({refreshLimits.used}/{refreshLimits.limit} this month). Upgrade for more.
                 </p>
               )}
@@ -622,9 +597,7 @@ function ContentIdeasPageInner() {
                 onClick={() => handleGenerateIdeas(false)}
                 disabled={generatingIdeas || !!(refreshLimits && !refreshLimits.canRefresh)}
                 className={`rounded-xl transition-all duration-200 ${
-                  isDark
-                    ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                  "bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-primary dark:hover:bg-primary/90 dark:text-primary-foreground"
                 }`}
               >
                 {generatingIdeas ? (
@@ -649,9 +622,7 @@ function ContentIdeasPageInner() {
                 onClick={handleRefresh}
                 variant="outline"
                 className={`rounded-xl transition-all duration-200 ${
-                  isDark
-                    ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+                  "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
                 }`}
               >
                 Try Again
@@ -667,9 +638,7 @@ function ContentIdeasPageInner() {
           onClick={() => router.push("/dashboard/post-stack")}
           variant="outline"
           className={`rounded-xl transition-all duration-200 ${
-            isDark
-              ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white"
-              : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+            "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
           }`}
         >
           View Post Stack

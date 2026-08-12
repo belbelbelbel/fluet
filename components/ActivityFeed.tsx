@@ -13,7 +13,6 @@ import {
   Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext";
 
 export type ActivityType =
   | "client_approved"
@@ -51,8 +50,6 @@ export function ActivityFeed({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   const fetchActivities = useCallback(async () => {
     try {
@@ -127,7 +124,7 @@ export function ActivityFeed({
       <div
         className={cn(
           !embedded && "rounded-lg border p-4",
-          !embedded && (isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"),
+          !embedded && ("bg-card border-border"),
           embedded && "py-2"
         )}
       >
@@ -151,7 +148,7 @@ export function ActivityFeed({
             <Inbox
               className={cn(
                 "w-10 h-10 mx-auto mb-3",
-                isDark ? "text-slate-500" : "text-gray-400"
+                "text-muted-foreground/70"
               )}
             />
             <p className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
@@ -204,7 +201,7 @@ export function ActivityFeed({
     <div
       className={cn(
         "rounded-lg border",
-        isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"
+        "bg-card border-border"
       )}
     >
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">

@@ -1,7 +1,6 @@
 "use client";
 
 import { AlertTriangle, AlertCircle } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 
 export type BannerVariant = "payment_overdue" | "credits_warning" | "credits_exceeded";
@@ -22,8 +21,6 @@ interface AlertBannerProps {
 }
 
 export function AlertBanner({ items, blockActions, className }: AlertBannerProps) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   if (items.length === 0) return null;
 
@@ -40,13 +37,9 @@ export function AlertBanner({ items, blockActions, className }: AlertBannerProps
         const wrapperClass = cn(
           "rounded-lg border p-3 flex items-center gap-3",
           isRed &&
-            (isDark
-              ? "bg-red-950/40 border-red-800 text-red-200"
-              : "bg-red-50 border-red-200 text-red-800"),
+            ("bg-red-50 border-red-200 text-red-800 dark:bg-red-950/40 dark:border-red-800 dark:text-red-200"),
           isYellow &&
-            (isDark
-              ? "bg-amber-950/40 border-amber-800 text-amber-200"
-              : "bg-amber-50 border-amber-200 text-amber-800")
+            ("bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/40 dark:border-amber-800 dark:text-amber-200")
         );
 
         const Icon = isRed ? AlertCircle : AlertTriangle;
@@ -60,8 +53,8 @@ export function AlertBanner({ items, blockActions, className }: AlertBannerProps
                 href={item.link}
                 className={cn(
                   "text-sm font-medium underline underline-offset-2",
-                  isRed && (isDark ? "text-red-300 hover:text-red-200" : "text-red-700 hover:text-red-800"),
-                  isYellow && (isDark ? "text-amber-300 hover:text-amber-200" : "text-amber-700 hover:text-amber-800")
+                  isRed && ("text-red-700 hover:text-red-800 dark:text-red-300 dark:hover:text-red-200"),
+                  isYellow && ("text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200")
                 )}
               >
                 View
@@ -73,7 +66,7 @@ export function AlertBanner({ items, blockActions, className }: AlertBannerProps
       {blockActions && (
         <p className={cn(
           "text-xs px-3",
-          isDark ? "text-red-300" : "text-red-600"
+          "text-red-600 dark:text-red-300"
         )}>
           Some actions are blocked until this is resolved.
         </p>

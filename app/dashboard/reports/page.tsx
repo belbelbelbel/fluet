@@ -12,7 +12,6 @@ import {
   AlertCircle,
   Plus,
 } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { showToast } from "@/lib/toast";
 
 interface ReportData {
@@ -37,8 +36,6 @@ interface Report {
 
 export default function ReportsPage() {
   const { userId } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   const [reports, setReports] = useState<Report[]>([]);
   const [clients, setClients] = useState<{ id: number; name: string }[]>([]);
@@ -188,9 +185,7 @@ export default function ReportsPage() {
               )
             }
             className={`w-full sm:w-auto min-w-0 px-4 py-2.5 sm:py-2 rounded-lg border text-sm ${
-              isDark
-                ? "bg-slate-800 border-slate-700 text-white"
-                : "bg-white border-gray-300 text-gray-900"
+              "bg-white border-gray-300 text-gray-900 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
             }`}
           >
             <option value="">All Clients</option>
@@ -224,7 +219,7 @@ export default function ReportsPage() {
             <div className="text-center">
               <FileText
                 className={`w-16 h-16 mx-auto mb-4 ${
-                  isDark ? "text-slate-600" : "text-gray-400"
+                  "text-gray-400 dark:text-slate-600"
                 }`}
               />
               <h2
@@ -278,9 +273,7 @@ export default function ReportsPage() {
                   {report.sentToClient && (
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                        isDark
-                          ? "bg-green-950/50 text-green-400"
-                          : "bg-green-100 text-green-700"
+                        "bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400"
                       }`}
                     >
                       Sent
@@ -308,9 +301,7 @@ export default function ReportsPage() {
                     variant="outline"
                     size="sm"
                     className={`w-full sm:w-auto min-h-[40px] touch-manipulation ${
-                      isDark
-                        ? "border-slate-600 text-slate-300 hover:bg-slate-700"
-                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                     }`}
                   >
                     <Download className="w-4 h-4 mr-1" />

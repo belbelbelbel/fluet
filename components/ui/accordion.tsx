@@ -8,22 +8,17 @@ interface AccordionItemProps {
   answer: string;
   isOpen: boolean;
   onToggle: () => void;
-  isDark?: boolean;
 }
 
-function AccordionItem({ question, answer, isOpen, onToggle, isDark = false }: AccordionItemProps) {
+function AccordionItem({ question, answer, isOpen, onToggle }: AccordionItemProps) {
   return (
     <div className={`border rounded-lg transition-all duration-200 ${
-      isDark 
-        ? "bg-gray-800/50 border-gray-700" 
-        : "bg-white border-gray-200"
+      "bg-white border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
     }`}>
       <button
         onClick={onToggle}
         className={`w-full flex items-center justify-between p-5 text-left transition-colors ${
-          isDark 
-            ? "hover:bg-gray-800" 
-            : "hover:bg-gray-50"
+          "hover:bg-gray-50 dark:hover:bg-gray-800"
         }`}
       >
         <h3 className={`text-base font-semibold pr-4 text-foreground`}>
@@ -50,11 +45,10 @@ function AccordionItem({ question, answer, isOpen, onToggle, isDark = false }: A
 
 interface AccordionProps {
   items: Array<{ question: string; answer: string }>;
-  isDark?: boolean;
   defaultOpenIndex?: number;
 }
 
-export function Accordion({ items, isDark = false, defaultOpenIndex }: AccordionProps) {
+export function Accordion({ items, defaultOpenIndex }: AccordionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(
     defaultOpenIndex !== undefined ? defaultOpenIndex : null
   );
@@ -72,7 +66,6 @@ export function Accordion({ items, isDark = false, defaultOpenIndex }: Accordion
           answer={item.answer}
           isOpen={openIndex === index}
           onToggle={() => handleToggle(index)}
-          isDark={isDark}
         />
       ))}
     </div>

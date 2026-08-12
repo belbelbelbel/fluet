@@ -21,6 +21,7 @@ export function DashboardHeader() {
   const toggleTheme = () => {
     if (theme === "light") setTheme("dark");
     else if (theme === "dark") setTheme("light");
+    // From "system", flip to whatever is the opposite of what's on screen.
     else setTheme(isDark ? "light" : "dark");
   };
 

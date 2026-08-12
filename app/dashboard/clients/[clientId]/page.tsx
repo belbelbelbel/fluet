@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PostRow, type PostStatus } from "@/components/PostRow";
-import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { showToast } from "@/lib/toast";
 import { FeatureComingSoon } from "@/components/FeatureComingSoon";
@@ -73,8 +72,6 @@ export default function ClientDashboardPage() {
   const params = useParams();
   const router = useRouter();
   const { userId } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const clientId = params?.clientId ? parseInt(params.clientId as string) : null;
 
   const [client, setClient] = useState<Client | null>(null);
@@ -240,8 +237,8 @@ export default function ClientDashboardPage() {
               fetchPriority="high"
             />
           ) : (
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center border ${isDark ? "bg-purple-900/50 border-slate-700" : "bg-purple-100 border-gray-200"}`}>
-              <Building2 className={`w-6 h-6 ${isDark ? "text-purple-400" : "text-foreground"}`} />
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center border ${"bg-purple-100 border-gray-200 dark:bg-purple-900/50 dark:border-slate-700"}`}>
+              <Building2 className={`w-6 h-6 ${"text-foreground dark:text-purple-400"}`} />
             </div>
           )}
           <div>
@@ -251,7 +248,7 @@ export default function ClientDashboardPage() {
                 variant="ghost"
                 size="icon"
                 onClick={openEditModal}
-                className={`h-8 w-8 shrink-0 ${isDark ? "text-slate-400 hover:text-white hover:bg-slate-700" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
+                className={`h-8 w-8 shrink-0 ${"text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"}`}
                 aria-label="Edit client"
               >
                 <Pencil className="w-4 h-4" />
@@ -264,19 +261,19 @@ export default function ClientDashboardPage() {
             )}
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {client.paymentStatus === "overdue" && (
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${isDark ? "bg-red-950/50 text-red-400" : "bg-red-100 text-red-700"}`}>
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${"bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400"}`}>
                   <AlertCircle className="w-3 h-3" />
                   Payment Due
                 </span>
               )}
               {client.status === "paused" && (
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${isDark ? "bg-yellow-950/50 text-yellow-400" : "bg-yellow-100 text-yellow-700"}`}>
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${"bg-yellow-100 text-yellow-700 dark:bg-yellow-950/50 dark:text-yellow-400"}`}>
                   <Clock className="w-3 h-3" />
                   Paused
                 </span>
               )}
               {client.status === "active" && client.paymentStatus === "paid" && (
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${isDark ? "bg-green-950/50 text-green-400" : "bg-green-100 text-green-700"}`}>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${"bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400"}`}>
                   Active
                 </span>
               )}
@@ -287,21 +284,21 @@ export default function ClientDashboardPage() {
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/brand-voice`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900"}`}
+            className={`transition-all duration-200 ${"border-purple-200 text-foreground hover:bg-muted hover:text-purple-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"}`}
           >
             Brand Voice
           </Button>
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/credits`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900"}`}
+            className={`transition-all duration-200 ${"border-purple-200 text-foreground hover:bg-muted hover:text-purple-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"}`}
           >
             Credits
           </Button>
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/clients/${clientId}/tasks`)}
-            className={`transition-all duration-200 ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900"}`}
+            className={`transition-all duration-200 ${"border-purple-200 text-foreground hover:bg-muted hover:text-purple-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"}`}
           >
             Tasks
           </Button>
@@ -309,7 +306,7 @@ export default function ClientDashboardPage() {
             variant="outline"
             onClick={() => router.push(`/dashboard/content-ideas?clientId=${clientId}`)}
             className={`transition-all duration-200 ${
-              isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white" : "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900"
+              "border-purple-200 text-foreground hover:bg-muted hover:text-purple-900 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500 dark:hover:text-white"
             }`}
           >
             <Lightbulb className="w-4 h-4 mr-2" />
@@ -327,7 +324,7 @@ export default function ClientDashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200 hover:border-gray-300"}`}>
+        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Posts This Month
@@ -354,7 +351,7 @@ export default function ClientDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200 hover:border-gray-300"}`}>
+        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Pending Approvals
@@ -372,7 +369,7 @@ export default function ClientDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200 hover:border-gray-300"}`}>
+        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Scheduled Posts
@@ -390,7 +387,7 @@ export default function ClientDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${isDark ? "bg-slate-800 border-slate-700 hover:border-slate-600" : "bg-white border-gray-200 hover:border-gray-300"}`}>
+        <Card className={`border transition-colors duration-300 hover:border-opacity-80 ${"bg-white border-gray-200 hover:border-gray-300 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-slate-600"}`}>
           <CardHeader className="pb-3">
             <CardTitle className={`text-sm font-medium text-muted-foreground`}>
               Engagement Rate
@@ -403,7 +400,7 @@ export default function ClientDashboardPage() {
                   <span className={`text-2xl font-bold text-foreground`}>
                     {stats.engagementRate}%
                   </span>
-                  <TrendingUp className={`w-4 h-4 ${isDark ? "text-green-400" : "text-green-600"}`} />
+                  <TrendingUp className={`w-4 h-4 ${"text-green-600 dark:text-green-400"}`} />
                 </div>
                 <p className={`text-xs mt-1 text-muted-foreground`}>
                   Average across platforms
@@ -426,14 +423,12 @@ export default function ClientDashboardPage() {
       {/* Tabs */}
       <Tabs defaultValue="calendar" className="space-y-4">
         <TabsList className={`p-1 ${
-          isDark ? "bg-slate-800" : "bg-gray-100"
+          "bg-gray-100 dark:bg-slate-800"
         }`}>
           <TabsTrigger 
             value="calendar" 
             className={cn(
-              isDark 
-                ? "text-slate-300 data-[state=active]:bg-slate-700 data-[state=active]:text-white" 
-                : "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950"
+              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <Calendar className="w-4 h-4 mr-2" />
@@ -442,9 +437,7 @@ export default function ClientDashboardPage() {
           <TabsTrigger 
             value="approvals" 
             className={cn(
-              isDark 
-                ? "text-slate-300 data-[state=active]:bg-slate-700 data-[state=active]:text-white" 
-                : "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950"
+              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <CheckCircle2 className="w-4 h-4 mr-2" />
@@ -458,9 +451,7 @@ export default function ClientDashboardPage() {
           <TabsTrigger 
             value="tasks" 
             className={cn(
-              isDark 
-                ? "text-slate-300 data-[state=active]:bg-slate-700 data-[state=active]:text-white" 
-                : "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950"
+              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <FileText className="w-4 h-4 mr-2" />
@@ -469,9 +460,7 @@ export default function ClientDashboardPage() {
           <TabsTrigger 
             value="analytics" 
             className={cn(
-              isDark 
-                ? "text-slate-300 data-[state=active]:bg-slate-700 data-[state=active]:text-white" 
-                : "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950"
+              "text-gray-600 data-[state=active]:bg-white data-[state=active]:text-gray-950 dark:text-slate-300 dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white"
             )}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
@@ -496,7 +485,7 @@ export default function ClientDashboardPage() {
                 onClick={() => router.push(`/dashboard/clients/${clientId}/calendar`)}
                 size="sm"
                 variant="outline"
-                className={`shrink-0 ${isDark ? "border-slate-600 text-slate-200 hover:bg-slate-700" : ""}`}
+                className={`shrink-0 ${"dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"}`}
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 Full calendar
@@ -506,7 +495,7 @@ export default function ClientDashboardPage() {
               {upcomingPosts.length === 0 ? (
                 <div className="text-center py-10">
                   <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${
-                    isDark ? "bg-slate-700/60 text-slate-400" : "bg-slate-100 text-slate-400"
+                    "bg-slate-100 text-slate-400 dark:bg-slate-700/60 dark:text-slate-400"
                   }`}>
                     <Calendar className="h-5 w-5" />
                   </div>
@@ -568,7 +557,7 @@ export default function ClientDashboardPage() {
               {pendingApprovals.length === 0 ? (
                 <div className="text-center py-10">
                   <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl ${
-                    isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-500"
+                    "bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400"
                   }`}>
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
@@ -595,7 +584,7 @@ export default function ClientDashboardPage() {
                             size="sm"
                             title="Copy approval link"
                             onClick={() => handleCopyApprovalLink(approval.approvalLink)}
-                            className={isDark ? "text-slate-300 hover:bg-slate-700" : "text-slate-600"}
+                            className={"text-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"}
                           >
                             <Copy className="w-4 h-4 sm:mr-1.5" />
                             <span className="hidden sm:inline">Copy</span>
@@ -604,7 +593,7 @@ export default function ClientDashboardPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => window.open(approval.approvalLink, "_blank")}
-                            className={isDark ? "border-slate-600 text-slate-200 hover:bg-slate-700" : ""}
+                            className={"dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"}
                           >
                             <ExternalLink className="w-4 h-4 sm:mr-1.5" />
                             <span className="hidden sm:inline">Preview</span>
@@ -641,7 +630,7 @@ export default function ClientDashboardPage() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="text-center py-8">
-                <FileText className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
+                <FileText className={`w-12 h-12 mx-auto mb-4 ${"text-purple-300 dark:text-purple-400"}`} />
                 <h3 className={`text-lg font-semibold mb-2 text-foreground`}>Task Management</h3>
                 <p className={`mb-4 text-muted-foreground`}>
                   Create and assign tasks to team members
@@ -680,7 +669,6 @@ export default function ClientDashboardPage() {
             <CardContent className="pt-6">
               <FeatureComingSoon
                 compact
-                isDark={isDark}
                 icon={BarChart3}
                 title="Performance insights coming soon"
                 description="Post counts and scheduling are live. Engagement metrics will appear here when platform analytics are connected."
@@ -704,7 +692,7 @@ export default function ClientDashboardPage() {
               <CardTitle className={`text-lg text-foreground`}>Edit Client</CardTitle>
               <button
                 onClick={() => !editSaving && setEditModalOpen(false)}
-                className={`p-2 rounded-lg transition-colors ${isDark ? "text-slate-400 hover:text-white hover:bg-slate-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"}`}
+                className={`p-2 rounded-lg transition-colors ${"text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700"}`}
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
@@ -719,7 +707,7 @@ export default function ClientDashboardPage() {
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-gray-300 text-gray-900 dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
                   placeholder="Client name"
                 />
               </div>
@@ -731,7 +719,7 @@ export default function ClientDashboardPage() {
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-gray-300 text-gray-900 dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
                   placeholder="client@example.com"
                 />
                 <p className={`text-xs mt-1 text-muted-foreground`}>
@@ -746,7 +734,7 @@ export default function ClientDashboardPage() {
                   type="url"
                   value={editForm.logoUrl}
                   onChange={(e) => setEditForm({ ...editForm, logoUrl: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${isDark ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus-visible:ring-ring outline-none ${"bg-white border-gray-300 text-gray-900 dark:bg-slate-700 dark:border-slate-600 dark:text-white"}`}
                   placeholder="https://example.com/logo.png"
                 />
               </div>
@@ -755,7 +743,7 @@ export default function ClientDashboardPage() {
                   variant="outline"
                   onClick={() => !editSaving && setEditModalOpen(false)}
                   disabled={editSaving}
-                  className={isDark ? "border-slate-600 text-slate-300 hover:bg-slate-700" : ""}
+                  className={"dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"}
                 >
                   Cancel
                 </Button>

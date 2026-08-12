@@ -26,6 +26,8 @@ const sizeMap = {
 };
 
 function getLogoSrc(variant: LogoProps["variant"], isDark: boolean) {
+  // A CSS `dark:` variant cannot swap an <img> src, so this stays a JS branch
+  // on the resolved theme rather than moving to a token/variant.
   if (variant === "icon") {
     // The light variant must be the transparent asset — logo-icon.png is baked
     // onto solid white and shows as a white box on any tinted surface.
@@ -95,9 +97,7 @@ export function Logo({
       </div>
       {showText && (
         <span
-          className={`text-lg font-bold ${
-            isDark ? "text-white" : "text-gray-950"
-          }`}
+          className={`text-lg font-bold text-foreground`}
         >
           Revvy
         </span>

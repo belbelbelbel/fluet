@@ -2,7 +2,6 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { useState, useEffect, useCallback } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -79,8 +78,6 @@ interface TeamMember {
 
 export default function TeamPage() {
   const { userId } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [clients, setClients] = useState<AgencyClient[]>([]);
   const [receivedInvitations, setReceivedInvitations] = useState<ReceivedInvitation[]>([]);
@@ -390,9 +387,7 @@ export default function TeamPage() {
   const clientNameById = (id: number) =>
     clients.find((c) => c.id === id)?.name || `Client #${id}`;
 
-  const fieldClass = isDark
-    ? "bg-slate-700 border-slate-600 text-white"
-    : "bg-white border-gray-300 text-gray-950";
+  const fieldClass = "bg-white border-gray-300 text-gray-950 dark:bg-slate-700 dark:border-slate-600 dark:text-white";
 
   const ClientChecklist = ({
     selected,
@@ -414,7 +409,7 @@ export default function TeamPage() {
       ) : (
         <div
           className={`max-h-40 overflow-y-auto rounded-xl border p-2 space-y-1 ${
-            isDark ? "border-slate-600" : "border-gray-200"
+            "border-gray-200 dark:border-slate-600"
           }`}
         >
           {clients.map((client) => {
@@ -423,7 +418,7 @@ export default function TeamPage() {
               <label
                 key={client.id}
                 className={`flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer text-sm ${
-                  isDark ? "hover:bg-slate-700" : "hover:bg-gray-50"
+                  "hover:bg-gray-50 dark:hover:bg-slate-700"
                 }`}
               >
                 <input
@@ -432,7 +427,7 @@ export default function TeamPage() {
                   onChange={() => onChange(toggleId(selected, client.id))}
                   className="rounded border-gray-300"
                 />
-                <span className={isDark ? "text-slate-200" : "text-gray-800"}>
+                <span className={"text-foreground"}>
                   {client.name}
                 </span>
               </label>
@@ -459,7 +454,7 @@ export default function TeamPage() {
           >
             Team
           </h1>
-          <p className={isDark ? "text-slate-400" : "text-gray-600"}>
+          <p className={"text-muted-foreground"}>
             Invite people, set roles, assign clients, and hand off work
           </p>
         </div>
@@ -507,8 +502,8 @@ export default function TeamPage() {
         className={`border rounded-xl bg-card border-border`}
       >
         <CardHeader>
-          <CardTitle className={isDark ? "text-white" : "text-gray-950"}>Team members</CardTitle>
-          <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+          <CardTitle className={"text-foreground"}>Team members</CardTitle>
+          <CardDescription className={"text-muted-foreground"}>
             Role + client access for each person
           </CardDescription>
         </CardHeader>
@@ -528,9 +523,7 @@ export default function TeamPage() {
                 <div
                   key={`${member.id}-${member.membershipId || "owner"}`}
                   className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border ${
-                    isDark
-                      ? "bg-slate-700/50 border-slate-700"
-                      : "bg-gray-50 border-gray-200"
+                    "bg-gray-50 border-gray-200 dark:bg-slate-700/50 dark:border-slate-700"
                   }`}
                 >
                   <div className="flex items-start gap-3 min-w-0">
@@ -566,7 +559,7 @@ export default function TeamPage() {
                         ) : member.clients.length === 0 ? (
                           <span
                             className={`text-xs ${
-                              isDark ? "text-amber-300/90" : "text-amber-700"
+                              "text-amber-700 dark:text-amber-300/90"
                             }`}
                           >
                             No clients assigned yet
@@ -576,9 +569,7 @@ export default function TeamPage() {
                             <span
                               key={c.clientId}
                               className={`text-xs px-2 py-0.5 rounded-full ${
-                                isDark
-                                  ? "bg-slate-600 text-slate-200"
-                                  : "bg-white border border-gray-200 text-gray-700"
+                                "bg-white border border-gray-200 text-gray-700 dark:bg-slate-600 dark:text-slate-200"
                               }`}
                             >
                               {c.clientName}
@@ -628,10 +619,10 @@ export default function TeamPage() {
           className={`border rounded-xl bg-card border-border`}
         >
           <CardHeader>
-            <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+            <CardTitle className={"text-foreground"}>
               Sent invitations
             </CardTitle>
-            <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+            <CardDescription className={"text-muted-foreground"}>
               Waiting for them to accept
             </CardDescription>
           </CardHeader>
@@ -640,7 +631,7 @@ export default function TeamPage() {
               <div
                 key={inv.id}
                 className={`p-4 rounded-xl border ${
-                  isDark ? "border-slate-600 bg-slate-700/40" : "border-amber-100 bg-amber-50/40"
+                  "border-amber-100 bg-amber-50/40 dark:border-slate-600 dark:bg-slate-700/40"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -663,7 +654,7 @@ export default function TeamPage() {
                       <span
                         key={id}
                         className={`text-xs px-2 py-0.5 rounded-full ${
-                          isDark ? "bg-slate-600 text-slate-200" : "bg-white border text-gray-700"
+                          "bg-white border text-gray-700 dark:bg-slate-600 dark:text-slate-200"
                         }`}
                       >
                         {clientNameById(id)}
@@ -682,7 +673,7 @@ export default function TeamPage() {
           className={`border rounded-xl bg-card border-border`}
         >
           <CardHeader>
-            <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+            <CardTitle className={"text-foreground"}>
               Invitations for you
             </CardTitle>
           </CardHeader>
@@ -691,7 +682,7 @@ export default function TeamPage() {
               <div
                 key={invitation.id}
                 className={`flex items-center justify-between gap-3 p-4 rounded-xl border ${
-                  isDark ? "border-slate-600" : "border-gray-200"
+                  "border-gray-200 dark:border-slate-600"
                 }`}
               >
                 <p className={`text-sm text-foreground/80`}>
@@ -759,10 +750,10 @@ export default function TeamPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader>
-              <CardTitle className={isDark ? "text-white" : "text-gray-950"}>
+              <CardTitle className={"text-foreground"}>
                 Invite team member
               </CardTitle>
-              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Set their role and which clients they can work on
               </CardDescription>
             </CardHeader>
@@ -863,9 +854,7 @@ export default function TeamPage() {
                   onClick={() => closeEdit()}
                   disabled={savingMember}
                   className={`rounded-lg p-1.5 shrink-0 ${
-                    isDark
-                      ? "text-slate-400 hover:bg-slate-700 hover:text-white"
-                      : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                    "text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
                   }`}
                   aria-label="Close"
                 >
@@ -918,9 +907,7 @@ export default function TeamPage() {
                 {editClientIds.length === 0 ? (
                   <p
                     className={`text-sm rounded-xl border px-3 py-2.5 ${
-                      isDark
-                        ? "border-slate-600 text-slate-400"
-                        : "border-gray-200 text-gray-500"
+                      "border-gray-200 text-gray-500 dark:border-slate-600 dark:text-slate-400"
                     }`}
                   >
                     Select clients above to assign tasks.
@@ -935,9 +922,7 @@ export default function TeamPage() {
                 ) : (
                   <div
                     className={`max-h-44 overflow-y-auto rounded-xl border divide-y ${
-                      isDark
-                        ? "border-slate-600 divide-slate-600"
-                        : "border-gray-200 divide-gray-100"
+                      "border-gray-200 divide-gray-100 dark:border-slate-600 dark:divide-slate-600"
                     }`}
                   >
                     {editOpenTasks.length === 0 ? (
@@ -956,7 +941,7 @@ export default function TeamPage() {
                           <label
                             key={task.id}
                             className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer transition-colors ${
-                              isDark ? "hover:bg-slate-700/60" : "hover:bg-gray-50"
+                              "hover:bg-gray-50 dark:hover:bg-slate-700/60"
                             }`}
                           >
                             <input
@@ -970,7 +955,7 @@ export default function TeamPage() {
                             <span className="min-w-0 flex-1">
                               <span
                                 className={`block text-sm font-medium ${
-                                  isDark ? "text-slate-100" : "text-gray-900"
+                                  "text-gray-900 dark:text-slate-100"
                                 }`}
                               >
                                 {typeLabel}
@@ -1004,7 +989,7 @@ export default function TeamPage() {
 
                 <div
                   className={`rounded-xl border p-3 space-y-2.5 ${
-                    isDark ? "border-slate-600 bg-slate-900/40" : "border-gray-200 bg-gray-50/80"
+                    "border-gray-200 bg-gray-50/80 dark:border-slate-600 dark:bg-slate-900/40"
                   }`}
                 >
                   <p

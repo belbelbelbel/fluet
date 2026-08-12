@@ -10,7 +10,6 @@ import {
   Youtube,
   Facebook,
 } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 
 /**
@@ -120,8 +119,6 @@ export function PostRow({
   actions?: ReactNode;
   onClick?: () => void;
 }) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   const meta = platformMeta(platform);
   const Icon = meta.icon;
@@ -143,7 +140,7 @@ export function PostRow({
       className={cn(
         "group relative flex gap-4 rounded-xl px-4 py-4 transition-colors sm:px-5",
         interactive && "cursor-pointer",
-        interactive && (isDark ? "hover:bg-white/[0.03]" : "hover:bg-slate-50")
+        interactive && ("hover:bg-slate-50 dark:hover:bg-white/[0.03]")
       )}
     >
       {/* Status rail — state readable before a single word is parsed */}
@@ -164,19 +161,19 @@ export function PostRow({
 
       <div className="min-w-0 flex-1">
         <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-          <span className={cn("font-semibold", isDark ? "text-slate-200" : "text-slate-700")}>
+          <span className={cn("font-semibold", "text-slate-700 dark:text-slate-200")}>
             {meta.label}
           </span>
-          <span className={isDark ? "text-slate-600" : "text-slate-300"}>·</span>
+          <span className={"text-slate-300 dark:text-slate-600"}>·</span>
           <span
             title={absoluteTime(scheduledFor)}
-            className={cn("tabular-nums", isDark ? "text-slate-400" : "text-slate-500")}
+            className={cn("tabular-nums", "text-slate-500 dark:text-slate-400")}
           >
             {relativeTime(scheduledFor)}
           </span>
           {status && status !== "scheduled" && (
             <>
-              <span className={isDark ? "text-slate-600" : "text-slate-300"}>·</span>
+              <span className={"text-slate-300 dark:text-slate-600"}>·</span>
               <span className={cn("inline-flex items-center gap-1.5 font-medium", state.fg)}>
                 <span className={cn("h-1.5 w-1.5 rounded-full", state.dot)} />
                 {state.label}
@@ -188,7 +185,7 @@ export function PostRow({
         <p
           className={cn(
             "line-clamp-2 text-[13.5px] leading-relaxed",
-            isDark ? "text-slate-300" : "text-slate-700"
+            "text-slate-700 dark:text-slate-300"
           )}
         >
           {body}
@@ -198,7 +195,7 @@ export function PostRow({
           <p
             className={cn(
               "mt-1.5 truncate text-xs",
-              isDark ? "text-slate-500" : "text-slate-400"
+              "text-muted-foreground"
             )}
           >
             {tags.join(" ")}

@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ClientAvatar } from "@/components/ClientAvatar";
-import { useTheme } from "@/contexts/ThemeContext";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import {
   TrendingUp,
@@ -289,8 +288,6 @@ export default function DashboardPage() {
 
   const weekDates = getWeekDates();
 
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   // Everything that used to sit above the KPI row — payment/credit banners and
   // the "Needs attention" panel — folded into one docked toast so the page
@@ -377,15 +374,13 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="relative">
               <Bell className={`w-5 h-5 cursor-pointer ${
-                isDark
-                  ? "text-gray-400 hover:text-white"
-                  : "text-gray-600 hover:text-gray-950"
+                "text-gray-600 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
               }`} />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </div>
             <div className="relative flex-1 sm:flex-none">
               <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                isDark ? "text-gray-500" : "text-gray-400"
+                "text-gray-400 dark:text-gray-500"
               }`} />
               <Input
                 type="text"
@@ -393,7 +388,7 @@ export default function DashboardPage() {
                 className="pl-9 w-full sm:w-48 lg:w-64"
               />
               <span className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-xs hidden sm:inline ${
-                isDark ? "text-gray-500" : "text-gray-400"
+                "text-gray-400 dark:text-gray-500"
               }`}>
                 /
               </span>
@@ -448,7 +443,7 @@ export default function DashboardPage() {
           </Card>
 
           <Card className={`rounded-xl sm:col-span-2 lg:col-span-1 transition-colors ${
-            isDark ? "bg-gray-900" : "bg-white"
+            "bg-white dark:bg-gray-900"
           }`}>
             <CardContent className="p-4 sm:p-6">
               <div className={`text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 text-muted-foreground`}>
@@ -482,7 +477,7 @@ export default function DashboardPage() {
                     size="sm"
                     onClick={() => router.push("/dashboard/clients")}
                     className={`text-xs sm:text-sm ${
-                      isDark ? "text-slate-300 hover:text-white hover:bg-slate-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      "text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700"
                     }`}
                   >
                     Manage all
@@ -506,7 +501,7 @@ export default function DashboardPage() {
                         key={client.id}
                         onClick={() => router.push(`/dashboard/clients/${client.id}`)}
                         className={`flex items-center gap-2.5 px-3 py-2.5 rounded-md border border-border text-left min-w-0 transition-colors hover:bg-accent/50 ${
-                          isDark ? "bg-card" : "bg-card"
+                          "bg-card dark:bg-card"
                         }`}
                       >
                         <ClientAvatar name={client.name} size="sm" />
@@ -532,7 +527,7 @@ export default function DashboardPage() {
                 </>
               ) : (
                 <div className={`py-6 text-center rounded-lg border border-dashed border-gray-200 dark:border-slate-600 ${
-                  isDark ? "bg-slate-900/30" : "bg-gray-50"
+                  "bg-gray-50 dark:bg-slate-900/30"
                 }`}>
                   <Building2 className={`w-10 h-10 mx-auto mb-2 text-muted-foreground/70`} />
                   <p className={`text-sm font-medium text-muted-foreground`}>
@@ -568,9 +563,7 @@ export default function DashboardPage() {
                         setOverviewRange(e.target.value as "7d" | "30d" | "90d")
                       }
                       className={`flex-1 sm:flex-none text-xs sm:text-sm border rounded-lg px-2 sm:px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring ${
-                      isDark 
-                        ? "bg-slate-700 border-slate-600 text-slate-200" 
-                        : "bg-white border-gray-200 text-gray-700"
+                      "bg-white border-gray-200 text-gray-700 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
                     }`}
                     >
                       <option value="7d">Last 7 days</option>
@@ -580,7 +573,7 @@ export default function DashboardPage() {
                     <Link
                       href="/dashboard/analytics"
                       className={`text-xs font-medium whitespace-nowrap ${
-                        isDark ? "text-slate-300 hover:text-white" : "text-gray-600 hover:text-gray-950"
+                        "text-gray-600 hover:text-gray-950 dark:text-slate-300 dark:hover:text-white"
                       }`}
                     >
                       Full analytics
@@ -589,7 +582,7 @@ export default function DashboardPage() {
                 </div>
               </CardHeader>
               <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <MiniVolumeChart series={overview.contentVolume} isDark={isDark} />
+                <MiniVolumeChart series={overview.contentVolume} />
               </CardContent>
             </Card>
 
@@ -620,7 +613,7 @@ export default function DashboardPage() {
                         <div
                           key={item.label}
                           className={`rounded-lg p-3 ${
-                            isDark ? "bg-slate-700/60" : "bg-gray-50"
+                            "bg-gray-50 dark:bg-slate-700/60"
                           }`}
                         >
                           <div className="flex items-center gap-1.5 mb-1">
@@ -656,7 +649,7 @@ export default function DashboardPage() {
                               {p.platform}
                             </span>
                             <span
-                              className={isDark ? "text-slate-400" : "text-gray-500"}
+                              className={"text-muted-foreground"}
                             >
                               {p.engagement}% · {p.views.toLocaleString()} views
                             </span>
@@ -668,7 +661,7 @@ export default function DashboardPage() {
                 ) : (
                   <div
                     className={`rounded-lg px-4 py-6 text-center ${
-                      isDark ? "bg-slate-700/40" : "bg-gray-50"
+                      "bg-gray-50 dark:bg-slate-700/40"
                     }`}
                   >
                     <p
@@ -719,7 +712,7 @@ export default function DashboardPage() {
                               {p.platform}
                             </span>
                             <span
-                              className={isDark ? "text-slate-400" : "text-gray-500"}
+                              className={"text-muted-foreground"}
                             >
                               {p.posts} posts
                             </span>
@@ -761,9 +754,7 @@ export default function DashboardPage() {
                       className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg text-center min-w-[60px] sm:min-w-[70px] ${
                         date.isToday
                           ? "bg-primary text-primary-foreground"
-                          : isDark
-                          ? "bg-slate-700 text-slate-200 hover:bg-slate-600"
-                          : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                          : "bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
                       }`}
                     >
                       <div className="text-xs font-medium">{date.day}</div>
@@ -786,7 +777,7 @@ export default function DashboardPage() {
                   <Link
                     href="/dashboard/inbox"
                     className={`text-xs font-medium ${
-                      isDark ? "text-slate-300 hover:text-white" : "text-gray-600 hover:text-gray-950"
+                      "text-gray-600 hover:text-gray-950 dark:text-slate-300 dark:hover:text-white"
                     }`}
                   >
                     Open all
@@ -810,10 +801,8 @@ export default function DashboardPage() {
 
 function MiniVolumeChart({
   series,
-  isDark,
 }: {
   series: { date: string; generated: number; scheduled: number }[];
-  isDark: boolean;
 }) {
   if (!series.length) {
     return (
@@ -847,11 +836,11 @@ function MiniVolumeChart({
                 style={{ height: `${h}%` }}
               >
                 <div
-                  className={isDark ? "bg-sky-400/90" : "bg-sky-500"}
+                  className={"bg-sky-500 dark:bg-sky-400/90"}
                   style={{ height: `${genShare}%`, minHeight: day.generated ? 2 : 0 }}
                 />
                 <div
-                  className={isDark ? "bg-emerald-400/80" : "bg-emerald-500/80"}
+                  className={"bg-emerald-500/80 dark:bg-emerald-400/80"}
                   style={{
                     height: `${100 - genShare}%`,
                     minHeight: day.scheduled ? 2 : 0,
@@ -866,12 +855,12 @@ function MiniVolumeChart({
         className={`flex flex-wrap gap-4 text-xs text-muted-foreground`}
       >
         <span className="inline-flex items-center gap-1.5">
-          <span className={`h-2 w-2 rounded-sm ${isDark ? "bg-sky-400" : "bg-sky-500"}`} />
+          <span className={`h-2 w-2 rounded-sm ${"bg-sky-500 dark:bg-sky-400"}`} />
           {totalGen} generated
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span
-            className={`h-2 w-2 rounded-sm ${isDark ? "bg-emerald-400" : "bg-emerald-500"}`}
+            className={`h-2 w-2 rounded-sm ${"bg-emerald-500 dark:bg-emerald-400"}`}
           />
           {totalSched} scheduled
         </span>

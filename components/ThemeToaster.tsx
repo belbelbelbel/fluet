@@ -20,13 +20,14 @@ const toastDescription =
   "!text-xs !text-muted-foreground !leading-relaxed !mt-0.5";
 
 export function ThemeToaster() {
+  // Sonner renders in a portal outside the themed tree, so it cannot inherit
+  // `.dark` from <html> — it needs the resolved value passed explicitly.
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
 
   return (
     <Toaster
       position="bottom-right"
-      theme={isDark ? "dark" : "light"}
+      theme={resolvedTheme}
       closeButton
       gap={8}
       offset={16}

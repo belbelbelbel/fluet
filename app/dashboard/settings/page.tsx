@@ -416,62 +416,48 @@ export default function SettingsPage() {
       <Tabs defaultValue="ai" className="space-y-6">
         <div className={`border-b transition-colors duration-300 border-border -mx-4 sm:mx-0 px-4 sm:px-0`}>
           <TabsList className={`bg-transparent h-auto p-0 w-full justify-start gap-0 flex-wrap sm:flex-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide border-0 ${
-            isDark ? "" : ""
+            ""
           }`}>
             <TabsTrigger value="agency" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              isDark
-                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Bot className="w-4 h-4 mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Agency Profile</span>
               <span className="sm:hidden">Agency</span>
             </TabsTrigger>
             <TabsTrigger value="integrations" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              isDark
-                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <LinkIcon className="w-4 h-4 mr-2 flex-shrink-0" />
               Integrations
             </TabsTrigger>
             <TabsTrigger value="team" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              isDark
-                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Check className="w-4 h-4 mr-2 flex-shrink-0" />
               Team
             </TabsTrigger>
             <TabsTrigger value="notifications" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              isDark
-                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
               <span className="hidden md:inline">Notifications</span>
               <span className="md:hidden">Notify</span>
             </TabsTrigger>
             <TabsTrigger value="ai" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              isDark
-                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Brain className="w-4 h-4 mr-2 flex-shrink-0" />
               AI
             </TabsTrigger>
             <TabsTrigger value="workflow" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              isDark
-                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <Cpu className="w-4 h-4 mr-2 flex-shrink-0" />
               Workflow
             </TabsTrigger>
             <TabsTrigger value="billing" className={`flex-shrink-0 px-3 sm:px-4 py-3 text-sm font-medium border-b-[3px] rounded-t-lg transition-all duration-200 -mb-px min-h-[44px] touch-manipulation ${
-              isDark
-                ? "data-[state=active]:text-purple-300 data-[state=active]:border-purple-500 data-[state=active]:bg-purple-950/40 border-transparent text-slate-400 hover:text-slate-300"
-                : "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950"
+              "data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-muted data-[state=active]:font-semibold border-transparent text-gray-600 hover:text-gray-950 dark:data-[state=active]:text-purple-300 dark:data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/40 dark:border-transparent dark:text-slate-400 dark:hover:text-slate-300"
             }`}>
               <CreditCard className="w-4 h-4 mr-2 flex-shrink-0" />
               Billing
@@ -485,7 +471,7 @@ export default function SettingsPage() {
           <Card className={`bg-card border-border rounded-xl shadow-sm`}>
             <CardHeader className={`border-b border-border bg-muted/50`}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>Agency Information</CardTitle>
-              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Manage your agency profile and contact details
               </CardDescription>
             </CardHeader>
@@ -499,13 +485,11 @@ export default function SettingsPage() {
                   value={user?.fullName || ""}
                   readOnly
                   className={`w-full px-4 py-2 border rounded-lg ${
-                    isDark
-                      ? "border-slate-600 bg-slate-700 text-slate-200"
-                      : "border-gray-300 bg-gray-50 text-gray-600"
+                    "border-gray-300 bg-gray-50 text-gray-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                   }`}
                 />
                 <p className={`text-xs mt-1 ${
-                  isDark ? "text-gray-500" : "text-gray-500"
+                  "text-muted-foreground"
                 }`}>
                   Agency name is managed through your account profile
           </p>
@@ -519,51 +503,43 @@ export default function SettingsPage() {
                   value={user?.primaryEmailAddress?.emailAddress || ""}
                   readOnly
                   className={`w-full px-4 py-2 border rounded-lg ${
-                    isDark
-                      ? "border-slate-600 bg-slate-700 text-slate-200"
-                      : "border-gray-300 bg-gray-50 text-gray-600"
+                    "border-gray-300 bg-gray-50 text-gray-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
                   }`}
                 />
               </div>
               <div className={`pt-4 border-t ${
-                isDark ? "border-gray-800" : "border-gray-200"
+                "border-gray-200 dark:border-gray-800"
               }`}>
                 <h3 className={`text-sm font-semibold mb-4 text-foreground`}>Quick Stats</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className={`p-4 rounded-lg border ${
-                    isDark
-                      ? "bg-purple-950/50 border-purple-900"
-                      : "bg-muted border-purple-200"
+                    "bg-muted border-purple-200 dark:bg-purple-950/50 dark:border-purple-900"
                   }`}>
                     <div className={`text-2xl font-bold mb-1 ${
-                      isDark ? "text-purple-300" : "text-purple-900"
+                      "text-purple-900 dark:text-purple-300"
                     }`}>{agencyStats.clients}</div>
                     <div className={`text-sm ${
-                      isDark ? "text-purple-400" : "text-foreground"
+                      "text-foreground dark:text-purple-400"
                     }`}>Active Clients</div>
                   </div>
                   <div className={`p-4 rounded-lg border ${
-                    isDark
-                      ? "bg-blue-950/50 border-blue-900"
-                      : "bg-blue-50 border-blue-200"
+                    "bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:border-blue-900"
                   }`}>
                     <div className={`text-2xl font-bold mb-1 ${
-                      isDark ? "text-blue-300" : "text-blue-900"
+                      "text-blue-900 dark:text-blue-300"
                     }`}>{agencyStats.team}</div>
                     <div className={`text-sm ${
-                      isDark ? "text-blue-400" : "text-blue-700"
+                      "text-blue-700 dark:text-blue-400"
                     }`}>Team Members</div>
                   </div>
                   <div className={`p-4 rounded-lg border ${
-                    isDark
-                      ? "bg-green-950/50 border-green-900"
-                      : "bg-green-50 border-green-200"
+                    "bg-green-50 border-green-200 dark:bg-green-950/50 dark:border-green-900"
                   }`}>
                     <div className={`text-2xl font-bold mb-1 ${
-                      isDark ? "text-green-300" : "text-green-900"
+                      "text-green-900 dark:text-green-300"
                     }`}>{usage?.usageCount ?? 0}</div>
                     <div className={`text-sm ${
-                      isDark ? "text-green-400" : "text-green-700"
+                      "text-green-700 dark:text-green-400"
                     }`}>Generations this month</div>
                   </div>
                 </div>
@@ -573,12 +549,12 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="billing" className="space-y-6">
-          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
-            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+          <Card className={"bg-card border-border rounded-xl shadow-sm"}>
+            <CardHeader className={"border-b border-border bg-muted/50"}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>
                 Plan & usage
               </CardTitle>
-              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 See what’s included this month and upgrade when you need more.
               </CardDescription>
             </CardHeader>
@@ -599,10 +575,10 @@ export default function SettingsPage() {
 
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className={isDark ? "text-slate-300" : "text-gray-700"}>
+                  <span className={"text-foreground/80"}>
                     Generations used
                   </span>
-                  <span className={isDark ? "text-slate-400" : "text-gray-500"}>
+                  <span className={"text-muted-foreground"}>
                     {usage
                       ? `${usage.usageCount} / ${
                           usage.limit === Infinity || !Number.isFinite(usage.limit)
@@ -650,10 +626,10 @@ export default function SettingsPage() {
 
         {/* Integrations Tab */}
         <TabsContent value="integrations" className="space-y-6">
-          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
-            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+          <Card className={"bg-card border-border rounded-xl shadow-sm"}>
+            <CardHeader className={"border-b border-border bg-muted/50"}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>Social Media Integrations</CardTitle>
-              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Connect your social media accounts for automated posting
               </CardDescription>
             </CardHeader>
@@ -764,14 +740,14 @@ export default function SettingsPage() {
                 {publishReport ? (
                   <div
                     className={`rounded-xl border p-4 space-y-3 text-sm ${
-                      isDark ? "bg-slate-900/60 border-slate-700" : "bg-white border-gray-200"
+                      "bg-white border-gray-200 dark:bg-slate-900/60 dark:border-slate-700"
                     }`}
                   >
-                    <p className={isDark ? "text-slate-300" : "text-gray-700"}>
+                    <p className={"text-foreground/80"}>
                       {publishReport.canAutoPostTwitter
                         ? "Twitter token looks good."
                         : "Twitter not ready for auto-post yet."}{" "}
-                      <span className={isDark ? "text-slate-400" : "text-gray-500"}>
+                      <span className={"text-muted-foreground"}>
                         {publishReport.readyCount}/{publishReport.dueCount} due posts ready
                       </span>
                     </p>
@@ -781,12 +757,8 @@ export default function SettingsPage() {
                           key={c.id}
                           className={
                             c.ok
-                              ? isDark
-                                ? "text-emerald-300"
-                                : "text-emerald-700"
-                              : isDark
-                                ? "text-amber-200"
-                                : "text-amber-800"
+                              ? "text-emerald-700 dark:text-emerald-300"
+                              : "text-amber-800 dark:text-amber-200"
                           }
                         >
                           <span className="flex items-center gap-2">
@@ -801,9 +773,9 @@ export default function SettingsPage() {
                       ))}
                     </ul>
                     {publishReport.duePosts.length > 0 ? (
-                      <ul className={`space-y-2 pt-1 border-t ${isDark ? "border-slate-700" : "border-gray-100"}`}>
+                      <ul className={`space-y-2 pt-1 border-t ${"border-gray-100 dark:border-slate-700"}`}>
                         {publishReport.duePosts.slice(0, 8).map((p) => (
-                          <li key={p.id} className={isDark ? "text-slate-300" : "text-gray-700"}>
+                          <li key={p.id} className={"text-foreground/80"}>
                             <span className="font-medium capitalize">#{p.id} {p.platform}</span>
                             {" — "}
                             {p.ready ? "ready" : p.reason}
@@ -819,14 +791,14 @@ export default function SettingsPage() {
                       </p>
                     )}
                     {publishReport.lastRun ? (
-                      <div className={`pt-2 border-t ${isDark ? "border-slate-700" : "border-gray-100"}`}>
+                      <div className={`pt-2 border-t ${"border-gray-100 dark:border-slate-700"}`}>
                         <p className={`text-xs font-medium mb-1 text-muted-foreground`}>
                           Last run: {publishReport.lastRun.successful} posted ·{" "}
                           {publishReport.lastRun.failed} failed · {publishReport.lastRun.skipped} skipped
                         </p>
                         <ul className="space-y-1 text-xs">
                           {publishReport.lastRun.actions.slice(0, 10).map((a) => (
-                            <li key={`${a.id}-${a.result}`} className={isDark ? "text-slate-400" : "text-gray-600"}>
+                            <li key={`${a.id}-${a.result}`} className={"text-muted-foreground"}>
                               #{a.id} {a.platform}: {a.result}
                             </li>
                           ))}
@@ -1072,9 +1044,9 @@ export default function SettingsPage() {
               <div className={`rounded-xl border p-4 bg-muted/50 border-border`}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isDark ? "bg-blue-900" : "bg-blue-100"
+                    "bg-blue-100 dark:bg-blue-900"
                   }`}>
-                    <Calendar className={`w-5 h-5 ${isDark ? "text-blue-300" : "text-blue-700"}`} />
+                    <Calendar className={`w-5 h-5 ${"text-blue-700 dark:text-blue-300"}`} />
                   </div>
                   <div>
                     <h3 className={`font-semibold text-foreground`}>
@@ -1155,12 +1127,12 @@ export default function SettingsPage() {
 
         {/* Team Tab */}
         <TabsContent value="team" className="space-y-6">
-          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
-            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+          <Card className={"bg-card border-border rounded-xl shadow-sm"}>
+            <CardHeader className={"border-b border-border bg-muted/50"}>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className={`text-lg font-semibold text-foreground`}>Team Management</CardTitle>
-                  <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+                  <CardDescription className={"text-muted-foreground"}>
                     Invite team members, assign roles, and manage permissions
                   </CardDescription>
         </div>
@@ -1174,7 +1146,7 @@ export default function SettingsPage() {
             </CardHeader>
             <div className="p-6">
               <div className="text-center py-8">
-                <Check className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
+                <Check className={`w-12 h-12 mx-auto mb-4 ${"text-purple-300 dark:text-purple-400"}`} />
                 <h3 className={`text-lg font-semibold mb-2 text-foreground`}>Team Collaboration</h3>
                 <p className={`mb-4 text-muted-foreground`}>
                   Invite team members, assign roles, and manage permissions for your agency
@@ -1182,7 +1154,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={() => window.location.href = "/dashboard/team"}
                   variant="outline"
-                  className={isDark ? "border-slate-600 text-purple-300 hover:bg-slate-700" : "border-purple-200 text-foreground hover:bg-muted"}
+                  className={"border-purple-200 text-foreground hover:bg-muted dark:border-slate-600 dark:text-purple-300 dark:hover:bg-slate-700"}
                 >
                   Go to Team Page
                 </Button>
@@ -1193,10 +1165,10 @@ export default function SettingsPage() {
 
         {/* Workflow Tab */}
         <TabsContent value="workflow" className="space-y-6">
-          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
-            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+          <Card className={"bg-card border-border rounded-xl shadow-sm"}>
+            <CardHeader className={"border-b border-border bg-muted/50"}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>Workflow Preferences</CardTitle>
-              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Configure default workflow settings for your agency
               </CardDescription>
             </CardHeader>
@@ -1230,10 +1202,10 @@ export default function SettingsPage() {
 
         {/* Appearance Tab */}
         <TabsContent value="appearance" className="space-y-6">
-          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
-            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+          <Card className={"bg-card border-border rounded-xl shadow-sm"}>
+            <CardHeader className={"border-b border-border bg-muted/50"}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>Appearance</CardTitle>
-              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Customize the look and feel of your dashboard
               </CardDescription>
             </CardHeader>
@@ -1260,12 +1232,12 @@ export default function SettingsPage() {
                       }}
                       className={`p-4 rounded-xl border text-center transition-all ${
                         currentTheme === theme
-                          ? isDark ? "border-purple-500 bg-purple-900/40" : "border-primary bg-muted"
-                          : isDark ? "border-slate-700 bg-slate-800 hover:border-slate-600" : "border-gray-200 bg-white hover:border-gray-300"
+                          ? "border-primary bg-muted dark:border-purple-500 dark:bg-purple-900/40"
+                          : "border-gray-200 bg-white hover:border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
                       }`}
                     >
                       <p className={`font-semibold capitalize text-sm ${
-                        currentTheme === theme ? (isDark ? "text-purple-300" : "text-purple-900") : (isDark ? "text-white" : "text-gray-950")
+                        currentTheme === theme ? ("text-purple-900 dark:text-purple-300") : ("text-foreground")
                       }`}>{theme}</p>
                     </button>
                   )              )}
@@ -1277,12 +1249,12 @@ export default function SettingsPage() {
 
         {/* Team Tab */}
         <TabsContent value="team" className="space-y-6">
-          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
-            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+          <Card className={"bg-card border-border rounded-xl shadow-sm"}>
+            <CardHeader className={"border-b border-border bg-muted/50"}>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className={`text-lg font-semibold text-foreground`}>Team Management</CardTitle>
-                  <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+                  <CardDescription className={"text-muted-foreground"}>
                     Invite team members, assign roles, and manage permissions
                   </CardDescription>
                 </div>
@@ -1296,7 +1268,7 @@ export default function SettingsPage() {
             </CardHeader>
             <div className="p-6">
               <div className="text-center py-8">
-                <Check className={`w-12 h-12 mx-auto mb-4 ${isDark ? "text-purple-400" : "text-purple-300"}`} />
+                <Check className={`w-12 h-12 mx-auto mb-4 ${"text-purple-300 dark:text-purple-400"}`} />
                 <h3 className={`text-lg font-semibold mb-2 text-foreground`}>Team Collaboration</h3>
                 <p className={`mb-4 text-muted-foreground`}>
                   Invite team members, assign roles, and manage permissions for your agency
@@ -1304,7 +1276,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={() => window.location.href = "/dashboard/team"}
                   variant="outline"
-                  className={isDark ? "border-slate-600 text-purple-300 hover:bg-slate-700" : "border-purple-200 text-foreground hover:bg-muted"}
+                  className={"border-purple-200 text-foreground hover:bg-muted dark:border-slate-600 dark:text-purple-300 dark:hover:bg-slate-700"}
                 >
                   Go to Team Page
                 </Button>
@@ -1315,10 +1287,10 @@ export default function SettingsPage() {
 
         {/* Notifications Tab */}
         <TabsContent value="notifications" className="space-y-6">
-          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
-            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+          <Card className={"bg-card border-border rounded-xl shadow-sm"}>
+            <CardHeader className={"border-b border-border bg-muted/50"}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>Email Notifications</CardTitle>
-              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Configure when you receive email notifications
               </CardDescription>
             </CardHeader>
@@ -1398,10 +1370,10 @@ export default function SettingsPage() {
 
         {/* AI Settings Tab */}
         <TabsContent value="ai" className="space-y-6">
-          <Card className={isDark ? "bg-slate-800 border-slate-700 rounded-xl shadow-sm" : "bg-white border-gray-200 rounded-xl shadow-sm"}>
-            <CardHeader className={isDark ? "border-b border-slate-700 bg-slate-800/50" : "border-b border-gray-200 bg-gray-50"}>
+          <Card className={"bg-card border-border rounded-xl shadow-sm"}>
+            <CardHeader className={"border-b border-border bg-muted/50"}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>AI Model Selection</CardTitle>
-              <CardDescription className={isDark ? "text-slate-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Choose your preferred AI model for content generation
               </CardDescription>
             </CardHeader>
@@ -1415,7 +1387,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-md text-left focus:outline-none focus:ring-1 focus-visible:ring-ring focus-visible:border-ring transition-colors text-sm ${isDark ? "bg-slate-700 border-slate-600 hover:border-slate-500" : "bg-white border-gray-300 hover:border-gray-400"}`}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-md text-left focus:outline-none focus:ring-1 focus-visible:ring-ring focus-visible:border-ring transition-colors text-sm ${"bg-white border-gray-300 hover:border-gray-400 dark:bg-slate-700 dark:border-slate-600 dark:hover:border-slate-500"}`}
                   >
                     <div className="flex items-center gap-2.5 flex-1 min-w-0">
                       {(() => {
@@ -1428,10 +1400,10 @@ export default function SettingsPage() {
                             </div>
                             <span className={`font-medium text-sm text-foreground`}>{selectedModel.name}</span>
                             <span className={`text-xs ${
-                              isDark ? "text-gray-500" : "text-gray-500"
+                              "text-muted-foreground"
                             }`}>•</span>
                             <span className={`text-xs ${
-                              isDark ? "text-gray-500" : "text-gray-500"
+                              "text-muted-foreground"
                             }`}>{selectedModel.provider}</span>
                           </>
                         );
@@ -1439,7 +1411,7 @@ export default function SettingsPage() {
                     </div>
                     <ChevronDown 
                       className={`w-4 h-4 flex-shrink-0 transition-transform ${
-                        isDark ? "text-gray-500" : "text-gray-400"
+                        "text-gray-400 dark:text-gray-500"
                       } ${isModelDropdownOpen ? 'transform rotate-180' : ''}`}
                     />
                   </button>
@@ -1447,9 +1419,7 @@ export default function SettingsPage() {
                   {/* Simple Dropdown Menu */}
                   {isModelDropdownOpen && (
                     <div className={`absolute z-50 w-full mt-1 border rounded-md shadow-lg max-h-64 overflow-y-auto ${
-                      isDark
-                        ? "bg-slate-800 border-slate-700"
-                        : "bg-white border-gray-300"
+                      "bg-white border-gray-300 dark:bg-slate-800 dark:border-slate-700"
                     }`}>
                       <div className="py-1">
                         {aiModels.map((model) => {
@@ -1475,20 +1445,20 @@ export default function SettingsPage() {
                             <div className="flex items-center gap-2">
                                   <span className={`font-medium ${
                                     isSelected
-                                      ? isDark ? "text-white" : "text-gray-950"
-                                      : isDark ? "text-gray-300" : "text-gray-700"
+                                      ? "text-foreground"
+                                      : "text-foreground/80"
                                   }`}>
                                     {model.name}
                                   </span>
                                   <span className={`text-xs ${
-                                    isDark ? "text-gray-600" : "text-gray-400"
+                                    "text-gray-400 dark:text-gray-600"
                                   }`}>•</span>
                                   <span className={`text-xs ${
-                                    isDark ? "text-gray-500" : "text-gray-500"
+                                    "text-muted-foreground"
                                   }`}>{model.provider}</span>
                                   {isSelected && (
                                     <Check className={`w-4 h-4 ml-auto flex-shrink-0 ${
-                                      isDark ? "text-purple-400" : "text-gray-950"
+                                      "text-gray-950 dark:text-purple-400"
                                     }`} />
                                   )}
                                 </div>
@@ -1507,7 +1477,7 @@ export default function SettingsPage() {
           <Card className={`bg-card border-border rounded-xl shadow-sm`}>
             <CardHeader className={`border-b border-border bg-muted/50`}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>Niche Selection</CardTitle>
-              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Choose your niche to get personalized content ideas
               </CardDescription>
             </CardHeader>
@@ -1530,12 +1500,8 @@ export default function SettingsPage() {
                       }}
                       className={`relative p-4 rounded-xl border transition-all text-left ${
                         isSelected
-                          ? isDark
-                            ? "border-primary bg-purple-950/50 text-purple-200"
-                            : "border-primary bg-muted text-purple-900"
-                          : isDark
-                          ? "border-slate-600 bg-slate-700 hover:border-slate-500"
-                          : "border-gray-200 bg-white hover:border-gray-300"
+                          ? "border-primary bg-muted text-purple-900 dark:border-primary dark:bg-purple-950/50 dark:text-purple-200"
+                          : "border-gray-200 bg-white hover:border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-500"
                       }`}
                     >
                       {isSelected && (
@@ -1547,21 +1513,21 @@ export default function SettingsPage() {
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                           isSelected
-                            ? isDark ? "bg-purple-900/50" : "bg-purple-100"
-                            : isDark ? "bg-gray-700" : "bg-gray-100"
+                            ? "bg-purple-100 dark:bg-purple-900/50"
+                            : "bg-gray-100 dark:bg-gray-700"
                         }`}>
                           <Icon className={`w-5 h-5 ${
                             isSelected
-                              ? isDark ? "text-purple-400" : "text-foreground"
-                              : isDark ? "text-gray-400" : "text-gray-600"
+                              ? "text-foreground dark:text-purple-400"
+                              : "text-muted-foreground"
                           }`} />
                         </div>
                         
                         <div className="flex-1 min-w-0">
                           <h3 className={`font-semibold text-sm ${
                             isSelected
-                              ? isDark ? "text-slate-100" : "text-gray-950"
-                              : isDark ? "text-white" : "text-gray-950"
+                              ? "text-gray-950 dark:text-slate-100"
+                              : "text-foreground"
                           }`}>
                             {niche.name}
                           </h3>
@@ -1577,7 +1543,7 @@ export default function SettingsPage() {
           <Card className={`bg-card border-border rounded-xl shadow-sm`}>
             <CardHeader className={`border-b border-border bg-muted/50`}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>Content Settings</CardTitle>
-              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Configure your content generation preferences
               </CardDescription>
             </CardHeader>
@@ -1614,7 +1580,7 @@ export default function SettingsPage() {
           <Card className={`bg-card border-border rounded-xl shadow-sm`}>
             <CardHeader className={`border-b border-border bg-muted/50`}>
               <CardTitle className={`text-lg font-semibold text-foreground`}>Appearance</CardTitle>
-              <CardDescription className={isDark ? "text-gray-400" : "text-gray-600"}>
+              <CardDescription className={"text-muted-foreground"}>
                 Customize the look and feel of your dashboard
               </CardDescription>
             </CardHeader>
@@ -1641,18 +1607,14 @@ export default function SettingsPage() {
                       }}
                       className={`p-4 rounded-xl border text-center transition-all ${
                         currentTheme === theme
-                          ? isDark
-                            ? "border-primary bg-purple-950/50"
-                            : "border-primary bg-muted"
-                          : isDark
-                          ? "border-slate-600 bg-slate-700 hover:border-slate-500"
-                          : "border-gray-200 bg-white hover:border-gray-300"
+                          ? "border-primary bg-muted dark:border-primary dark:bg-purple-950/50"
+                          : "border-gray-200 bg-white hover:border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:hover:border-slate-500"
                       }`}
                     >
                       <p className={`font-semibold capitalize text-sm ${
                         currentTheme === theme
-                          ? isDark ? "text-purple-300" : "text-purple-900"
-                          : isDark ? "text-white" : "text-gray-950"
+                          ? "text-purple-900 dark:text-purple-300"
+                          : "text-foreground"
                       }`}>{theme}</p>
                     </button>
                   ))}
@@ -1665,7 +1627,7 @@ export default function SettingsPage() {
 
       {/* Save notice + button */}
       <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t ${
-        isDark ? "border-gray-800" : "border-gray-200"
+        "border-gray-200 dark:border-gray-800"
       }`}>
         <p className={`text-sm max-w-xl text-muted-foreground`}>
           <span className={`font-medium text-foreground/80`}>
@@ -1678,9 +1640,7 @@ export default function SettingsPage() {
           disabled={saving}
           variant="outline"
           className={`rounded-md px-6 py-2 text-sm font-medium shrink-0 ${
-            isDark
-              ? "border-slate-600 text-slate-300 hover:bg-slate-800"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+            "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
           }`}
         >
           {saving ? (
