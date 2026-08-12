@@ -1,0 +1,66 @@
+name: Publish due posts
+
+# Vercel's Hobby plan only permits a once-daily cron, which is far too slow for
+# publishing posts near their scheduled time. vercel.json keeps a daily run as a
+# backstop; this workflow drives the same endpoint every 15 minutes.
+#
+# Requires a repository secret named CRON_SECRET whose value matches the
+# CRON_SECRET environment variable in Vercel production.
+#   Settings -> Secrets and variables -> Actions -> New repository secret
+#
+# Note: GitHub disables scheduled workflows after 60 days without repo activity,
+# and queued runs can be delayed at peak times, so treat the cadence as
+# best-effort rather than exact.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  # Allows a manual run from the Actions tab, optionally as a dry run.
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: "Report due posts without publishing them"
+        type: boolean
+        default: false
+
+concurrency:
+  # Never let two publish runs overlap — a slow run must not race the next tick.
+  group: publish-due-posts
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger scheduled publishing
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          DRY_RUN: ${{ inputs.dryRun }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::CRON_SECRET repository secret is not set."
+            exit 1
+          fi
+
+          url="https://www.getrevvy.pro/api/cron/post-scheduled"
+          if [ "$DRY_RUN" = "true" ]; then
+            url="$url?dryRun=1"
+            echo "Dry run — no posts will be published."
+          fi
+
+          # Bearer header rather than ?secret= so the token stays out of access logs.
+          code=$(curl -sS -X GET "$url" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -o response.json -w '%{http_code}' \
+            --max-time 300 --retry 2 --retry-delay 10 --retry-connrefused)
+
+          echo "HTTP $code"
+          # Response carries counts of what was published; keep it in the log.
+          cat response.json || true
+          echo
+
+          if [ "$code" != "200" ]; then
+            echo "::error::Cron endpoint returned HTTP $code"
+            exit 1
+          fi
