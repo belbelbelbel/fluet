@@ -744,8 +744,8 @@ export default function DashboardSchedulePage() {
                 : "text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
-            <BriefcaseIcon className="w-4 h-4" />
-            <span className="text-sm font-medium">Upcoming Posts</span>
+            <CalendarIcon className="w-4 h-4" />
+            <span className="text-sm font-medium">Calendar</span>
           </button>
           <button
             onClick={() => setViewMode("list")}
@@ -755,8 +755,8 @@ export default function DashboardSchedulePage() {
                 : "text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white"
             }`}
           >
-            <CalendarIcon className="w-4 h-4" />
-            <span className="text-sm font-medium">This Week Scheduled</span>
+            <BriefcaseIcon className="w-4 h-4" />
+            <span className="text-sm font-medium">Upcoming Posts</span>
           </button>
         </div>
       </div>
@@ -791,25 +791,29 @@ export default function DashboardSchedulePage() {
           <p className={"text-muted-foreground"}>Loading scheduled posts...</p>
         </div>
       ) : viewMode === "calendar" ? (
-        /* Calendar View */
-        upcomingPosts.length === 0 ? (
-          <div className={`text-center py-12 border rounded-xl transition-colors duration-300 bg-card border-border`}>
-            <CalendarIcon className={`w-12 h-12 mx-auto mb-3 text-muted-foreground/70`} />
-            <h3 className={`text-lg font-semibold mb-1.5 text-foreground`}>No scheduled posts</h3>
-            <p className={`text-sm mb-4 text-muted-foreground`}>
-              Schedule your first post to see it on the calendar
-            </p>
-            <Button
-              onClick={() => setShowScheduleModal(true)}
-              className={`rounded-xl transition-all duration-200 ${
-                "bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
-              }`}
-            >
-              <PlusIcon className="w-4 h-4 mr-2" />
-              Schedule Post
-            </Button>
-          </div>
-        ) : (
+        /* Calendar View — the calendar always renders. Replacing it with an
+           empty state meant you could never see the month you were scheduling
+           into until a post already existed. */
+        <div className="space-y-4">
+          {upcomingPosts.length === 0 && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-border bg-card p-4">
+              <div className="min-w-0">
+                <h3 className="text-sm sm:text-base font-semibold text-foreground">
+                  Nothing scheduled yet
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Pick a date below, or schedule a post and it will appear here.
+                </p>
+              </div>
+              <Button
+                onClick={() => setShowScheduleModal(true)}
+                className="w-full sm:w-auto shrink-0 rounded-xl transition-all duration-200 bg-gray-900 hover:bg-gray-800 active:bg-gray-950 text-white dark:bg-primary dark:hover:bg-primary/90 dark:active:bg-purple-800 dark:text-primary-foreground"
+              >
+                <PlusIcon className="w-4 h-4 mr-2" />
+                Schedule Post
+              </Button>
+            </div>
+          )}
           <CalendarView
             events={upcomingPosts.map((post) => ({
               id: post.id,
@@ -823,7 +827,7 @@ export default function DashboardSchedulePage() {
               if (post) handleEdit(post);
             }}
           />
-        )
+        </div>
       ) : (
         <>
           {/* List View - Upcoming Posts */}
