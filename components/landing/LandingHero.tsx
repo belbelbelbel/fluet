@@ -114,17 +114,13 @@ export function LandingHero() {
               />
             </div>
 
-            {/* Set into the photograph's own flat beige margin — the only part of
-                the frame with nothing in it, so the type never crosses the
-                subject. Confined to the right band, and only from lg up: below
-                that the band is too narrow to hold readable type. */}
-            <div className="absolute bottom-7 right-5 hidden w-[30%] lg:block">
-              <ApprovalMock />
-            </div>
           </div>
 
-          {/* Below lg the same trail sits on the canvas under the photo. */}
-          <div className="mt-8 lg:hidden">
+          {/* The trail sits UNDER the photograph on the canvas, not over it.
+              As bare type it has no opaque ground, so overlaying it on the image
+              made it unreadable — and giving it one would just be the panel this
+              is deliberately not. */}
+          <div className="mt-9 sm:mt-11">
             <ApprovalMock />
           </div>
         </Reveal>
