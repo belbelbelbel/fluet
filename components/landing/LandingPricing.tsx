@@ -7,7 +7,11 @@ import { showToast } from "@/lib/toast";
 import { RuledSection, SectionLabel } from "./Frame";
 import { Reveal } from "./Reveal";
 
-/** Mirrors app/components/PricingSection.tsx — same ids, prices and checkout route. */
+/**
+ * The single source of pricing on the site. The old app/components/PricingSection
+ * and the standalone /pricing page duplicated these ids and prices; both are gone
+ * and /pricing now redirects to this section.
+ */
 const PLANS = [
   {
     id: "basic",
