@@ -404,7 +404,7 @@ export default function TeamPage() {
       </label>
       {clients.length === 0 ? (
         <p className={`text-sm text-muted-foreground`}>
-          No clients yet — add clients first, then assign them here.
+          No clients yet. Add clients first, then assign them here.
         </p>
       ) : (
         <div

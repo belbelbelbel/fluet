@@ -7,7 +7,7 @@ import { Reveal } from "./Reveal";
 const QUESTIONS = [
   {
     q: "Do my clients need to create an account?",
-    a: "No. They get a link by email and confirm it's them with a short code — the same way your bank verifies a login. No password to forget, no seat to pay for.",
+    a: "No. They get a link by email and confirm it's them with a short code. The same way your bank verifies a login. No password to forget, no seat to pay for.",
   },
   {
     q: "Which platforms does Revvy publish to automatically?",
@@ -19,7 +19,7 @@ const QUESTIONS = [
   },
   {
     q: "What happens if a client never responds?",
-    a: "Nothing publishes. The post sits in your queue marked as awaiting approval, and you can see every pending item across all clients in one place — which is usually the nudge you needed anyway.",
+    a: "Nothing publishes. The post sits in your queue marked as awaiting approval, and you can see every pending item across all clients in one place, which is usually the nudge you needed anyway.",
   },
   {
     q: "Can I bring my team in?",

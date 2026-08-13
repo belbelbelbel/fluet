@@ -124,7 +124,7 @@ export function AttentionToast({
   const summary =
     items.length === 1
       ? items[0].meta
-        ? `${items[0].label} — ${items[0].group.toLowerCase()}`
+        ? `${items[0].label}, ${items[0].group.toLowerCase()}`
         : items[0].label
       : `${items.length} things need your attention`;
 

@@ -159,7 +159,7 @@ export function buildEmailContent(
               </td>
             </tr>
           </table>
-          ${p(`<span style="font-size:13px;color:#71717a;">This code expires in ${data.codeTtlMinutes ?? 10} minutes. If you didn't request it, you can ignore this email — nothing will change.</span>`)}
+          ${p(`<span style="font-size:13px;color:#71717a;">This code expires in ${data.codeTtlMinutes ?? 10} minutes. If you didn't request it, you can ignore this email. Nothing will change.</span>`)}
         `,
       });
       const text = [
@@ -167,13 +167,13 @@ export function buildEmailContent(
         ``,
         `Enter it on the approval page to confirm it's you.`,
         `Expires in ${data.codeTtlMinutes ?? 10} minutes.`,
-        `Didn't request this? Ignore this email — nothing will change.`,
+        `Didn't request this? Ignore this email. Nothing will change.`,
       ].join("\n");
       return { subject, html, text };
     }
 
     case "approval_requested": {
-      const subject = `Post approval needed — ${clientName}`;
+      const subject = `Post approval needed for ${clientName}`;
       const html = layout({
         preheader: `Review a scheduled post for ${clientName}`,
         title: "A post needs your approval",
@@ -203,7 +203,7 @@ export function buildEmailContent(
     }
 
     case "approval_approved": {
-      const subject = `Post approved — ${clientName}`;
+      const subject = `Post approved for ${clientName}`;
       const html = layout({
         preheader: `${clientName} approved your post`,
         title: "Post approved",
@@ -222,7 +222,7 @@ export function buildEmailContent(
     }
 
     case "approval_changes_requested": {
-      const subject = `Changes requested — ${clientName}`;
+      const subject = `Changes requested for ${clientName}`;
       const html = layout({
         preheader: `${clientName} asked for edits`,
         title: "Changes requested",
@@ -241,7 +241,7 @@ export function buildEmailContent(
     }
 
     case "approval_rejected": {
-      const subject = `Post rejected — ${clientName}`;
+      const subject = `Post rejected for ${clientName}`;
       const html = layout({
         preheader: `${clientName} rejected the post`,
         title: "Post rejected",
@@ -260,7 +260,7 @@ export function buildEmailContent(
     }
 
     case "task_assigned": {
-      const subject = `New task — ${clientName}`;
+      const subject = `New task for ${clientName}`;
       const html = layout({
         preheader: `New task for ${clientName}`,
         title: "You have a new task",
@@ -341,7 +341,7 @@ export function buildEmailContent(
         data.expiresAt ? `Expires: ${formatWhen(data.expiresAt)}` : "",
         plainCta(data.inviteLink, "Accept invite"),
         ``,
-        `— Revvy · getrevvy.pro`,
+        `Revvy · getrevvy.pro`,
       ]
         .filter(Boolean)
         .join("\n");

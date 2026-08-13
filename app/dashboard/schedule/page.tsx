@@ -513,7 +513,7 @@ export default function DashboardSchedulePage() {
           // possible" left it ambiguous whether anything was sent.
           if (data.approvalEmailWarning) {
             showToast.warning(
-              editingPost ? "Post updated — not sent" : "Post scheduled — not sent",
+              editingPost ? "Post updated, not sent" : "Post scheduled, not sent",
               data.approvalEmailWarning
             );
           } else {
@@ -1400,7 +1400,7 @@ export default function DashboardSchedulePage() {
             <DialogTitle>Client approval link</DialogTitle>
             <DialogDescription className="leading-relaxed">
               We&apos;ve attempted to email your client. Copy this link if they
-              need it manually — it opens their approval portal.
+              need it manually. It opens their approval portal.
             </DialogDescription>
           </DialogHeader>
           <div className="rounded-lg border border-border dark:border-slate-600 bg-muted dark:bg-slate-900 px-3 py-2 text-xs break-all text-foreground/80 dark:text-slate-300">

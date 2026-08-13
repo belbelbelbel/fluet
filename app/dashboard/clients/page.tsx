@@ -189,7 +189,7 @@ export default function ClientsPage() {
           <p
             className={`mt-1 text-sm text-muted-foreground`}
           >
-            {clients.length} {clients.length === 1 ? "client" : "clients"} — manage all your accounts
+            {clients.length} {clients.length === 1 ? "client" : "clients"}. Manage all your accounts
           </p>
         </div>
         <Button

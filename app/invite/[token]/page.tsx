@@ -79,7 +79,7 @@ export default function InviteAcceptPage() {
       setSuccess(true);
       setTimeout(() => router.push(data.redirectTo || "/dashboard/team"), 1200);
     } catch {
-      setError("Network error — try again");
+      setError("Network error. Try again");
     } finally {
       setAccepting(false);
     }
@@ -152,7 +152,7 @@ export default function InviteAcceptPage() {
             {success && (
               <div className="flex gap-3 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
                 <CheckCircle2 className="w-5 h-5 shrink-0" />
-                <p>You&apos;re in — taking you to the team page…</p>
+                <p>You&apos;re in. Taking you to the team page…</p>
               </div>
             )}
 

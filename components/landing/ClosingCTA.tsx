@@ -33,7 +33,7 @@ export function ClosingCTA() {
               <span className="italic">follow-up message</span>.
             </h2>
             <p className="mx-auto mt-6 max-w-md text-[15.5px] leading-relaxed text-white/60">
-              Set up your first client in a few minutes. Free while you try it —
+              Set up your first client in a few minutes. Free while you try it.
               no card needed.
             </p>
             <Link

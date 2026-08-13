@@ -194,7 +194,7 @@ export default function InboxPage() {
             Inbox
           </h1>
           <p className={cn("text-sm mt-1", "text-muted-foreground")}>
-            Approvals, tasks, and workspace updates — social comments connect later.
+            Approvals, tasks, and workspace updates. Social comments connect later.
           </p>
         </div>
         <div className="flex items-center gap-2">

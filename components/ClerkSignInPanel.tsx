@@ -33,7 +33,7 @@ export function ClerkSignInPanel({ redirectUrl }: ClerkSignInPanelProps) {
 
       {slowLoad && (
         <div className="mt-2 rounded-lg border border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-center text-sm text-amber-900 dark:text-amber-200">
-          Sign-in is taking longer than usual — usually stale cookies.{" "}
+          Sign-in is taking longer than usual. Usually stale cookies.{" "}
           <Link
             href={`/clear-session?redirect_url=${encodeURIComponent(safeRedirect)}`}
             className="font-medium underline underline-offset-2"

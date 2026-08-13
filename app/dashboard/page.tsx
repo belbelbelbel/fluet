@@ -514,7 +514,7 @@ export default function DashboardPage() {
                   </div>
                   {clients.length > 6 && (
                     <p className={`text-xs mt-3 text-muted-foreground`}>
-                      +{clients.length - 6} more —{" "}
+                      +{clients.length - 6} more.{" "}
                       <button
                         type="button"
                         onClick={() => router.push("/dashboard/clients")}
@@ -672,7 +672,7 @@ export default function DashboardPage() {
                     <p
                       className={`text-xs mt-1.5 max-w-sm mx-auto text-muted-foreground`}
                     >
-                      Connect Twitter in Settings and auto-post — metrics sync on each cron run.
+                      Connect Twitter in Settings and auto-post. Metrics sync on each cron run.
                     </p>
                     <Link
                       href="/dashboard/settings"

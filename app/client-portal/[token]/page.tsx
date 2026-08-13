@@ -189,10 +189,10 @@ export default function ClientApprovalPage() {
         setApproval(data.approval);
         setDoneMessage(
           action === "approve"
-            ? "Approved — your agency has been notified."
+            ? "Approved. Your agency has been notified."
             : action === "request_changes"
-              ? "Changes requested — your agency has been notified."
-              : "Rejected — your agency has been notified."
+              ? "Changes requested. Your agency has been notified."
+              : "Rejected. Your agency has been notified."
         );
       } else {
         setDoneMessage(data.error || "Couldn’t submit. Try again.");

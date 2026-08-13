@@ -63,7 +63,7 @@ export function LandingHero() {
           <Reveal delay={140}>
             <p className="mt-9 max-w-lg text-[17px] leading-relaxed text-[rgb(var(--ink-soft))]">
               Revvy gives your agency one link where clients review, approve and
-              schedule — so nothing goes out unapproved, and nobody has to chase
+              schedule projects so nothing goes out unapproved, and nobody has to chase
               a WhatsApp reply again.
             </p>
           </Reveal>

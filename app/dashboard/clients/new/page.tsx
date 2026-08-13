@@ -125,7 +125,7 @@ export default function CreateClientPage() {
                   placeholder="https://example.com/logo.png"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Optional — link to the client&apos;s logo image
+                  Optional. Link to the client&apos;s logo image
                 </p>
               </div>
 

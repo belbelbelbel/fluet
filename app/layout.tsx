@@ -59,9 +59,9 @@ const geistMono = localFont({
 });
 
 const SITE_NAME = "Revvy";
-const SITE_TITLE = "Revvy — Client approvals, without the chasing";
+const SITE_TITLE = "Revvy. Client approvals without the chasing";
 const SITE_DESCRIPTION =
-  "Revvy gives your agency one link where clients review, approve, and schedule — so nothing goes out unapproved. Built for agencies managing 3–10 clients.";
+  "Revvy gives your agency one link where clients review, approve, and schedule, so nothing goes out unapproved. Built for agencies managing 3–10 clients.";
 
 /**
  * Canonical origin. metadataBase is what turns the relative image paths below
@@ -78,7 +78,7 @@ const OG_IMAGE = {
   url: "/images/Revvylogo/logo-1-primary.png",
   width: 800,
   height: 400,
-  alt: "Revvy — client approvals, without the chasing",
+  alt: "Revvy. Client approvals without the chasing",
 };
 
 export const metadata: Metadata = {

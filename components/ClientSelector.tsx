@@ -380,7 +380,7 @@ export function ClientSelector({ userId, selectedClientId, onClientChange, autoS
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className={`text-sm text-foreground/80`}>
-                          No client — skip approval
+                          No client, skip approval
                         </span>
                         {!selectedClient && (
                           <Check className={`w-4 h-4 flex-shrink-0 ml-2 text-foreground/80`} />

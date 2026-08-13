@@ -122,7 +122,7 @@ export default function BrandVoicePage() {
       if (response.ok) {
         showToast.success(
           "Brand voice saved",
-          "Generate for this client — DeepSeek will match this voice"
+          "Generate for this client. DeepSeek will match this voice"
         );
       } else {
         const error = await response.json();
@@ -181,7 +181,7 @@ export default function BrandVoicePage() {
         <CardHeader className="border-b border-border bg-muted">
           <CardTitle className="text-lg font-semibold text-foreground">Brand Voice Settings</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            Teach DeepSeek how this brand speaks — identity, tone contrasts, dos/don’ts, and example posts
+            Teach DeepSeek how this brand speaks. Add identity, tone contrasts, dos/don’ts, and example posts
           </p>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
@@ -317,7 +317,7 @@ export default function BrandVoicePage() {
               </p>
             ) : (
               <p className="text-xs text-muted-foreground mt-1">
-                Archetypes encode write-rules (e.g. “confident, not arrogant”) — not vague vibes
+                Archetypes encode write-rules (e.g. “confident, not arrogant”), not vague vibes
               </p>
             )}
           </div>

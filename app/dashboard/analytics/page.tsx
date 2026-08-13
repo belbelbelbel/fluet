@@ -154,7 +154,7 @@ export default function AnalyticsPage() {
         <div className="flex-1">
           <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-3 text-foreground`}>Analytics Dashboard</h1>
           <p className={"text-muted-foreground"}>
-            Live activity from your workspace — social engagement connects next
+            Live activity from your workspace. Social engagement connects next
           </p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">

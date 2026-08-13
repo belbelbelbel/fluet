@@ -10,10 +10,10 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Revvy — Client approvals, without the chasing",
+    name: "Revvy. Client approvals without the chasing",
     short_name: "Revvy",
     description:
-      "One link where clients review, approve, and schedule — so nothing goes out unapproved.",
+      "One link where clients review, approve, and schedule, so nothing goes out unapproved.",
     // "/" rather than "/dashboard": a launch straight into an authed route
     // bounces through sign-in, which is a poor first impression from an icon tap.
     start_url: "/",

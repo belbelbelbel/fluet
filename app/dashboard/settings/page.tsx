@@ -92,7 +92,7 @@ const aiModels: AIModelInfo[] = [
     id: "deepseek-v4-flash",
     name: "DeepSeek V4 Flash",
     provider: "DeepSeek",
-    description: "Best default — fast + cheap for tweets, captions, and ideas",
+    description: "Best default. Fast + cheap for tweets, captions, and ideas",
     speed: "fast",
     quality: "high",
     cost: "low",
@@ -373,7 +373,7 @@ export default function SettingsPage() {
         if (result.persisted === false) {
           showToast.info(
             "Saved on this device",
-            "Account sync wasn’t available — try again in a moment."
+            "Account sync wasn’t available. Try again in a moment."
           );
         } else {
           showToast.success("Settings saved", "Your preferences are saved to your account");
@@ -777,7 +777,7 @@ export default function SettingsPage() {
                         {publishReport.duePosts.slice(0, 8).map((p) => (
                           <li key={p.id} className={"text-foreground/80"}>
                             <span className="font-medium capitalize">#{p.id} {p.platform}</span>
-                            {" — "}
+                            {", "}
                             {p.ready ? "ready" : p.reason}
                             <span className={`block text-xs truncate text-muted-foreground/70`}>
                               {p.preview}
@@ -916,10 +916,10 @@ export default function SettingsPage() {
                     {settings.twitterConnected ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-                        Connected — scheduled tweets can auto-publish
+                        Connected. Scheduled tweets can auto-publish
                       </>
                     ) : (
-                      "Not connected — connect to enable auto-posting"
+                      "Not connected. Connect to enable auto-posting"
                     )}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -988,10 +988,10 @@ export default function SettingsPage() {
                     {settings.instagramConnected ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-                        Connected — image posts can auto-publish
+                        Connected. Image posts can auto-publish
                       </>
                     ) : (
-                      "Not connected — connect a Business/Creator account"
+                      "Not connected. Connect a Business/Creator account"
                     )}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -1062,10 +1062,10 @@ export default function SettingsPage() {
                     {settings.googleCalendarConnected ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-                        Connected — due posts can create calendar events
+                        Connected. Due posts can create calendar events
                       </>
                     ) : (
-                      "Not connected — optional reminders for manual platforms"
+                      "Not connected. Optional reminders for manual platforms"
                     )}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">

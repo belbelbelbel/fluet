@@ -20,12 +20,12 @@ const FEATURES = [
   {
     icon: LayoutDashboardIcon,
     title: "Client dashboards",
-    body: "Each client sees what's scheduled, what's live and what needs them — the thing that makes a two-person agency look like a twenty-person one.",
+    body: "Each client sees what's scheduled, what's live and what needs them. The thing that makes a two-person agency look like a twenty-person one.",
   },
   {
     icon: CalendarClockIcon,
     title: "Scheduling that publishes",
-    body: "Approved posts go out automatically on Instagram, X and YouTube. LinkedIn and TikTok send you a reminder instead — their APIs don't allow the rest.",
+    body: "Approved posts go out automatically on Instagram, X and YouTube. LinkedIn and TikTok send you a reminder instead. Their APIs don't allow the rest.",
   },
   {
     icon: UsersIcon,

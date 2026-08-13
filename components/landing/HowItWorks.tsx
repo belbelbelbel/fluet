@@ -7,7 +7,7 @@ const STEPS = [
   {
     n: "01",
     title: "Add the client once",
-    body: "Invite them by email. They get their own dashboard with everything scheduled for them — no logins to remember, no folder to share.",
+    body: "Invite them by email. They get their own dashboard with everything scheduled for them. No logins to remember, no folder to share.",
   },
   {
     n: "02",

@@ -300,7 +300,7 @@ function CheckoutContent() {
                 One step and you&apos;re <span className="italic">running</span>.
               </h1>
               <p className="mt-4 text-[15px] leading-relaxed text-[rgb(var(--ink-soft))]">
-                Card details go straight to Stripe or Kora — they never touch Revvy.
+                Card details go straight to Stripe or Kora. They never touch Revvy.
               </p>
             </div>
           </div>
