@@ -12,7 +12,7 @@ export interface AttentionItem {
   severity: AttentionSeverity;
   /** Group heading, e.g. "Awaiting approval" */
   group: string;
-  /** Primary text — usually the client name */
+  /** Primary text, usually the client name */
   label: string;
   /** Right-aligned secondary text, e.g. "3 posts" or "82% used" */
   meta?: string;
@@ -154,7 +154,7 @@ export function AttentionToast({
           "border-black/[0.07] bg-white/90 shadow-slate-900/10 dark:border-white/10 dark:bg-slate-900/85 dark:shadow-black/40"
         )}
       >
-        {/* Collapsed row — always visible */}
+        {/* Collapsed row, always visible */}
         <div className="flex items-center gap-3 px-3.5 py-2.5">
           <span className="relative flex h-2 w-2 shrink-0">
             {severity === "critical" && (

@@ -2,7 +2,7 @@
  * Professional brand-voice prompting for DeepSeek / LLM caption generation.
  *
  * Research-backed patterns (NN/g tone dimensions, contrast pairs, few-shot,
- * banned AI-default lexicon) — encode voice as rules + examples, not adjectives.
+ * banned AI-default lexicon). Encode voice as rules + examples, not adjectives.
  */
 
 import type { BrandVoiceContext } from "./prompt-builder";
@@ -72,7 +72,7 @@ export const TONE_ARCHETYPES: Record<
   },
   witty: {
     label: "Witty / sharp",
-    summary: "Smart humor and pattern interrupts — never mean or meme-spam.",
+    summary: "Smart humor and pattern interrupts, never mean or meme-spam.",
     contrasts: [
       "Clever, not cringe",
       "Playful, not chaotic",
@@ -156,7 +156,7 @@ export const TONE_ARCHETYPES: Record<
   },
 };
 
-/** Generic AI filler DeepSeek/GPT defaults to — always ban for brand copy */
+/** Generic AI filler DeepSeek/GPT defaults to. Always ban for brand copy */
 export const DEFAULT_AI_BANNED_PHRASES = [
   "delve",
   "leverage",
@@ -185,7 +185,7 @@ const SLANG_RULES: Record<string, string> = {
   light:
     "Mostly clear English. At most 1 light Nigerian expression if it fits naturally (e.g. 'abeg', 'sharp'). Never force it.",
   moderate:
-    "Natural mix of English + light Pidgin. Sound like a real Nigerian creator — not a tourist phrase-dump.",
+    "Natural mix of English + light Pidgin. Sound like a real Nigerian creator, not a tourist phrase-dump.",
   heavy:
     "Comfortable Pidgin-forward voice is OK when it fits the brand. Stay clear and readable; don't make every line slang.",
 };
@@ -245,8 +245,8 @@ export function buildBrandVoiceSystemBlock(
   const uniqueBanned = Array.from(new Set(banned.map((w) => w.toLowerCase())));
 
   const lines: string[] = [
-    "BRAND VOICE (non-negotiable — write AS this brand, not as a generic AI):",
-    `Voice archetype: ${archetype.label} — ${archetype.summary}`,
+    "BRAND VOICE (non-negotiable, write AS this brand, not as a generic AI):",
+    `Voice archetype: ${archetype.label}. ${archetype.summary}`,
     `Tone contrasts: ${archetype.contrasts.join("; ")}.`,
     `Sentence style: ${archetype.sentenceStyle}`,
     `Language: ${slang}`,
@@ -279,7 +279,7 @@ export function buildBrandVoiceSystemBlock(
     );
   }
 
-  // Few-shot examples — highest signal for voice matching
+  // Few-shot examples, highest signal for voice matching
   const examples = (bv.examplePosts || [])
     .map((p) => String(p || "").trim())
     .filter(Boolean)
@@ -289,7 +289,7 @@ export function buildBrandVoiceSystemBlock(
     examples.forEach((ex, i) => lines.push(`  [${i + 1}] ${ex}`));
   } else {
     lines.push(
-      "No example posts provided — still obey tone contrasts, bans, and identity above."
+      "No example posts provided. Still obey tone contrasts, bans, and identity above."
     );
   }
 
@@ -309,12 +309,12 @@ export function buildBrandVoiceSystemBlock(
     );
   } else if (p === "tiktok") {
     lines.push(
-      "Channel fit (TikTok): Spoken script energy. Hook in 0–3s. Caption stays on-voice."
+      "Channel fit (TikTok): Spoken script energy. Hook in 0-3s. Caption stays on-voice."
     );
   }
 
   lines.push(
-    "Self-check before output: Would a follower recognize this as THIS brand — or as generic AI? If generic, rewrite."
+    "Self-check before output: Would a follower recognize this as THIS brand, or as generic AI? If generic, rewrite."
   );
 
   return lines.join("\n");

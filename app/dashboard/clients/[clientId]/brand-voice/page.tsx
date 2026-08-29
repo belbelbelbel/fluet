@@ -186,7 +186,7 @@ export default function BrandVoicePage() {
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
           <div className="rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 text-sm text-teal-950">
-            Best results: fill <strong>description</strong>, pick a <strong>tone</strong>, add 2–3{" "}
+            Best results: fill <strong>description</strong>, pick a <strong>tone</strong>, add 2-3{" "}
             <strong>example posts</strong>, and a short do/don’t list. Vague adjectives alone won’t stick.
           </div>
 
@@ -210,7 +210,7 @@ export default function BrandVoicePage() {
             <Textarea
               value={brandVoice.targetAudience || ""}
               onChange={(e) => setBrandVoice({ ...brandVoice, targetAudience: e.target.value })}
-              placeholder="e.g. University students 18–25 in Nigeria dealing with social media anxiety, FOMO, and sleep issues. Want practical boundaries, not lectures."
+              placeholder="e.g. University students 18-25 in Nigeria dealing with social media anxiety, FOMO, and sleep issues. Want practical boundaries, not lectures."
               rows={2}
             />
           </div>
@@ -276,7 +276,7 @@ export default function BrandVoicePage() {
               ) && (
               <div>
                 <label className="block text-sm font-medium text-foreground/80 mb-2">
-                  Specific Niche (optional – e.g. Jollof specialist, Wedding cakes)
+                  Specific Niche (optional, e.g. Jollof specialist, Wedding cakes)
                 </label>
                 <input
                   type="text"
@@ -442,11 +442,11 @@ export default function BrandVoicePage() {
             </div>
           </div>
 
-          {/* Example posts — few-shot voice matching */}
+          {/* Example posts, few-shot voice matching */}
           <div>
             <Label className="mb-2 block">Example posts (match this voice)</Label>
             <p className="text-xs text-muted-foreground mb-2">
-              Paste 2–3 real captions that sound like the brand. This is the #1 lever for DeepSeek accuracy.
+              Paste 2-3 real captions that sound like the brand. This is the #1 lever for DeepSeek accuracy.
             </p>
             <div className="space-y-2">
               {[0, 1, 2].map((idx) => (

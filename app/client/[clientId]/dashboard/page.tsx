@@ -203,7 +203,7 @@ export default function ClientDashboardPage() {
         ) : null}
       </div>
 
-      {/* Stats — strip, not heavy cards */}
+      {/* Stats, a strip rather than heavy cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/10 bg-white/10">
         {[
           { label: "This month", value: stats.postsThisMonth },

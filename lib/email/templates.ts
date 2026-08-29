@@ -28,7 +28,7 @@ function isLocalhostUrl(href?: string): boolean {
   }
 }
 
-/** Shared shell — clean, light, transactional (not marketing-y). */
+/** Shared shell. Clean, light, transactional (not marketing-y). */
 function layout(opts: {
   preheader: string;
   title: string;
@@ -120,7 +120,7 @@ function plainCta(href: string | undefined, label: string): string {
  *
  * The decision endpoint only accepts a submission from someone who proved
  * control of the client's address, so this line is evidence rather than a
- * self-reported name — it's what distinguishes a real sign-off from someone
+ * self-reported name. It's what distinguishes a real sign-off from someone
  * who was merely forwarded the link.
  */
 function verifiedRow(email: string | undefined): string {

@@ -64,7 +64,7 @@ export default function ClientApprovalPage() {
   const [doneMessage, setDoneMessage] = useState<string | null>(null);
   const [entered, setEntered] = useState(false);
 
-  // Identity verification — a link holder must prove control of the client's
+  // Identity verification. A link holder must prove control of the client's
   // email before any decision is accepted.
   const [verified, setVerified] = useState(false);
   const [verifyEmail, setVerifyEmail] = useState("");
@@ -306,7 +306,7 @@ export default function ClientApprovalPage() {
           </div>
         )}
 
-        {/* Post preview — phone chrome as visual anchor */}
+        {/* Post preview, phone chrome as visual anchor */}
         <article className="rounded-[1.75rem] border border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.03] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur-xl">
           <div className="px-5 sm:px-6 py-4 flex items-center justify-between gap-3 border-b border-white/8">
             <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-200">

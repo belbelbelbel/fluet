@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 
 /**
- * Inline styles only — must render even when UI chunks or ThemeContext fail.
+ * Inline styles only. Must render even when UI chunks or ThemeContext fail.
  */
 export default function Error({
   error,

@@ -138,7 +138,7 @@ export async function PUT(
         }
 
         // A client that gains (or corrects) an email may have approvals that
-        // were never actually delivered — the link is useless sitting in the
+        // were never actually delivered. The link is useless sitting in the
         // database. Send the outstanding ones to the new address.
         const nextEmail = updatedClient.email?.trim() || null;
         const emailChanged =
@@ -165,7 +165,7 @@ export async function PUT(
             approvalsSent,
             message:
                 approvalsSent > 0
-                    ? `Client updated — sent ${approvalsSent} pending approval${approvalsSent !== 1 ? "s" : ""} to ${nextEmail}`
+                    ? `Client updated. Sent ${approvalsSent} pending approval${approvalsSent !== 1 ? "s" : ""} to ${nextEmail}`
                     : "Client updated successfully",
         });
     } catch (error) {

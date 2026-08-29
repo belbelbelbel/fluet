@@ -1623,7 +1623,7 @@ export const CreatePostApproval = async (data: {
     expiresAt?: Date | null;
 }) => {
     try {
-        // Never persist an expiry that is already past (or too close) — that
+        // Never persist an expiry that is already past (or too close). That
         // would hand the client a link that is dead the moment it is sent.
         const expiresAt = computeApprovalExpiry(data.expiresAt);
 
@@ -1668,7 +1668,7 @@ export const GetApprovalByToken = async (token: string) => {
  * Push an approval's expiry forward.
  *
  * Used to self-heal links that expired while the post was still sitting
- * unpublished and undecided — the exact case the link exists to resolve.
+ * unpublished and undecided, the exact case the link exists to resolve.
  */
 export const ExtendApprovalExpiry = async (
     approvalId: number,

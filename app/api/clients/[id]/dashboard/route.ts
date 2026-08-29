@@ -1,5 +1,5 @@
 /**
- * Agency client dashboard — real stats, approvals, and upcoming posts
+ * Agency client dashboard. Real stats, approvals, and upcoming posts
  */
 
 import { NextRequest, NextResponse } from "next/server";

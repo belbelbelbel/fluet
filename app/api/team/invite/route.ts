@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 
     if (normalizedInviterEmail === normalizedInviteEmail) {
       return NextResponse.json(
-        { error: "You cannot invite yourself — you're already the team owner." },
+        { error: "You cannot invite yourself. You're already the team owner." },
         { status: 400 }
       );
     }
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     const inviteLink = `${appUrl}/invite/${invitation.token}`;
     if (appUrl.includes("localhost") || appUrl.includes("127.0.0.1")) {
       console.warn(
-        "[Team Invite] Invite link uses localhost — set EMAIL_APP_URL to your production domain."
+        "[Team Invite] Invite link uses localhost. Set EMAIL_APP_URL to your production domain."
       );
     }
 

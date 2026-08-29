@@ -13,7 +13,7 @@ export interface PaymentCheckResult {
   gracePeriodDaysRemaining?: number;
 }
 
-/** True once Stripe or Kora keys are set — until then, billing checks stay relaxed. */
+/** True once Stripe or Kora keys are set. Until then, billing checks stay relaxed. */
 export function isPaymentProviderConfigured(): boolean {
   return !!(
     process.env.STRIPE_SECRET_KEY?.trim() ||
@@ -37,7 +37,7 @@ export async function checkAgencySubscription(
       };
     }
 
-    // No Stripe/Kora yet — allow usage and seed a local Pro subscription for limits/UI
+    // No Stripe/Kora yet, allow usage and seed a local Pro subscription for limits/UI
     if (!isPaymentProviderConfigured()) {
       await EnsureLocalSubscription(user.id);
       return { isBlocked: false, status: "paid" };

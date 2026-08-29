@@ -29,12 +29,12 @@ const nunito = localFont({
  * globals.css so the dashboard keeps Nunito untouched.
  *
  * Fraunces carries the editorial voice; Geist does the UI work; Geist Mono
- * labels the technical detail. Fraunces is variable across 100–900, so headings
- * can sit at 600–700 with real presence — Instrument Serif only shipped a 400
+ * labels the technical detail. Fraunces is variable across 100-900, so headings
+ * can sit at 600-700 with real presence. Instrument Serif only shipped a 400
  * and read too thin at display sizes.
  */
 // No `weight` here on purpose: naming weights requests static instances, and
-// `axes` is only valid on the variable font. Omitting it loads the full 100–900
+// `axes` is only valid on the variable font. Omitting it loads the full 100-900
 // range, which is what lets the headings sit at 600.
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -61,11 +61,11 @@ const geistMono = localFont({
 const SITE_NAME = "Revvy";
 const SITE_TITLE = "Revvy. Client approvals without the chasing";
 const SITE_DESCRIPTION =
-  "Revvy gives your agency one link where clients review, approve, and schedule, so nothing goes out unapproved. Built for agencies managing 3–10 clients.";
+  "Revvy gives your agency one link where clients review, approve, and schedule, so nothing goes out unapproved. Built for agencies managing 3-10 clients.";
 
 /**
  * Canonical origin. metadataBase is what turns the relative image paths below
- * into the absolute URLs that scrapers require — without it Next emits relative
+ * into the absolute URLs that scrapers require. Without it Next emits relative
  * og:image values and every social preview silently renders blank.
  *
  * Uses the www host deliberately: the apex 308-redirects to it, and a redirect
@@ -73,7 +73,7 @@ const SITE_DESCRIPTION =
  */
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.getrevvy.pro";
 
-/** 800x400 on disk — the declared size must match the file or cards crop badly. */
+/** 800x400 on disk. The declared size must match the file or cards crop badly. */
 const OG_IMAGE = {
   url: "/images/Revvylogo/logo-1-primary.png",
   width: 800,

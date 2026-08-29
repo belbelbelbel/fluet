@@ -6,7 +6,7 @@ import { normalizeRedirectPath } from "@/lib/auth-redirect";
 
 /**
  * Runs once on sign-in/sign-up when middleware sends the user here.
- * Clerk's protect() can send a full URL — rewrite the address bar to path-only
+ * Clerk's protect() can send a full URL, so rewrite the address bar to path-only
  * so the value stays consistent with what we hand the Clerk component.
  *
  * Do NOT clear cookies here. __clerk_db_jwt is the dev browser token that

@@ -37,7 +37,7 @@ function hashCode(code: string, approvalId: number): string {
   return createHash("sha256").update(`${approvalId}:${code}`).digest("hex");
 }
 
-/** 6 digits, uniformly drawn — no Math.random */
+/** 6 digits, uniformly drawn, no Math.random */
 function generateCode(): string {
   return String(randomBytes(4).readUInt32BE(0) % 1_000_000).padStart(6, "0");
 }

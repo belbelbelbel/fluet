@@ -24,7 +24,7 @@ on:
         default: false
 
 concurrency:
-  # Never let two publish runs overlap — a slow run must not race the next tick.
+  # Never let two publish runs overlap. A slow run must not race the next tick.
   group: publish-due-posts
   cancel-in-progress: false
 
@@ -46,7 +46,7 @@ jobs:
           url="https://www.getrevvy.pro/api/cron/post-scheduled"
           if [ "$DRY_RUN" = "true" ]; then
             url="$url?dryRun=1"
-            echo "Dry run — no posts will be published."
+            echo "Dry run, no posts will be published."
           fi
 
           # Bearer header rather than ?secret= so the token stays out of access logs.

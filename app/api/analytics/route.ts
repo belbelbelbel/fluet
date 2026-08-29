@@ -170,7 +170,7 @@ export async function GET(req: NextRequest) {
       if (bucket) bucket.scheduled = Number(row.count || 0);
     }
 
-    // Activity by platform (from scheduled posts — real, not engagement)
+    // Activity by platform (from scheduled posts, real data rather than engagement)
     const activityPlatform = await db
       .select({
         platform: ScheduledPosts.platform,

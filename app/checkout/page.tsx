@@ -14,14 +14,14 @@ import { LandingNav } from "@/components/landing/LandingNav";
  * that sent the visitor here rather than like the app they haven't bought yet.
  *
  * That means the white canvas, Fraunces for the heading, and Geist Mono for every
- * number — and the deep-forest accent instead of the dashboard's purple.
+ * number, and the deep-forest accent instead of the dashboard's purple.
  *
  * The summary is deliberately shaped as a receipt (mono figures, tabular
  * numerals, a dashed rule above the total). It matches the record-keeping
  * language the rest of the product uses.
  */
 
-/** Shared input styling — hairline rule, accent focus, surface fill. */
+/** Shared input styling. Hairline rule, accent focus, surface fill. */
 const fieldClass =
   "w-full rounded-lg border border-[rgb(var(--rule))] bg-[rgb(var(--surface))] px-3.5 py-2.5 text-[14px] text-[rgb(var(--ink))] outline-none transition-colors placeholder:text-[rgb(var(--ink-faint))] focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-[rgb(var(--accent))]/15";
 
@@ -50,7 +50,7 @@ const pricingPlans = [
   {
     id: "pro",
     name: "Business plan",
-    description: "For small agencies managing 3–10 clients. Advanced reporting, team collaboration, all platforms.",
+    description: "For small agencies managing 3-10 clients. Advanced reporting, team collaboration, all platforms.",
     price: "25000",
     priceDisplay: "₦25,000",
     priceId: "price_1PyFN0Bibz3ZDixDqm9eYL8W",
@@ -283,7 +283,7 @@ function CheckoutContent() {
       <LandingNav />
       <main className="mx-auto max-w-5xl px-5 pb-24 pt-10 sm:px-6 sm:pt-14 lg:px-8">
         <div>
-          {/* Header — mono eyebrow over a display line, as on the marketing pages */}
+          {/* Header, mono eyebrow over a display line, as on the marketing pages */}
           <div className="mb-10 lg:mb-14">
             <button
               onClick={() => router.push("/pricing")}
@@ -334,7 +334,7 @@ function CheckoutContent() {
                     </span>
                   </div>
 
-                  {/* Dashed rather than solid — the detail that makes it read as a receipt */}
+                  {/* Dashed rather than solid, the detail that makes it read as a receipt */}
                   <div className="mt-4 border-t border-dashed border-[rgb(var(--rule))] pt-4">
                     <div className="flex items-baseline justify-between gap-3">
                       <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-[rgb(var(--ink-faint))]">

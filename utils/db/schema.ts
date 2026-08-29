@@ -238,7 +238,7 @@ export const PostApprovals = pgTable("post_approvals", {
   clientComment: text("client_comment"),
   expiresAt: timestamp("expires_at"),
   approvedAt: timestamp("approved_at"),
-  // Verified email of whoever made the decision — audit trail
+  // Verified email of whoever made the decision, audit trail
   approvedByEmail: varchar("approved_by_email", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -248,7 +248,7 @@ export const PostApprovals = pgTable("post_approvals", {
  * Email-ownership challenges for the public approval portal.
  *
  * The portal link is a bearer token, so possession alone can't prove the
- * approver is the client — a forwarded email would let anyone decide. A code
+ * approver is the client. A forwarded email would let anyone decide. A code
  * sent to the client's address on file closes that gap.
  */
 export const ApprovalVerifications = pgTable("approval_verifications", {
@@ -257,7 +257,7 @@ export const ApprovalVerifications = pgTable("approval_verifications", {
     .references(() => PostApprovals.id, { onDelete: "cascade" })
     .notNull(),
   email: varchar("email", { length: 255 }).notNull(),
-  // sha256 of the code — never store the code itself
+  // sha256 of the code, never store the code itself
   codeHash: varchar("code_hash", { length: 128 }).notNull(),
   attempts: integer("attempts").default(0).notNull(),
   expiresAt: timestamp("expires_at").notNull(),

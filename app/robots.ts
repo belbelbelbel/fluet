@@ -6,7 +6,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.getrevvy.pro";
  * Served at /robots.txt.
  *
  * The disallow list is not only about crawl budget. /client-portal/<token> and
- * /invite/<token> ARE the credential — the token in the path is what grants
+ * /invite/<token> ARE the credential. The token in the path is what grants
  * access. If either is ever linked from an indexable page, a crawler could put
  * a live approval link into search results. Keeping them out of the index is a
  * cheap second line of defence behind the email-code verification.

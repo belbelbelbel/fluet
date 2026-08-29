@@ -247,7 +247,7 @@ export default function SettingsPage() {
         const data = await response.json();
         setSettings({ ...data, theme: currentTheme });
         // Only adopt the server's theme when it was actually saved. A missing
-        // row — or a failed query — returns the default with persisted:false,
+        // row, or a failed query, returns the default with persisted:false,
         // and applying that would silently overwrite the local choice.
         if (data.persisted && data.theme && data.theme !== currentTheme) {
           setCurrentTheme(data.theme);

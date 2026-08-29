@@ -134,7 +134,7 @@ export async function POST() {
             results.actions.push({
               id: post.id,
               platform,
-              result: "Instagram not connected — skipped",
+              result: "Instagram not connected, skipped",
             });
             continue;
           }
@@ -146,7 +146,7 @@ export async function POST() {
             results.actions.push({
               id: post.id,
               platform,
-              result: "No image URL in content — skipped",
+              result: "No image URL in content, skipped",
             });
             continue;
           }
@@ -198,7 +198,7 @@ export async function POST() {
         results.actions.push({
           id: post.id,
           platform,
-          result: "Reminder-only platform — skipped",
+          result: "Reminder-only platform, skipped",
         });
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Unknown error";

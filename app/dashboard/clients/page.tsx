@@ -250,7 +250,7 @@ export default function ClientsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="recent">Recently added</SelectItem>
-                  <SelectItem value="name">Name A–Z</SelectItem>
+                  <SelectItem value="name">Name A-Z</SelectItem>
                   <SelectItem value="payment">Payment status</SelectItem>
                 </SelectContent>
               </Select>

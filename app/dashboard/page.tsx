@@ -289,8 +289,8 @@ export default function DashboardPage() {
   const weekDates = getWeekDates();
 
 
-  // Everything that used to sit above the KPI row — payment/credit banners and
-  // the "Needs attention" panel — folded into one docked toast so the page
+  // Everything that used to sit above the KPI row, payment/credit banners and
+  // the "Needs attention" panel, folded into one docked toast so the page
   // itself opens on the numbers.
   const attentionItems: AttentionItem[] = useMemo(() => {
     const out: AttentionItem[] = [];
@@ -397,7 +397,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Alerts live in the chrome, not the page flow — see AttentionToast */}
+      {/* Alerts live in the chrome, not the page flow. See AttentionToast */}
       <AttentionToast items={attentionItems} blocked={actionsBlocked} />
 
       {/* Main Content */}
@@ -463,7 +463,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Your clients — always visible; shows list or "No clients" */}
+        {/* Your clients, always visible; shows list or "No clients" */}
         {!loading && userId && (
           <Card className={`rounded-xl transition-colors bg-card`}>
             <CardHeader className="pb-3 px-4 sm:px-6 pt-4 sm:pt-6 flex flex-row items-center justify-between space-y-0">

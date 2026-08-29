@@ -1,5 +1,5 @@
 /**
- * Prompt Builder – Maps generation modes to specialized AI instructions
+ * Prompt Builder. Maps generation modes to specialized AI instructions
  * Brand voice is injected into the SYSTEM prompt (persona) for DeepSeek fidelity.
  */
 
@@ -51,7 +51,8 @@ export interface PromptBuildOutput {
 }
 
 const BASE_SYSTEM = `You are a senior social media copywriter for agencies.
-Output PLAIN TEXT only — no markdown, no asterisks, no bullet markers, no emojis unless the brand voice explicitly allows them.
+Output PLAIN TEXT only. No markdown, no asterisks, no bullet markers, no emojis unless the brand voice explicitly allows them.
+Never use an em dash (—) or en dash (–). Use a comma or a full stop instead. They read as AI-written.
 Write copy ready to paste into the platform.
 Never sound like generic AI marketing. Prefer concrete language, specificity, and a human ear.`;
 
@@ -66,7 +67,7 @@ const MODE_SYSTEM_AUGMENT: Record<Exclude<GenerationMode, "standard">, string> =
     "Instagram carousel structure: curiosity hook slide → clear value slides → save-worthy CTA. Scannable lines. Logical swipe flow.",
 
   cta:
-    "High-converting CTAs: soft engagement, authority prompts, community questions, light conversion. Specific actions — never 'click here' emptiness.",
+    "High-converting CTAs: soft engagement, authority prompts, community questions, light conversion. Specific actions, never 'click here' emptiness.",
 
   authority:
     "Thought-leader content: contrarian insight, experience, industry observation. Credibility over hype. Specific claims over slogans.",
@@ -92,7 +93,7 @@ const PLATFORM_TEMPLATES: Record<
     `Write an X/Twitter post (or short thread if needed) about: "${p}".
 Requirements: Tone=${t}. Style=${s}. Length=${l}.
 Hook in the first line. Number threads as 1/ 2/ 3/ only if multiple tweets.
-Include 1–3 relevant hashtags at the end. Plain text only.`,
+Include 1-3 relevant hashtags at the end. Plain text only.`,
   instagram: (p, t, s, l) =>
     `Write an Instagram caption about: "${p}".
 Requirements: Tone=${t}. Style=${s}. Length=${l}.

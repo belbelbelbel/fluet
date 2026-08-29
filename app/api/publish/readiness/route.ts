@@ -1,5 +1,5 @@
 /**
- * Publish readiness — can this user auto-post right now?
+ * Publish readiness. Can this user auto-post right now?
  * Used from Settings to prove the Twitter/IG loop without waiting on cron.
  */
 
@@ -68,7 +68,7 @@ export async function GET() {
       } else {
         const ok = await verifyTwitterToken(tokenResult.accessToken);
         twitter.tokenOk = ok;
-        if (!ok) twitter.error = "Token failed verification — reconnect Twitter";
+        if (!ok) twitter.error = "Token failed verification. Reconnect Twitter";
       }
     } else {
       twitter.error = "Not connected";
@@ -107,7 +107,7 @@ export async function GET() {
             : "Will auto-post on next run";
       } else if (platform === "linkedin" || platform === "tiktok") {
         ready = false;
-        reason = "Reminder only — auto-post not built yet";
+        reason = "Reminder only, auto-post not built yet";
       } else {
         ready = false;
         reason = "Platform not supported for auto-post";

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Root fallback — no imports from app components. Renders when layout itself crashes.
+ * Root fallback, no imports from app components. Renders when layout itself crashes.
  */
 export default function GlobalError({
   error,

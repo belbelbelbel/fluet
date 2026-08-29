@@ -97,7 +97,7 @@ export async function POST(
             );
         }
 
-        // The address must match the client record — this is the actual gate.
+        // The address must match the client record. This is the actual gate.
         if (normalizeEmail(email) !== normalizeEmail(client.email)) {
             return json(
                 { error: "That email doesn't match the one this approval was sent to." },

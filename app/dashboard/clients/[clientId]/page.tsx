@@ -69,7 +69,7 @@ interface UpcomingPost {
   approvalStatus: string | null;
 }
 
-/** A post that actually went out — the client's record of work delivered. */
+/** A post that actually went out, the client's record of work delivered. */
 interface PublishedPost {
   id: number;
   platform: string;

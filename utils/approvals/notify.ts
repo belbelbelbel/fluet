@@ -2,7 +2,7 @@
  * Delivering approval links to a client after the fact.
  *
  * An approval link is emailed when the post is scheduled. If the client had no
- * email on file at that moment — or the address was wrong — the link was never
+ * email on file at that moment, or the address was wrong, the link was never
  * delivered and the approval silently stalls. Whenever we learn a usable
  * address, outstanding approvals are (re)sent.
  */

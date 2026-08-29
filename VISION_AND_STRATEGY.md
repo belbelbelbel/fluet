@@ -72,7 +72,7 @@
 
 ## 🚀 Positioning Statement
 
-**For small marketing agencies who struggle with approval chaos and client communication, Revvy is a workflow infrastructure platform that organizes content, manages approvals, and protects revenue—saving 10+ hours per week.**
+**For small marketing agencies who struggle with approval chaos and client communication, Revvy is a workflow infrastructure platform that organizes content, manages approvals, and protects revenue, saving 10+ hours per week.**
 
 **Unlike generic AI content tools, Revvy is built specifically for agencies managing multiple clients with structured workflows, payment enforcement, and professional client dashboards.**
 

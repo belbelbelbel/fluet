@@ -112,20 +112,20 @@ export function LandingHero() {
                 sizes="(max-width: 1024px) 100vw, 46vw"
                 /* object-center, not the old 20%: the source is 1.5:1 inside a
                    1.21:1 frame, so ~10% comes off each side. Centred keeps both
-                   subjects — biasing left would cut the foreground figure whose
+                   subjects. Biasing left would cut the foreground figure whose
                    hands are the point of the shot.
 
                    Shown in full colour. The studio is already near-monochrome
                    (white room, black equipment), so it sits on the pure-white
-                   palette without the caramel problem the previous photo had —
-                   no grayscale filter needed. */
+                   palette without the caramel problem the previous photo had.
+                   No grayscale filter needed. */
                 className="object-cover object-center"
               />
             </div>
 
           </div>
 
-          {/* One line of proof rather than a product diagram — see
+          {/* One line of proof rather than a product diagram. See
               ApprovalProof for why four mock attempts were abandoned. */}
           <div className="mt-9 sm:mt-11">
             <ApprovalProof />

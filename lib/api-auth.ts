@@ -16,7 +16,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
  * of every check. On /api/clients it was worse than a read: the GET path calls
  * CreateOrUpdateUser(), so a forged id also wrote new user rows.
  *
- * Clerk ids are not secrets — the frontend passed them in query strings, so they
+ * Clerk ids are not secrets. The frontend passed them in query strings, so they
  * sit in browser history, server logs, referrer headers and any analytics.
  *
  * The rule
@@ -31,7 +31,7 @@ export async function resolveClerkUserId(): Promise<string | null> {
     const authResult = await auth();
     if (authResult?.userId) return authResult.userId;
   } catch {
-    // auth() throws on expired/malformed tokens — fall through to currentUser().
+    // auth() throws on expired/malformed tokens, fall through to currentUser().
   }
   try {
     const user = await currentUser();

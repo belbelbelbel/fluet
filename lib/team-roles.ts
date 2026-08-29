@@ -3,7 +3,7 @@ export const TEAM_ROLES = [
   {
     id: "admin",
     label: "Admin",
-    description: "Full access — manage team, clients, and billing-adjacent settings",
+    description: "Full access. Manage team, clients, and billing-adjacent settings",
   },
   {
     id: "manager",

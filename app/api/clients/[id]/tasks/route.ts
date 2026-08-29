@@ -215,7 +215,7 @@ export async function POST(
             .execute();
 
         // Assigning on creation is just as much an assignment as reassigning
-        // later — notify the assignee either way.
+        // later. Notify the assignee either way.
         if (task?.assignedTo) {
             try {
                 const [assignee] = await db

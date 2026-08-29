@@ -339,11 +339,11 @@
 This is not "another content tool."
 This is a **Creator Operating System** built around how people actually behave today.
 
-We're not copying BuzzSumo—we're adapting their research logic for African creators.
+We're not copying BuzzSumo, we're adapting their research logic for African creators.
 
-We're not building for "creators" generically—we're building for specific Nigerian segments with specific needs.
+We're not building for "creators" generically, we're building for specific Nigerian segments with specific needs.
 
-We're not guessing—we're researching, measuring, and finding patterns.
+We're not guessing, we're researching, measuring, and finding patterns.
 
 **The goal:** Predictable, actionable, daily growth for Nigerian creators through intelligent content ideas + stacked post scheduling + auto-posting.
 

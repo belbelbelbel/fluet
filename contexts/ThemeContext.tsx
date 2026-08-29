@@ -12,7 +12,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-/** Marketing home stays light — dark mode is for the app shell only. */
+/** Marketing home stays light. Dark mode is for the app shell only. */
 function isLandingPath(pathname?: string | null): boolean {
   if (typeof window === "undefined") return false;
   const path = pathname ?? window.location.pathname;
@@ -26,8 +26,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Apply theme changes (landing path never gets .dark on <html>)
   const applyTheme = (newTheme: Theme) => {
     // "system" deliberately resolves to light rather than following the OS.
-    // Only the settings page has real dark styling — the rest of the dashboard
-    // has almost no `dark:` variants — so honouring an OS dark preference made
+    // Only the settings page has real dark styling. The rest of the dashboard
+    // has almost no `dark:` variants, so honouring an OS dark preference made
     // settings render dark while every other page stayed white. Dark is
     // opt-in until the rest of the app is themed.
     const resolved: "light" | "dark" = newTheme === "dark" ? "dark" : "light";

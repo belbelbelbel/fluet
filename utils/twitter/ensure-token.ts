@@ -27,7 +27,7 @@ export async function ensureTwitterAccessToken(
 
   if (!account.refreshToken) {
     return {
-      error: "Twitter token expired — reconnect Twitter in Settings",
+      error: "Twitter token expired. Reconnect Twitter in Settings",
     };
   }
 
@@ -45,7 +45,7 @@ export async function ensureTwitterAccessToken(
   } catch (e) {
     console.error("[Twitter] Token refresh failed:", e);
     return {
-      error: "Couldn’t refresh Twitter token — reconnect in Settings",
+      error: "Couldn’t refresh Twitter token. Reconnect in Settings",
     };
   }
 }

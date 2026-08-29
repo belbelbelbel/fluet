@@ -74,7 +74,7 @@ export async function resolveAgencyContext(
     };
   }
 
-  // Active membership on another agency — only if this user is not an owner workspace
+  // Active membership on another agency, only if this user is not an owner workspace
   if (
     membership?.agencyId &&
     membership.agencyId !== user.id &&

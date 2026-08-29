@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
  * Approval state changes and must never be cached.
  *
  * Without an explicit directive, 200/404/410 are all heuristically cacheable
- * (RFC 9111 §4.2.2) — browsers happily store a `410 Gone` on disk and keep
+ * (RFC 9111 §4.2.2). Browsers happily store a `410 Gone` on disk and keep
  * serving it long after the approval is valid again.
  */
 function json(body: unknown, status = 200) {
@@ -79,7 +79,7 @@ export async function GET(
             return json({ error: "Post not found" }, 404);
         }
 
-        // Expiry is a staleness backstop, not a security boundary — the token
+        // Expiry is a staleness backstop, not a security boundary. The token
         // itself is a 128-bit secret. Refuse only once the link can no longer
         // do anything useful (post already published, or already decided).
         // While the post is unpublished and still pending, the client must be

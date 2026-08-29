@@ -21,7 +21,7 @@ const toastDescription =
 
 export function ThemeToaster() {
   // Sonner renders in a portal outside the themed tree, so it cannot inherit
-  // `.dark` from <html> — it needs the resolved value passed explicitly.
+  // `.dark` from <html>. It needs the resolved value passed explicitly.
   const { resolvedTheme } = useTheme();
 
   return (

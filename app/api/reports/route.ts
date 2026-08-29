@@ -1,5 +1,5 @@
 /**
- * Reports API – list and create client reports
+ * Reports API. List and create client reports
  */
 
 import { NextRequest, NextResponse } from "next/server";

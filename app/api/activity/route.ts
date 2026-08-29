@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     const accessibleClients = ctx ? await getAccessibleClients(ctx) : [];
     const agencyClientIds = accessibleClients.map((c) => c.id);
 
-    // Client created events – show when the agency added a client (most recent first)
+    // Client created events, show when the agency added a client (most recent first)
     const recentClientsForActivity = [...accessibleClients]
       .sort(
         (a, b) =>

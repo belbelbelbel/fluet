@@ -35,7 +35,7 @@ const PLANS = [
     name: "Business",
     price: 25000,
     priceId: "price_1PyFN0Bibz3ZDixDqm9eYL8W",
-    description: "For small agencies managing 3–10 clients with a team behind them.",
+    description: "For small agencies managing 3-10 clients with a team behind them.",
     cta: "Start free",
     popular: true,
     features: [

@@ -1,12 +1,12 @@
 /**
- * Reference mock data generators — NOT used in production UI.
+ * Reference mock data generators. NOT used in production UI.
  *
  * Kept for future analytics prototyping and as documentation of what was
  * previously shown as fake metrics. Dashboard and analytics pages now gate
  * engagement/geo/social metrics behind honest "coming soon" states instead.
  */
 
-/** Previously used for dashboard engagement line chart (Jul–Dec sample data). */
+/** Previously used for dashboard engagement line chart (Jul-Dec sample data). */
 export const MOCK_DASHBOARD_ENGAGEMENT_CHART = [
   { month: "Jul", Facebook: 45, Instagram: 38, LinkedIn: 32 },
   { month: "Aug", Facebook: 48, Instagram: 42, LinkedIn: 35 },

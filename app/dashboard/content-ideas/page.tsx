@@ -341,7 +341,7 @@ function ContentIdeasPageInner() {
     );
   }
 
-  // No niche selected – show Primary Industry picker
+  // No niche selected, show Primary Industry picker
   if (!niche) {
     const customIndustries = ["other", "health_fitness", "real_estate", "creative_services", "tech_startups"];
     return (
@@ -367,7 +367,7 @@ function ContentIdeasPageInner() {
                   type="button"
                   onClick={() => {
                     if (isCustom) {
-                      // Focus custom niche: scroll / hint — keep typing box below
+                      // Focus custom niche: scroll / hint, keep typing box below
                       const el = document.getElementById("custom-niche-input");
                       el?.focus();
                       return;

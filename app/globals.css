@@ -17,7 +17,7 @@ body {
 }
 
 
-/* Typography — lighter weights */
+/* Typography, lighter weights */
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.01em;
   line-height: 1.3;
@@ -69,7 +69,7 @@ p, span, div, li {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-  /* Flat UI — no drop shadows */
+  /* Flat UI, no drop shadows */
   .shadow-sm,
   .shadow,
   .shadow-md,
@@ -81,7 +81,7 @@ p, span, div, li {
   }
 }
 
-/* Sonner toasts — minimal, no heavy borders */
+/* Sonner toasts, minimal with no heavy borders */
 [data-sonner-toaster] {
   font-family: inherit !important;
   --width: 360px;
@@ -249,7 +249,7 @@ p, span, div, li {
 /* ==========================================================================
    LANDING PAGE SYSTEM
    Scoped under `.landing` so the dashboard keeps Nunito and its own tokens.
-   Palette is a warm off-white canvas with near-black ink — the reference
+   Palette is a warm off-white canvas with near-black ink. The reference
    language is editorial print, not the usual SaaS gradient.
    ========================================================================== */
 
@@ -263,17 +263,17 @@ p, span, div, li {
      its hairline rather than by a fill, which is what keeps the page feeling
      clean instead of panelled. */
   --canvas: 255 255 255;      /* pure white */
-  --surface: 255 255 255;     /* cards — defined by --rule, not by contrast */
+  --surface: 255 255 255;     /* cards, defined by --rule, not by contrast */
   --ink: 15 15 16;            /* neutral near-black */
   --ink-soft: 82 82 88;       /* secondary copy */
-  --ink-faint: 112 112 120;   /* captions, meta — 4.6:1 on white */
+  --ink-faint: 112 112 120;   /* captions and meta, 4.6:1 on white */
   --rule: 228 228 232;        /* neutral hairlines */
   /* A hair off white, for hover and inset states only. With --canvas and
      --surface both pure white those states had nothing to shift to, so the
      Features card hover became a no-op. Light enough to keep the page reading
      as white; just enough to register as a change. */
   --inset: 250 250 251;
-  --accent: 26 61 47;         /* deep forest — the one colour on the page */
+  --accent: 26 61 47;         /* deep forest, the one colour on the page */
   --accent-soft: 236 241 238;
 
   background-color: rgb(var(--canvas));
@@ -321,7 +321,7 @@ p, span, div, li {
   font-family: var(--font-geist-mono), ui-monospace, monospace !important;
 }
 
-/* Small caps technical label — the Voice Aura detail that reads "designed" */
+/* Small caps technical label, the Voice Aura detail that reads "designed" */
 .landing .label {
   font-family: var(--font-geist-mono), ui-monospace, monospace !important;
   font-size: 0.6875rem;
@@ -359,7 +359,7 @@ p, span, div, li {
   50%      { transform: translateY(-7px); }
 }
 
-/* Respect the OS setting — motion is decoration, never the message. */
+/* Respect the OS setting. Motion is decoration, never the message. */
 @media (prefers-reduced-motion: reduce) {
   .landing [data-reveal] {
     opacity: 1;

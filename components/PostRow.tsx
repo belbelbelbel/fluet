@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Per-platform identity. Colour carries the platform so the text label can
- * stay quiet — previously every platform was an identically-shaped grey (or
+ * stay quiet. Previously every platform was an identically-shaped grey (or
  * arbitrarily amber) chip, which read as noise rather than information.
  */
 const PLATFORMS: Record<
@@ -57,13 +57,13 @@ const STATUS: Record<PostStatus, { label: string; rail: string; dot: string; fg:
   changes_requested: { label: "Changes requested", rail: "bg-orange-500", dot: "bg-orange-500", fg: "text-orange-600 dark:text-orange-400" },
   rejected: { label: "Rejected", rail: "bg-rose-500", dot: "bg-rose-500", fg: "text-rose-600 dark:text-rose-400" },
   scheduled: { label: "Scheduled", rail: "bg-slate-300 dark:bg-slate-600", dot: "bg-slate-400", fg: "text-slate-500" },
-  // Terminal state — a teal rail separates "went out" from the amber/emerald
+  // Terminal state. A teal rail separates "went out" from the amber/emerald
   // of the approval pipeline at a glance.
   published: { label: "Published", rail: "bg-teal-500", dot: "bg-teal-500", fg: "text-teal-600 dark:text-teal-400" },
 };
 
 /**
- * "in 3 days" beats "8 Aug, 00:16" for a queue you scan — the exact stamp
+ * "in 3 days" beats "8 Aug, 00:16" for a queue you scan. The exact stamp
  * stays available as a tooltip.
  */
 export function relativeTime(iso: string | null): string {
@@ -152,7 +152,7 @@ export function PostRow({
         interactive && ("hover:bg-slate-50 dark:hover:bg-white/[0.03]")
       )}
     >
-      {/* Status rail — state readable before a single word is parsed */}
+      {/* Status rail, state readable before a single word is parsed */}
       <span
         aria-hidden
         className={cn("absolute left-0 top-4 bottom-4 w-[3px] rounded-full", state.rail)}

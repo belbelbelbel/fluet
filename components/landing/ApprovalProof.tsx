@@ -10,7 +10,7 @@
  * *about* the product rather than anything real.
  *
  * So no diagram. One sentence carrying the mechanism the subhead doesn't
- * mention — that possession of the link is not enough — plus the audit line
+ * mention, that possession of the link is not enough, plus the audit line
  * underneath. This is the one claim competitors can't make, and it needs no
  * illustration to land.
  *
@@ -18,7 +18,7 @@
  * timestamp reads as a fake testimonial. A statement about how the product
  * works is both honest and stronger.
  *
- * Deliberately static — the removed mock carried a 7s animation loop whose only
+ * Deliberately static. The removed mock carried a 7s animation loop whose only
  * job was to make a diagram look alive.
  */
 export function ApprovalProof() {

@@ -11,7 +11,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** GET — preview invite (public enough for signed-in users; no secrets beyond email) */
+/** GET. Preview invite (public enough for signed-in users; no secrets beyond email) */
 export async function GET(
   _req: NextRequest,
   { params }: { params: { token: string } }
@@ -49,7 +49,7 @@ export async function GET(
   }
 }
 
-/** POST — accept invite by token (must be signed in as the invited email) */
+/** POST. Accept invite by token (must be signed in as the invited email) */
 export async function POST(
   _req: NextRequest,
   { params }: { params: { token: string } }
@@ -172,7 +172,7 @@ export async function POST(
         .where(eq(Users.id, user.id))
         .execute();
     } catch {
-      /* optional columns / constraints — ignore */
+      /* optional columns / constraints, ignore */
     }
 
     return NextResponse.json({

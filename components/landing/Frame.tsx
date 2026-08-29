@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 /**
  * Section wrapper. Previously drew vertical margin rules with crosshair corner
- * marks; those were removed — at the wider measure they fenced the content in
+ * marks; those were removed. At the wider measure they fenced the content in
  * rather than framing it.
  */
 export function RuledSection({

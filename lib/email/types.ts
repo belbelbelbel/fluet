@@ -29,7 +29,7 @@ export interface NotificationEmailData {
   /** Approval identity verification */
   code?: string;
   codeTtlMinutes?: number;
-  /** Verified email of whoever made the decision — proves it was the client */
+  /** Verified email of whoever made the decision, proves it was the client */
   decidedByEmail?: string;
   /** Client assignment */
   clientNames?: string[];

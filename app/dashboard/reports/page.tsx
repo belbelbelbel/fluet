@@ -112,7 +112,7 @@ export default function ReportsPage() {
       }
       const data = await res.json();
       setReports((prev) => [data.report, ...prev]);
-      showToast.success("Report generated", `${data.report.clientName} – last 30 days`);
+      showToast.success("Report generated", `${data.report.clientName}, last 30 days`);
     } catch (e) {
       showToast.error("Error", e instanceof Error ? e.message : "Could not generate report");
     } finally {
@@ -127,7 +127,7 @@ export default function ReportsPage() {
       const data = report.reportData;
       const text = data
         ? [
-            `${report.clientName} – ${report.periodStart} to ${report.periodEnd}`,
+            `${report.clientName}, ${report.periodStart} to ${report.periodEnd}`,
             "",
             "Summary",
             `Posts scheduled: ${data.postsScheduled}`,

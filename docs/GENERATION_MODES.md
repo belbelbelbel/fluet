@@ -23,23 +23,23 @@ The content generator supports **generation modes** and **client brand voice** t
 
 Stored in `client_brand_voice`:
 
-- **Brand description** – Personality, positioning, what makes it unique
-- **Target audience** – Demographics, goals, pain points, language patterns
-- **Tone** – Formal, casual, funny, professional
-- **Industry** – e.g. Food & Beverage, Fashion, Tech
-- **Do's / Don'ts** – What to include or avoid
-- **Example posts** – Reference content to match
+- **Brand description**: Personality, positioning, what makes it unique
+- **Target audience**: Demographics, goals, pain points, language patterns
+- **Tone**: Formal, casual, funny, professional
+- **Industry**: e.g. Food & Beverage, Fashion, Tech
+- **Do's / Don'ts**: What to include or avoid
+- **Example posts**: Reference content to match
 - **Preferred hashtags** / **Banned words**
 
 When generating for a client, brand voice is automatically injected into prompts.
 
 ## Files
 
-- `utils/ai/prompt-builder.ts` – Mode definitions, brand voice injection
-- `utils/ai/optimized-generator.ts` – Uses prompt-builder, calls OpenAI
-- `app/api/generate/route.ts` – Accepts `generationMode`, fetches brand voice when `clientId` present
-- `app/dashboard/generate/page.tsx` – Mode selector, brand voice display
-- `app/dashboard/clients/[clientId]/brand-voice/page.tsx` – Edit brand voice
+- `utils/ai/prompt-builder.ts`: Mode definitions, brand voice injection
+- `utils/ai/optimized-generator.ts`: Uses prompt-builder, calls OpenAI
+- `app/api/generate/route.ts`: Accepts `generationMode`, fetches brand voice when `clientId` present
+- `app/dashboard/generate/page.tsx`: Mode selector, brand voice display
+- `app/dashboard/clients/[clientId]/brand-voice/page.tsx`: Edit brand voice
 
 ## DB Migration
 

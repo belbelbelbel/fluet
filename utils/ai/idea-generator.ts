@@ -6,7 +6,7 @@
 import type { ContentIdea, Niche, HookStyle, Format, ContentStrategy } from "@/lib/content-ideas";
 import { DEEPSEEK_MODELS, getChatClient } from "./client";
 
-/** Flash is best for batch idea JSON — fast + cheap */
+/** Flash is best for batch idea JSON, fast + cheap */
 const MODEL = DEEPSEEK_MODELS.flash;
 
 const HOOK_STYLES: HookStyle[] = ["story", "question", "shock", "value", "tip"];
@@ -28,6 +28,8 @@ Your ideas MUST:
 2. Include naijaTone variants: mild (professional English), moderate (light Pidgin), heavy (full Pidgin)
 3. Have compelling hook examples that stop the scroll
 4. Align with proven content strategies (viral hooks, authority, testimonials, etc.)
+
+Never use an em dash (—) or en dash (–) in any field. Use a comma or a full stop instead. They read as AI-written.
 
 Output valid JSON only. No markdown, no explanation.`;
 

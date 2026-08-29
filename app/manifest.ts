@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 /**
- * Served at /manifest.webmanifest — the path referenced by metadata.manifest
+ * Served at /manifest.webmanifest, the path referenced by metadata.manifest
  * in app/layout.tsx. Lets the dashboard be installed to a phone home screen.
  *
  * No "maskable" icon is declared on purpose: maskable icons are cropped to a

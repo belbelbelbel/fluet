@@ -227,7 +227,14 @@ export class OptimizedAIGenerator {
 
   private cleanContent(content: string): string {
     return content
-      .replace(/\s*[—–]\s*(?=\d)/g, ", ")
+      // Em and en dashes are the loudest AI tell in a caption, so none survive
+      // into published copy. Between digits the dash is a range and collapses to
+      // a hyphen ("9-5", not "9, 5"); opening a line it is a bullet marker;
+      // anywhere else it is punctuation and becomes a comma.
+      .replace(/(\d)[ \t]*[—–][ \t]*(?=[₦$€£]?\d)/g, "$1-")
+      .replace(/^[ \t]*[—–][ \t]+/gm, "")
+      .replace(/[ \t]*[—–][ \t]*$/gm, "")
+      .replace(/[ \t]*[—–][ \t]*/g, ", ")
       .replace(/\*\*(.*?)\*\*/g, "$1")
       .replace(/__(.*?)__/g, "$1")
       .replace(/\*(.*?)\*/g, "$1")

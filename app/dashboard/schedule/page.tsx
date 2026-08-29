@@ -509,7 +509,7 @@ export default function DashboardSchedulePage() {
         fetchScheduledPosts();
         if (data.approvalLink) {
           setApprovalLinkModal({ open: true, link: data.approvalLink });
-          // Say plainly whether the client was actually emailed — "when
+          // Say plainly whether the client was actually emailed. "When
           // possible" left it ambiguous whether anything was sent.
           if (data.approvalEmailWarning) {
             showToast.warning(
@@ -791,7 +791,7 @@ export default function DashboardSchedulePage() {
           <p className={"text-muted-foreground"}>Loading scheduled posts...</p>
         </div>
       ) : viewMode === "calendar" ? (
-        /* Calendar View — the calendar always renders. Replacing it with an
+        /* Calendar View. The calendar always renders. Replacing it with an
            empty state meant you could never see the month you were scheduling
            into until a post already existed. */
         <div className="space-y-4">
@@ -1388,7 +1388,7 @@ export default function DashboardSchedulePage() {
         variant="destructive"
       />
 
-      {/* Approval link — manual fallback when client email is delayed or missing */}
+      {/* Approval link, manual fallback when client email is delayed or missing */}
       <Dialog
         open={approvalLinkModal.open}
         onOpenChange={(open) =>

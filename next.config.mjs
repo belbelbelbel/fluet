@@ -28,7 +28,7 @@ const nextConfig = {
 
   /**
    * /pricing and /features were standalone pages duplicating sections the
-   * landing page already has (#pricing, #features), in the older purple design —
+   * landing page already has (#pricing, #features), in the older purple design,
    * so the marketing site contradicted itself depending on the route taken.
    *
    * Redirects rather than deletion: nine places still link to /pricing as the

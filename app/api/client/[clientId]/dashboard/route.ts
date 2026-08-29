@@ -1,5 +1,5 @@
 /**
- * Client dashboard API – stats, posts, pending approvals for the logged-in client
+ * Client dashboard API. Stats, posts, pending approvals for the logged-in client
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -107,7 +107,7 @@ export async function GET(
         pendingApprovals: pendingApprovalsWithPosts.length,
         publishedThisMonth,
         upcomingCount: upcoming.length,
-        // Honest: no social engagement yet — surface publish rate instead
+        // Honest: no social engagement yet, surface publish rate instead
         publishRate:
           postsThisMonth > 0
             ? Math.round((publishedThisMonth / postsThisMonth) * 100)

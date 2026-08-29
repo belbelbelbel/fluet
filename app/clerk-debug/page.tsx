@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * TEMPORARY diagnostic page — safe to delete.
+ * TEMPORARY diagnostic page. Safe to delete.
  * Reports whether Clerk's script/API can actually be reached from THIS browser.
  * Visit http://localhost:3000/clerk-debug and screenshot the result.
  */
@@ -52,16 +52,16 @@ export default function ClerkDebugPage() {
           { mode: "cors" }
         );
         // 401 is expected here (no dev-browser token on a bare fetch) and still
-        // proves the domain is reachable — only a thrown error means blocked.
+        // proves the domain is reachable. Only a thrown error means blocked.
         push(
           "fetch Clerk API",
-          `HTTP ${res.status}${res.status === 401 ? " (reachable — expected)" : ""}`,
+          `HTTP ${res.status}${res.status === 401 ? " (reachable, expected)" : ""}`,
           true
         );
       } catch (e) {
         push(
           "fetch Clerk API",
-          `BLOCKED / FAILED — ${(e as Error).message}`,
+          `BLOCKED / FAILED. ${(e as Error).message}`,
           false
         );
       }
@@ -89,7 +89,7 @@ export default function ClerkDebugPage() {
       push("Clerk.version", String(C?.version ?? "n/a"), null);
 
       // The decisive rows: if Clerk thinks a session exists, <SignIn> renders
-      // nothing at all — which looks identical to "the form is broken".
+      // nothing at all, which looks identical to "the form is broken".
       const session = C?.session as { id?: string; status?: string } | undefined;
       const user = C?.user as { primaryEmailAddress?: { emailAddress?: string } } | undefined;
       push("Clerk.session", session ? `EXISTS (status: ${session.status ?? "?"})` : "none", null);
@@ -101,8 +101,8 @@ export default function ClerkDebugPage() {
       push(
         "→ diagnosis",
         session
-          ? "Signed in client-side — this is why no form renders. Click Sign out below."
-          : "No client session — form should render.",
+          ? "Signed in client-side. This is why no form renders. Click Sign out below."
+          : "No client session, form should render.",
         session ? false : true
       );
       push(

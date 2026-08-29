@@ -16,7 +16,7 @@ function currentReturnPath(pathname: string | null): string {
 
 /**
  * Wait for Clerk, then either render the dashboard or send expired /
- * signed-out users straight to sign-in — no messaging.
+ * signed-out users straight to sign-in, no messaging.
  */
 export function DashboardAuthGate({ children }: DashboardAuthGateProps) {
   const { isLoaded, isSignedIn, userId } = useAuth();

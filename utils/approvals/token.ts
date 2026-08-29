@@ -33,7 +33,7 @@ export const APPROVAL_MIN_WINDOW_HOURS = 72;
  * Compute when an approval link should stop working.
  *
  * The link is valid until the post is due (clients approve before publish),
- * but never for less than APPROVAL_MIN_WINDOW_HOURS from now — so short-notice
+ * but never for less than APPROVAL_MIN_WINDOW_HOURS from now, so short-notice
  * and already-past schedules still produce a usable link.
  */
 export function computeApprovalExpiry(

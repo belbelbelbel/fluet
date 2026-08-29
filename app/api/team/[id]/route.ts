@@ -33,7 +33,7 @@ async function resolveClerkId() {
   return clerkUserId;
 }
 
-/** PATCH /api/team/[id] — update role and/or client assignments (id = membershipId) */
+/** PATCH /api/team/[id]. Update role and/or client assignments (id = membershipId) */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -72,8 +72,8 @@ export async function PATCH(
 
     let assigned: number[] | undefined;
     if (Array.isArray(clientIds)) {
-      // Capture the prior set so we only announce genuinely new work —
-      // re-saving an unchanged list shouldn't spam the member.
+      // Capture the prior set so we only announce genuinely new work.
+      // Re-saving an unchanged list shouldn't spam the member.
       const before = await GetClientAssignmentsForAgency(ctx.agencyId);
       const previous = new Set(
         before.filter((a) => a.userId === membership.userId).map((a) => a.clientId)
@@ -109,7 +109,7 @@ export async function PATCH(
             console.error("[Team PATCH] Assignment email failed:", emailResult.error);
           }
         } catch (emailError) {
-          // Assignment already succeeded — email is best effort
+          // Assignment already succeeded, email is best effort
           console.error("[Team PATCH] Assignment email error:", emailError);
         }
       }
@@ -130,7 +130,7 @@ export async function PATCH(
   }
 }
 
-/** DELETE /api/team/[id] — soft-remove member */
+/** DELETE /api/team/[id]. Soft-remove member */
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }

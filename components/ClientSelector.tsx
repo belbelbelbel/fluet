@@ -27,7 +27,7 @@ interface Client {
 }
 
 interface ClientSelectorProps {
-  /** Clerk userId – when passed, fetch uses ?userId= so API always gets auth even if cookies lag */
+  /** Clerk userId, when passed, fetch uses ?userId= so API always gets auth even if cookies lag */
   userId?: string | null;
   selectedClientId?: number | null;
   onClientChange?: (clientId: number | null) => void;

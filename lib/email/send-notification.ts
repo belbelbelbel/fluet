@@ -35,8 +35,8 @@ export function getResendFromAddress(): string | null {
 
 /**
  * Base URL for links inside emails.
- * Prefer EMAIL_APP_URL (production domain) so links match the sending domain —
- * localhost links are a common spam trigger.
+ * Prefer EMAIL_APP_URL (production domain) so links match the sending domain.
+ * Localhost links are a common spam trigger.
  */
 export function getEmailAppUrl(): string {
   const preferred =
@@ -64,7 +64,7 @@ export async function sendNotificationEmail(params: {
 
   const resend = getResendClient();
   if (!resend) {
-    console.error("[Email] RESEND_API_KEY is not configured — email not sent", {
+    console.error("[Email] RESEND_API_KEY is not configured, email not sent", {
       type,
       to,
     });
@@ -77,7 +77,7 @@ export async function sendNotificationEmail(params: {
 
   const from = getResendFromAddress();
   if (!from) {
-    console.error("[Email] RESEND_FROM_EMAIL is not configured — email not sent", {
+    console.error("[Email] RESEND_FROM_EMAIL is not configured, email not sent", {
       type,
       to,
     });

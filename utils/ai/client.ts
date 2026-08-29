@@ -1,20 +1,20 @@
 /**
- * Shared LLM client — DeepSeek first (OpenAI-compatible API).
+ * Shared LLM client. DeepSeek first (OpenAI-compatible API).
  * Docs: https://api-docs.deepseek.com/
  *
  * Models (2026):
  * - deepseek-v4-flash  → default for captions, ideas, high volume
  * - deepseek-v4-pro    → premium / strategy / long-form
  *
- * Legacy IDs deepseek-chat / deepseek-reasoner retire 2026-07-24 — do not use.
+ * Legacy IDs deepseek-chat / deepseek-reasoner retire 2026-07-24. Do not use.
  */
 
 import OpenAI from "openai";
 
 export const DEEPSEEK_MODELS = {
-  /** Fast + cheap — best for tweets, IG captions, content ideas */
+  /** Fast + cheap. Best for tweets, IG captions, content ideas */
   flash: "deepseek-v4-flash",
-  /** Higher quality — brand strategy, audience research, long LinkedIn */
+  /** Higher quality. Brand strategy, audience research, long LinkedIn */
   pro: "deepseek-v4-pro",
 } as const;
 
